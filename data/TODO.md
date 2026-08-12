@@ -1,3 +1,5 @@
+## 담당: 김태윤
+
 # data TODO
 
 - [ ] GFW API 인증키 발급 (기획서: 외부 데이터 연동 - Global Fishing Watch 조업활동 데이터 확보)
