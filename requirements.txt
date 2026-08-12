@@ -1,1 +1,9 @@
-
+fastapi
+streamlit
+lightgbm
+shap
+pandas
+geopandas
+python-dotenv
+requests
+plotly
