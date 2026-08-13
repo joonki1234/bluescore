@@ -1,0 +1,16 @@
+{
+  "query_key": "vessel_detail_events_priority__source_events__2026-08-13T08-22-34.917Z",
+  "source_vessel_list": "C:\\Users\\taeyo\\OneDrive\\Desktop\\bluescore\\raw_data\\gfw\\events\\events__2026-08-13T08-22-34.917Z\\vessels_with_events.json",
+  "scope_note": "이벤트 1건 이상 있는 vesselId만 대상 (구조적 우선순위, 값 기반 필터링 아님). 이벤트 0건 22,382척은 보류 — rules_gfw.md 2-2번 참고.",
+  "dataset": "public-global-vessel-identity:latest",
+  "started_at": "2026-08-13T08:41:35.267Z",
+  "updated_at": "2026-08-13T08:45:54.126Z",
+  "status": "complete",
+  "total_target": 9723,
+  "completed_count": 9723,
+  "failed": [],
+  "registry_matched_count": 271,
+  "registry_unmatched_count": 9452,
+  "registry_owners_nonempty_count": 217,
+  "completed_at": "2026-08-13T08:45:54.129Z"
+}
