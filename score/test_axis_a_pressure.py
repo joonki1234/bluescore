@@ -119,3 +119,31 @@ class TestComputeAxisAPressure:
         result = compute_axis_a_pressure(congested_events + isolated_events)
 
         assert result["v1"].congestion_density_raw > result["v4"].congestion_density_raw
+
+    def test_congestion_excludes_own_revisits(self):
+        # 다른 배는 하나도 없이, v1 혼자 같은 격자를 5번 반복 방문 ->
+        # 혼잡압력은 "다른 배 기준"이므로 0이어야 한다 (자기 자신은 카운트하지 않음).
+        solo_events = [
+            make_event(f"s{i}", "v1", f"2026-08-0{i + 1}T00:00:00Z", 10.0, 20.0) for i in range(5)
+        ]
+        result = compute_axis_a_pressure(solo_events)
+
+        assert result["v1"].congestion_density_raw == 0.0
+        # 재방문압력 자체는 여전히 0보다 커야 한다 (반복 방문 신호는 살아있음)
+        assert result["v1"].revisit_pressure_raw > 0.0
+
+    def test_interaction_term_amplifies_when_both_signals_high(self):
+        # v1: 같은 혼잡한 격자(다른 배 v2, v3 포함)를 짧은 간격으로 반복 방문
+        repeated_congested_events = [
+            make_event("a1", "v1", "2026-08-01T00:00:00Z", 10.0, 20.0),
+            make_event("a2", "v1", "2026-08-01T02:00:00Z", 10.0, 20.0),
+            make_event("a3", "v1", "2026-08-01T04:00:00Z", 10.0, 20.0),
+            make_event("a4", "v2", "2026-08-01T00:30:00Z", 10.0, 20.0),
+            make_event("a5", "v3", "2026-08-01T01:00:00Z", 10.0, 20.0),
+        ]
+        result = compute_axis_a_pressure(repeated_congested_events)
+        v1 = result["v1"]
+
+        plain_weighted_sum = 0.5 * v1.revisit_pressure_raw + 0.5 * v1.congestion_density_raw
+        assert v1.interaction_raw > 0.0
+        assert v1.axis_a_pressure_raw > plain_weighted_sum

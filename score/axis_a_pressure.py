@@ -15,29 +15,35 @@ A축(자원 압력) 지표 산출 — 동일·인접 격자 내 조업 이벤트
     2. 재방문간격: 선박별로, 동일/인접(체비쇼프 거리 1 이내) 격자에서
        발생한 직전 이벤트와의 시간 간격을 구하고 평균낸다. 간격이 짧을수록
        압력이 높다는 방향으로 점수화한다(반비례 변환).
-    3. 혼잡가중압력: 전체 이벤트를 격자별로 집계해 밀도(이벤트 수)를 구하고,
-       선박이 조업한 격자들의 평균 밀도를 구한다.
-    4. 두 raw 값을 선박 단위로 집계해 반환한다.
+    3. 혼잡가중압력: 전체 이벤트를 격자별로 집계해 밀도(이벤트 수)를 구하되,
+       선박 자기 자신의 이벤트는 밀도에서 제외한다 — "다른 배들이 이미
+       몰려있는 곳인가"만 측정하기 위함이다 (자기 자신의 재방문 빈도는
+       revisit_pressure_raw가 이미 담당한다).
+    4. 재방문압력과 혼잡압력을 가중합으로 결합하되, 상호작용(interaction)
+       항을 더해 "내가 자주 오는 곳(revisit 높음) + 그곳이 원래도 혼잡한
+       곳(congestion 높음)"인 경우를 단순 합보다 더 크게 반영한다:
+         axis_a_pressure_raw = revisit_weight * revisit_raw
+                              + congestion_weight * congestion_raw
+                              + interaction_weight * revisit_raw * congestion_raw
+       (2026-08-13, 오동규·김준기 논의로 결정 — 혼잡한 해역을 반복 착취하는
+       것이 한산한 해역을 반복 방문하는 것보다 자원에 더 큰 압력을 준다는
+       판단에 따름.)
+    5. 두 raw 값과 결합값을 선박 단위로 집계해 반환한다.
 
 주의:
     - 이 모듈은 유사 선박군 내 백분위 정규화 이전의 원값(raw value) 산출까지만
       담당한다. 절대 점수가 아니며, 점수조립 단계에서 유사 선박군 내 상대값으로
       다시 정규화되어야 한다.
-    - 격자 크기(GRID_CELL_SIZE_DEG), 재방문압력 변환 계수, 두 구성요소 결합
-      가중치는 전부 팀에서 아직 확정하지 않은 잠정값이며 검증 후 교체해야 한다.
-      두 구성요소는 스케일이 서로 다르므로(revisit_pressure_raw는 시간 기반
-      반비례 값, congestion_density_raw는 이벤트 개수), 결합 raw 값
+    - 격자 크기(GRID_CELL_SIZE_DEG), 재방문압력 변환 계수, 결합 가중치
+      (AXIS_A_REVISIT_WEIGHT, AXIS_A_CONGESTION_WEIGHT, AXIS_A_INTERACTION_WEIGHT)는
+      전부 팀에서 아직 확정하지 않은 잠정값이며 검증 후 교체해야 한다.
+      세 항의 스케일이 서로 달라(revisit_pressure_raw는 시간 기반 반비례 값,
+      congestion_density_raw는 이벤트 개수, 상호작용항은 그 곱) 결합 raw 값
       (axis_a_pressure_raw)을 그대로 쓰기보다 점수조립 단계에서 각 raw 값을
       그룹 내 백분위로 개별 정규화한 뒤 합치는 방식으로 대체될 수 있다.
     - 혼잡가중압력은 "자원이 실제로 풍부해서 몰린 경우"와 "단순히 접근이 편한
       지형이라 몰린 경우"를 구분하지 못한다 (기획서 리스크 ⑥번). 추후 CPUE 등
       자원 밀도 대리지표로 보정이 필요하다.
-    - [팀 논의 대기] 혼잡가중압력(congestion_density_raw) 계산에서 격자별
-      밀도를 셀 때 선박 자기 자신의 재방문 이벤트도 그대로 카운트한다. 즉 같은
-      해역을 혼자 자주 반복 방문하는 선박은 "다른 배가 없어도" 혼잡압력이 함께
-      올라가며, 이는 재방문압력(revisit_pressure_raw)과 신호가 겹쳐 이중 가중되는
-      효과가 있다. 다른 선박의 이벤트만 카운트하도록 바꿀지 여부는 아직 팀에서
-      결정하지 않았다 (2026-08-13 기준 보류 — 오동규 확인 필요).
 """
 
 from collections import Counter
@@ -61,9 +67,12 @@ ADJACENT_GRID_CHEBYSHEV_DISTANCE = 1
 REVISIT_PRESSURE_SCALE_HOURS = 24.0
 REVISIT_INTERVAL_EPSILON_HOURS = 1.0
 
-# A축 raw 값 결합 시 재방문압력/혼잡압력 가중치 — 잠정값
+# A축 raw 값 결합 시 재방문압력/혼잡압력/상호작용항 가중치 — 잠정값.
+# interaction 항은 "혼잡한 곳을 반복 착취"하는 경우를 단순 합보다 더 크게
+# 반영하기 위한 것 (revisit_raw * congestion_raw에 곱해짐).
 AXIS_A_REVISIT_WEIGHT = 0.5
 AXIS_A_CONGESTION_WEIGHT = 0.5
+AXIS_A_INTERACTION_WEIGHT = 0.1
 
 GridCell = Tuple[int, int]
 
@@ -86,6 +95,7 @@ class VesselAxisAResult:
     avg_revisit_interval_hours: Optional[float] = None
     revisit_pressure_raw: float = 0.0
     congestion_density_raw: float = 0.0
+    interaction_raw: float = 0.0
     axis_a_pressure_raw: float = 0.0
 
 
@@ -211,6 +221,7 @@ def compute_axis_a_pressure(
     cell_size_deg: float = GRID_CELL_SIZE_DEG,
     revisit_weight: float = AXIS_A_REVISIT_WEIGHT,
     congestion_weight: float = AXIS_A_CONGESTION_WEIGHT,
+    interaction_weight: float = AXIS_A_INTERACTION_WEIGHT,
 ) -> Dict[str, VesselAxisAResult]:
     """
     조업 이벤트 리스트로부터 선박별 A축(자원 압력) raw 값을 산출한다.
@@ -221,7 +232,9 @@ def compute_axis_a_pressure(
             이벤트가 섞여 있어야 혼잡가중압력을 제대로 계산할 수 있다.
         cell_size_deg: 격자 한 변의 크기 (도 단위)
         revisit_weight: 결합 raw 값에서 재방문압력에 부여할 가중치
-        congestion_weight: 결합 raw 값에서 혼잡압력에 부여할 가중치
+        congestion_weight: 결합 raw 값에서 혼잡압력(다른 선박 기준)에 부여할 가중치
+        interaction_weight: "재방문압력 × 혼잡압력" 상호작용항에 부여할 가중치.
+            혼잡한 해역을 반복 방문하는 경우를 단순 가중합보다 더 크게 반영한다.
 
     Returns:
         {vessel_id: VesselAxisAResult} 딕셔너리.
@@ -236,6 +249,11 @@ def compute_axis_a_pressure(
     vessel_ids.discard(None)
 
     density_by_cell = Counter(gdf["gridCell"]) if not gdf.empty else Counter()
+    # 선박별로 자기 자신이 각 격자에 남긴 이벤트 수 — 혼잡압력 계산 시 이만큼을
+    # 밀도에서 빼서 "다른 배들만의 밀도"를 구한다.
+    own_vessel_cell_counts = (
+        Counter(zip(gdf["vesselId"], gdf["gridCell"])) if not gdf.empty else Counter()
+    )
 
     results: Dict[str, VesselAxisAResult] = {}
 
@@ -254,15 +272,20 @@ def compute_axis_a_pressure(
         revisit_raw = revisit_pressure_from_interval(avg_interval)
 
         if vessel_events_sorted:
-            # 주의: density_by_cell은 선박 자기 자신의 이벤트도 포함해 카운트한다.
-            # [팀 논의 대기] 모듈 docstring 참고 — 자기 재방문을 제외할지 미정.
-            congestion_raw = sum(
-                density_by_cell[e["gridCell"]] for e in vessel_events_sorted
-            ) / len(vessel_events_sorted)
+            other_vessel_densities = [
+                density_by_cell[e["gridCell"]] - own_vessel_cell_counts[(vessel_id, e["gridCell"])]
+                for e in vessel_events_sorted
+            ]
+            congestion_raw = sum(other_vessel_densities) / len(other_vessel_densities)
         else:
             congestion_raw = 0.0
 
-        combined_raw = revisit_weight * revisit_raw + congestion_weight * congestion_raw
+        interaction_raw = revisit_raw * congestion_raw
+        combined_raw = (
+            revisit_weight * revisit_raw
+            + congestion_weight * congestion_raw
+            + interaction_weight * interaction_raw
+        )
 
         results[vessel_id] = VesselAxisAResult(
             vessel_id=vessel_id,
@@ -271,6 +294,7 @@ def compute_axis_a_pressure(
             avg_revisit_interval_hours=avg_interval,
             revisit_pressure_raw=revisit_raw,
             congestion_density_raw=congestion_raw,
+            interaction_raw=interaction_raw,
             axis_a_pressure_raw=combined_raw,
         )
 
