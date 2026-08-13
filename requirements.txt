@@ -3,6 +3,7 @@ streamlit
 lightgbm
 shap
 pandas
+openpyxl
 geopandas
 python-dotenv
 requests
