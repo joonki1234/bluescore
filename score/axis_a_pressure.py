@@ -32,6 +32,12 @@ A축(자원 압력) 지표 산출 — 동일·인접 격자 내 조업 이벤트
     - 혼잡가중압력은 "자원이 실제로 풍부해서 몰린 경우"와 "단순히 접근이 편한
       지형이라 몰린 경우"를 구분하지 못한다 (기획서 리스크 ⑥번). 추후 CPUE 등
       자원 밀도 대리지표로 보정이 필요하다.
+    - [팀 논의 대기] 혼잡가중압력(congestion_density_raw) 계산에서 격자별
+      밀도를 셀 때 선박 자기 자신의 재방문 이벤트도 그대로 카운트한다. 즉 같은
+      해역을 혼자 자주 반복 방문하는 선박은 "다른 배가 없어도" 혼잡압력이 함께
+      올라가며, 이는 재방문압력(revisit_pressure_raw)과 신호가 겹쳐 이중 가중되는
+      효과가 있다. 다른 선박의 이벤트만 카운트하도록 바꿀지 여부는 아직 팀에서
+      결정하지 않았다 (2026-08-13 기준 보류 — 오동규 확인 필요).
 """
 
 from collections import Counter
@@ -248,6 +254,8 @@ def compute_axis_a_pressure(
         revisit_raw = revisit_pressure_from_interval(avg_interval)
 
         if vessel_events_sorted:
+            # 주의: density_by_cell은 선박 자기 자신의 이벤트도 포함해 카운트한다.
+            # [팀 논의 대기] 모듈 docstring 참고 — 자기 재방문을 제외할지 미정.
             congestion_raw = sum(
                 density_by_cell[e["gridCell"]] for e in vessel_events_sorted
             ) / len(vessel_events_sorted)
