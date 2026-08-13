@@ -8,7 +8,7 @@ import pytest
 
 from score.axis_b_baseline import (
     SkippedRow,
-    compute_actual_fuel_kg,
+    compute_estimated_fuel_kg,
     compute_axis_b_efficiency,
     compute_residual,
     fit_baseline_model,
@@ -54,18 +54,18 @@ def make_dummy_dataset():
     return large_fast, small_slow
 
 
-class TestComputeActualFuelKg:
+class TestComputeEstimatedFuelKg:
     def test_matches_axis_b_physics_directly(self):
         row = make_row("v1", tonnage_gt=50.0, average_speed_knots=10.0, duration_hours=5.0)
         expected = estimate_fuel_consumption(tonnage_gt=50.0, speed_kn=10.0, operating_hours=5.0)
-        assert compute_actual_fuel_kg(row) == expected
+        assert compute_estimated_fuel_kg(row) == expected
 
 
 class TestComputeResidual:
-    def test_positive_when_actual_exceeds_expected(self):
+    def test_positive_when_estimated_exceeds_expected(self):
         assert compute_residual(100.0, 80.0) == 20.0
 
-    def test_negative_when_actual_below_expected(self):
+    def test_negative_when_estimated_below_expected(self):
         assert compute_residual(80.0, 100.0) == -20.0
 
 
@@ -134,8 +134,8 @@ class TestComputeAxisBEfficiency:
         results = compute_axis_b_efficiency(repeated_vessel_rows, model)
 
         assert results["repeatv"].used_row_count == 2
-        assert results["repeatv"].axis_b_residual_raw == pytest.approx(
-            compute_residual(results["repeatv"].actual_fuel_kg, results["repeatv"].expected_fuel_kg)
+        assert results["repeatv"].residual_raw == pytest.approx(
+            compute_residual(results["repeatv"].estimated_fuel_kg, results["repeatv"].expected_fuel_kg)
         )
 
     def test_end_to_end_pipeline_runs_without_error(self):
@@ -147,4 +147,4 @@ class TestComputeAxisBEfficiency:
         assert len(results) == len(large_fast) + len(small_slow)
         for vessel_id, result in results.items():
             assert result.used_row_count == 1
-            assert result.actual_fuel_kg > 0
+            assert result.estimated_fuel_kg > 0

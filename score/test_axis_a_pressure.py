@@ -76,7 +76,7 @@ class TestComputeAxisAPressure:
 
         assert result["v1"].used_event_count == 1
         assert result["v1"].avg_revisit_interval_hours is None
-        assert result["v1"].revisit_pressure_raw == 0.0
+        assert result["v1"].revisit_interval_raw == 0.0
 
     def test_missing_coordinates_are_skipped_with_reason(self):
         events = [
@@ -103,7 +103,7 @@ class TestComputeAxisAPressure:
         ]
         result = compute_axis_a_pressure(frequent_events + rare_events)
 
-        assert result["frequent"].revisit_pressure_raw > result["rare"].revisit_pressure_raw
+        assert result["frequent"].revisit_interval_raw > result["rare"].revisit_interval_raw
 
     def test_congested_cell_scores_higher_than_isolated_cell(self):
         # v1 조업 격자에는 다른 두 척(v2, v3)도 함께 조업 -> 밀도가 높다
@@ -118,7 +118,7 @@ class TestComputeAxisAPressure:
         ]
         result = compute_axis_a_pressure(congested_events + isolated_events)
 
-        assert result["v1"].congestion_density_raw > result["v4"].congestion_density_raw
+        assert result["v1"].crowding_pressure_raw > result["v4"].crowding_pressure_raw
 
     def test_congestion_excludes_own_revisits(self):
         # 다른 배는 하나도 없이, v1 혼자 같은 격자를 5번 반복 방문 ->
@@ -128,9 +128,9 @@ class TestComputeAxisAPressure:
         ]
         result = compute_axis_a_pressure(solo_events)
 
-        assert result["v1"].congestion_density_raw == 0.0
+        assert result["v1"].crowding_pressure_raw == 0.0
         # 재방문압력 자체는 여전히 0보다 커야 한다 (반복 방문 신호는 살아있음)
-        assert result["v1"].revisit_pressure_raw > 0.0
+        assert result["v1"].revisit_interval_raw > 0.0
 
     def test_interaction_term_amplifies_when_both_signals_high(self):
         # v1: 같은 혼잡한 격자(다른 배 v2, v3 포함)를 짧은 간격으로 반복 방문
@@ -144,6 +144,6 @@ class TestComputeAxisAPressure:
         result = compute_axis_a_pressure(repeated_congested_events)
         v1 = result["v1"]
 
-        plain_weighted_sum = 0.5 * v1.revisit_pressure_raw + 0.5 * v1.congestion_density_raw
+        plain_weighted_sum = 0.5 * v1.revisit_interval_raw + 0.5 * v1.crowding_pressure_raw
         assert v1.interaction_raw > 0.0
         assert v1.axis_a_pressure_raw > plain_weighted_sum

@@ -18,7 +18,7 @@ A축(자원 압력) 지표 산출 — 동일·인접 격자 내 조업 이벤트
     3. 혼잡가중압력: 전체 이벤트를 격자별로 집계해 밀도(이벤트 수)를 구하되,
        선박 자기 자신의 이벤트는 밀도에서 제외한다 — "다른 배들이 이미
        몰려있는 곳인가"만 측정하기 위함이다 (자기 자신의 재방문 빈도는
-       revisit_pressure_raw가 이미 담당한다).
+       revisit_interval_raw가 이미 담당한다).
     4. 재방문압력과 혼잡압력을 가중합으로 결합하되, 상호작용(interaction)
        항을 더해 "내가 자주 오는 곳(revisit 높음) + 그곳이 원래도 혼잡한
        곳(congestion 높음)"인 경우를 단순 합보다 더 크게 반영한다:
@@ -37,8 +37,8 @@ A축(자원 압력) 지표 산출 — 동일·인접 격자 내 조업 이벤트
     - 격자 크기(GRID_CELL_SIZE_DEG), 재방문압력 변환 계수, 결합 가중치
       (AXIS_A_REVISIT_WEIGHT, AXIS_A_CONGESTION_WEIGHT, AXIS_A_INTERACTION_WEIGHT)는
       전부 팀에서 아직 확정하지 않은 잠정값이며 검증 후 교체해야 한다.
-      세 항의 스케일이 서로 달라(revisit_pressure_raw는 시간 기반 반비례 값,
-      congestion_density_raw는 이벤트 개수, 상호작용항은 그 곱) 결합 raw 값
+      세 항의 스케일이 서로 달라(revisit_interval_raw는 시간 기반 반비례 값,
+      crowding_pressure_raw는 이벤트 개수, 상호작용항은 그 곱) 결합 raw 값
       (axis_a_pressure_raw)을 그대로 쓰기보다 점수조립 단계에서 각 raw 값을
       그룹 내 백분위로 개별 정규화한 뒤 합치는 방식으로 대체될 수 있다.
     - 혼잡가중압력은 "자원이 실제로 풍부해서 몰린 경우"와 "단순히 접근이 편한
@@ -93,8 +93,8 @@ class VesselAxisAResult:
     used_event_count: int
     skipped_events: List[SkippedEvent] = field(default_factory=list)
     avg_revisit_interval_hours: Optional[float] = None
-    revisit_pressure_raw: float = 0.0
-    congestion_density_raw: float = 0.0
+    revisit_interval_raw: float = 0.0
+    crowding_pressure_raw: float = 0.0
     interaction_raw: float = 0.0
     axis_a_pressure_raw: float = 0.0
 
@@ -292,8 +292,8 @@ def compute_axis_a_pressure(
             used_event_count=len(vessel_events_sorted),
             skipped_events=skipped_by_vessel.get(vessel_id, []),
             avg_revisit_interval_hours=avg_interval,
-            revisit_pressure_raw=revisit_raw,
-            congestion_density_raw=congestion_raw,
+            revisit_interval_raw=revisit_raw,
+            crowding_pressure_raw=congestion_raw,
             interaction_raw=interaction_raw,
             axis_a_pressure_raw=combined_raw,
         )
