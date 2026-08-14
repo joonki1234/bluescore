@@ -2,6 +2,16 @@
 
 # chain TODO
 
+## 진행 현황 정리 (2026-08-15)
+
+해시 생성·인메모리 원장·Hardhat 실배포·Python(web3.py) 연동·score/ 연결부까지
+전부 구현·테스트·end-to-end 검증 완료. **남은 건 딱 하나, `ui/adapter.score_hash()`를
+`chain.hashing.compute_result_hash()` 호출로 교체하는 배선뿐이고, 이건 최지희님과
+조율이 필요하다** (아래 마지막 항목 참고). 오동규·김준기 단독으로 chain/에서
+더 할 일은 없다.
+
+---
+
 - [x] SHA-256 해시 생성 함수 (기획서: 온체인 증적 - 스코어/평가 결과 무결성 증명용 해시 생성)
       — `hashing.py`. CLAUDE.md 해시 규칙(sort_keys, 소수점 둘째자리 반올림 후 문자열화,
       빈 값은 키 제외) 그대로 구현, 테스트 12개.
