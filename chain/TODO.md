@@ -11,3 +11,7 @@
       호출로 교체 예정. 테스트 8개.
 - [ ] Hardhat 테스트넷 연동 (기획서: 온체인 증적 - 테스트넷 환경에서 스마트컨트랙트 배포 및 연동)
       — 미착수. `ledger.py`의 `HashLedger` 내부 저장소를 여기로 교체할 예정.
+- [x] score/ ↔ chain/ 연결부 — `commit_score_result.py`(`commit_score_result`/
+      `verify_score_result`). score/가 아직 mock 폴백이라 실제로 호출하는 곳은
+      없지만, 실산출 전환 시 바로 쓸 수 있게 미리 준비. record_id 정책(예:
+      `f"{vesselId}:{period}"`)은 호출부(예정된 main.py)가 정함. 테스트 3개.
