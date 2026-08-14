@@ -1,0 +1,60 @@
+{
+  "vesselId": "c3f15b541-1cc8-6d89-c6f0-1456cd2c113e",
+  "gfwImo": null,
+  "gfwCallSign": "945162",
+  "gfwName": "KUM YANG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "945162",
+      "candidates": [
+        {
+          "vesselNameKor": "금양호",
+          "vesselNameEng": null,
+          "callSign": "945162",
+          "vesselNo": "945162",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 68.0,
+          "netTonnage": 68.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 28.49,
+          "totalLengthM": 28.5,
+          "widthM": 5.3,
+          "depthM": 2.8,
+          "draftM": 2.8,
+          "constructionDate": "1994-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "945162",
+            "vsslNo": "945162",
+            "imoNo": null,
+            "vsslKorNm": "금양호",
+            "vsslEngNm": null,
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "68",
+            "ntng": "68",
+            "vsslTotLt": "28.5",
+            "shdth": "5.3",
+            "vsslDrft": "2.8",
+            "vsslLt": "28.49",
+            "vsslDp": "2.8",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1994-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

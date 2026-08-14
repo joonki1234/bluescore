@@ -1,0 +1,13 @@
+{
+  "vesselId": "e3ee52a73-36d6-ef39-9159-9012f568b96e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JINSUNG1HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JINSUNG1HO",
+      "candidates": []
+    }
+  ]
+}

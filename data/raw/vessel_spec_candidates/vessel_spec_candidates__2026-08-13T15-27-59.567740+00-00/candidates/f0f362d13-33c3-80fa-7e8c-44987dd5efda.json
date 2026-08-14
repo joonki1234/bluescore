@@ -1,0 +1,18 @@
+{
+  "vesselId": "f0f362d13-33c3-80fa-7e8c-44987dd5efda",
+  "gfwImo": null,
+  "gfwCallSign": "101GYEO",
+  "gfwName": "GYEONGWON7HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101GYEO",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GYEONGWON7HO",
+      "candidates": []
+    }
+  ]
+}

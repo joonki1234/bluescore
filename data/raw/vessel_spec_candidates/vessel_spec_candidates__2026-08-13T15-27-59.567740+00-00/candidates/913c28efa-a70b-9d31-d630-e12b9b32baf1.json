@@ -1,0 +1,18 @@
+{
+  "vesselId": "913c28efa-a70b-9d31-d630-e12b9b32baf1",
+  "gfwImo": null,
+  "gfwCallSign": "122@",
+  "gfwName": "MO BI DIC@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "122@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MO BI DIC@",
+      "candidates": []
+    }
+  ]
+}

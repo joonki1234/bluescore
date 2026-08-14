@@ -1,0 +1,18 @@
+{
+  "vesselId": "7f44fa6ef-fd7b-8f21-0b4d-eceac0d4b748",
+  "gfwImo": null,
+  "gfwCallSign": "301@",
+  "gfwName": "MYUNG GA   @",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "301@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MYUNG GA   @",
+      "candidates": []
+    }
+  ]
+}

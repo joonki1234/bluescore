@@ -1,0 +1,65 @@
+{
+  "vesselId": "592e5e702-27b3-c52d-ce85-e2003b1d9abf",
+  "gfwImo": null,
+  "gfwCallSign": "26002",
+  "gfwName": "TAHITI",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "26002",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "TAHITI",
+      "candidates": [
+        {
+          "vesselNameKor": "TAHITI ONE",
+          "vesselNameEng": "TAHITI ONE",
+          "callSign": "9HA3130",
+          "vesselNo": null,
+          "imoNo": "9597032",
+          "vesselKind": "39[일반화물선]",
+          "nationality": "MT[몰타]",
+          "grossTonnage": 44229.0,
+          "netTonnage": 27068.0,
+          "internationalGrossTonnage": 44229.0,
+          "lengthM": 223.0,
+          "totalLengthM": 223.0,
+          "widthM": 32.3,
+          "depthM": 20.1,
+          "draftM": 12.3,
+          "constructionDate": "2011-12-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "9HA3130",
+            "vsslNo": null,
+            "imoNo": "9597032",
+            "vsslKorNm": "TAHITI ONE",
+            "vsslEngNm": "TAHITI ONE",
+            "vsslKnd": "39[일반화물선]",
+            "vsslNlty": "MT[몰타]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "44229",
+            "grtg": "44229",
+            "ntng": "27068",
+            "vsslTotLt": "223",
+            "shdth": "32.3",
+            "vsslDrft": "12.3",
+            "vsslLt": "223",
+            "vsslDp": "20.1",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2011-12-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

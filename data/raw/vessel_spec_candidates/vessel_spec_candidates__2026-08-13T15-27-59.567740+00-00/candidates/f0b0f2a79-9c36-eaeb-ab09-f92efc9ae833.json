@@ -1,0 +1,13 @@
+{
+  "vesselId": "f0b0f2a79-9c36-eaeb-ab09-f92efc9ae833",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GREEN BLUE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GREEN BLUE",
+      "candidates": []
+    }
+  ]
+}

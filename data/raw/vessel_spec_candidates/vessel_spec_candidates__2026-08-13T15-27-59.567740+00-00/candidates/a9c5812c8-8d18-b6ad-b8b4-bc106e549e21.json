@@ -1,0 +1,13 @@
+{
+  "vesselId": "a9c5812c8-8d18-b6ad-b8b4-bc106e549e21",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "TAECHANGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "TAECHANGHO",
+      "candidates": []
+    }
+  ]
+}

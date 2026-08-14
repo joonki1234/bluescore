@@ -1,0 +1,18 @@
+{
+  "vesselId": "933ac285b-b828-d4ce-f844-8611586b5866",
+  "gfwImo": null,
+  "gfwCallSign": "221SY",
+  "gfwName": "SUNYANGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "221SY",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SUNYANGHO",
+      "candidates": []
+    }
+  ]
+}

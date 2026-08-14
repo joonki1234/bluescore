@@ -1,0 +1,60 @@
+{
+  "vesselId": "8ef607269-93ce-4d4e-9787-9b918ac5211c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KUMSAN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KUMSAN",
+      "candidates": [
+        {
+          "vesselNameKor": "KUMSANBONG",
+          "vesselNameEng": null,
+          "callSign": "8810384",
+          "vesselNo": null,
+          "imoNo": "8810384",
+          "vesselKind": "99[기타선]",
+          "nationality": "ZZ[기타국가]",
+          "grossTonnage": 1000.0,
+          "netTonnage": 1000.0,
+          "internationalGrossTonnage": 1000.0,
+          "lengthM": 100.0,
+          "totalLengthM": 100.0,
+          "widthM": 100.0,
+          "depthM": 10.0,
+          "draftM": 10.0,
+          "constructionDate": "2018-09-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "8810384",
+            "vsslNo": null,
+            "imoNo": "8810384",
+            "vsslKorNm": "KUMSANBONG",
+            "vsslEngNm": null,
+            "vsslKnd": "99[기타선]",
+            "vsslNlty": "ZZ[기타국가]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "1000",
+            "grtg": "1000",
+            "ntng": "1000",
+            "vsslTotLt": "100",
+            "shdth": "100",
+            "vsslDrft": "10",
+            "vsslLt": "100",
+            "vsslDp": "10",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": null,
+            "nvgShapNm": "-",
+            "vsslCnstrDt": "2018-09-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

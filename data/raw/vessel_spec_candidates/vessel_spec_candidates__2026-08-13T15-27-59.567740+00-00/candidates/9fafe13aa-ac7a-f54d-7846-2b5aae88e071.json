@@ -1,0 +1,13 @@
+{
+  "vesselId": "9fafe13aa-ac7a-f54d-7846-2b5aae88e071",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HEALING@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HEALING@",
+      "candidates": []
+    }
+  ]
+}

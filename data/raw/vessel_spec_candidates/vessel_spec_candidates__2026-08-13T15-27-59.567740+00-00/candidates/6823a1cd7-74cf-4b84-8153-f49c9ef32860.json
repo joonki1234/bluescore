@@ -1,0 +1,60 @@
+{
+  "vesselId": "6823a1cd7-74cf-4b84-8153-f49c9ef32860",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BIRYONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BIRYONG",
+      "candidates": [
+        {
+          "vesselNameKor": "비룡호",
+          "vesselNameEng": "BIRYONG HO",
+          "callSign": "146805",
+          "vesselNo": "146805",
+          "imoNo": null,
+          "vesselKind": "93[급유선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 476.0,
+          "netTonnage": 476.0,
+          "internationalGrossTonnage": 476.0,
+          "lengthM": 54.0,
+          "totalLengthM": 54.0,
+          "widthM": 10.0,
+          "depthM": 4.6,
+          "draftM": 4.6,
+          "constructionDate": "2014-05-09T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "146805",
+            "vsslNo": "146805",
+            "imoNo": null,
+            "vsslKorNm": "비룡호",
+            "vsslEngNm": "BIRYONG HO",
+            "vsslKnd": "93[급유선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "476",
+            "grtg": "476",
+            "ntng": "476",
+            "vsslTotLt": "54",
+            "shdth": "10",
+            "vsslDrft": "4.6",
+            "vsslLt": "54",
+            "vsslDp": "4.6",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2014-05-09T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

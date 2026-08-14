@@ -1,0 +1,18 @@
+{
+  "vesselId": "b0ebdc9ac-c280-a475-d511-27ede363c818",
+  "gfwImo": null,
+  "gfwCallSign": "300NEW",
+  "gfwName": "NEWSUSEONG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300NEW",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NEWSUSEONG",
+      "candidates": []
+    }
+  ]
+}

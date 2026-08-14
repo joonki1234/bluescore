@@ -1,0 +1,13 @@
+{
+  "vesselId": "fdf9dd6df-f5be-e8a7-08e6-da67218ba8ac",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BU HUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BU HUNG",
+      "candidates": []
+    }
+  ]
+}

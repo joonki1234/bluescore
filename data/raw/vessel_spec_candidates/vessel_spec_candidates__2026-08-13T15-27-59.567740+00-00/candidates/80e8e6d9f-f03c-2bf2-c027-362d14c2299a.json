@@ -1,0 +1,13 @@
+{
+  "vesselId": "80e8e6d9f-f03c-2bf2-c027-362d14c2299a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DONGSAN2HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DONGSAN2HO",
+      "candidates": []
+    }
+  ]
+}

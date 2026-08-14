@@ -1,0 +1,13 @@
+{
+  "vesselId": "a2e689260-06ca-134c-7bc8-c237ea09a7e4",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "105 DAE SEUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "105 DAE SEUNG",
+      "candidates": []
+    }
+  ]
+}

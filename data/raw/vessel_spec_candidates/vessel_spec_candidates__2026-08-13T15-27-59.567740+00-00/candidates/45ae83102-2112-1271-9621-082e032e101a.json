@@ -1,0 +1,13 @@
+{
+  "vesselId": "45ae83102-2112-1271-9621-082e032e101a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHEONGYANG FISHING",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEONGYANG FISHING",
+      "candidates": []
+    }
+  ]
+}

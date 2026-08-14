@@ -1,0 +1,13 @@
+{
+  "vesselId": "77924abbf-fae1-e4b7-ab7f-806e7b25854b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DEOK MYUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DEOK MYUNG",
+      "candidates": []
+    }
+  ]
+}

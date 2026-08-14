@@ -1,0 +1,18 @@
+{
+  "vesselId": "ea4bd978e-ebf2-1b47-e577-e1cfa792268e",
+  "gfwImo": null,
+  "gfwCallSign": "206@",
+  "gfwName": "3002 EUN SUNG@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "206@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "3002 EUN SUNG@",
+      "candidates": []
+    }
+  ]
+}

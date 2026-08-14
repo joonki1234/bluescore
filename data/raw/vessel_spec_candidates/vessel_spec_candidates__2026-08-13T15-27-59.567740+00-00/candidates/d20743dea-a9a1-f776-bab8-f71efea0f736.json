@@ -1,0 +1,60 @@
+{
+  "vesselId": "d20743dea-a9a1-f776-bab8-f71efea0f736",
+  "gfwImo": "9400409",
+  "gfwCallSign": "D7KM",
+  "gfwName": "JBU OPAL",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D7KM",
+      "candidates": [
+        {
+          "vesselNameKor": "제이비유 오팔",
+          "vesselNameEng": "JBU OPAL",
+          "callSign": "D7KM",
+          "vesselNo": "241036",
+          "imoNo": "9400409",
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 11561.0,
+          "netTonnage": 6115.0,
+          "internationalGrossTonnage": 11561.0,
+          "lengthM": 133.21,
+          "totalLengthM": 141.0,
+          "widthM": 24.2,
+          "depthM": 13.2,
+          "draftM": 9.7,
+          "constructionDate": "2009-04-22T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D7KM",
+            "vsslNo": "241036",
+            "imoNo": "9400409",
+            "vsslKorNm": "제이비유 오팔",
+            "vsslEngNm": "JBU OPAL",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "11561",
+            "grtg": "11561",
+            "ntng": "6115",
+            "vsslTotLt": "141",
+            "shdth": "24.2",
+            "vsslDrft": "9.7",
+            "vsslLt": "133.21",
+            "vsslDp": "13.2",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2009-04-22T00:00:00+09:00",
+            "befClsgn": "V7IN4",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

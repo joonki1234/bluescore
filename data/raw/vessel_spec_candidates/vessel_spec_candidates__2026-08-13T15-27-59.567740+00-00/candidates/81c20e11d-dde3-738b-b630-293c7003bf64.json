@@ -1,0 +1,18 @@
+{
+  "vesselId": "81c20e11d-dde3-738b-b630-293c7003bf64",
+  "gfwImo": null,
+  "gfwCallSign": "15212",
+  "gfwName": "HUIDUANQIHANG2",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "15212",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HUIDUANQIHANG2",
+      "candidates": []
+    }
+  ]
+}

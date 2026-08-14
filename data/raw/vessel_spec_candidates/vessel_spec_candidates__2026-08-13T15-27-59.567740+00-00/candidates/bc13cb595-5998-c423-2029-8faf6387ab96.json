@@ -1,0 +1,13 @@
+{
+  "vesselId": "bc13cb595-5998-c423-2029-8faf6387ab96",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAEYANGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAEYANGHO",
+      "candidates": []
+    }
+  ]
+}

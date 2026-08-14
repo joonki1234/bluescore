@@ -1,0 +1,13 @@
+{
+  "vesselId": "8860afd3e-e29a-7d38-a7e6-ba41268727c6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE  BOK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE  BOK",
+      "candidates": []
+    }
+  ]
+}

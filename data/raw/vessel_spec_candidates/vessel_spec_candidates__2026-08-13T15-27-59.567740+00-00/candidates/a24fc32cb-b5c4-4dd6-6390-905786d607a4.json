@@ -1,0 +1,18 @@
+{
+  "vesselId": "a24fc32cb-b5c4-4dd6-6390-905786d607a4",
+  "gfwImo": null,
+  "gfwCallSign": "244@",
+  "gfwName": "YEON IL@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "244@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YEON IL@",
+      "candidates": []
+    }
+  ]
+}

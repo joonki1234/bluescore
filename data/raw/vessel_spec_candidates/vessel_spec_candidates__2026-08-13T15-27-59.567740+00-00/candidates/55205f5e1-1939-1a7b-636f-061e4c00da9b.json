@@ -1,0 +1,13 @@
+{
+  "vesselId": "55205f5e1-1939-1a7b-636f-061e4c00da9b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NEWFHINGRAND",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NEWFHINGRAND",
+      "candidates": []
+    }
+  ]
+}

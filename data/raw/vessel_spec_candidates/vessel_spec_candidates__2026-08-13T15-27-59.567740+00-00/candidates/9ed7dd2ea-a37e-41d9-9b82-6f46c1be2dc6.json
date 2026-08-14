@@ -1,0 +1,13 @@
+{
+  "vesselId": "9ed7dd2ea-a37e-41d9-9b82-6f46c1be2dc6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "202GISUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GISUNGHO",
+      "candidates": []
+    }
+  ]
+}

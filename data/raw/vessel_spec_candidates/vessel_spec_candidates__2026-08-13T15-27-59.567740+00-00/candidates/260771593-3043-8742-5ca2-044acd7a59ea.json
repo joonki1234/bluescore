@@ -1,0 +1,13 @@
+{
+  "vesselId": "260771593-3043-8742-5ca2-044acd7a59ea",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SU SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SU SEONG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "8c31a09e7-7350-627e-8240-d2e94f619bb4",
+  "gfwImo": null,
+  "gfwCallSign": "301SEON",
+  "gfwName": "SEONIN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "301SEON",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SEONIN",
+      "candidates": []
+    }
+  ]
+}

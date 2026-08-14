@@ -1,0 +1,13 @@
+{
+  "vesselId": "714f68e87-7686-ee0e-d89c-5f1864e7e7ae",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "102SEUNGJIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEUNGJIN",
+      "candidates": []
+    }
+  ]
+}

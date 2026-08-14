@@ -1,0 +1,18 @@
+{
+  "vesselId": "3e72fa0ed-dc60-e554-fb26-02348238f0ed",
+  "gfwImo": null,
+  "gfwCallSign": "201@",
+  "gfwName": "HANHA 3@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "201@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HANHA 3@",
+      "candidates": []
+    }
+  ]
+}

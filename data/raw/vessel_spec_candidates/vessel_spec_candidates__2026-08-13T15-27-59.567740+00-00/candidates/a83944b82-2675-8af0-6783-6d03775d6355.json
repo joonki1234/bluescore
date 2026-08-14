@@ -1,0 +1,13 @@
+{
+  "vesselId": "a83944b82-2675-8af0-6783-6d03775d6355",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "106 HYUN DAE HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "106 HYUN DAE",
+      "candidates": []
+    }
+  ]
+}

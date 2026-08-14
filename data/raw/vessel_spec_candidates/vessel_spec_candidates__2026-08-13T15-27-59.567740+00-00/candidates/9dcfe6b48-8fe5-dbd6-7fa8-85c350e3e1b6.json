@@ -1,0 +1,18 @@
+{
+  "vesselId": "9dcfe6b48-8fe5-dbd6-7fa8-85c350e3e1b6",
+  "gfwImo": null,
+  "gfwCallSign": "101@",
+  "gfwName": "CARISMA        @",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "CARISMA        @",
+      "candidates": []
+    }
+  ]
+}

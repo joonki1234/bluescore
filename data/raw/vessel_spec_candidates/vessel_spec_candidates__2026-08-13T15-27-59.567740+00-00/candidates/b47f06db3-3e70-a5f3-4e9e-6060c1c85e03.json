@@ -1,0 +1,60 @@
+{
+  "vesselId": "b47f06db3-3e70-a5f3-4e9e-6060c1c85e03",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "TAEGWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "TAEGWANG",
+      "candidates": [
+        {
+          "vesselNameKor": "태광호",
+          "vesselNameEng": "TAEGWANG",
+          "callSign": "142824",
+          "vesselNo": "142824",
+          "imoNo": null,
+          "vesselKind": "74[석유제품운반용 부선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 94.0,
+          "netTonnage": 94.0,
+          "internationalGrossTonnage": 94.0,
+          "lengthM": 23.97,
+          "totalLengthM": 23.97,
+          "widthM": 9.0,
+          "depthM": 2.98,
+          "draftM": 2.9,
+          "constructionDate": "1988-05-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "3[항내운항]",
+            "clsgn": "142824",
+            "vsslNo": "142824",
+            "imoNo": null,
+            "vsslKorNm": "태광호",
+            "vsslEngNm": "TAEGWANG",
+            "vsslKnd": "74[석유제품운반용 부선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "94",
+            "grtg": "94",
+            "ntng": "94",
+            "vsslTotLt": "23.97",
+            "shdth": "9",
+            "vsslDrft": "2.9",
+            "vsslLt": "23.97",
+            "vsslDp": "2.98",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1988-05-01T00:00:00+09:00",
+            "befClsgn": "13045",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

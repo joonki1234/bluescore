@@ -1,0 +1,13 @@
+{
+  "vesselId": "84dde4c09-9cc6-0fd4-ef73-ffc17282f916",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "601GILJEONGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GILJEONGHO",
+      "candidates": []
+    }
+  ]
+}

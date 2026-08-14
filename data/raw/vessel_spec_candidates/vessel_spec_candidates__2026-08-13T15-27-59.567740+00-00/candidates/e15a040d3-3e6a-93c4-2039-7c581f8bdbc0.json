@@ -1,0 +1,18 @@
+{
+  "vesselId": "e15a040d3-3e6a-93c4-2039-7c581f8bdbc0",
+  "gfwImo": null,
+  "gfwCallSign": "300@",
+  "gfwName": "GAL ME GI HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GAL ME GI HO@",
+      "candidates": []
+    }
+  ]
+}

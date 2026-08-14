@@ -1,0 +1,18 @@
+{
+  "vesselId": "4f704cd17-7a73-00fc-5f91-95022b3b4120",
+  "gfwImo": null,
+  "gfwCallSign": "927YON",
+  "gfwName": "207 YONG SOUNG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "927YON",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "207 YONG SOUNG",
+      "candidates": []
+    }
+  ]
+}

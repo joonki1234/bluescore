@@ -1,0 +1,13 @@
+{
+  "vesselId": "7dec66c26-6e06-56ad-61e6-a367f0920c7b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HEA UN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HEA UN",
+      "candidates": []
+    }
+  ]
+}

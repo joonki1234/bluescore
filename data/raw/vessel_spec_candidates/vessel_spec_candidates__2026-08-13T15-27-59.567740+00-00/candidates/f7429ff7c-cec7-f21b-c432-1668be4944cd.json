@@ -1,0 +1,60 @@
+{
+  "vesselId": "f7429ff7c-cec7-f21b-c432-1668be4944cd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2017SUNGWOOHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SUNGWOOHO",
+      "candidates": [
+        {
+          "vesselNameKor": "제5성우호",
+          "vesselNameEng": "SUNGWOOHO NO.5",
+          "callSign": "20057",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 72.0,
+          "netTonnage": 34.0,
+          "internationalGrossTonnage": null,
+          "lengthM": 23.7,
+          "totalLengthM": 30.0,
+          "widthM": 5.4,
+          "depthM": 2.5,
+          "draftM": 2.3,
+          "constructionDate": "1975-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "20057",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "제5성우호",
+            "vsslEngNm": "SUNGWOOHO NO.5",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "3",
+            "tonEdycSeNm": "기타",
+            "intrlGrtg": null,
+            "grtg": "72",
+            "ntng": "34",
+            "vsslTotLt": "30",
+            "shdth": "5.4",
+            "vsslDrft": "2.3",
+            "vsslLt": "23.7",
+            "vsslDp": "2.5",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1975-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

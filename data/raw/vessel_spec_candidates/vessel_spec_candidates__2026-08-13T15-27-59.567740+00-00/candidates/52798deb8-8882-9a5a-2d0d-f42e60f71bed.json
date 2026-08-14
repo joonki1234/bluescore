@@ -1,0 +1,13 @@
+{
+  "vesselId": "52798deb8-8882-9a5a-2d0d-f42e60f71bed",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DEOK YANG@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DEOK YANG@",
+      "candidates": []
+    }
+  ]
+}

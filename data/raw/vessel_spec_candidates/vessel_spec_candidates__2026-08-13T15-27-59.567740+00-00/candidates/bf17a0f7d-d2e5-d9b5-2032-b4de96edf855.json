@@ -1,0 +1,60 @@
+{
+  "vesselId": "bf17a0f7d-d2e5-d9b5-2032-b4de96edf855",
+  "gfwImo": "9946647",
+  "gfwCallSign": "D8HO",
+  "gfwName": "SAWASDEE SPICA",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D8HO",
+      "candidates": [
+        {
+          "vesselNameKor": "싸왓디 스피카",
+          "vesselNameEng": "SAWASDEE SPICA",
+          "callSign": "D8HO",
+          "vesselNo": "261040",
+          "imoNo": "9946647",
+          "vesselKind": "41[풀컨테이너선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 18072.0,
+          "netTonnage": 7595.0,
+          "internationalGrossTonnage": 18072.0,
+          "lengthM": 164.88,
+          "totalLengthM": 164.88,
+          "widthM": 27.4,
+          "depthM": 14.3,
+          "draftM": 9.7,
+          "constructionDate": "2023-03-30T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D8HO",
+            "vsslNo": "261040",
+            "imoNo": "9946647",
+            "vsslKorNm": "싸왓디 스피카",
+            "vsslEngNm": "SAWASDEE SPICA",
+            "vsslKnd": "41[풀컨테이너선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "18072",
+            "grtg": "18072",
+            "ntng": "7595",
+            "vsslTotLt": "164.88",
+            "shdth": "27.4",
+            "vsslDrft": "9.7",
+            "vsslLt": "164.88",
+            "vsslDp": "14.3",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "2023-03-30T00:00:00+09:00",
+            "befClsgn": "V7A6230",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

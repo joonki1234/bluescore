@@ -1,0 +1,13 @@
+{
+  "vesselId": "071a15a54-4d1a-d14d-0a77-d60357806164",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "8CHOI KWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHOI KWANG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "289a26e6c-c618-0eb8-4b3b-627ddebb9cb2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NEW CHUNG HAE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NEW CHUNG HAE",
+      "candidates": []
+    }
+  ]
+}

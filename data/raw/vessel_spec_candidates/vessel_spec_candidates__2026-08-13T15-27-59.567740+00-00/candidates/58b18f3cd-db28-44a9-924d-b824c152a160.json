@@ -1,0 +1,59 @@
+{
+  "vesselId": "58b18f3cd-db28-44a9-924d-b824c152a160",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YOUNG BOK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YOUNG BOK",
+      "candidates": [
+        {
+          "vesselNameKor": "영복",
+          "vesselNameEng": "YOUNG BOK",
+          "callSign": "HP6169",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "92[원양 어선]",
+          "nationality": "PA[파나마]",
+          "grossTonnage": 1021.0,
+          "netTonnage": 1021.0,
+          "internationalGrossTonnage": null,
+          "lengthM": 50.5,
+          "totalLengthM": 50.5,
+          "widthM": 10.9,
+          "depthM": 99.9,
+          "draftM": 7.9,
+          "constructionDate": null,
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "HP6169",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "영복",
+            "vsslEngNm": "YOUNG BOK",
+            "vsslKnd": "92[원양 어선]",
+            "vsslNlty": "PA[파나마]",
+            "tonEdycSe": "3",
+            "tonEdycSeNm": "기타",
+            "intrlGrtg": null,
+            "grtg": "1021",
+            "ntng": "1021",
+            "vsslTotLt": "50.5",
+            "shdth": "10.9",
+            "vsslDrft": "7.9",
+            "vsslLt": "50.5",
+            "vsslDp": "99.9",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "784df97c5-53d5-58bf-4b2a-0de0862b1d3c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CT3-4412-02",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CT3-4412-02",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "046abef02-2488-4672-eda1-0c8137f71e42",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NEW ORION HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NEW ORION HO@",
+      "candidates": []
+    }
+  ]
+}

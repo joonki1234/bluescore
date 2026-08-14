@@ -1,0 +1,13 @@
+{
+  "vesselId": "0a5166e6c-c70f-088d-e632-21e3552c9e17",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SAIANHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SAIANHO",
+      "candidates": []
+    }
+  ]
+}

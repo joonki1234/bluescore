@@ -1,0 +1,13 @@
+{
+  "vesselId": "df31399f7-7ba1-f96a-5562-3b1171e26c06",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NAM KWANG FISHING HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NAM KWANG FISHING",
+      "candidates": []
+    }
+  ]
+}

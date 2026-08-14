@@ -1,0 +1,18 @@
+{
+  "vesselId": "ad4709023-330a-6768-5f01-46f87224a43c",
+  "gfwImo": null,
+  "gfwCallSign": "802GW",
+  "gfwName": "GANGWON203",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "802GW",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GANGWON203",
+      "candidates": []
+    }
+  ]
+}

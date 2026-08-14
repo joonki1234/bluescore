@@ -1,0 +1,13 @@
+{
+  "vesselId": "a793627fc-c6be-8949-7637-724a4c9d12b5",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEONG JIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEONG JIN",
+      "candidates": []
+    }
+  ]
+}

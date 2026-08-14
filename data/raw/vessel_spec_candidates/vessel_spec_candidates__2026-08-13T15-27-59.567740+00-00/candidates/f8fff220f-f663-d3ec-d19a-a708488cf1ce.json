@@ -1,0 +1,65 @@
+{
+  "vesselId": "f8fff220f-f663-d3ec-d19a-a708488cf1ce",
+  "gfwImo": null,
+  "gfwCallSign": "600GIAN",
+  "gfwName": "BOK YOUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "600GIAN",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "BOK YOUNG",
+      "candidates": [
+        {
+          "vesselNameKor": "15 BOK YOUNG",
+          "vesselNameEng": "15 BOK YOUNG",
+          "callSign": "HO3148",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "91[연근해 어선]",
+          "nationality": "PA[파나마]",
+          "grossTonnage": 97.0,
+          "netTonnage": 66.0,
+          "internationalGrossTonnage": 160.0,
+          "lengthM": 23.8,
+          "totalLengthM": 23.8,
+          "widthM": 7.1,
+          "depthM": 2.7,
+          "draftM": 2.7,
+          "constructionDate": "1997-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "HO3148",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "15 BOK YOUNG",
+            "vsslEngNm": "15 BOK YOUNG",
+            "vsslKnd": "91[연근해 어선]",
+            "vsslNlty": "PA[파나마]",
+            "tonEdycSe": "4",
+            "tonEdycSeNm": "계산톤수",
+            "intrlGrtg": "160",
+            "grtg": "97",
+            "ntng": "66",
+            "vsslTotLt": "23.8",
+            "shdth": "7.1",
+            "vsslDrft": "2.7",
+            "vsslLt": "23.8",
+            "vsslDp": "2.7",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1997-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

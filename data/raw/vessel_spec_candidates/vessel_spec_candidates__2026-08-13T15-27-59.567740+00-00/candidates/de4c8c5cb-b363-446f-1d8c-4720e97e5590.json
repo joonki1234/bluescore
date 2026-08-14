@@ -1,0 +1,13 @@
+{
+  "vesselId": "de4c8c5cb-b363-446f-1d8c-4720e97e5590",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "OH SUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "OH SUNG",
+      "candidates": []
+    }
+  ]
+}

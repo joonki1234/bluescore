@@ -1,0 +1,13 @@
+{
+  "vesselId": "043743cff-fb3e-383c-5e3c-1bf6d0f1cfda",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YEONGOONGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YEONGOONGHO",
+      "candidates": []
+    }
+  ]
+}

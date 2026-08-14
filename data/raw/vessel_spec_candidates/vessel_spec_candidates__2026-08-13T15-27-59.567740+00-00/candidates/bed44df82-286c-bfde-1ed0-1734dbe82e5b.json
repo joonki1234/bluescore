@@ -1,0 +1,18 @@
+{
+  "vesselId": "bed44df82-286c-bfde-1ed0-1734dbe82e5b",
+  "gfwImo": null,
+  "gfwCallSign": "201@",
+  "gfwName": "KWANG MYUNG@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "201@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "KWANG MYUNG@",
+      "candidates": []
+    }
+  ]
+}

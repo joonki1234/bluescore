@@ -1,0 +1,13 @@
+{
+  "vesselId": "dc041e95b-bcb8-0196-906d-e0fa2ffe9e44",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "808CHUNGNAM",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHUNGNAM",
+      "candidates": []
+    }
+  ]
+}

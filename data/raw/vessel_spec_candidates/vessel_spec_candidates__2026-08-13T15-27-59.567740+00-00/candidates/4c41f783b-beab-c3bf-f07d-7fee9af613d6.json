@@ -1,0 +1,13 @@
+{
+  "vesselId": "4c41f783b-beab-c3bf-f07d-7fee9af613d6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.25 KEOMBOCK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.25 KEOMBOCK",
+      "candidates": []
+    }
+  ]
+}

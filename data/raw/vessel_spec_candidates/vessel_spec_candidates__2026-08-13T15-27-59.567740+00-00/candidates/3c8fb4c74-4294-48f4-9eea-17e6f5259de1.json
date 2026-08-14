@@ -1,0 +1,60 @@
+{
+  "vesselId": "3c8fb4c74-4294-48f4-9eea-17e6f5259de1",
+  "gfwImo": null,
+  "gfwCallSign": "077411",
+  "gfwName": "106DAESHIN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "077411",
+      "candidates": [
+        {
+          "vesselNameKor": "106대신호",
+          "vesselNameEng": null,
+          "callSign": "077411",
+          "vesselNo": "077411",
+          "imoNo": null,
+          "vesselKind": "69[기타 예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 50.0,
+          "netTonnage": 50.0,
+          "internationalGrossTonnage": 50.0,
+          "lengthM": 23.0,
+          "totalLengthM": 24.0,
+          "widthM": null,
+          "depthM": 2.2,
+          "draftM": 2.2,
+          "constructionDate": "1988-10-15T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "077411",
+            "vsslNo": "077411",
+            "imoNo": null,
+            "vsslKorNm": "106대신호",
+            "vsslEngNm": null,
+            "vsslKnd": "69[기타 예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "50",
+            "grtg": "50",
+            "ntng": "50",
+            "vsslTotLt": "24",
+            "shdth": null,
+            "vsslDrft": "2.2",
+            "vsslLt": "23",
+            "vsslDp": "2.2",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1988-10-15T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

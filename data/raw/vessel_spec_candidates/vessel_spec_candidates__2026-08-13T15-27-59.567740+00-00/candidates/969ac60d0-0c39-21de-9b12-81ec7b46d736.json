@@ -1,0 +1,13 @@
+{
+  "vesselId": "969ac60d0-0c39-21de-9b12-81ec7b46d736",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GO RAE HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GO RAE",
+      "candidates": []
+    }
+  ]
+}

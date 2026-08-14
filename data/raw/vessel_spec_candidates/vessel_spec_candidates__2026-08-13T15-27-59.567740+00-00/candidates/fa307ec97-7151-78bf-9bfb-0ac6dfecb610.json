@@ -1,0 +1,13 @@
+{
+  "vesselId": "fa307ec97-7151-78bf-9bfb-0ac6dfecb610",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE YOUNG 995",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE YOUNG 995",
+      "candidates": []
+    }
+  ]
+}

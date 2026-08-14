@@ -1,0 +1,18 @@
+{
+  "vesselId": "54dfd89b4-4b23-4f71-d37c-58641999ba04",
+  "gfwImo": null,
+  "gfwCallSign": "125MYWA",
+  "gfwName": "MYWAY206",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "125MYWA",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MYWAY206",
+      "candidates": []
+    }
+  ]
+}

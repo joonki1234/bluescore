@@ -1,0 +1,13 @@
+{
+  "vesselId": "83476ebc3-3592-368a-dde1-dd4f4c939a86",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "PYEONGSAN@@HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "PYEONGSAN@@HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "02784fa32-2551-d3f4-aff7-78ae2ded1e29",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SUNG DUK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SUNG DUK",
+      "candidates": []
+    }
+  ]
+}

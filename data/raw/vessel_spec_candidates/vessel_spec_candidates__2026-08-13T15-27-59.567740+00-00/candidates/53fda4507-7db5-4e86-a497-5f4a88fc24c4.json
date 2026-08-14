@@ -1,0 +1,13 @@
+{
+  "vesselId": "53fda4507-7db5-4e86-a497-5f4a88fc24c4",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "WOOJINHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "WOOJINHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "fe763801f-fa09-b701-099e-726fc9c692e8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JE8JOYANGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JE8JOYANGHO",
+      "candidates": []
+    }
+  ]
+}

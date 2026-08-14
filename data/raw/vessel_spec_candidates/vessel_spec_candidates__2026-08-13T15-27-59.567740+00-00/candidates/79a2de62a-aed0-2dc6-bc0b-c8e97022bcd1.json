@@ -1,0 +1,13 @@
+{
+  "vesselId": "79a2de62a-aed0-2dc6-bc0b-c8e97022bcd1",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GIL SUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GIL SUNG",
+      "candidates": []
+    }
+  ]
+}

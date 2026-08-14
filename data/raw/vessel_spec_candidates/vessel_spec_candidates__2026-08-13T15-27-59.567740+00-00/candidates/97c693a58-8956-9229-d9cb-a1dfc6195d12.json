@@ -1,0 +1,60 @@
+{
+  "vesselId": "97c693a58-8956-9229-d9cb-a1dfc6195d12",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DONG NAM HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DONG NAM",
+      "candidates": [
+        {
+          "vesselNameKor": "DONG NAM NO.1",
+          "vesselNameEng": "DONG NAM NO.1",
+          "callSign": "HMYL9",
+          "vesselNo": null,
+          "imoNo": "8503735",
+          "vesselKind": "42[세미(혼재)컨테이너선]",
+          "nationality": "KP[북한]",
+          "grossTonnage": 3232.0,
+          "netTonnage": 1541.0,
+          "internationalGrossTonnage": 3232.0,
+          "lengthM": 82.9,
+          "totalLengthM": 90.6,
+          "widthM": 15.0,
+          "depthM": 9.65,
+          "draftM": 6.3,
+          "constructionDate": "1985-01-28T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "HMYL9",
+            "vsslNo": null,
+            "imoNo": "8503735",
+            "vsslKorNm": "DONG NAM NO.1",
+            "vsslEngNm": "DONG NAM NO.1",
+            "vsslKnd": "42[세미(혼재)컨테이너선]",
+            "vsslNlty": "KP[북한]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "3232",
+            "grtg": "3232",
+            "ntng": "1541",
+            "vsslTotLt": "90.6",
+            "shdth": "15",
+            "vsslDrft": "6.3",
+            "vsslLt": "82.9",
+            "vsslDp": "9.65",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1985-01-28T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

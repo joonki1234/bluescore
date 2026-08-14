@@ -1,0 +1,13 @@
+{
+  "vesselId": "5eb79c9b4-42fb-d4e7-b630-fdb7b99faa1a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DONG BOO HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DONG BOO HO@",
+      "candidates": []
+    }
+  ]
+}

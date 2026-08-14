@@ -1,0 +1,13 @@
+{
+  "vesselId": "67b74d19c-c0ac-fbba-6589-af47fe0abb00",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HYUP DONG NO.15",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HYUP DONG NO.15",
+      "candidates": []
+    }
+  ]
+}

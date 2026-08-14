@@ -1,0 +1,18 @@
+{
+  "vesselId": "2c7545d5c-cd07-0e45-baca-9fdb9eee0158",
+  "gfwImo": null,
+  "gfwCallSign": "200SANG",
+  "gfwName": "SANGDEOKHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "200SANG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SANGDEOKHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "85ffcc915-5dc2-7ee5-9a86-fb31d109ab38",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HANSUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HANSUNGHO",
+      "candidates": []
+    }
+  ]
+}

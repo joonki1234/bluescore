@@ -1,0 +1,13 @@
+{
+  "vesselId": "45abe7fe6-6fdd-e159-fad7-f0c14b28496d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "5 BU JANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "5 BU JANG",
+      "candidates": []
+    }
+  ]
+}

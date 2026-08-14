@@ -1,0 +1,13 @@
+{
+  "vesselId": "b32dbe450-0f70-bb35-0cf1-c8f222bab6bc",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "OSYEON",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "OSYEON",
+      "candidates": []
+    }
+  ]
+}

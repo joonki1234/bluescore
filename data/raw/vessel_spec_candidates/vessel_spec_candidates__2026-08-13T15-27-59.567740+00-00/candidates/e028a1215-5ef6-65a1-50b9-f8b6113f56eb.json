@@ -1,0 +1,13 @@
+{
+  "vesselId": "e028a1215-5ef6-65a1-50b9-f8b6113f56eb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "201JE IL HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JE IL",
+      "candidates": []
+    }
+  ]
+}

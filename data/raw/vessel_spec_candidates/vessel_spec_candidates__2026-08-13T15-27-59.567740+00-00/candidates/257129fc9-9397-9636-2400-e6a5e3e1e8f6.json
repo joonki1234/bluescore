@@ -1,0 +1,13 @@
+{
+  "vesselId": "257129fc9-9397-9636-2400-e6a5e3e1e8f6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "303 CHEONG GWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "303 CHEONG GWANG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "542fcf8a3-34a1-cde3-18d4-2226a51982ea",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BLUEMARIN@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BLUEMARIN@",
+      "candidates": []
+    }
+  ]
+}

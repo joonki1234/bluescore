@@ -1,0 +1,13 @@
+{
+  "vesselId": "bc05a6ebb-bda9-4efa-6236-74569c44d60e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MARUHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MARUHO",
+      "candidates": []
+    }
+  ]
+}

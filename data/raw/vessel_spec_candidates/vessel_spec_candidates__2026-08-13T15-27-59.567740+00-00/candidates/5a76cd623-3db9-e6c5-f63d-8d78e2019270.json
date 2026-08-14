@@ -1,0 +1,60 @@
+{
+  "vesselId": "5a76cd623-3db9-e6c5-f63d-8d78e2019270",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KYUNG JIN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KYUNG JIN",
+      "candidates": [
+        {
+          "vesselNameKor": "제1경진호",
+          "vesselNameEng": "KYUNG JIN 1",
+          "callSign": "925299",
+          "vesselNo": "925299",
+          "imoNo": null,
+          "vesselKind": "93[급유선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 67.0,
+          "netTonnage": 67.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 23.47,
+          "totalLengthM": 23.5,
+          "widthM": 6.0,
+          "depthM": 3.1,
+          "draftM": 3.1,
+          "constructionDate": "1992-08-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "3[항내운항]",
+            "clsgn": "925299",
+            "vsslNo": "925299",
+            "imoNo": null,
+            "vsslKorNm": "제1경진호",
+            "vsslEngNm": "KYUNG JIN 1",
+            "vsslKnd": "93[급유선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "67",
+            "ntng": "67",
+            "vsslTotLt": "23.5",
+            "shdth": "6",
+            "vsslDrft": "3.1",
+            "vsslLt": "23.47",
+            "vsslDp": "3.1",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1992-08-01T00:00:00+09:00",
+            "befClsgn": "USR925299",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "17d0dc1a5-51b4-1cfd-2347-18b1bc645c8a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KEUM KANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KEUM KANG",
+      "candidates": []
+    }
+  ]
+}

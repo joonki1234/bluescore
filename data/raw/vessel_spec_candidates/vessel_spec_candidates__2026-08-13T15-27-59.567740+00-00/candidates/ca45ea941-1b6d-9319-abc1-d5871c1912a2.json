@@ -1,0 +1,13 @@
+{
+  "vesselId": "ca45ea941-1b6d-9319-abc1-d5871c1912a2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HWA GEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HWA GEONG",
+      "candidates": []
+    }
+  ]
+}

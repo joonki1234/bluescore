@@ -1,0 +1,65 @@
+{
+  "vesselId": "8968e18bc-c9fb-aeef-a8db-1384b7e5896d",
+  "gfwImo": null,
+  "gfwCallSign": "06028",
+  "gfwName": "MINFUDINGYU06028",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "06028",
+      "candidates": [
+        {
+          "vesselNameKor": "골드마린11호",
+          "vesselNameEng": "GOLDMARINE11",
+          "callSign": "060281",
+          "vesselNo": "060281",
+          "imoNo": null,
+          "vesselKind": "69[기타 예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 130.0,
+          "netTonnage": 130.0,
+          "internationalGrossTonnage": 130.0,
+          "lengthM": 25.2,
+          "totalLengthM": 26.0,
+          "widthM": 8.6,
+          "depthM": 3.8,
+          "draftM": 3.8,
+          "constructionDate": "1971-08-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "060281",
+            "vsslNo": "060281",
+            "imoNo": null,
+            "vsslKorNm": "골드마린11호",
+            "vsslEngNm": "GOLDMARINE11",
+            "vsslKnd": "69[기타 예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "130",
+            "grtg": "130",
+            "ntng": "130",
+            "vsslTotLt": "26",
+            "shdth": "8.6",
+            "vsslDrft": "3.8",
+            "vsslLt": "25.2",
+            "vsslDp": "3.8",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": null,
+            "nvgShapNm": "-",
+            "vsslCnstrDt": "1971-08-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MINFUDINGYU06028",
+      "candidates": []
+    }
+  ]
+}

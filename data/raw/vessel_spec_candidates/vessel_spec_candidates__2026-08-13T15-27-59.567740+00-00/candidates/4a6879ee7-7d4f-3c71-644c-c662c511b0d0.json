@@ -1,0 +1,18 @@
+{
+  "vesselId": "4a6879ee7-7d4f-3c71-644c-c662c511b0d0",
+  "gfwImo": null,
+  "gfwCallSign": "283@",
+  "gfwName": "EUNSUNG@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "283@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "EUNSUNG@",
+      "candidates": []
+    }
+  ]
+}

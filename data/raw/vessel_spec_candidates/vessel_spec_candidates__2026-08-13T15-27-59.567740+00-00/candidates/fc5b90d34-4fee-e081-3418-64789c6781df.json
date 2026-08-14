@@ -1,0 +1,18 @@
+{
+  "vesselId": "fc5b90d34-4fee-e081-3418-64789c6781df",
+  "gfwImo": null,
+  "gfwCallSign": "101 YM",
+  "gfwName": "TAE HYEONG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101 YM",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "TAE HYEONG",
+      "candidates": []
+    }
+  ]
+}

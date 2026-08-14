@@ -1,0 +1,13 @@
+{
+  "vesselId": "3164b1c09-9678-5712-3ce1-4e2906376b47",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "17HAW CHANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAW CHANG",
+      "candidates": []
+    }
+  ]
+}

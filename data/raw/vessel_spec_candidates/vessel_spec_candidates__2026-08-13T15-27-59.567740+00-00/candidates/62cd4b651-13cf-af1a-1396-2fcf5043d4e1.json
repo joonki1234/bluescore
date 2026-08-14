@@ -1,0 +1,60 @@
+{
+  "vesselId": "62cd4b651-13cf-af1a-1396-2fcf5043d4e1",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "WHITE SHARK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "WHITE SHARK",
+      "candidates": [
+        {
+          "vesselNameKor": "CMA CGM WHITE SHARK",
+          "vesselNameEng": "CMA CGM WHITE SHARK",
+          "callSign": "9HA5021",
+          "vesselNo": null,
+          "imoNo": "9317975",
+          "vesselKind": "41[풀컨테이너선]",
+          "nationality": "MT[몰타]",
+          "grossTonnage": 54309.0,
+          "netTonnage": 34011.0,
+          "internationalGrossTonnage": 54309.0,
+          "lengthM": 284.1,
+          "totalLengthM": 294.1,
+          "widthM": 32.2,
+          "depthM": 21.8,
+          "draftM": 12.0,
+          "constructionDate": "2006-12-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "9HA5021",
+            "vsslNo": null,
+            "imoNo": "9317975",
+            "vsslKorNm": "CMA CGM WHITE SHARK",
+            "vsslEngNm": "CMA CGM WHITE SHARK",
+            "vsslKnd": "41[풀컨테이너선]",
+            "vsslNlty": "MT[몰타]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "54309",
+            "grtg": "54309",
+            "ntng": "34011",
+            "vsslTotLt": "294.1",
+            "shdth": "32.2",
+            "vsslDrft": "12",
+            "vsslLt": "284.1",
+            "vsslDp": "21.8",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "2006-12-01T00:00:00+09:00",
+            "befClsgn": "MPXV7",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

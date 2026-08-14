@@ -1,0 +1,18 @@
+{
+  "vesselId": "db9d45230-010d-ebaa-e2b9-401e7661ec85",
+  "gfwImo": null,
+  "gfwCallSign": "640TS11",
+  "gfwName": "TI ESEU 11 HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "640TS11",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "TI ESEU 11",
+      "candidates": []
+    }
+  ]
+}

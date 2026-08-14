@@ -1,0 +1,13 @@
+{
+  "vesselId": "a695b35c1-1ae7-701d-014c-cf3a0910bdf9",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2SE JIN_HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SE JIN_HO",
+      "candidates": []
+    }
+  ]
+}

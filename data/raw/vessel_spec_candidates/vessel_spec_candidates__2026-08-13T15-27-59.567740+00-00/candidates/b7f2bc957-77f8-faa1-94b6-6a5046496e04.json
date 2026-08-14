@@ -1,0 +1,60 @@
+{
+  "vesselId": "b7f2bc957-77f8-faa1-94b6-6a5046496e04",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SAM DA HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SAM DA",
+      "candidates": [
+        {
+          "vesselNameKor": "삼다호",
+          "vesselNameEng": "SAM DA",
+          "callSign": "DSKH",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "81[관공선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 250.0,
+          "netTonnage": 130.0,
+          "internationalGrossTonnage": 250.0,
+          "lengthM": 52.0,
+          "totalLengthM": 53.0,
+          "widthM": 7.0,
+          "depthM": 3.0,
+          "draftM": 3.0,
+          "constructionDate": "1994-09-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "DSKH",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "삼다호",
+            "vsslEngNm": "SAM DA",
+            "vsslKnd": "81[관공선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "250",
+            "grtg": "250",
+            "ntng": "130",
+            "vsslTotLt": "53",
+            "shdth": "7",
+            "vsslDrft": "3",
+            "vsslLt": "52",
+            "vsslDp": "3",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1994-09-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

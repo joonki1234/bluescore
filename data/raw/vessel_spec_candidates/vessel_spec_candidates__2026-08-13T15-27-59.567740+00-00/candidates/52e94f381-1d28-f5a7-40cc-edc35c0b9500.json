@@ -1,0 +1,18 @@
+{
+  "vesselId": "52e94f381-1d28-f5a7-40cc-edc35c0b9500",
+  "gfwImo": null,
+  "gfwCallSign": "320YEON",
+  "gfwName": "YEONGSINHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "320YEON",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YEONGSINHO",
+      "candidates": []
+    }
+  ]
+}

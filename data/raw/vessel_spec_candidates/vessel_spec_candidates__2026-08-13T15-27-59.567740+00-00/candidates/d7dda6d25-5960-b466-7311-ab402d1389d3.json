@@ -1,0 +1,65 @@
+{
+  "vesselId": "d7dda6d25-5960-b466-7311-ab402d1389d3",
+  "gfwImo": null,
+  "gfwCallSign": "123KING",
+  "gfwName": "KINGKONG8",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "123KING",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "KINGKONG8",
+      "candidates": [
+        {
+          "vesselNameKor": "킹콩8",
+          "vesselNameEng": "KINGKONG8",
+          "callSign": "ICR231828",
+          "vesselNo": "231828",
+          "imoNo": null,
+          "vesselKind": "11[여객선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 40.0,
+          "netTonnage": 40.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": null,
+          "totalLengthM": 21.85,
+          "widthM": null,
+          "depthM": 1.75,
+          "draftM": null,
+          "constructionDate": "2023-08-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "ICR231828",
+            "vsslNo": "231828",
+            "imoNo": null,
+            "vsslKorNm": "킹콩8",
+            "vsslEngNm": "KINGKONG8",
+            "vsslKnd": "11[여객선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "40",
+            "ntng": "40",
+            "vsslTotLt": "21.85",
+            "shdth": null,
+            "vsslDrft": null,
+            "vsslLt": null,
+            "vsslDp": "1.75",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2023-08-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

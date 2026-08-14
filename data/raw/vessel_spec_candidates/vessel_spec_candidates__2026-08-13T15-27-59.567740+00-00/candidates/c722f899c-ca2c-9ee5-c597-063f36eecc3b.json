@@ -1,0 +1,13 @@
+{
+  "vesselId": "c722f899c-ca2c-9ee5-c597-063f36eecc3b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEONKYEONG2HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEONKYEONG2HO",
+      "candidates": []
+    }
+  ]
+}

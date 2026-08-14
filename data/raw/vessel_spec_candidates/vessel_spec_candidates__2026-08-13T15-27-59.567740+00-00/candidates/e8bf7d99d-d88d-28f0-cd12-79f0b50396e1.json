@@ -1,0 +1,13 @@
+{
+  "vesselId": "e8bf7d99d-d88d-28f0-cd12-79f0b50396e1",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "EUN JEONG 2HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "EUN JEONG 2HO",
+      "candidates": []
+    }
+  ]
+}

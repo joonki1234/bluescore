@@ -1,0 +1,13 @@
+{
+  "vesselId": "fbbb8c927-7a6b-5d5a-e856-be1b65da18b2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "307 SEUNG JIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "307 SEUNG JIN",
+      "candidates": []
+    }
+  ]
+}

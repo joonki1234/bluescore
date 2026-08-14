@@ -1,0 +1,13 @@
+{
+  "vesselId": "06a5b0b0b-b05d-b2b4-4c7a-8e89e5c738b8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2002 GEON YANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2002 GEON YANG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "1e956106a-a2c4-609b-a0ed-7e309fdd8282",
+  "gfwImo": null,
+  "gfwCallSign": "102MANC",
+  "gfwName": "DAEDONGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "102MANC",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "DAEDONGHO",
+      "candidates": []
+    }
+  ]
+}

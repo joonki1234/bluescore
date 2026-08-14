@@ -1,0 +1,13 @@
+{
+  "vesselId": "904123356-6c47-4863-a58d-e958d1a1e8f2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "TO MAL HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "TO MAL",
+      "candidates": []
+    }
+  ]
+}

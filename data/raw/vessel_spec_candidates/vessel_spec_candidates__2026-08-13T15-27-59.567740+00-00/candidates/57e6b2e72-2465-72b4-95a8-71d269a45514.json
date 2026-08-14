@@ -1,0 +1,13 @@
+{
+  "vesselId": "57e6b2e72-2465-72b4-95a8-71d269a45514",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.3 HO NAM",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.3 HO NAM",
+      "candidates": []
+    }
+  ]
+}

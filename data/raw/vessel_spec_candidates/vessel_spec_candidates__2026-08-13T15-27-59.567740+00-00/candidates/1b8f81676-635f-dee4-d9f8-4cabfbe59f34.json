@@ -1,0 +1,13 @@
+{
+  "vesselId": "1b8f81676-635f-dee4-d9f8-4cabfbe59f34",
+  "gfwImo": null,
+  "gfwCallSign": "500TAI",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "500TAI",
+      "candidates": []
+    }
+  ]
+}

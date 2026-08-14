@@ -1,0 +1,13 @@
+{
+  "vesselId": "39a6a715d-da83-7624-6fc3-f8d52f10156c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "FISHINGMANAGER",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "FISHINGMANAGER",
+      "candidates": []
+    }
+  ]
+}

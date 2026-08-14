@@ -1,0 +1,13 @@
+{
+  "vesselId": "102f9ec65-5f76-f0c1-9d09-c16c0c32ee59",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SUNGUN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SUNGUN",
+      "candidates": []
+    }
+  ]
+}

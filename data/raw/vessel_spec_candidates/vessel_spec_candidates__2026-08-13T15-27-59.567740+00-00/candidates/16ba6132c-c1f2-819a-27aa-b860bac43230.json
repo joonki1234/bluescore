@@ -1,0 +1,60 @@
+{
+  "vesselId": "16ba6132c-c1f2-819a-27aa-b860bac43230",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAESEUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAESEUNGHO",
+      "candidates": [
+        {
+          "vesselNameKor": "대승호",
+          "vesselNameEng": "DAESEUNGHO",
+          "callSign": "216803",
+          "vesselNo": "216803",
+          "imoNo": null,
+          "vesselKind": "62[이.접안용 예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 214.0,
+          "netTonnage": 214.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 31.72,
+          "totalLengthM": 31.72,
+          "widthM": 9.4,
+          "depthM": 4.2,
+          "draftM": 4.2,
+          "constructionDate": "2021-01-13T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "216803",
+            "vsslNo": "216803",
+            "imoNo": null,
+            "vsslKorNm": "대승호",
+            "vsslEngNm": "DAESEUNGHO",
+            "vsslKnd": "62[이.접안용 예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "214",
+            "ntng": "214",
+            "vsslTotLt": "31.72",
+            "shdth": "9.4",
+            "vsslDrft": "4.2",
+            "vsslLt": "31.72",
+            "vsslDp": "4.2",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2021-01-13T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}
