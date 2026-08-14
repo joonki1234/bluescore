@@ -1,0 +1,13 @@
+{
+  "vesselId": "96e70506c-c669-811d-a106-427036372390",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHUNGK WANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHUNGK WANG",
+      "candidates": []
+    }
+  ]
+}

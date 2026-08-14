@@ -1,0 +1,18 @@
+{
+  "vesselId": "9bf56c123-38df-c4c4-4658-a07799c01668",
+  "gfwImo": null,
+  "gfwCallSign": "229@",
+  "gfwName": "LUNA@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "229@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "LUNA@",
+      "candidates": []
+    }
+  ]
+}

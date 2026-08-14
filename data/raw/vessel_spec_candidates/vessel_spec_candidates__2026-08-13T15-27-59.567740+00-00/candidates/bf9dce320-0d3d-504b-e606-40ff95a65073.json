@@ -1,0 +1,60 @@
+{
+  "vesselId": "bf9dce320-0d3d-504b-e606-40ff95a65073",
+  "gfwImo": "7388310",
+  "gfwCallSign": "6KSP",
+  "gfwName": "NO.99 OYANG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "6KSP",
+      "candidates": [
+        {
+          "vesselNameKor": "제99오양",
+          "vesselNameEng": "NO.99 OYANG",
+          "callSign": "6KSP",
+          "vesselNo": null,
+          "imoNo": "7388310",
+          "vesselKind": "92[원양 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 2187.0,
+          "netTonnage": 695.0,
+          "internationalGrossTonnage": 2187.0,
+          "lengthM": 77.0,
+          "totalLengthM": 80.3,
+          "widthM": 13.0,
+          "depthM": 8.4,
+          "draftM": 8.4,
+          "constructionDate": "1975-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "6KSP",
+            "vsslNo": null,
+            "imoNo": "7388310",
+            "vsslKorNm": "제99오양",
+            "vsslEngNm": "NO.99 OYANG",
+            "vsslKnd": "92[원양 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "2187",
+            "grtg": "2187",
+            "ntng": "695",
+            "vsslTotLt": "80.3",
+            "shdth": "13",
+            "vsslDrft": "8.4",
+            "vsslLt": "77",
+            "vsslDp": "8.4",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1975-01-01T00:00:00+09:00",
+            "befClsgn": "UAFE",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "b659dab71-1d3d-6adf-2695-87d092bd419f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DEOK SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DEOK SEONG HO",
+      "candidates": []
+    }
+  ]
+}

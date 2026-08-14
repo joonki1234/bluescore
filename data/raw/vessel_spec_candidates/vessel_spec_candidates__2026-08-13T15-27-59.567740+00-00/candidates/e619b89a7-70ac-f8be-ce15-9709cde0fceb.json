@@ -1,0 +1,60 @@
+{
+  "vesselId": "e619b89a7-70ac-f8be-ce15-9709cde0fceb",
+  "gfwImo": null,
+  "gfwCallSign": "231809",
+  "gfwName": "BAN GA WER HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "231809",
+      "candidates": [
+        {
+          "vesselNameKor": "반가워호",
+          "vesselNameEng": null,
+          "callSign": "231809",
+          "vesselNo": "231809",
+          "imoNo": null,
+          "vesselKind": "97[유람선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 50.0,
+          "netTonnage": 0.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 21.87,
+          "totalLengthM": 21.87,
+          "widthM": 5.8,
+          "depthM": 2.05,
+          "draftM": null,
+          "constructionDate": "2023-02-10T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "231809",
+            "vsslNo": "231809",
+            "imoNo": null,
+            "vsslKorNm": "반가워호",
+            "vsslEngNm": null,
+            "vsslKnd": "97[유람선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "50",
+            "ntng": "0",
+            "vsslTotLt": "21.87",
+            "shdth": "5.8",
+            "vsslDrft": null,
+            "vsslLt": "21.87",
+            "vsslDp": "2.05",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2023-02-10T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

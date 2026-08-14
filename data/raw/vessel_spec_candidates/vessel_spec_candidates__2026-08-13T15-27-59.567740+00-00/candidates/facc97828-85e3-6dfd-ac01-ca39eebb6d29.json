@@ -1,0 +1,18 @@
+{
+  "vesselId": "facc97828-85e3-6dfd-ac01-ca39eebb6d29",
+  "gfwImo": null,
+  "gfwCallSign": "1276GDS",
+  "gfwName": "GOLDEN SEA 5HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "1276GDS",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GOLDEN SEA 5HO",
+      "candidates": []
+    }
+  ]
+}

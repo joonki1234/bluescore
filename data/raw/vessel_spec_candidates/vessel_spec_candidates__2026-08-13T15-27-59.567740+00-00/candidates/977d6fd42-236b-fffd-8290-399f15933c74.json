@@ -1,0 +1,13 @@
+{
+  "vesselId": "977d6fd42-236b-fffd-8290-399f15933c74",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NA REU SHA",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NA REU SHA",
+      "candidates": []
+    }
+  ]
+}

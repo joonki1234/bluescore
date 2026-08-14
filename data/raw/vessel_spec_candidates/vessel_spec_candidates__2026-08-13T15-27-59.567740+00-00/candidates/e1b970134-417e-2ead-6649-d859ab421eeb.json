@@ -1,0 +1,13 @@
+{
+  "vesselId": "e1b970134-417e-2ead-6649-d859ab421eeb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GWANG SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GWANG SEONG HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "a688dc2fb-bd4a-64a2-8916-86ca0fd7073f",
+  "gfwImo": null,
+  "gfwCallSign": "353MS",
+  "gfwName": "JE53MAN SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "353MS",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "JE53MAN SEONG HO",
+      "candidates": []
+    }
+  ]
+}

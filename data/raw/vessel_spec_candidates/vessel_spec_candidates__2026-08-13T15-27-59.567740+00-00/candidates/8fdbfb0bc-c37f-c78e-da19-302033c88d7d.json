@@ -1,0 +1,13 @@
+{
+  "vesselId": "8fdbfb0bc-c37f-c78e-da19-302033c88d7d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHEON SEUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEON SEUNG",
+      "candidates": []
+    }
+  ]
+}

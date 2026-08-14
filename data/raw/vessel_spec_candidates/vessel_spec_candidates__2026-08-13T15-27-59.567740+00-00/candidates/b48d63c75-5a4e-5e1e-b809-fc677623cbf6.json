@@ -1,0 +1,13 @@
+{
+  "vesselId": "b48d63c75-5a4e-5e1e-b809-fc677623cbf6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE GWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE GWANG HO",
+      "candidates": []
+    }
+  ]
+}

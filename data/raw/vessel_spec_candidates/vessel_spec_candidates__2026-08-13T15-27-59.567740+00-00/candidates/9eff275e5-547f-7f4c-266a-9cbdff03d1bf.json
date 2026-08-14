@@ -1,0 +1,13 @@
+{
+  "vesselId": "9eff275e5-547f-7f4c-266a-9cbdff03d1bf",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NAMJIN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NAMJIN HO",
+      "candidates": []
+    }
+  ]
+}

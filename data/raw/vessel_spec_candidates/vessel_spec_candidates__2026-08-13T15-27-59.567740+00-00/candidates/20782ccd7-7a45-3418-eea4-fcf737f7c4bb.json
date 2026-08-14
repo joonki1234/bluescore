@@ -1,0 +1,18 @@
+{
+  "vesselId": "20782ccd7-7a45-3418-eea4-fcf737f7c4bb",
+  "gfwImo": null,
+  "gfwCallSign": "101DAEP",
+  "gfwName": "DAEPOHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101DAEP",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "DAEPOHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "651a06b07-7cc1-f5dd-e8a7-c50aac1c4a2c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "211TAEJINHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "211TAEJINHO",
+      "candidates": []
+    }
+  ]
+}

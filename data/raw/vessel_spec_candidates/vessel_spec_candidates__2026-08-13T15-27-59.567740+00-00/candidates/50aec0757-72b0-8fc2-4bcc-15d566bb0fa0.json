@@ -1,0 +1,13 @@
+{
+  "vesselId": "50aec0757-72b0-8fc2-4bcc-15d566bb0fa0",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "55GEUM CHANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "55GEUM CHANG",
+      "candidates": []
+    }
+  ]
+}

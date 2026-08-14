@@ -1,0 +1,13 @@
+{
+  "vesselId": "7c9293ba2-2423-8b2f-bd9d-8dab80767567",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "72 GEUM JEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "72 GEUM JEONG",
+      "candidates": []
+    }
+  ]
+}

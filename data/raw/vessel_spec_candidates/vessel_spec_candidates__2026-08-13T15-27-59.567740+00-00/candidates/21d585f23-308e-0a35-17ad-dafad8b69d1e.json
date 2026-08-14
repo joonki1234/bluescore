@@ -1,0 +1,18 @@
+{
+  "vesselId": "21d585f23-308e-0a35-17ad-dafad8b69d1e",
+  "gfwImo": null,
+  "gfwCallSign": "8@O",
+  "gfwName": "SU DEOK HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "8@O",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SU DEOK HO",
+      "candidates": []
+    }
+  ]
+}

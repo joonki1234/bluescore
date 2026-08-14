@@ -1,0 +1,13 @@
+{
+  "vesselId": "30daf834d-df07-8364-36e6-0ca57d4f5976",
+  "gfwImo": null,
+  "gfwCallSign": "124JEON",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "124JEON",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "e25d24866-6828-1a1a-e575-84d5769cadda",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "65DONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "65DONG HO",
+      "candidates": []
+    }
+  ]
+}

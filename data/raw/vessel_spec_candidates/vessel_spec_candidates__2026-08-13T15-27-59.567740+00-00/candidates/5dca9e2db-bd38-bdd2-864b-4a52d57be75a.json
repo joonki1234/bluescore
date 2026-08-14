@@ -1,0 +1,13 @@
+{
+  "vesselId": "5dca9e2db-bd38-bdd2-864b-4a52d57be75a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "TAI JIN 2HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "TAI JIN 2HO",
+      "candidates": []
+    }
+  ]
+}

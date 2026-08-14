@@ -1,0 +1,13 @@
+{
+  "vesselId": "d5504a10d-de1a-4177-c96e-f215fe272afa",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.306 YEONGHWA",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.306 YEONGHWA",
+      "candidates": []
+    }
+  ]
+}

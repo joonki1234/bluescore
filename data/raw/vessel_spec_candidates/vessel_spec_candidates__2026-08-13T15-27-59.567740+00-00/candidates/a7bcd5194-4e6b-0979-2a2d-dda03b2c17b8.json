@@ -1,0 +1,60 @@
+{
+  "vesselId": "a7bcd5194-4e6b-0979-2a2d-dda03b2c17b8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SUN YANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SUN YANG HO",
+      "candidates": [
+        {
+          "vesselNameKor": "선양호",
+          "vesselNameEng": "SUN YANG HO",
+          "callSign": "D9ZY",
+          "vesselNo": "921171",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 652.0,
+          "netTonnage": 325.0,
+          "internationalGrossTonnage": 652.0,
+          "lengthM": 62.0,
+          "totalLengthM": 62.0,
+          "widthM": 11.2,
+          "depthM": 5.2,
+          "draftM": 5.2,
+          "constructionDate": "1973-08-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "D9ZY",
+            "vsslNo": "921171",
+            "imoNo": null,
+            "vsslKorNm": "선양호",
+            "vsslEngNm": "SUN YANG HO",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "652",
+            "grtg": "652",
+            "ntng": "325",
+            "vsslTotLt": "62",
+            "shdth": "11.2",
+            "vsslDrft": "5.2",
+            "vsslLt": "62",
+            "vsslDp": "5.2",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1973-08-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

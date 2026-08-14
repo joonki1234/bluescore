@@ -1,0 +1,18 @@
+{
+  "vesselId": "48f2e6dea-aa8d-76d9-26a5-29ba89195788",
+  "gfwImo": null,
+  "gfwCallSign": "210@",
+  "gfwName": "RED SKY@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "210@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "RED SKY@",
+      "candidates": []
+    }
+  ]
+}

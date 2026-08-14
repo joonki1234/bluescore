@@ -1,0 +1,18 @@
+{
+  "vesselId": "83b5c0282-246c-9c5e-c255-12d82046e316",
+  "gfwImo": null,
+  "gfwCallSign": "309DK",
+  "gfwName": "YEO MYEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "309DK",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YEO MYEONG HO",
+      "candidates": []
+    }
+  ]
+}

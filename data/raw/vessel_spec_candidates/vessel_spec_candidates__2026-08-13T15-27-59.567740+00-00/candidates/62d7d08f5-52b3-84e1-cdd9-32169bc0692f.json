@@ -1,0 +1,13 @@
+{
+  "vesselId": "62d7d08f5-52b3-84e1-cdd9-32169bc0692f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2016SINAESAN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2016SINAESAN",
+      "candidates": []
+    }
+  ]
+}

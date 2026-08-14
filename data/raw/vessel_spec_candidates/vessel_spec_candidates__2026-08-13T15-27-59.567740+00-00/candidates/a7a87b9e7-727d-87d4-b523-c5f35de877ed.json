@@ -1,0 +1,18 @@
+{
+  "vesselId": "a7a87b9e7-727d-87d4-b523-c5f35de877ed",
+  "gfwImo": null,
+  "gfwCallSign": "303@",
+  "gfwName": "HAN SOL @",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "303@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HAN SOL @",
+      "candidates": []
+    }
+  ]
+}

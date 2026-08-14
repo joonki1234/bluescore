@@ -1,0 +1,60 @@
+{
+  "vesselId": "ecd7d77c9-9967-b74b-54a0-734b611c46ff",
+  "gfwImo": "9906697",
+  "gfwCallSign": "D8FX",
+  "gfwName": "GRAND WINNER 2",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D8FX",
+      "candidates": [
+        {
+          "vesselNameKor": "그랜드 위너 2",
+          "vesselNameEng": "GRAND WINNER 2",
+          "callSign": "D8FX",
+          "vesselNo": "261037",
+          "imoNo": "9906697",
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 29707.0,
+          "netTonnage": 13918.0,
+          "internationalGrossTonnage": 29707.0,
+          "lengthM": 176.2,
+          "totalLengthM": 183.06,
+          "widthM": 32.2,
+          "depthM": 19.1,
+          "draftM": 13.3,
+          "constructionDate": "2021-02-04T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D8FX",
+            "vsslNo": "261037",
+            "imoNo": "9906697",
+            "vsslKorNm": "그랜드 위너 2",
+            "vsslEngNm": "GRAND WINNER 2",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "29707",
+            "grtg": "29707",
+            "ntng": "13918",
+            "vsslTotLt": "183.06",
+            "shdth": "32.2",
+            "vsslDrft": "13.3",
+            "vsslLt": "176.2",
+            "vsslDp": "19.1",
+            "brbtSe": "1",
+            "brbtSeNm": "국취부나용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2021-02-04T00:00:00+09:00",
+            "befClsgn": "HPOZ",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

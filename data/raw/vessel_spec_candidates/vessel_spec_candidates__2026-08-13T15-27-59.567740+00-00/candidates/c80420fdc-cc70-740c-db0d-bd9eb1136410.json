@@ -1,0 +1,13 @@
+{
+  "vesselId": "c80420fdc-cc70-740c-db0d-bd9eb1136410",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GANG JIN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GANG JIN HO",
+      "candidates": []
+    }
+  ]
+}

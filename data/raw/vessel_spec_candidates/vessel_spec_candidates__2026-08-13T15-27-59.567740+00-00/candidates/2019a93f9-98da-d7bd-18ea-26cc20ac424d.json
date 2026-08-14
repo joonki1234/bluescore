@@ -1,0 +1,18 @@
+{
+  "vesselId": "2019a93f9-98da-d7bd-18ea-26cc20ac424d",
+  "gfwImo": null,
+  "gfwCallSign": "126  @",
+  "gfwName": "CHEONG MA HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "126  @",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEONG MA HO@",
+      "candidates": []
+    }
+  ]
+}

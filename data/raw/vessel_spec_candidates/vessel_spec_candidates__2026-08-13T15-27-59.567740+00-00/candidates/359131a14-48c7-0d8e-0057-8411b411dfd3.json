@@ -1,0 +1,13 @@
+{
+  "vesselId": "359131a14-48c7-0d8e-0057-8411b411dfd3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE GYEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE GYEONG HO",
+      "candidates": []
+    }
+  ]
+}

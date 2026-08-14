@@ -1,0 +1,18 @@
+{
+  "vesselId": "affd4354b-b182-6bc0-d679-de35c07d1cba",
+  "gfwImo": null,
+  "gfwCallSign": "99988",
+  "gfwName": "MINGZHULUN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "99988",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MINGZHULUN",
+      "candidates": []
+    }
+  ]
+}

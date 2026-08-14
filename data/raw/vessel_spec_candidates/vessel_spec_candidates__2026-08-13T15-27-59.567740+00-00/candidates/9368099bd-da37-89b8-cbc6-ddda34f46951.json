@@ -1,0 +1,13 @@
+{
+  "vesselId": "9368099bd-da37-89b8-cbc6-ddda34f46951",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "102 JIN SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "102 JIN SEONG",
+      "candidates": []
+    }
+  ]
+}

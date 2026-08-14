@@ -1,0 +1,13 @@
+{
+  "vesselId": "cb6d27624-4414-6a93-433f-48a3e4463ad0",
+  "gfwImo": null,
+  "gfwCallSign": "126MORN",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "126MORN",
+      "candidates": []
+    }
+  ]
+}

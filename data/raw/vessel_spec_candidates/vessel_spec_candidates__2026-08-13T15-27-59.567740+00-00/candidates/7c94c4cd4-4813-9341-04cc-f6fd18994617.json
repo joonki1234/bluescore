@@ -1,0 +1,13 @@
+{
+  "vesselId": "7c94c4cd4-4813-9341-04cc-f6fd18994617",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "ALLFOUR OCEAN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "ALLFOUR OCEAN",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "4c4781139-9369-7c36-f8e8-a42f6247a149",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "208 IL SIM",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "208 IL SIM",
+      "candidates": []
+    }
+  ]
+}

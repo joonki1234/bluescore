@@ -1,0 +1,13 @@
+{
+  "vesselId": "84269b4a2-219d-1d18-11c2-46bbb57ef365",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAMSU",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAMSU",
+      "candidates": []
+    }
+  ]
+}

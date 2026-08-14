@@ -1,0 +1,18 @@
+{
+  "vesselId": "7e9bd1054-4a38-0a7a-e647-b0f1743e3829",
+  "gfwImo": null,
+  "gfwCallSign": "124@",
+  "gfwName": "CHEONG CHOON HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "124@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEONG CHOON HO@",
+      "candidates": []
+    }
+  ]
+}

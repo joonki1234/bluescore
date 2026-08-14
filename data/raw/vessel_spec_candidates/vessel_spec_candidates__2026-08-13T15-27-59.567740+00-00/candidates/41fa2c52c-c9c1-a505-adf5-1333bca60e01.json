@@ -1,0 +1,13 @@
+{
+  "vesselId": "41fa2c52c-c9c1-a505-adf5-1333bca60e01",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "206BOKSEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "206BOKSEONG",
+      "candidates": []
+    }
+  ]
+}

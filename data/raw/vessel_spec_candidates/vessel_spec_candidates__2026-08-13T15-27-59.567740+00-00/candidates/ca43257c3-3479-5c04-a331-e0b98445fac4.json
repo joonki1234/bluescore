@@ -1,0 +1,13 @@
+{
+  "vesselId": "ca43257c3-3479-5c04-a331-e0b98445fac4",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "820DONG HYEON HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "820DONG HYEON HO",
+      "candidates": []
+    }
+  ]
+}

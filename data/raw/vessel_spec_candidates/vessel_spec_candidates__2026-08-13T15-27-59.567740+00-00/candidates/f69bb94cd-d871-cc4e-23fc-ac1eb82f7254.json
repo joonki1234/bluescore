@@ -1,0 +1,18 @@
+{
+  "vesselId": "f69bb94cd-d871-cc4e-23fc-ac1eb82f7254",
+  "gfwImo": null,
+  "gfwCallSign": "323HG",
+  "gfwName": "201 HAE GEUM",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "323HG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "201 HAE GEUM",
+      "candidates": []
+    }
+  ]
+}

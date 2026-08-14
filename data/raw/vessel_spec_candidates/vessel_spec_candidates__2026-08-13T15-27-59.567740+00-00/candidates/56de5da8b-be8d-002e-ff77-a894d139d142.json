@@ -1,0 +1,13 @@
+{
+  "vesselId": "56de5da8b-be8d-002e-ff77-a894d139d142",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "3DONGA",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "3DONGA",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "vesselId": "b5b44869c-cdc6-6978-4258-be1ab0415818",
+  "gfwImo": "9693563",
+  "gfwCallSign": "9HA5890",
+  "gfwName": "SEAWIND",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "9HA5890",
+      "candidates": [
+        {
+          "vesselNameKor": "SEAWIND",
+          "vesselNameEng": "SEAWIND",
+          "callSign": "9HA5890",
+          "vesselNo": null,
+          "imoNo": "9693563",
+          "vesselKind": "21[산물선(벌크선)]",
+          "nationality": "MT[몰타]",
+          "grossTonnage": 94879.0,
+          "netTonnage": 60329.0,
+          "internationalGrossTonnage": 94879.0,
+          "lengthM": 286.6,
+          "totalLengthM": 292.0,
+          "widthM": 45.0,
+          "depthM": 24.8,
+          "draftM": 18.2,
+          "constructionDate": "2015-11-30T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "9HA5890",
+            "vsslNo": null,
+            "imoNo": "9693563",
+            "vsslKorNm": "SEAWIND",
+            "vsslEngNm": "SEAWIND",
+            "vsslKnd": "21[산물선(벌크선)]",
+            "vsslNlty": "MT[몰타]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "94879",
+            "grtg": "94879",
+            "ntng": "60329",
+            "vsslTotLt": "292",
+            "shdth": "45",
+            "vsslDrft": "18.2",
+            "vsslLt": "286.6",
+            "vsslDp": "24.8",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2015-11-30T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

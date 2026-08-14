@@ -1,0 +1,13 @@
+{
+  "vesselId": "133aad54c-ca37-4971-9a2e-d255619108a4",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "506 SEONG GWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "506 SEONG GWANG",
+      "candidates": []
+    }
+  ]
+}

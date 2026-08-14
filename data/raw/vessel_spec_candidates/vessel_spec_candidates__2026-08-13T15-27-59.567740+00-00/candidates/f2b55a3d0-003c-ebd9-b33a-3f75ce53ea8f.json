@@ -1,0 +1,13 @@
+{
+  "vesselId": "f2b55a3d0-003c-ebd9-b33a-3f75ce53ea8f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YEON JIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YEON JIN",
+      "candidates": []
+    }
+  ]
+}

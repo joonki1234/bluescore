@@ -1,0 +1,13 @@
+{
+  "vesselId": "e1dd25bab-b5b1-bb40-78e3-8648743e2773",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "707 KWANG IL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "707 KWANG IL",
+      "candidates": []
+    }
+  ]
+}

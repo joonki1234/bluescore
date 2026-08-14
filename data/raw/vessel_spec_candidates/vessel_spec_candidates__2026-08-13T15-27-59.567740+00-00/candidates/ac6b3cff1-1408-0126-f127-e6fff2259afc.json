@@ -1,0 +1,65 @@
+{
+  "vesselId": "ac6b3cff1-1408-0126-f127-e6fff2259afc",
+  "gfwImo": "9975959",
+  "gfwCallSign": "500ELDO",
+  "gfwName": "EL DORADO EXPRESS",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "500ELDO",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "EL DORADO EXPRESS",
+      "candidates": [
+        {
+          "vesselNameKor": "EL DORADO EXPRESS",
+          "vesselNameEng": "EL DORADO EXPRESS",
+          "callSign": "3E3498",
+          "vesselNo": null,
+          "imoNo": "9975959",
+          "vesselKind": "11[여객선]",
+          "nationality": "PA[파나마]",
+          "grossTonnage": 3158.0,
+          "netTonnage": 949.0,
+          "internationalGrossTonnage": 3158.0,
+          "lengthM": 67.34,
+          "totalLengthM": 76.7,
+          "widthM": 20.6,
+          "depthM": 6.32,
+          "draftM": 6.3,
+          "constructionDate": "2022-01-13T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "3E3498",
+            "vsslNo": null,
+            "imoNo": "9975959",
+            "vsslKorNm": "EL DORADO EXPRESS",
+            "vsslEngNm": "EL DORADO EXPRESS",
+            "vsslKnd": "11[여객선]",
+            "vsslNlty": "PA[파나마]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "3158",
+            "grtg": "3158",
+            "ntng": "949",
+            "vsslTotLt": "76.7",
+            "shdth": "20.6",
+            "vsslDrft": "6.3",
+            "vsslLt": "67.34",
+            "vsslDp": "6.32",
+            "brbtSe": "1",
+            "brbtSeNm": "국취부나용선",
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "2022-01-13T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

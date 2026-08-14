@@ -1,0 +1,13 @@
+{
+  "vesselId": "9f1839d41-10e8-71ac-be6a-becd7373b810",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KWANG SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KWANG SEONG",
+      "candidates": []
+    }
+  ]
+}

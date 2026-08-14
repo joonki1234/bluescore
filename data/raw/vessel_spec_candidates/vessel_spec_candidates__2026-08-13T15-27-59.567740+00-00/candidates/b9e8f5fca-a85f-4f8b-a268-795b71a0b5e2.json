@@ -1,0 +1,13 @@
+{
+  "vesselId": "b9e8f5fca-a85f-4f8b-a268-795b71a0b5e2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "307SEUNGSEUNGJANGGU",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "307SEUNGSEUNGJANGGU",
+      "candidates": []
+    }
+  ]
+}

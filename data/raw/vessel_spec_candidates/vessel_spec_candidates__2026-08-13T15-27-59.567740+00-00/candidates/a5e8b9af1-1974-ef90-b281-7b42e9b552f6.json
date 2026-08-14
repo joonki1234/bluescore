@@ -1,0 +1,13 @@
+{
+  "vesselId": "a5e8b9af1-1974-ef90-b281-7b42e9b552f6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "1GEUM MYUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "1GEUM MYUNG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "41c94e9a9-9310-1ac1-d7f2-eaa48278c98f",
+  "gfwImo": null,
+  "gfwCallSign": "210@",
+  "gfwName": "DAE GOONG@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "210@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE GOONG@",
+      "candidates": []
+    }
+  ]
+}

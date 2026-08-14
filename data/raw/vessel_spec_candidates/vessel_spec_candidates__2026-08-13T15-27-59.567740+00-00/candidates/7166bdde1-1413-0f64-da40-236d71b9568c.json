@@ -1,0 +1,18 @@
+{
+  "vesselId": "7166bdde1-1413-0f64-da40-236d71b9568c",
+  "gfwImo": null,
+  "gfwCallSign": "300YOUN",
+  "gfwName": "YOUNGSUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300YOUN",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YOUNGSUNGHO",
+      "candidates": []
+    }
+  ]
+}

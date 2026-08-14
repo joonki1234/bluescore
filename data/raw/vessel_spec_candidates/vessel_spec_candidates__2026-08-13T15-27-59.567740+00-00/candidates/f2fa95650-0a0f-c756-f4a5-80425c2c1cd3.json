@@ -1,0 +1,18 @@
+{
+  "vesselId": "f2fa95650-0a0f-c756-f4a5-80425c2c1cd3",
+  "gfwImo": null,
+  "gfwCallSign": "999GALR",
+  "gfwName": "GALRILLY",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "999GALR",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GALRILLY",
+      "candidates": []
+    }
+  ]
+}

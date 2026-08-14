@@ -1,0 +1,13 @@
+{
+  "vesselId": "7557917fb-b97c-6317-41c2-139f53c9ac86",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HEUNGYEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HEUNGYEONG",
+      "candidates": []
+    }
+  ]
+}

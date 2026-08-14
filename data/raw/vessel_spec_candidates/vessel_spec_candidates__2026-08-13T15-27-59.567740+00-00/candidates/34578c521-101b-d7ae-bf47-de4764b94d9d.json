@@ -1,0 +1,13 @@
+{
+  "vesselId": "34578c521-101b-d7ae-bf47-de4764b94d9d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JU YEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JU YEONG HO",
+      "candidates": []
+    }
+  ]
+}

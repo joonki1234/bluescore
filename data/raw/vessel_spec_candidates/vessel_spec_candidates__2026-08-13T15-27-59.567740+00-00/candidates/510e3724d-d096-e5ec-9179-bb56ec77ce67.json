@@ -1,0 +1,13 @@
+{
+  "vesselId": "510e3724d-d096-e5ec-9179-bb56ec77ce67",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2045 YEONG SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2045 YEONG SEONG",
+      "candidates": []
+    }
+  ]
+}

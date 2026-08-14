@@ -1,0 +1,13 @@
+{
+  "vesselId": "8ea76a40a-abf7-c9f5-93c0-0a2db1739894",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DEA  SUNG 3",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DEA  SUNG 3",
+      "candidates": []
+    }
+  ]
+}

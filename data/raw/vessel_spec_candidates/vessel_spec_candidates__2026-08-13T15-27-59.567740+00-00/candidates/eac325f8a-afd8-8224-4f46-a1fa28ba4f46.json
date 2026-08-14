@@ -1,0 +1,18 @@
+{
+  "vesselId": "eac325f8a-afd8-8224-4f46-a1fa28ba4f46",
+  "gfwImo": "4194304",
+  "gfwCallSign": "301GU",
+  "gfwName": "NO1 GU JIN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "301GU",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NO1 GU JIN",
+      "candidates": []
+    }
+  ]
+}

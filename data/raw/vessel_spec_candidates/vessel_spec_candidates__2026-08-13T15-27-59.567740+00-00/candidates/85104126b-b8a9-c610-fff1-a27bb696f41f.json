@@ -1,0 +1,18 @@
+{
+  "vesselId": "85104126b-b8a9-c610-fff1-a27bb696f41f",
+  "gfwImo": null,
+  "gfwCallSign": "6287205",
+  "gfwName": "INCHEON NO.226",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "6287205",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "INCHEON NO.226",
+      "candidates": []
+    }
+  ]
+}

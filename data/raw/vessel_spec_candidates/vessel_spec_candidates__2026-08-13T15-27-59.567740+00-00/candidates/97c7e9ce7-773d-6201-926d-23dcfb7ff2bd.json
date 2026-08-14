@@ -1,0 +1,13 @@
+{
+  "vesselId": "97c7e9ce7-773d-6201-926d-23dcfb7ff2bd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "9070NAM0YANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "9070NAM0YANG",
+      "candidates": []
+    }
+  ]
+}

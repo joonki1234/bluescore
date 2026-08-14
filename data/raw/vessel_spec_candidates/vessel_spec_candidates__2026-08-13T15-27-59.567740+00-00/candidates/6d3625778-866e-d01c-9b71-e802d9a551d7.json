@@ -1,0 +1,18 @@
+{
+  "vesselId": "6d3625778-866e-d01c-9b71-e802d9a551d7",
+  "gfwImo": null,
+  "gfwCallSign": "9609005",
+  "gfwName": "NO.506 HAE SUNG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "9609005",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.506 HAE SUNG",
+      "candidates": []
+    }
+  ]
+}

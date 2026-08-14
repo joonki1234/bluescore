@@ -1,0 +1,60 @@
+{
+  "vesselId": "e2d404328-8903-2e67-2a47-e3a8527b2272",
+  "gfwImo": null,
+  "gfwCallSign": "121820",
+  "gfwName": "SHIN SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "121820",
+      "candidates": [
+        {
+          "vesselNameKor": "신성호",
+          "vesselNameEng": null,
+          "callSign": "121820",
+          "vesselNo": "121820",
+          "imoNo": null,
+          "vesselKind": "99[기타선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 10.0,
+          "netTonnage": 10.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 13.84,
+          "totalLengthM": 13.84,
+          "widthM": null,
+          "depthM": 1.3,
+          "draftM": null,
+          "constructionDate": "1989-04-25T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "121820",
+            "vsslNo": "121820",
+            "imoNo": null,
+            "vsslKorNm": "신성호",
+            "vsslEngNm": null,
+            "vsslKnd": "99[기타선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "10",
+            "ntng": "10",
+            "vsslTotLt": "13.84",
+            "shdth": null,
+            "vsslDrft": null,
+            "vsslLt": "13.84",
+            "vsslDp": "1.3",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1989-04-25T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

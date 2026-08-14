@@ -1,0 +1,13 @@
+{
+  "vesselId": "1c3fe8982-26cd-659f-54be-0c41d344f5dd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHANG SEONG 32",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHANG SEONG 32",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "18b729774-45fd-ad49-aee1-e725efeb31cf",
+  "gfwImo": null,
+  "gfwCallSign": "99HANIL",
+  "gfwName": "1003 HAN IL",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "99HANIL",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "1003 HAN IL",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "9ecfbd6a2-2044-3345-d56e-d8cd8d59cb49",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "209 GEUM YOUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "209 GEUM YOUNG HO",
+      "candidates": []
+    }
+  ]
+}

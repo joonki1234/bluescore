@@ -1,0 +1,13 @@
+{
+  "vesselId": "ae10e5481-19cb-9f67-26b0-390248fcf1dd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "TAE YEONG 2HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "TAE YEONG 2HO",
+      "candidates": []
+    }
+  ]
+}

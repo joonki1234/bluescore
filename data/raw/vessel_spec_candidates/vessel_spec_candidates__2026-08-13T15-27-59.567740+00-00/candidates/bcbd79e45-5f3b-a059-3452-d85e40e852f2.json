@@ -1,0 +1,13 @@
+{
+  "vesselId": "bcbd79e45-5f3b-a059-3452-d85e40e852f2",
+  "gfwImo": null,
+  "gfwCallSign": "121HARA",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "121HARA",
+      "candidates": []
+    }
+  ]
+}

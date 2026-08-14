@@ -1,0 +1,13 @@
+{
+  "vesselId": "3ece47d4b-b2ab-7ead-d517-e9ba7334d2ba",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "61KEUMYOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "61KEUMYOUNG",
+      "candidates": []
+    }
+  ]
+}

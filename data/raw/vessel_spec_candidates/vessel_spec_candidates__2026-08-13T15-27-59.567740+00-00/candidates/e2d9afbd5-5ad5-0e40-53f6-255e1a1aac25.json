@@ -1,0 +1,13 @@
+{
+  "vesselId": "e2d9afbd5-5ad5-0e40-53f6-255e1a1aac25",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "77 YONG DEUK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "77 YONG DEUK",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "e5af09afd-dccc-3ed2-3bcc-844c9c8f71c8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE SEONG",
+      "candidates": []
+    }
+  ]
+}

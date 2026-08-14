@@ -1,0 +1,13 @@
+{
+  "vesselId": "f51941659-9a81-9464-43df-59f340ccf128",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "PYUNGKANGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "PYUNGKANGHO",
+      "candidates": []
+    }
+  ]
+}

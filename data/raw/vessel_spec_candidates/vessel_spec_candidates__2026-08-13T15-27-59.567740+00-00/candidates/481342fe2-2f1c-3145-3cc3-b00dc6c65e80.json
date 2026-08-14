@@ -1,0 +1,13 @@
+{
+  "vesselId": "481342fe2-2f1c-3145-3cc3-b00dc6c65e80",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "88WOONGCHEON",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "88WOONGCHEON",
+      "candidates": []
+    }
+  ]
+}

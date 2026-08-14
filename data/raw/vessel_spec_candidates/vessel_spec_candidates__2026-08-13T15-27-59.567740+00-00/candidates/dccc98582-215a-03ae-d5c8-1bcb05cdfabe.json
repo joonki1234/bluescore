@@ -1,0 +1,13 @@
+{
+  "vesselId": "dccc98582-215a-03ae-d5c8-1bcb05cdfabe",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "6 JAE SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "6 JAE SEONG HO",
+      "candidates": []
+    }
+  ]
+}

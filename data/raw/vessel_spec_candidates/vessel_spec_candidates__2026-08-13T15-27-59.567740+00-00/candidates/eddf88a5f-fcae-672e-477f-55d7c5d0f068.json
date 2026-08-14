@@ -1,0 +1,13 @@
+{
+  "vesselId": "eddf88a5f-fcae-672e-477f-55d7c5d0f068",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "IN YOUNG HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "IN YOUNG HO@",
+      "candidates": []
+    }
+  ]
+}

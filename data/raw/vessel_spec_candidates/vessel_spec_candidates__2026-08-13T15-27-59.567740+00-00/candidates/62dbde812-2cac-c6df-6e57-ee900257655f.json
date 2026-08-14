@@ -1,0 +1,18 @@
+{
+  "vesselId": "62dbde812-2cac-c6df-6e57-ee900257655f",
+  "gfwImo": null,
+  "gfwCallSign": "321HG",
+  "gfwName": "102 HAE GEUM",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "321HG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "102 HAE GEUM",
+      "candidates": []
+    }
+  ]
+}

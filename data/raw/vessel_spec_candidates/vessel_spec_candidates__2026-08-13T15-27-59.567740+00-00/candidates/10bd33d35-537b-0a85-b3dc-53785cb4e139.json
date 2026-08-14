@@ -1,0 +1,13 @@
+{
+  "vesselId": "10bd33d35-537b-0a85-b3dc-53785cb4e139",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "998DEAHAN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "998DEAHAN HO",
+      "candidates": []
+    }
+  ]
+}

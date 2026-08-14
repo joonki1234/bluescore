@@ -1,0 +1,13 @@
+{
+  "vesselId": "9be7faa28-8629-bb2f-70cd-f350d57dad81",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE RYONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE RYONG HO",
+      "candidates": []
+    }
+  ]
+}

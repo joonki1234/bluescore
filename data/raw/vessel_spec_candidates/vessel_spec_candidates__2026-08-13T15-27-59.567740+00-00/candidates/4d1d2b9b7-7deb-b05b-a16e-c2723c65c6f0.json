@@ -1,0 +1,60 @@
+{
+  "vesselId": "4d1d2b9b7-7deb-b05b-a16e-c2723c65c6f0",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHEONG YONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEONG YONG",
+      "candidates": [
+        {
+          "vesselNameKor": "청룡",
+          "vesselNameEng": "CHEONG YONG",
+          "callSign": "3FGLS",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "PA[파나마]",
+          "grossTonnage": 6402.0,
+          "netTonnage": 3683.0,
+          "internationalGrossTonnage": 6402.0,
+          "lengthM": 130.6,
+          "totalLengthM": 130.6,
+          "widthM": 20.0,
+          "depthM": 7.0,
+          "draftM": 10.0,
+          "constructionDate": "1993-10-10T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "3FGLS",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "청룡",
+            "vsslEngNm": "CHEONG YONG",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "PA[파나마]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "6402",
+            "grtg": "6402",
+            "ntng": "3683",
+            "vsslTotLt": "130.6",
+            "shdth": "20",
+            "vsslDrft": "10",
+            "vsslLt": "130.6",
+            "vsslDp": "7",
+            "brbtSe": "1",
+            "brbtSeNm": "국취부나용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1993-10-10T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

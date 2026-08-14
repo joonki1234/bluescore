@@ -1,0 +1,13 @@
+{
+  "vesselId": "12ec0b417-7b7f-f4ee-1e9a-839c29e84875",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KANGNAMHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KANGNAMHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "9b5cb1da2-2135-57ed-eca1-56b4ecba4e98",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MAN.SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MAN.SUNG HO",
+      "candidates": []
+    }
+  ]
+}

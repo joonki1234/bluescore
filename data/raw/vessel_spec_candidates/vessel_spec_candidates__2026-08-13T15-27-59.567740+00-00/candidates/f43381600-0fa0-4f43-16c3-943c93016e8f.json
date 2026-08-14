@@ -1,0 +1,60 @@
+{
+  "vesselId": "f43381600-0fa0-4f43-16c3-943c93016e8f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JINYOUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JINYOUNGHO",
+      "candidates": [
+        {
+          "vesselNameKor": "진영호",
+          "vesselNameEng": "JINYOUNGHO",
+          "callSign": "246206",
+          "vesselNo": "246206",
+          "imoNo": null,
+          "vesselKind": "99[기타선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 14.0,
+          "netTonnage": 14.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 15.39,
+          "totalLengthM": 15.39,
+          "widthM": null,
+          "depthM": 1.26,
+          "draftM": null,
+          "constructionDate": "1999-05-20T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "246206",
+            "vsslNo": "246206",
+            "imoNo": null,
+            "vsslKorNm": "진영호",
+            "vsslEngNm": "JINYOUNGHO",
+            "vsslKnd": "99[기타선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "14",
+            "ntng": "14",
+            "vsslTotLt": "15.39",
+            "shdth": null,
+            "vsslDrft": null,
+            "vsslLt": "15.39",
+            "vsslDp": "1.26",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1999-05-20T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

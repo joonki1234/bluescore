@@ -1,0 +1,18 @@
+{
+  "vesselId": "e1472ae34-4dc1-b7e4-fc83-a78c4c3aa5ad",
+  "gfwImo": null,
+  "gfwCallSign": "TUGUETU",
+  "gfwName": "[,@A@@A  Q",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "TUGUETU",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "[,@A@@A  Q",
+      "candidates": []
+    }
+  ]
+}

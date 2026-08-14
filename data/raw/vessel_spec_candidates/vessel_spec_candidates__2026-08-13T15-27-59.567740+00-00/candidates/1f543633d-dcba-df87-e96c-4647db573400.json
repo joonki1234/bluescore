@@ -1,0 +1,13 @@
+{
+  "vesselId": "1f543633d-dcba-df87-e96c-4647db573400",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.5 GEUM HWA",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.5 GEUM HWA",
+      "candidates": []
+    }
+  ]
+}

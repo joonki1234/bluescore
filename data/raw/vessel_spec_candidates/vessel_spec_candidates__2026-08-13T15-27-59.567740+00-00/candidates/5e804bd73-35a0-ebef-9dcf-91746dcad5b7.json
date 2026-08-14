@@ -1,0 +1,13 @@
+{
+  "vesselId": "5e804bd73-35a0-ebef-9dcf-91746dcad5b7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GOON SAN DO SI EO BU",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GOON SAN DO SI EO BU",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "38e33ba7f-f5d7-fd23-aae7-01475bba155c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAISUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAISUNG HO",
+      "candidates": []
+    }
+  ]
+}

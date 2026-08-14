@@ -1,0 +1,13 @@
+{
+  "vesselId": "f98b969e1-1222-964f-7d4f-a0577580642e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MYEONGSEONGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MYEONGSEONGHO",
+      "candidates": []
+    }
+  ]
+}

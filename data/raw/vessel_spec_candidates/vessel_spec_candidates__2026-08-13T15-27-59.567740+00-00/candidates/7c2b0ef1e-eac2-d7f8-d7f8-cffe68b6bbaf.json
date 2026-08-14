@@ -1,0 +1,18 @@
+{
+  "vesselId": "7c2b0ef1e-eac2-d7f8-d7f8-cffe68b6bbaf",
+  "gfwImo": null,
+  "gfwCallSign": "303MAIL",
+  "gfwName": "MAEIL HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "303MAIL",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MAEIL HO",
+      "candidates": []
+    }
+  ]
+}

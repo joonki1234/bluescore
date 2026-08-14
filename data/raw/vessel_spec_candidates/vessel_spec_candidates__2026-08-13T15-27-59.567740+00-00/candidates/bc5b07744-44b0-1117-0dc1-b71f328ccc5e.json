@@ -1,0 +1,60 @@
+{
+  "vesselId": "bc5b07744-44b0-1117-0dc1-b71f328ccc5e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KEUM SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KEUM SUNG HO",
+      "candidates": [
+        {
+          "vesselNameKor": "금성호",
+          "vesselNameEng": "KEUM SUNG HO",
+          "callSign": "058282",
+          "vesselNo": "058282",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 204.0,
+          "netTonnage": 204.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 44.04,
+          "totalLengthM": 44.04,
+          "widthM": 8.0,
+          "depthM": 3.45,
+          "draftM": 3.0,
+          "constructionDate": "1994-02-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "058282",
+            "vsslNo": "058282",
+            "imoNo": null,
+            "vsslKorNm": "금성호",
+            "vsslEngNm": "KEUM SUNG HO",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "204",
+            "ntng": "204",
+            "vsslTotLt": "44.04",
+            "shdth": "8",
+            "vsslDrft": "3",
+            "vsslLt": "44.04",
+            "vsslDp": "3.45",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1994-02-01T00:00:00+09:00",
+            "befClsgn": "044017",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

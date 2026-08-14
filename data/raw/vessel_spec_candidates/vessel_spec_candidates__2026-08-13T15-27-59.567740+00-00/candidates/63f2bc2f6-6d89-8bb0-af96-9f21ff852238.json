@@ -1,0 +1,65 @@
+{
+  "vesselId": "63f2bc2f6-6d89-8bb0-af96-9f21ff852238",
+  "gfwImo": "9626352",
+  "gfwCallSign": "250026",
+  "gfwName": "TN LETO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "250026",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "TN LETO",
+      "candidates": [
+        {
+          "vesselNameKor": "티앤 레토",
+          "vesselNameEng": "TN LETO",
+          "callSign": "300TNLETO",
+          "vesselNo": "250026",
+          "imoNo": "9626352",
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 2650.0,
+          "netTonnage": 1238.0,
+          "internationalGrossTonnage": 2961.0,
+          "lengthM": 90.02,
+          "totalLengthM": 96.0,
+          "widthM": 15.0,
+          "depthM": 7.0,
+          "draftM": 5.4,
+          "constructionDate": "2011-12-21T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "300TNLETO",
+            "vsslNo": "250026",
+            "imoNo": "9626352",
+            "vsslKorNm": "티앤 레토",
+            "vsslEngNm": "TN LETO",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "2961",
+            "grtg": "2650",
+            "ntng": "1238",
+            "vsslTotLt": "96",
+            "shdth": "15",
+            "vsslDrft": "5.4",
+            "vsslLt": "90.02",
+            "vsslDp": "7",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2011-12-21T00:00:00+09:00",
+            "befClsgn": "250026",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

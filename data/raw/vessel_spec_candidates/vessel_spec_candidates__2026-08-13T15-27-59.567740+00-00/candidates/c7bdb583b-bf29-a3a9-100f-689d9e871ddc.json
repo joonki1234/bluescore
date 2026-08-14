@@ -1,0 +1,13 @@
+{
+  "vesselId": "c7bdb583b-bf29-a3a9-100f-689d9e871ddc",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JONG SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JONG SEONG HO",
+      "candidates": []
+    }
+  ]
+}

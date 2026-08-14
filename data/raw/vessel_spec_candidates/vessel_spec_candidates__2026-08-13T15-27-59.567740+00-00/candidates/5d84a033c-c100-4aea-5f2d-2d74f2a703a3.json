@@ -1,0 +1,18 @@
+{
+  "vesselId": "5d84a033c-c100-4aea-5f2d-2d74f2a703a3",
+  "gfwImo": null,
+  "gfwCallSign": "402CH",
+  "gfwName": "208CHANGNAM",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "402CH",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "208CHANGNAM",
+      "candidates": []
+    }
+  ]
+}

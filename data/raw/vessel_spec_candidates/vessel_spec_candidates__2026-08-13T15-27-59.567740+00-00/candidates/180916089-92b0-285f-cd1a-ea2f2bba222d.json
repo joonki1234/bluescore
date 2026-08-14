@@ -1,0 +1,13 @@
+{
+  "vesselId": "180916089-92b0-285f-cd1a-ea2f2bba222d",
+  "gfwImo": null,
+  "gfwCallSign": "200365",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "200365",
+      "candidates": []
+    }
+  ]
+}

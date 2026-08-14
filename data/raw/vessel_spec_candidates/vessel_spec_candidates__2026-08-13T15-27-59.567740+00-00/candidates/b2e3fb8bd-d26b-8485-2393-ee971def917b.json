@@ -1,0 +1,13 @@
+{
+  "vesselId": "b2e3fb8bd-d26b-8485-2393-ee971def917b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.98 IM SU",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.98 IM SU",
+      "candidates": []
+    }
+  ]
+}

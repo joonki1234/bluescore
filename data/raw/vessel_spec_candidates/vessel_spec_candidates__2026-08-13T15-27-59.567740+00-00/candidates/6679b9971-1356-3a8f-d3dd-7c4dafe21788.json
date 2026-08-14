@@ -1,0 +1,65 @@
+{
+  "vesselId": "6679b9971-1356-3a8f-d3dd-7c4dafe21788",
+  "gfwImo": null,
+  "gfwCallSign": "927NARA",
+  "gfwName": "NARA HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "927NARA",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NARA HO",
+      "candidates": [
+        {
+          "vesselNameKor": "한나라호",
+          "vesselNameEng": "HAN NARA HO",
+          "callSign": "930563",
+          "vesselNo": "930563",
+          "imoNo": null,
+          "vesselKind": "81[관공선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 3640.0,
+          "netTonnage": 3640.0,
+          "internationalGrossTonnage": 3640.0,
+          "lengthM": 102.7,
+          "totalLengthM": 102.7,
+          "widthM": 14.5,
+          "depthM": 9.5,
+          "draftM": 9.0,
+          "constructionDate": "1993-03-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "930563",
+            "vsslNo": "930563",
+            "imoNo": null,
+            "vsslKorNm": "한나라호",
+            "vsslEngNm": "HAN NARA HO",
+            "vsslKnd": "81[관공선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "3640",
+            "grtg": "3640",
+            "ntng": "3640",
+            "vsslTotLt": "102.7",
+            "shdth": "14.5",
+            "vsslDrft": "9",
+            "vsslLt": "102.7",
+            "vsslDp": "9.5",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1993-03-01T00:00:00+09:00",
+            "befClsgn": "BSR930563",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

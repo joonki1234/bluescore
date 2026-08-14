@@ -1,0 +1,13 @@
+{
+  "vesselId": "3b7c703ee-ea0b-ebac-07c0-49fb0f7ef3fe",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NAYEON",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NAYEON",
+      "candidates": []
+    }
+  ]
+}

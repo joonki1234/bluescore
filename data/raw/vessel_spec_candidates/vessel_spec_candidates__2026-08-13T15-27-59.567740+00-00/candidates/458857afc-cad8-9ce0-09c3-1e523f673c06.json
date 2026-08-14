@@ -1,0 +1,13 @@
+{
+  "vesselId": "458857afc-cad8-9ce0-09c3-1e523f673c06",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEUNG JOON HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEUNG JOON HO",
+      "candidates": []
+    }
+  ]
+}

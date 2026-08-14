@@ -1,0 +1,13 @@
+{
+  "vesselId": "fe21846d3-35ce-e0ff-2d08-921e570fb6cd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "76DAECHANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "76DAECHANG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "afac932d3-3065-39e7-7262-c2969220cb0a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.7SINYOUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.7SINYOUNGHO",
+      "candidates": []
+    }
+  ]
+}

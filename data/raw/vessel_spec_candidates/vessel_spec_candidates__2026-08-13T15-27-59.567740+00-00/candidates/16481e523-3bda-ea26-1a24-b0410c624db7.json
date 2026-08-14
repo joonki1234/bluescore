@@ -1,0 +1,18 @@
+{
+  "vesselId": "16481e523-3bda-ea26-1a24-b0410c624db7",
+  "gfwImo": null,
+  "gfwCallSign": "700GAL",
+  "gfwName": "GALRILRI",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "700GAL",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GALRILRI",
+      "candidates": []
+    }
+  ]
+}

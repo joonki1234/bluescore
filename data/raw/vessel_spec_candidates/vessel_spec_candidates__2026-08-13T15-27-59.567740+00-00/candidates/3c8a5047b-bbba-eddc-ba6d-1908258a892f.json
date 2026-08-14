@@ -1,0 +1,13 @@
+{
+  "vesselId": "3c8a5047b-bbba-eddc-ba6d-1908258a892f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YONG SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YONG SUNG HO",
+      "candidates": []
+    }
+  ]
+}

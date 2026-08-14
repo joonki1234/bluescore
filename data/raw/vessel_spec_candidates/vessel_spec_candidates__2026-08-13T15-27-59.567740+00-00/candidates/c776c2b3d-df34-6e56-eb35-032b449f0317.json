@@ -1,0 +1,18 @@
+{
+  "vesselId": "c776c2b3d-df34-6e56-eb35-032b449f0317",
+  "gfwImo": null,
+  "gfwCallSign": "502CHAN",
+  "gfwName": "NO.101 CHANG YANG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "502CHAN",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.101 CHANG YANG",
+      "candidates": []
+    }
+  ]
+}

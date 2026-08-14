@@ -1,0 +1,18 @@
+{
+  "vesselId": "e26a9391d-d58e-5d57-4911-5135d153c54c",
+  "gfwImo": null,
+  "gfwCallSign": "122@",
+  "gfwName": "SEOHAE FISHING  @",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "122@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SEOHAE FISHING  @",
+      "candidates": []
+    }
+  ]
+}

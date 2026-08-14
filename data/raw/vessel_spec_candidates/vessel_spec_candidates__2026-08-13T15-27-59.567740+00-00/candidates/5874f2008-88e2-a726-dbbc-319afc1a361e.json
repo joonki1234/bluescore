@@ -1,0 +1,18 @@
+{
+  "vesselId": "5874f2008-88e2-a726-dbbc-319afc1a361e",
+  "gfwImo": null,
+  "gfwCallSign": "266 @",
+  "gfwName": "MAN SUK@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "266 @",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MAN SUK@",
+      "candidates": []
+    }
+  ]
+}

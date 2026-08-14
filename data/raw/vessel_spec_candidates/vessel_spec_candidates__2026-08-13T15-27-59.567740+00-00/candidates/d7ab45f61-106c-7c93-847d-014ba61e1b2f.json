@@ -1,0 +1,13 @@
+{
+  "vesselId": "d7ab45f61-106c-7c93-847d-014ba61e1b2f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KYEONGILHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KYEONGILHO",
+      "candidates": []
+    }
+  ]
+}

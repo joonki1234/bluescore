@@ -1,0 +1,13 @@
+{
+  "vesselId": "a0e53dd89-951a-5d47-0050-fe53d5c4b612",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NEW GEO JE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NEW GEO JE",
+      "candidates": []
+    }
+  ]
+}

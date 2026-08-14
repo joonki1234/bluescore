@@ -1,0 +1,18 @@
+{
+  "vesselId": "7a90f5dee-e2ae-1193-42c8-d40fe96d30ad",
+  "gfwImo": null,
+  "gfwCallSign": "207DAE",
+  "gfwName": "DAEPUNG 7 HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "207DAE",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "DAEPUNG 7 HO",
+      "candidates": []
+    }
+  ]
+}

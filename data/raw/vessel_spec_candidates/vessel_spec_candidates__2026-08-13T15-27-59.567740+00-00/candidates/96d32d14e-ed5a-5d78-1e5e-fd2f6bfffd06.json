@@ -1,0 +1,13 @@
+{
+  "vesselId": "96d32d14e-ed5a-5d78-1e5e-fd2f6bfffd06",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "LABAENDE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "LABAENDE",
+      "candidates": []
+    }
+  ]
+}

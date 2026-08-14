@@ -1,0 +1,13 @@
+{
+  "vesselId": "f98c7259e-e581-be17-40b0-884e5b671e0b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "588GOREA",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "588GOREA",
+      "candidates": []
+    }
+  ]
+}

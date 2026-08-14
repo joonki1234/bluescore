@@ -1,0 +1,13 @@
+{
+  "vesselId": "8c53ad865-5af6-72a4-8731-86b6bfa2136a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEONG GWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEONG GWANG",
+      "candidates": []
+    }
+  ]
+}

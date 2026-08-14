@@ -1,0 +1,13 @@
+{
+  "vesselId": "c66bc6642-24b8-5f58-3878-d29ca21d05ee",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BONG  UN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BONG  UN HO",
+      "candidates": []
+    }
+  ]
+}

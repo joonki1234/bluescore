@@ -1,0 +1,13 @@
+{
+  "vesselId": "9e048fa08-8560-6524-dc9c-bddc80b177eb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "102 NAM YOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "102 NAM YOUNG",
+      "candidates": []
+    }
+  ]
+}

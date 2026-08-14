@@ -1,0 +1,13 @@
+{
+  "vesselId": "a22332fa7-7704-7aa8-a118-feaa69a2e0af",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAESUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAESUNGHO",
+      "candidates": []
+    }
+  ]
+}

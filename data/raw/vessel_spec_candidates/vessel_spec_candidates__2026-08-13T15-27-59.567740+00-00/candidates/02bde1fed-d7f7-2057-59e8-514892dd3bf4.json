@@ -1,0 +1,13 @@
+{
+  "vesselId": "02bde1fed-d7f7-2057-59e8-514892dd3bf4",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "77SUNGHAIHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "77SUNGHAIHO",
+      "candidates": []
+    }
+  ]
+}

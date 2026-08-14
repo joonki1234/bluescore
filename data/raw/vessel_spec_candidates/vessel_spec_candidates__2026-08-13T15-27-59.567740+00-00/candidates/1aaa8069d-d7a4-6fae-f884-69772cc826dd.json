@@ -1,0 +1,13 @@
+{
+  "vesselId": "1aaa8069d-d7a4-6fae-f884-69772cc826dd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE HAENG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE HAENG HO",
+      "candidates": []
+    }
+  ]
+}

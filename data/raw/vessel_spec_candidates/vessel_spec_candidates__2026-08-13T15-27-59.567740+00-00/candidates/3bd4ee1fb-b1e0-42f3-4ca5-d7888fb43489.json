@@ -1,0 +1,65 @@
+{
+  "vesselId": "3bd4ee1fb-b1e0-42f3-4ca5-d7888fb43489",
+  "gfwImo": null,
+  "gfwCallSign": "1234567",
+  "gfwName": "44D ^^[2053]^^",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "1234567",
+      "candidates": [
+        {
+          "vesselNameKor": "항만호",
+          "vesselNameEng": null,
+          "callSign": "12345678",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "69[기타 예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 28.0,
+          "netTonnage": 28.0,
+          "internationalGrossTonnage": null,
+          "lengthM": 26.0,
+          "totalLengthM": 26.0,
+          "widthM": 13.0,
+          "depthM": 8.0,
+          "draftM": 7.0,
+          "constructionDate": "1900-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "12345678",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "항만호",
+            "vsslEngNm": null,
+            "vsslKnd": "69[기타 예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "3",
+            "tonEdycSeNm": "기타",
+            "intrlGrtg": null,
+            "grtg": "28",
+            "ntng": "28",
+            "vsslTotLt": "26",
+            "shdth": "13",
+            "vsslDrft": "7",
+            "vsslLt": "26",
+            "vsslDp": "8",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": null,
+            "nvgShapNm": "-",
+            "vsslCnstrDt": "1900-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "44D ^^[2053]^^",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "bf5419821-1f99-ba45-4483-c46fb07d8700",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BO GWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BO GWANG HO",
+      "candidates": []
+    }
+  ]
+}

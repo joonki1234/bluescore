@@ -1,0 +1,13 @@
+{
+  "vesselId": "bbad28af4-4d33-7fcb-64ad-21cf4646177a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HYUNDAIHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HYUNDAIHO",
+      "candidates": []
+    }
+  ]
+}

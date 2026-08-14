@@ -1,0 +1,13 @@
+{
+  "vesselId": "2c0948ab0-0a0c-caf9-2bea-fe63b6bb5a8b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "307 DUCKWON",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "307 DUCKWON",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "2ec6f2904-484e-c027-32dd-699297eccfc6",
+  "gfwImo": null,
+  "gfwCallSign": "205@",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "205@",
+      "candidates": []
+    }
+  ]
+}

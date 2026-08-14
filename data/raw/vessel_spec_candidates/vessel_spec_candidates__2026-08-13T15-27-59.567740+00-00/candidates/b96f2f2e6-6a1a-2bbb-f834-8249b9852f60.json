@@ -1,0 +1,13 @@
+{
+  "vesselId": "b96f2f2e6-6a1a-2bbb-f834-8249b9852f60",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "707 DONG KWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "707 DONG KWANG HO",
+      "candidates": []
+    }
+  ]
+}

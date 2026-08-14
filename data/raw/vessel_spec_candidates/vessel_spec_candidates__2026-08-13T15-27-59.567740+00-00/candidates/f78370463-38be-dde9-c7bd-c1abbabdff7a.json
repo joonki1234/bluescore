@@ -1,0 +1,13 @@
+{
+  "vesselId": "f78370463-38be-dde9-c7bd-c1abbabdff7a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KEON YEONG 2",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KEON YEONG 2",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "f0d313a4b-b549-879f-8577-19e19d86da6b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HYEONG JE 1 HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HYEONG JE 1 HO",
+      "candidates": []
+    }
+  ]
+}

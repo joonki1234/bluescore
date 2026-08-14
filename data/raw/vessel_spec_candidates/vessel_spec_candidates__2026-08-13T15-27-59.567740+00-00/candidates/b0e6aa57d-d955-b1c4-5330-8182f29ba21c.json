@@ -1,0 +1,13 @@
+{
+  "vesselId": "b0e6aa57d-d955-b1c4-5330-8182f29ba21c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAISUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAISUNG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "deefdb949-9ae7-2a82-241f-8ca35f96b6f2",
+  "gfwImo": null,
+  "gfwCallSign": "600AWON",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "600AWON",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "0b085cc45-55d6-4f8f-f461-cd5a88b94116",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2020 NAM SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2020 NAM SEONG",
+      "candidates": []
+    }
+  ]
+}

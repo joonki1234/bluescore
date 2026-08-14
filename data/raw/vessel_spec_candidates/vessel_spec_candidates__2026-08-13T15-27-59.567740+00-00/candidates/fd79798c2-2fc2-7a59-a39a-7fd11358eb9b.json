@@ -1,0 +1,13 @@
+{
+  "vesselId": "fd79798c2-2fc2-7a59-a39a-7fd11358eb9b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BU SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BU SEONG HO",
+      "candidates": []
+    }
+  ]
+}

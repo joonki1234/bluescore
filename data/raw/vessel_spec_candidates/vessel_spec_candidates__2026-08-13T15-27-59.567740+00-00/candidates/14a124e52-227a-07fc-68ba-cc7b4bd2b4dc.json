@@ -1,0 +1,13 @@
+{
+  "vesselId": "14a124e52-227a-07fc-68ba-cc7b4bd2b4dc",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.66 DONGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.66 DONGHO",
+      "candidates": []
+    }
+  ]
+}

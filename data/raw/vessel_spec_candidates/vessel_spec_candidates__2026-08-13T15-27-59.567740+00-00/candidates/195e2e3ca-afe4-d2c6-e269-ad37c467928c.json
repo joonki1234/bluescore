@@ -1,0 +1,13 @@
+{
+  "vesselId": "195e2e3ca-afe4-d2c6-e269-ad37c467928c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE YOUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE YOUNG HO",
+      "candidates": []
+    }
+  ]
+}

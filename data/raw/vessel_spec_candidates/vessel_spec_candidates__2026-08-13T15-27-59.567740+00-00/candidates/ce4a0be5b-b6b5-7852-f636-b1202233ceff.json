@@ -1,0 +1,13 @@
+{
+  "vesselId": "ce4a0be5b-b6b5-7852-f636-b1202233ceff",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2020JAESEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2020JAESEONG",
+      "candidates": []
+    }
+  ]
+}

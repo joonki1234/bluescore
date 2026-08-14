@@ -1,0 +1,13 @@
+{
+  "vesselId": "5bf4a0f0e-e685-53b1-c3aa-51bb28755914",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "25GEUM SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "25GEUM SEONG",
+      "candidates": []
+    }
+  ]
+}

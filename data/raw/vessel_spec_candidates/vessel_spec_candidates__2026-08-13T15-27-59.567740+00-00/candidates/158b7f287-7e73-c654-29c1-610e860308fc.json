@@ -1,0 +1,13 @@
+{
+  "vesselId": "158b7f287-7e73-c654-29c1-610e860308fc",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MYEONG JEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MYEONG JEONG HO",
+      "candidates": []
+    }
+  ]
+}

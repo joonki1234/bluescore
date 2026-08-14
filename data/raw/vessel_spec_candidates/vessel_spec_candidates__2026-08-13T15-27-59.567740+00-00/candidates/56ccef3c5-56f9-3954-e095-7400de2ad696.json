@@ -1,0 +1,13 @@
+{
+  "vesselId": "56ccef3c5-56f9-3954-e095-7400de2ad696",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YEOJUHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YEOJUHO",
+      "candidates": []
+    }
+  ]
+}

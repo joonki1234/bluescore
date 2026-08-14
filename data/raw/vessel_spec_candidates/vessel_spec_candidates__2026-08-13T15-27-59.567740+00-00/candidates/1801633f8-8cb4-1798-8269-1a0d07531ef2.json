@@ -1,0 +1,18 @@
+{
+  "vesselId": "1801633f8-8cb4-1798-8269-1a0d07531ef2",
+  "gfwImo": null,
+  "gfwCallSign": "215@",
+  "gfwName": "BLUE OSYEON@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "215@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "BLUE OSYEON@",
+      "candidates": []
+    }
+  ]
+}

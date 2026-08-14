@@ -1,0 +1,13 @@
+{
+  "vesselId": "d83ddcdaf-ffd5-5098-698b-c6e25bec618d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "101 MAN SU HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "101 MAN SU HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "71c09eeb8-878a-a10c-1d04-2ce8db8115c7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE DONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE DONG HO",
+      "candidates": []
+    }
+  ]
+}

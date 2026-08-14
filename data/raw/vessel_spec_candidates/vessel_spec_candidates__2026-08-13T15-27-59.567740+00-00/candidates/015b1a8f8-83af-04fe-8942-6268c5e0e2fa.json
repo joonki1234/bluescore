@@ -1,0 +1,18 @@
+{
+  "vesselId": "015b1a8f8-83af-04fe-8942-6268c5e0e2fa",
+  "gfwImo": null,
+  "gfwCallSign": "503X",
+  "gfwName": "303WOOJIN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "503X",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "303WOOJIN",
+      "candidates": []
+    }
+  ]
+}

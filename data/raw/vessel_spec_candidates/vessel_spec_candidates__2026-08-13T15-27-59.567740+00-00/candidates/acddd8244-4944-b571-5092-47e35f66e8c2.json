@@ -1,0 +1,13 @@
+{
+  "vesselId": "acddd8244-4944-b571-5092-47e35f66e8c2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "701 MUJEONHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "701 MUJEONHO",
+      "candidates": []
+    }
+  ]
+}

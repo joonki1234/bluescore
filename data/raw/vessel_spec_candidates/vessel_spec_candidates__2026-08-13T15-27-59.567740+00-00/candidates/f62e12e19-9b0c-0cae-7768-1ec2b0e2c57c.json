@@ -1,0 +1,13 @@
+{
+  "vesselId": "f62e12e19-9b0c-0cae-7768-1ec2b0e2c57c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "308 TAE GWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "308 TAE GWANG",
+      "candidates": []
+    }
+  ]
+}

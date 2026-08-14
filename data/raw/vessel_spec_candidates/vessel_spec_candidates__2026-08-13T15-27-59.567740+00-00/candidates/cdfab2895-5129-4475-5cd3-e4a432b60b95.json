@@ -1,0 +1,13 @@
+{
+  "vesselId": "cdfab2895-5129-4475-5cd3-e4a432b60b95",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "72 HAEYOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "72 HAEYOUNG",
+      "candidates": []
+    }
+  ]
+}

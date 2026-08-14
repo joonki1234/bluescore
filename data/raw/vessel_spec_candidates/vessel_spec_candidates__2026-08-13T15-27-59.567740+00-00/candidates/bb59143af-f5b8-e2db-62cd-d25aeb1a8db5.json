@@ -1,0 +1,13 @@
+{
+  "vesselId": "bb59143af-f5b8-e2db-62cd-d25aeb1a8db5",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HYEN DAE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HYEN DAE",
+      "candidates": []
+    }
+  ]
+}

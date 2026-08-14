@@ -1,0 +1,13 @@
+{
+  "vesselId": "1befd0263-3e01-5167-49cf-f49211f72cd1",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "117DONGYEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "117DONGYEONG",
+      "candidates": []
+    }
+  ]
+}

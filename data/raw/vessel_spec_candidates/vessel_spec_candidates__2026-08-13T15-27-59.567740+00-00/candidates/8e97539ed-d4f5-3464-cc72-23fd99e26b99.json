@@ -1,0 +1,13 @@
+{
+  "vesselId": "8e97539ed-d4f5-3464-cc72-23fd99e26b99",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "101HANIL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "101HANIL",
+      "candidates": []
+    }
+  ]
+}

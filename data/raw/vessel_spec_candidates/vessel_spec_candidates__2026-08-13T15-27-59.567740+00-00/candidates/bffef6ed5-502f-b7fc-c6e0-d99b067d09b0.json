@@ -1,0 +1,13 @@
+{
+  "vesselId": "bffef6ed5-502f-b7fc-c6e0-d99b067d09b0",
+  "gfwImo": null,
+  "gfwCallSign": "700NANA",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "700NANA",
+      "candidates": []
+    }
+  ]
+}

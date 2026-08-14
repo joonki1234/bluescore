@@ -1,0 +1,13 @@
+{
+  "vesselId": "b5df7529f-faaa-bc01-215c-b7b2a01972b4",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE SANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE SANG HO",
+      "candidates": []
+    }
+  ]
+}

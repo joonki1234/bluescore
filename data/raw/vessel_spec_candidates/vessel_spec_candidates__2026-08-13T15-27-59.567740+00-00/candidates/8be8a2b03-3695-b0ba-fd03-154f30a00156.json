@@ -1,0 +1,13 @@
+{
+  "vesselId": "8be8a2b03-3695-b0ba-fd03-154f30a00156",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE KYUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE KYUNG HO",
+      "candidates": []
+    }
+  ]
+}

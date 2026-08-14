@@ -1,0 +1,13 @@
+{
+  "vesselId": "a34b1d665-5db9-083f-ae34-828013b39a99",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "588 GORYE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "588 GORYE",
+      "candidates": []
+    }
+  ]
+}

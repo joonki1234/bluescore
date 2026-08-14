@@ -1,0 +1,13 @@
+{
+  "vesselId": "6ba06a3c0-054b-3a56-821b-a38a75ae21bb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "153DONGGWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "153DONGGWANG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "66af8ab28-8626-74b4-abe8-8c305108a2d0",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BOKRYUN@@@@@@@@@@@AT",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BOKRYUN@@@@@@@@@@@AT",
+      "candidates": []
+    }
+  ]
+}

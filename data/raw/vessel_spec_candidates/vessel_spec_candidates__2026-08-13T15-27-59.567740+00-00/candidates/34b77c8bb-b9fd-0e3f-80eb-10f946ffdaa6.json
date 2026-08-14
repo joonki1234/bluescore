@@ -1,0 +1,13 @@
+{
+  "vesselId": "34b77c8bb-b9fd-0e3f-80eb-10f946ffdaa6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SUNG KWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SUNG KWANG HO",
+      "candidates": []
+    }
+  ]
+}

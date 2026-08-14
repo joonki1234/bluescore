@@ -1,0 +1,13 @@
+{
+  "vesselId": "b8b295bb7-73bb-ed18-edb5-726e3faffcbe",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAECHANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAECHANG",
+      "candidates": []
+    }
+  ]
+}

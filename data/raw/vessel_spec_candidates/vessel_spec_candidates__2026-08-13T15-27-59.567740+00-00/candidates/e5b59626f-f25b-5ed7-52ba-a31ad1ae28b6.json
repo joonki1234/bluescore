@@ -1,0 +1,13 @@
+{
+  "vesselId": "e5b59626f-f25b-5ed7-52ba-a31ad1ae28b6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BEONSUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BEONSUNGHO",
+      "candidates": []
+    }
+  ]
+}

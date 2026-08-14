@@ -1,0 +1,13 @@
+{
+  "vesselId": "a4221ecaf-fca4-a1fb-2534-0f0120f4a42e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DONG WON HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DONG WON HO",
+      "candidates": []
+    }
+  ]
+}

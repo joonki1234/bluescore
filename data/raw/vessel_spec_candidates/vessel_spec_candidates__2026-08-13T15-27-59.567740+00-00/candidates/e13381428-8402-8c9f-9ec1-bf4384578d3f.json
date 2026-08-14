@@ -1,0 +1,18 @@
+{
+  "vesselId": "e13381428-8402-8c9f-9ec1-bf4384578d3f",
+  "gfwImo": null,
+  "gfwCallSign": "300YUGA",
+  "gfwName": "YUGANGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300YUGA",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YUGANGHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "64e9ce66c-cc03-0547-5124-a478ca73f05e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NAM KYOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NAM KYOUNG",
+      "candidates": []
+    }
+  ]
+}

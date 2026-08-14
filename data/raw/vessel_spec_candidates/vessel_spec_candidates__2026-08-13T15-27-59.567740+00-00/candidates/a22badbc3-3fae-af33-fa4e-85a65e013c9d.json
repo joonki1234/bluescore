@@ -1,0 +1,60 @@
+{
+  "vesselId": "a22badbc3-3fae-af33-fa4e-85a65e013c9d",
+  "gfwImo": null,
+  "gfwCallSign": "945215",
+  "gfwName": "7 OH BOK",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "945215",
+      "candidates": [
+        {
+          "vesselNameKor": "7오복",
+          "vesselNameEng": "NO.1 DAECHANG",
+          "callSign": "945215",
+          "vesselNo": "945215",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 22.0,
+          "netTonnage": 22.0,
+          "internationalGrossTonnage": null,
+          "lengthM": 18.2,
+          "totalLengthM": 18.2,
+          "widthM": null,
+          "depthM": 2.1,
+          "draftM": 2.1,
+          "constructionDate": "1994-04-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "3[항내운항]",
+            "clsgn": "945215",
+            "vsslNo": "945215",
+            "imoNo": null,
+            "vsslKorNm": "7오복",
+            "vsslEngNm": "NO.1 DAECHANG",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "3",
+            "tonEdycSeNm": "기타",
+            "intrlGrtg": null,
+            "grtg": "22",
+            "ntng": "22",
+            "vsslTotLt": "18.2",
+            "shdth": null,
+            "vsslDrft": "2.1",
+            "vsslLt": "18.2",
+            "vsslDp": "2.1",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "1994-04-01T00:00:00+09:00",
+            "befClsgn": "YSR945215",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

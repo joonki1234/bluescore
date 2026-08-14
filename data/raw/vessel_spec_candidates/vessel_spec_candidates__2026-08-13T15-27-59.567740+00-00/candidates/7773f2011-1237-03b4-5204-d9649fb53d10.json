@@ -1,0 +1,13 @@
+{
+  "vesselId": "7773f2011-1237-03b4-5204-d9649fb53d10",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BANDOHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BANDOHO",
+      "candidates": []
+    }
+  ]
+}

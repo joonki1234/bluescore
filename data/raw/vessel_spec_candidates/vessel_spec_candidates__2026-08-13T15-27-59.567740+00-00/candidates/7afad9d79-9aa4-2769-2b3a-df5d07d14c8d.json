@@ -1,0 +1,13 @@
+{
+  "vesselId": "7afad9d79-9aa4-2769-2b3a-df5d07d14c8d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2PUNGGANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2PUNGGANG",
+      "candidates": []
+    }
+  ]
+}

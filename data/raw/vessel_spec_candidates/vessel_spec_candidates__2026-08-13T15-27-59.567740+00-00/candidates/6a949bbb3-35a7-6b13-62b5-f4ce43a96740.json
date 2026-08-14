@@ -1,0 +1,65 @@
+{
+  "vesselId": "6a949bbb3-35a7-6b13-62b5-f4ce43a96740",
+  "gfwImo": "9368089",
+  "gfwCallSign": "330ECOG",
+  "gfwName": "ECO GAS",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "330ECOG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "ECO GAS",
+      "candidates": [
+        {
+          "vesselNameKor": "에코 가스",
+          "vesselNameEng": "ECO GAS",
+          "callSign": "240018",
+          "vesselNo": "240018",
+          "imoNo": "9368089",
+          "vesselKind": "55[LPG 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 998.0,
+          "netTonnage": 998.0,
+          "internationalGrossTonnage": 998.0,
+          "lengthM": 66.5,
+          "totalLengthM": 66.5,
+          "widthM": 12.5,
+          "depthM": 5.5,
+          "draftM": 4.5,
+          "constructionDate": "2005-07-23T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "240018",
+            "vsslNo": "240018",
+            "imoNo": "9368089",
+            "vsslKorNm": "에코 가스",
+            "vsslEngNm": "ECO GAS",
+            "vsslKnd": "55[LPG 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "998",
+            "grtg": "998",
+            "ntng": "998",
+            "vsslTotLt": "66.5",
+            "shdth": "12.5",
+            "vsslDrft": "4.5",
+            "vsslLt": "66.5",
+            "vsslDp": "5.5",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2005-07-23T00:00:00+09:00",
+            "befClsgn": "202418",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

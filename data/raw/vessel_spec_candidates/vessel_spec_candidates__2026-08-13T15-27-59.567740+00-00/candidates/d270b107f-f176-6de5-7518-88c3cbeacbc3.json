@@ -1,0 +1,13 @@
+{
+  "vesselId": "d270b107f-f176-6de5-7518-88c3cbeacbc3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SAMHYEONHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SAMHYEONHO",
+      "candidates": []
+    }
+  ]
+}

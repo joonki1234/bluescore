@@ -1,0 +1,13 @@
+{
+  "vesselId": "17fd291cf-fadb-ea77-a0e4-ae0fefde54cb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GA JA HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GA JA HO",
+      "candidates": []
+    }
+  ]
+}

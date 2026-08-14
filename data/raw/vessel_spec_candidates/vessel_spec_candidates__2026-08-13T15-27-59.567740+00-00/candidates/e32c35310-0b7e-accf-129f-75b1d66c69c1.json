@@ -1,0 +1,13 @@
+{
+  "vesselId": "e32c35310-0b7e-accf-129f-75b1d66c69c1",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "8 JO GWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "8 JO GWANG",
+      "candidates": []
+    }
+  ]
+}

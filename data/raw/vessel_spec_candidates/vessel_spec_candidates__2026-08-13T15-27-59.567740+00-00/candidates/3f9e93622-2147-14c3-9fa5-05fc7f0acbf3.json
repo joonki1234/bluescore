@@ -1,0 +1,60 @@
+{
+  "vesselId": "3f9e93622-2147-14c3-9fa5-05fc7f0acbf3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "207HAEDO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "207HAEDO",
+      "candidates": [
+        {
+          "vesselNameKor": "207해동호",
+          "vesselNameEng": "207HAEDONG",
+          "callSign": "BSR060694",
+          "vesselNo": "060694",
+          "imoNo": null,
+          "vesselKind": "69[기타 예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 223.0,
+          "netTonnage": 223.0,
+          "internationalGrossTonnage": 223.0,
+          "lengthM": 25.46,
+          "totalLengthM": 25.4,
+          "widthM": 9.5,
+          "depthM": 5.5,
+          "draftM": 5.5,
+          "constructionDate": "1997-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "BSR060694",
+            "vsslNo": "060694",
+            "imoNo": null,
+            "vsslKorNm": "207해동호",
+            "vsslEngNm": "207HAEDONG",
+            "vsslKnd": "69[기타 예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "223",
+            "grtg": "223",
+            "ntng": "223",
+            "vsslTotLt": "25.4",
+            "shdth": "9.5",
+            "vsslDrft": "5.5",
+            "vsslLt": "25.46",
+            "vsslDp": "5.5",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1997-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

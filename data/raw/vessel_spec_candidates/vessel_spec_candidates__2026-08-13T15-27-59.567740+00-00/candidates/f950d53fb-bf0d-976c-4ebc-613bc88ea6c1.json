@@ -1,0 +1,18 @@
+{
+  "vesselId": "f950d53fb-bf0d-976c-4ebc-613bc88ea6c1",
+  "gfwImo": null,
+  "gfwCallSign": "303EUSA",
+  "gfwName": "203 EOSA HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "303EUSA",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "203 EOSA HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "4c90358aa-aa04-b9c9-8d1e-e83477e8acd2",
+  "gfwImo": null,
+  "gfwCallSign": "995SEVE",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "995SEVE",
+      "candidates": []
+    }
+  ]
+}

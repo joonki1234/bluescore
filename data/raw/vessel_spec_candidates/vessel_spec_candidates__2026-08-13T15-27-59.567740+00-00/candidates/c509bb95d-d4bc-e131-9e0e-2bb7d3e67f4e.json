@@ -1,0 +1,13 @@
+{
+  "vesselId": "c509bb95d-d4bc-e131-9e0e-2bb7d3e67f4e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE DEUK HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE DEUK HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "832a4df9e-eea1-d02b-60e3-49012ebb977e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "101 SUSEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "101 SUSEONG",
+      "candidates": []
+    }
+  ]
+}

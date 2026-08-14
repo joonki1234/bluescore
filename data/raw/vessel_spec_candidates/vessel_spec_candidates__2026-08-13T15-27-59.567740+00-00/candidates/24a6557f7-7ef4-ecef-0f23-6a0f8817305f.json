@@ -1,0 +1,13 @@
+{
+  "vesselId": "24a6557f7-7ef4-ecef-0f23-6a0f8817305f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.2 NAM YOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.2 NAM YOUNG",
+      "candidates": []
+    }
+  ]
+}

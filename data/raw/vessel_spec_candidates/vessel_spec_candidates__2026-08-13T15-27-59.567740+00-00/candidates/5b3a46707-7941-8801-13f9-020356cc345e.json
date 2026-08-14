@@ -1,0 +1,13 @@
+{
+  "vesselId": "5b3a46707-7941-8801-13f9-020356cc345e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BIK TO LI HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BIK TO LI HO",
+      "candidates": []
+    }
+  ]
+}

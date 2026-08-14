@@ -1,0 +1,13 @@
+{
+  "vesselId": "026125e2e-eb55-89fa-508e-81b60d436c1a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MIN SEUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MIN SEUNG",
+      "candidates": []
+    }
+  ]
+}

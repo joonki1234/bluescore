@@ -1,0 +1,13 @@
+{
+  "vesselId": "6e48481be-e78b-e816-2fc1-2cd7069fef63",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE CHANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE CHANG HO",
+      "candidates": []
+    }
+  ]
+}

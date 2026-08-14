@@ -1,0 +1,18 @@
+{
+  "vesselId": "0e68337b1-12f8-6b9e-f099-2151ba039ff9",
+  "gfwImo": null,
+  "gfwCallSign": "103 D S",
+  "gfwName": "DEOK SU",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "103 D S",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "DEOK SU",
+      "candidates": []
+    }
+  ]
+}

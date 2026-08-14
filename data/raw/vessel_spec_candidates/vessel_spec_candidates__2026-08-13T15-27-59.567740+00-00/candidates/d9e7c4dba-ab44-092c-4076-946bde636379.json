@@ -1,0 +1,18 @@
+{
+  "vesselId": "d9e7c4dba-ab44-092c-4076-946bde636379",
+  "gfwImo": null,
+  "gfwCallSign": "300FISH",
+  "gfwName": "FISHINGTALK",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300FISH",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "FISHINGTALK",
+      "candidates": []
+    }
+  ]
+}

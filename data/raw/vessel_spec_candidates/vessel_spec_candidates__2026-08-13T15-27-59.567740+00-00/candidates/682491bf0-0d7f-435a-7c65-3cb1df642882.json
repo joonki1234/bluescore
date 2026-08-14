@@ -1,0 +1,13 @@
+{
+  "vesselId": "682491bf0-0d7f-435a-7c65-3cb1df642882",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JANG SHIN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JANG SHIN HO",
+      "candidates": []
+    }
+  ]
+}

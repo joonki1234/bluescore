@@ -1,0 +1,18 @@
+{
+  "vesselId": "08352f9b7-70d4-3cd7-541a-f80aa7b480c1",
+  "gfwImo": null,
+  "gfwCallSign": "DTAZ6",
+  "gfwName": "201YEONCHANG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "DTAZ6",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "201YEONCHANG",
+      "candidates": []
+    }
+  ]
+}

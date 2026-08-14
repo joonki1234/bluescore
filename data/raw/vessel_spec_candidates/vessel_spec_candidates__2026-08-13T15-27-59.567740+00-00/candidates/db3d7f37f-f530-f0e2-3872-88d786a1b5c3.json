@@ -1,0 +1,13 @@
+{
+  "vesselId": "db3d7f37f-f530-f0e2-3872-88d786a1b5c3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "7CHEONGJINHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "7CHEONGJINHO",
+      "candidates": []
+    }
+  ]
+}

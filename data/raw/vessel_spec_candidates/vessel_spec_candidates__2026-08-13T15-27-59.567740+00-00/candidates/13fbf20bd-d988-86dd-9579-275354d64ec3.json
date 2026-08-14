@@ -1,0 +1,18 @@
+{
+  "vesselId": "13fbf20bd-d988-86dd-9579-275354d64ec3",
+  "gfwImo": null,
+  "gfwCallSign": "201@",
+  "gfwName": "NEW SIN JUNG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "201@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NEW SIN JUNG",
+      "candidates": []
+    }
+  ]
+}

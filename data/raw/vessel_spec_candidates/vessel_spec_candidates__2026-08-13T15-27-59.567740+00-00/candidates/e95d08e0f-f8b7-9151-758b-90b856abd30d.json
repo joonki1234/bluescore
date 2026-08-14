@@ -1,0 +1,13 @@
+{
+  "vesselId": "e95d08e0f-f8b7-9151-758b-90b856abd30d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MIN YOUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MIN YOUNG HO",
+      "candidates": []
+    }
+  ]
+}

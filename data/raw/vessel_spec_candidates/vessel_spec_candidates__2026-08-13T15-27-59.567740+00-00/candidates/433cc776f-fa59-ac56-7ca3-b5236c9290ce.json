@@ -1,0 +1,18 @@
+{
+  "vesselId": "433cc776f-fa59-ac56-7ca3-b5236c9290ce",
+  "gfwImo": null,
+  "gfwCallSign": "231@",
+  "gfwName": "YE JIN HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "231@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YE JIN HO@",
+      "candidates": []
+    }
+  ]
+}

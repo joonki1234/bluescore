@@ -1,0 +1,18 @@
+{
+  "vesselId": "ea5899ec7-7f93-8f61-bd4e-70c47a75c5ff",
+  "gfwImo": null,
+  "gfwCallSign": "475 KS",
+  "gfwName": "NO.98 KEUM SUNG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "475 KS",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.98 KEUM SUNG",
+      "candidates": []
+    }
+  ]
+}

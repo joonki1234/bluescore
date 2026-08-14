@@ -1,0 +1,13 @@
+{
+  "vesselId": "cfc018e77-724f-84bd-90b2-9d4b7e4d2080",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JAE HEUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JAE HEUNG HO",
+      "candidates": []
+    }
+  ]
+}

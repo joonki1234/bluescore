@@ -1,0 +1,13 @@
+{
+  "vesselId": "3955c9f8e-e62d-f2f0-5362-01820993440f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KYUNGJIN_",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KYUNGJIN_",
+      "candidates": []
+    }
+  ]
+}

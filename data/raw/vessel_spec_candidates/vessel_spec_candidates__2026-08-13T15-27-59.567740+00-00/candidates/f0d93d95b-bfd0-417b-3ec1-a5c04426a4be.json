@@ -1,0 +1,13 @@
+{
+  "vesselId": "f0d93d95b-bfd0-417b-3ec1-a5c04426a4be",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DEOK SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DEOK SEONG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "7288aabd3-3935-0a5a-3f47-33a2ea85afcc",
+  "gfwImo": null,
+  "gfwCallSign": "302SYH",
+  "gfwName": "SINYONGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "302SYH",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SINYONGHO",
+      "candidates": []
+    }
+  ]
+}

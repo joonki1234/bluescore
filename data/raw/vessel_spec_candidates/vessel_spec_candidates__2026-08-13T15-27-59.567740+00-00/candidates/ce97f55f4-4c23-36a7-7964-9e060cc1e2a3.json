@@ -1,0 +1,60 @@
+{
+  "vesselId": "ce97f55f4-4c23-36a7-7964-9e060cc1e2a3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BLACK DRAGON",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BLACK DRAGON",
+      "candidates": [
+        {
+          "vesselNameKor": "BLACK DRAGON",
+          "vesselNameEng": "BLACK DRAGON",
+          "callSign": "3FBS2",
+          "vesselNo": null,
+          "imoNo": "9652301",
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "PA[파나마]",
+          "grossTonnage": 2106.0,
+          "netTonnage": 632.0,
+          "internationalGrossTonnage": 2106.0,
+          "lengthM": 74.0,
+          "totalLengthM": 74.0,
+          "widthM": 14.0,
+          "depthM": 6.1,
+          "draftM": 6.1,
+          "constructionDate": "2012-07-10T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "3FBS2",
+            "vsslNo": null,
+            "imoNo": "9652301",
+            "vsslKorNm": "BLACK DRAGON",
+            "vsslEngNm": "BLACK DRAGON",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "PA[파나마]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "2106",
+            "grtg": "2106",
+            "ntng": "632",
+            "vsslTotLt": "74",
+            "shdth": "14",
+            "vsslDrft": "6.1",
+            "vsslLt": "74",
+            "vsslDp": "6.1",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2012-07-10T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "2ef0aa8fd-dfd2-6902-2c68-acb420ca9626",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "IL JO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "IL JO",
+      "candidates": []
+    }
+  ]
+}

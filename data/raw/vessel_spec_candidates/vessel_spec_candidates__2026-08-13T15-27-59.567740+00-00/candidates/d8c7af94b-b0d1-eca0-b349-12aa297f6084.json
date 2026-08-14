@@ -1,0 +1,13 @@
+{
+  "vesselId": "d8c7af94b-b0d1-eca0-b349-12aa297f6084",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "99PYEONGJINHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "99PYEONGJINHO",
+      "candidates": []
+    }
+  ]
+}

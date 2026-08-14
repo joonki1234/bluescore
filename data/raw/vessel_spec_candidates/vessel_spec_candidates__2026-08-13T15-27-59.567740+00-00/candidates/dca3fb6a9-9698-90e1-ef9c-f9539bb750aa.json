@@ -1,0 +1,13 @@
+{
+  "vesselId": "dca3fb6a9-9698-90e1-ef9c-f9539bb750aa",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "607 SUNG DUK HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "607 SUNG DUK HO",
+      "candidates": []
+    }
+  ]
+}

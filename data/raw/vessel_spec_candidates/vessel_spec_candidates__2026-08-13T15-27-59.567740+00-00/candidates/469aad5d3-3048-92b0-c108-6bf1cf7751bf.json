@@ -1,0 +1,60 @@
+{
+  "vesselId": "469aad5d3-3048-92b0-c108-6bf1cf7751bf",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HEE SUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HEE SUNG",
+      "candidates": [
+        {
+          "vesselNameKor": "희성",
+          "vesselNameEng": "HEE SUNG",
+          "callSign": "D9KZ",
+          "vesselNo": "858702",
+          "imoNo": "8428234",
+          "vesselKind": "21[산물선(벌크선)]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 966.0,
+          "netTonnage": 503.0,
+          "internationalGrossTonnage": 966.0,
+          "lengthM": 70.0,
+          "totalLengthM": 70.0,
+          "widthM": 12.4,
+          "depthM": 5.2,
+          "draftM": 5.0,
+          "constructionDate": "1985-09-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "D9KZ",
+            "vsslNo": "858702",
+            "imoNo": "8428234",
+            "vsslKorNm": "희성",
+            "vsslEngNm": "HEE SUNG",
+            "vsslKnd": "21[산물선(벌크선)]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "966",
+            "grtg": "966",
+            "ntng": "503",
+            "vsslTotLt": "70",
+            "shdth": "12.4",
+            "vsslDrft": "5",
+            "vsslLt": "70",
+            "vsslDp": "5.2",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1985-09-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

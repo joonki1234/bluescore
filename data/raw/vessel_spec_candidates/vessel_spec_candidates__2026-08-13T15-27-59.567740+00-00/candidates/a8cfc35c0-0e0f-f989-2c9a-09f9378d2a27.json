@@ -1,0 +1,18 @@
+{
+  "vesselId": "a8cfc35c0-0e0f-f989-2c9a-09f9378d2a27",
+  "gfwImo": null,
+  "gfwCallSign": "326   _",
+  "gfwName": "BUGILHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "326   _",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "BUGILHO",
+      "candidates": []
+    }
+  ]
+}

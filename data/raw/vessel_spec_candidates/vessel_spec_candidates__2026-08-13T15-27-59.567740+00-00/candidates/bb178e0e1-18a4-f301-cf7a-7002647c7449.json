@@ -1,0 +1,13 @@
+{
+  "vesselId": "bb178e0e1-18a4-f301-cf7a-7002647c7449",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHANG YANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHANG YANG HO",
+      "candidates": []
+    }
+  ]
+}

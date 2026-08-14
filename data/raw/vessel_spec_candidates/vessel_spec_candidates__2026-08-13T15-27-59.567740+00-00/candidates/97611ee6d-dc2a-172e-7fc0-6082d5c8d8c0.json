@@ -1,0 +1,13 @@
+{
+  "vesselId": "97611ee6d-dc2a-172e-7fc0-6082d5c8d8c0",
+  "gfwImo": null,
+  "gfwCallSign": "300VITA",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300VITA",
+      "candidates": []
+    }
+  ]
+}

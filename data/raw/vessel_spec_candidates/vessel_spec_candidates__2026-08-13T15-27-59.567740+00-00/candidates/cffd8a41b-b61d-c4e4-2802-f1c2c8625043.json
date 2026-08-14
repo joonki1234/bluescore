@@ -1,0 +1,13 @@
+{
+  "vesselId": "cffd8a41b-b61d-c4e4-2802-f1c2c8625043",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JIN YANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JIN YANG HO",
+      "candidates": []
+    }
+  ]
+}

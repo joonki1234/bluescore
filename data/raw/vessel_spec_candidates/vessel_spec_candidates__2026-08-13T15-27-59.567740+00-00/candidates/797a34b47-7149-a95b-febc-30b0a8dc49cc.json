@@ -1,0 +1,13 @@
+{
+  "vesselId": "797a34b47-7149-a95b-febc-30b0a8dc49cc",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SANGJINHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SANGJINHO",
+      "candidates": []
+    }
+  ]
+}

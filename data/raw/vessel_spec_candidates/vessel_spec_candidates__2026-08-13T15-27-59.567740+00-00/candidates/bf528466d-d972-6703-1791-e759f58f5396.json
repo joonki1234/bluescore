@@ -1,0 +1,60 @@
+{
+  "vesselId": "bf528466d-d972-6703-1791-e759f58f5396",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEONG DEOK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEONG DEOK",
+      "candidates": [
+        {
+          "vesselNameKor": "318 성덕호",
+          "vesselNameEng": "NO.318 SEONG DEOK",
+          "callSign": "0007025",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "92[원양 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 79.0,
+          "netTonnage": 51.0,
+          "internationalGrossTonnage": 130.0,
+          "lengthM": 25.9,
+          "totalLengthM": 26.0,
+          "widthM": 6.9,
+          "depthM": 2.7,
+          "draftM": 2.6,
+          "constructionDate": "1995-06-15T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "0007025",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "318 성덕호",
+            "vsslEngNm": "NO.318 SEONG DEOK",
+            "vsslKnd": "92[원양 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "130",
+            "grtg": "79",
+            "ntng": "51",
+            "vsslTotLt": "26",
+            "shdth": "6.9",
+            "vsslDrft": "2.6",
+            "vsslLt": "25.9",
+            "vsslDp": "2.7",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "1995-06-15T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

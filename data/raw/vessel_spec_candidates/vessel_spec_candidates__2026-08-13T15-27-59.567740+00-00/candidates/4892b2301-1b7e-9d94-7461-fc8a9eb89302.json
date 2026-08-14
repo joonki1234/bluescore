@@ -1,0 +1,18 @@
+{
+  "vesselId": "4892b2301-1b7e-9d94-7461-fc8a9eb89302",
+  "gfwImo": null,
+  "gfwCallSign": "NGJUN",
+  "gfwName": "208GEUMHAE",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "NGJUN",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "208GEUMHAE",
+      "candidates": []
+    }
+  ]
+}

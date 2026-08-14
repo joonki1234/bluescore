@@ -1,0 +1,13 @@
+{
+  "vesselId": "901255aaa-ac67-c5ec-442a-4996cc76b167",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2 GEUM GANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2 GEUM GANG HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "a05941da7-700a-8b1e-5329-ca5242ea0c7f",
+  "gfwImo": null,
+  "gfwCallSign": "249@",
+  "gfwName": "ENJOY HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "249@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "ENJOY HO@",
+      "candidates": []
+    }
+  ]
+}

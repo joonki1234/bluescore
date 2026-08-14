@@ -1,0 +1,18 @@
+{
+  "vesselId": "6b537da1f-ff91-bf35-3735-379f14af6328",
+  "gfwImo": null,
+  "gfwCallSign": "255@",
+  "gfwName": "CHEON SOO MAN@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "255@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEON SOO MAN@",
+      "candidates": []
+    }
+  ]
+}

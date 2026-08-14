@@ -1,0 +1,13 @@
+{
+  "vesselId": "f489ddf6c-c4c8-76b5-017d-1e97f1acd175",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NA IL1",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NA IL1",
+      "candidates": []
+    }
+  ]
+}

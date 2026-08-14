@@ -1,0 +1,13 @@
+{
+  "vesselId": "7da00bacf-fba7-4c4e-2756-286c36452788",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "153BANG JU",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "153BANG JU",
+      "candidates": []
+    }
+  ]
+}

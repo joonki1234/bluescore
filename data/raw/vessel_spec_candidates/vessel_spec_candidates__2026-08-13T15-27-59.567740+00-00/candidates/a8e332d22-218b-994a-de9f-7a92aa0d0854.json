@@ -1,0 +1,18 @@
+{
+  "vesselId": "a8e332d22-218b-994a-de9f-7a92aa0d0854",
+  "gfwImo": null,
+  "gfwCallSign": "101DEOK",
+  "gfwName": "DEOK SUNG 1HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101DEOK",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "DEOK SUNG 1HO",
+      "candidates": []
+    }
+  ]
+}

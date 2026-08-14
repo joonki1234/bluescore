@@ -1,0 +1,13 @@
+{
+  "vesselId": "2a25eb90a-a002-6739-ee47-56248203ab59",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "58SG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "58SG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "db695c603-3fc2-dddc-92d3-586de0f6c067",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEE STAR HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEE STAR HO",
+      "candidates": []
+    }
+  ]
+}

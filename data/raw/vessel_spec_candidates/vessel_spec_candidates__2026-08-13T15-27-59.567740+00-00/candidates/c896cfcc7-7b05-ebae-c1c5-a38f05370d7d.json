@@ -1,0 +1,18 @@
+{
+  "vesselId": "c896cfcc7-7b05-ebae-c1c5-a38f05370d7d",
+  "gfwImo": null,
+  "gfwCallSign": "300COMB",
+  "gfwName": "COMBOHO2",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300COMB",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "COMBOHO2",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "7b217e78a-ad30-6a0d-0fb9-5b4eac204647",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HWAN SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HWAN SUNG HO",
+      "candidates": []
+    }
+  ]
+}

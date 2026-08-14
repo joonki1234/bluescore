@@ -1,0 +1,13 @@
+{
+  "vesselId": "d22cb5148-8d7b-dffb-b283-97426213cff8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "909 GEUM SEOK HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "909 GEUM SEOK HO",
+      "candidates": []
+    }
+  ]
+}

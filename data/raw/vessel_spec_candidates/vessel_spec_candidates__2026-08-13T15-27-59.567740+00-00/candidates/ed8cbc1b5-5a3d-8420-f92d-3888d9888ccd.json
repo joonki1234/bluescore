@@ -1,0 +1,13 @@
+{
+  "vesselId": "ed8cbc1b5-5a3d-8420-f92d-3888d9888ccd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "102SEONG GYUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "102SEONG GYUNG HO",
+      "candidates": []
+    }
+  ]
+}

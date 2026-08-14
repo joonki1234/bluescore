@@ -1,0 +1,13 @@
+{
+  "vesselId": "dceb95c4f-feab-8b59-a0a3-b9449e349cac",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "UN YEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "UN YEONG HO",
+      "candidates": []
+    }
+  ]
+}

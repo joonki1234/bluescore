@@ -1,0 +1,18 @@
+{
+  "vesselId": "4de48b588-89e3-ac1f-46ac-57ba37cafb68",
+  "gfwImo": null,
+  "gfwCallSign": "395SAIL",
+  "gfwName": "95-SAIL",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "395SAIL",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "95-SAIL",
+      "candidates": []
+    }
+  ]
+}

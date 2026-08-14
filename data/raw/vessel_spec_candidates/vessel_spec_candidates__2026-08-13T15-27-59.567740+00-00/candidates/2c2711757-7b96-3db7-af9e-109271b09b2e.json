@@ -1,0 +1,13 @@
+{
+  "vesselId": "2c2711757-7b96-3db7-af9e-109271b09b2e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BOK JIN HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BOK JIN HO@",
+      "candidates": []
+    }
+  ]
+}

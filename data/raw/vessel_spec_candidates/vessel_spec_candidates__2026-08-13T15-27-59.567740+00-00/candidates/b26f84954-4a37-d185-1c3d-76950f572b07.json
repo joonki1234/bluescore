@@ -1,0 +1,13 @@
+{
+  "vesselId": "b26f84954-4a37-d185-1c3d-76950f572b07",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAEJUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAEJUNG",
+      "candidates": []
+    }
+  ]
+}

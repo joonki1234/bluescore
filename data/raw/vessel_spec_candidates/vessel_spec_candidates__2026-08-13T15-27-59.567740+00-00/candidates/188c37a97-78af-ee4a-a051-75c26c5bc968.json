@@ -1,0 +1,13 @@
+{
+  "vesselId": "188c37a97-78af-ee4a-a051-75c26c5bc968",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DONGMYEONGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DONGMYEONGHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "cca62ba57-7d0a-aca9-316d-11ec33e2cd77",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HEUNG MIN @",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HEUNG MIN @",
+      "candidates": []
+    }
+  ]
+}

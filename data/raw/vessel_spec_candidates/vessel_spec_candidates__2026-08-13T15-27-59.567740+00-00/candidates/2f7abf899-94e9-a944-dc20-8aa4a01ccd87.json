@@ -1,0 +1,18 @@
+{
+  "vesselId": "2f7abf899-94e9-a944-dc20-8aa4a01ccd87",
+  "gfwImo": null,
+  "gfwCallSign": "123BIG",
+  "gfwName": "BIG POWER BANK",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "123BIG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "BIG POWER BANK",
+      "candidates": []
+    }
+  ]
+}

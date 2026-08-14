@@ -1,0 +1,18 @@
+{
+  "vesselId": "db227940c-c528-fca9-f314-4208d223f259",
+  "gfwImo": null,
+  "gfwCallSign": "102WANG",
+  "gfwName": "WANGSEONJANG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "102WANG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "WANGSEONJANG",
+      "candidates": []
+    }
+  ]
+}

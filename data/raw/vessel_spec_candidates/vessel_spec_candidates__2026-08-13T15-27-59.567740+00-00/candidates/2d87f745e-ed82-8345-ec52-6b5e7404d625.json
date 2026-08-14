@@ -1,0 +1,65 @@
+{
+  "vesselId": "2d87f745e-ed82-8345-ec52-6b5e7404d625",
+  "gfwImo": null,
+  "gfwCallSign": "352SD",
+  "gfwName": "115 DAE YANG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "352SD",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "115 DAE YANG",
+      "candidates": [
+        {
+          "vesselNameKor": "대양115",
+          "vesselNameEng": "NO 115 DAE YANG",
+          "callSign": "021603",
+          "vesselNo": "021603",
+          "imoNo": null,
+          "vesselKind": "91[연근해 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 247.0,
+          "netTonnage": 100.0,
+          "internationalGrossTonnage": 247.0,
+          "lengthM": 34.9,
+          "totalLengthM": 34.9,
+          "widthM": 6.5,
+          "depthM": 3.1,
+          "draftM": 3.0,
+          "constructionDate": "2002-04-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "021603",
+            "vsslNo": "021603",
+            "imoNo": null,
+            "vsslKorNm": "대양115",
+            "vsslEngNm": "NO 115 DAE YANG",
+            "vsslKnd": "91[연근해 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "4",
+            "tonEdycSeNm": "계산톤수",
+            "intrlGrtg": "247",
+            "grtg": "247",
+            "ntng": "100",
+            "vsslTotLt": "34.9",
+            "shdth": "6.5",
+            "vsslDrft": "3",
+            "vsslLt": "34.9",
+            "vsslDp": "3.1",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2002-04-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

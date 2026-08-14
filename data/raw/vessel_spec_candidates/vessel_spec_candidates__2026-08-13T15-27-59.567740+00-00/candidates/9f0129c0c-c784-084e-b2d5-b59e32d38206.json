@@ -1,0 +1,13 @@
+{
+  "vesselId": "9f0129c0c-c784-084e-b2d5-b59e32d38206",
+  "gfwImo": null,
+  "gfwCallSign": "6441802",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "6441802",
+      "candidates": []
+    }
+  ]
+}

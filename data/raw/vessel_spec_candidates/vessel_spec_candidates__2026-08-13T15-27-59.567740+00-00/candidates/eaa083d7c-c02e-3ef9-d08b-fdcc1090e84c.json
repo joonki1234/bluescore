@@ -1,0 +1,13 @@
+{
+  "vesselId": "eaa083d7c-c02e-3ef9-d08b-fdcc1090e84c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "67BUGYUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "67BUGYUNG",
+      "candidates": []
+    }
+  ]
+}

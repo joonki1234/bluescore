@@ -1,0 +1,13 @@
+{
+  "vesselId": "9bc55a5d7-7ecb-9e4b-4a63-f8ac24bc02dd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "WOO DO SA RANG 3HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "WOO DO SA RANG 3HO",
+      "candidates": []
+    }
+  ]
+}

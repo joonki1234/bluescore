@@ -1,0 +1,13 @@
+{
+  "vesselId": "083b4c242-2742-5780-155c-75b208712926",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MEONG GWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MEONG GWANG HO",
+      "candidates": []
+    }
+  ]
+}

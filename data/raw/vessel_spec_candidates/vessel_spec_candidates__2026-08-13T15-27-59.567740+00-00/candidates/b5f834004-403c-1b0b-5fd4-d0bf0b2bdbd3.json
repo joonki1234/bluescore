@@ -1,0 +1,13 @@
+{
+  "vesselId": "b5f834004-403c-1b0b-5fd4-d0bf0b2bdbd3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "668DAEBOK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "668DAEBOK",
+      "candidates": []
+    }
+  ]
+}

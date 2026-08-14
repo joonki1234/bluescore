@@ -1,0 +1,18 @@
+{
+  "vesselId": "153ec0e85-508e-9300-60fb-7240685b3d4f",
+  "gfwImo": null,
+  "gfwCallSign": "225 @",
+  "gfwName": "JI DO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "225 @",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "JI DO@",
+      "candidates": []
+    }
+  ]
+}

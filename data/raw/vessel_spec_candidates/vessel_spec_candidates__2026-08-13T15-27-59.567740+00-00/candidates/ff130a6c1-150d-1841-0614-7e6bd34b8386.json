@@ -1,0 +1,13 @@
+{
+  "vesselId": "ff130a6c1-150d-1841-0614-7e6bd34b8386",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DONG KYEONG 2 HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DONG KYEONG 2 HO@",
+      "candidates": []
+    }
+  ]
+}

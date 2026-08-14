@@ -1,0 +1,13 @@
+{
+  "vesselId": "fa652fe82-238e-002b-f262-176ef82de575",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NAMYOUNG1HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NAMYOUNG1HO",
+      "candidates": []
+    }
+  ]
+}

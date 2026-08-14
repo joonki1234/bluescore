@@ -1,0 +1,60 @@
+{
+  "vesselId": "e2b6f2439-90cb-4765-bfbf-202b5d2180b7",
+  "gfwImo": "9375317",
+  "gfwCallSign": "3EIG9",
+  "gfwName": "SINO WISDOM",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "3EIG9",
+      "candidates": [
+        {
+          "vesselNameKor": "GRAND ACE5",
+          "vesselNameEng": "GRAND ACE5",
+          "callSign": "3EIG9",
+          "vesselNo": null,
+          "imoNo": "9375317",
+          "vesselKind": "53[케미칼 운반선]",
+          "nationality": "PA[파나마]",
+          "grossTonnage": 30048.0,
+          "netTonnage": 11735.0,
+          "internationalGrossTonnage": 30048.0,
+          "lengthM": 175.9,
+          "totalLengthM": 183.0,
+          "widthM": 32.2,
+          "depthM": 19.1,
+          "draftM": 8.0,
+          "constructionDate": "2006-03-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "3EIG9",
+            "vsslNo": null,
+            "imoNo": "9375317",
+            "vsslKorNm": "GRAND ACE5",
+            "vsslEngNm": "GRAND ACE5",
+            "vsslKnd": "53[케미칼 운반선]",
+            "vsslNlty": "PA[파나마]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "30048",
+            "grtg": "30048",
+            "ntng": "11735",
+            "vsslTotLt": "183",
+            "shdth": "32.2",
+            "vsslDrft": "8",
+            "vsslLt": "175.9",
+            "vsslDp": "19.1",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2006-03-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

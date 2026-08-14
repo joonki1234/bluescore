@@ -1,0 +1,13 @@
+{
+  "vesselId": "8240296b9-9064-24ab-daf8-f501456c536d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HONG YOUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HONG YOUNG HO",
+      "candidates": []
+    }
+  ]
+}

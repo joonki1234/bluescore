@@ -1,0 +1,18 @@
+{
+  "vesselId": "30c158067-723f-e913-014f-3813ba15ed6b",
+  "gfwImo": null,
+  "gfwCallSign": "200@",
+  "gfwName": "SU DUK HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "200@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SU DUK HO@",
+      "candidates": []
+    }
+  ]
+}

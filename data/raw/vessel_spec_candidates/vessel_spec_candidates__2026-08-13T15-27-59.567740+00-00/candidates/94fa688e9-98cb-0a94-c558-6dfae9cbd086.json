@@ -1,0 +1,13 @@
+{
+  "vesselId": "94fa688e9-98cb-0a94-c558-6dfae9cbd086",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO 13 EUNSEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO 13 EUNSEONG",
+      "candidates": []
+    }
+  ]
+}

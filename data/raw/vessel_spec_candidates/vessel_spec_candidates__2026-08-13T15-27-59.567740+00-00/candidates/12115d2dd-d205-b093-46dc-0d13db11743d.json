@@ -1,0 +1,13 @@
+{
+  "vesselId": "12115d2dd-d205-b093-46dc-0d13db11743d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SUPERMARINE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SUPERMARINE",
+      "candidates": []
+    }
+  ]
+}

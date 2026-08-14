@@ -1,0 +1,60 @@
+{
+  "vesselId": "8f6fe2649-97b9-e127-3e9e-da93bc07f840",
+  "gfwImo": null,
+  "gfwCallSign": "182824",
+  "gfwName": "NO.81 SHIN HYUN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "182824",
+      "candidates": [
+        {
+          "vesselNameKor": "제81신현호",
+          "vesselNameEng": null,
+          "callSign": "182824",
+          "vesselNo": "182824",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 243.0,
+          "netTonnage": 243.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 41.3,
+          "totalLengthM": 41.3,
+          "widthM": 8.5,
+          "depthM": 3.8,
+          "draftM": 3.3,
+          "constructionDate": "2018-09-08T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "182824",
+            "vsslNo": "182824",
+            "imoNo": null,
+            "vsslKorNm": "제81신현호",
+            "vsslEngNm": null,
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "243",
+            "ntng": "243",
+            "vsslTotLt": "41.3",
+            "shdth": "8.5",
+            "vsslDrft": "3.3",
+            "vsslLt": "41.3",
+            "vsslDp": "3.8",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "2018-09-08T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

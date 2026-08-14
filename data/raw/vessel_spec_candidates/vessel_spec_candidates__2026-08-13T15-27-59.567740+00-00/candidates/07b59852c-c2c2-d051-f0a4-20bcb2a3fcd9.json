@@ -1,0 +1,18 @@
+{
+  "vesselId": "07b59852c-c2c2-d051-f0a4-20bcb2a3fcd9",
+  "gfwImo": null,
+  "gfwCallSign": "603MGHO",
+  "gfwName": "303MYEONGGWANGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "603MGHO",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "303MYEONGGWANGHO",
+      "candidates": []
+    }
+  ]
+}

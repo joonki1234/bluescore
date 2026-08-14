@@ -1,0 +1,13 @@
+{
+  "vesselId": "4555ba656-6607-dc09-ef27-0ca344690d1b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHANGDAIHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHANGDAIHO",
+      "candidates": []
+    }
+  ]
+}

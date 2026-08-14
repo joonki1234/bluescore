@@ -1,0 +1,60 @@
+{
+  "vesselId": "6e17dcfe3-3833-7337-fa2d-604bfd9efbac",
+  "gfwImo": null,
+  "gfwCallSign": "220030",
+  "gfwName": "DONGHWA5HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "220030",
+      "candidates": [
+        {
+          "vesselNameKor": "동화5호",
+          "vesselNameEng": "DONG HWA 5",
+          "callSign": "220030",
+          "vesselNo": "220030",
+          "imoNo": null,
+          "vesselKind": "93[급유선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 148.0,
+          "netTonnage": 148.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 35.45,
+          "totalLengthM": 35.45,
+          "widthM": 7.2,
+          "depthM": 3.2,
+          "draftM": 2.8,
+          "constructionDate": "1999-05-25T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "220030",
+            "vsslNo": "220030",
+            "imoNo": null,
+            "vsslKorNm": "동화5호",
+            "vsslEngNm": "DONG HWA 5",
+            "vsslKnd": "93[급유선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "148",
+            "ntng": "148",
+            "vsslTotLt": "35.45",
+            "shdth": "7.2",
+            "vsslDrft": "2.8",
+            "vsslLt": "35.45",
+            "vsslDp": "3.2",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1999-05-25T00:00:00+09:00",
+            "befClsgn": "202232",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

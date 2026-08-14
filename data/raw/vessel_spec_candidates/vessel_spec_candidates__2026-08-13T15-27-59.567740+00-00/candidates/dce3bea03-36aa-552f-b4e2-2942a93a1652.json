@@ -1,0 +1,13 @@
+{
+  "vesselId": "dce3bea03-36aa-552f-b4e2-2942a93a1652",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GWANG HAE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GWANG HAE",
+      "candidates": []
+    }
+  ]
+}

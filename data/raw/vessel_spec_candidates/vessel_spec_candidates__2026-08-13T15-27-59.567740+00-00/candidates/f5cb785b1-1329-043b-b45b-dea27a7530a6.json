@@ -1,0 +1,13 @@
+{
+  "vesselId": "f5cb785b1-1329-043b-b45b-dea27a7530a6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YEO REUM HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YEO REUM HO@",
+      "candidates": []
+    }
+  ]
+}

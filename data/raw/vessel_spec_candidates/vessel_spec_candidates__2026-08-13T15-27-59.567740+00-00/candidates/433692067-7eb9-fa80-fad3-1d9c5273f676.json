@@ -1,0 +1,13 @@
+{
+  "vesselId": "433692067-7eb9-fa80-fad3-1d9c5273f676",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHUNSEUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHUNSEUNGHO",
+      "candidates": []
+    }
+  ]
+}

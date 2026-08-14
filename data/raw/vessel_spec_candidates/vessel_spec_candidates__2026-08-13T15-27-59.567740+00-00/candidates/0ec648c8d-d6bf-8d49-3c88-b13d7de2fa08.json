@@ -1,0 +1,13 @@
+{
+  "vesselId": "0ec648c8d-d6bf-8d49-3c88-b13d7de2fa08",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "19BORYUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "19BORYUNG",
+      "candidates": []
+    }
+  ]
+}

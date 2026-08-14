@@ -1,0 +1,18 @@
+{
+  "vesselId": "8b172f85c-c224-7c29-82ca-5de017d698f2",
+  "gfwImo": null,
+  "gfwCallSign": "622CHAN",
+  "gfwName": "CHANGDAE",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "622CHAN",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "CHANGDAE",
+      "candidates": []
+    }
+  ]
+}

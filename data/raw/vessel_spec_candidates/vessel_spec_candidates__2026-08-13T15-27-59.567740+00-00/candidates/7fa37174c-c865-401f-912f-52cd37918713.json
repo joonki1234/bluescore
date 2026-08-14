@@ -1,0 +1,13 @@
+{
+  "vesselId": "7fa37174c-c865-401f-912f-52cd37918713",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BLACK PINK HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BLACK PINK HO",
+      "candidates": []
+    }
+  ]
+}

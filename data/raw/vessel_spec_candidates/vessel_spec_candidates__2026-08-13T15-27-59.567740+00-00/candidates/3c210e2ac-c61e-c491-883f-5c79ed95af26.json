@@ -1,0 +1,13 @@
+{
+  "vesselId": "3c210e2ac-c61e-c491-883f-5c79ed95af26",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "701KYEONGHAE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "701KYEONGHAE",
+      "candidates": []
+    }
+  ]
+}

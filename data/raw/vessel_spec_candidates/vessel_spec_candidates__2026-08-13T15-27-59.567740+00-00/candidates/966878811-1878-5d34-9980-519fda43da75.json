@@ -1,0 +1,13 @@
+{
+  "vesselId": "966878811-1878-5d34-9980-519fda43da75",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "7CHANGNAM",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "7CHANGNAM",
+      "candidates": []
+    }
+  ]
+}

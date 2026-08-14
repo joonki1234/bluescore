@@ -1,0 +1,18 @@
+{
+  "vesselId": "df44b2d2d-d05c-4bca-149d-0259884829f2",
+  "gfwImo": null,
+  "gfwCallSign": "101@",
+  "gfwName": "YEONG NAM HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YEONG NAM HO@",
+      "candidates": []
+    }
+  ]
+}

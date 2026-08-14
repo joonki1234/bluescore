@@ -1,0 +1,13 @@
+{
+  "vesselId": "4440d1cca-ae6a-71f9-ec59-34cfde2b665a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JAEYOUNG2",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JAEYOUNG2",
+      "candidates": []
+    }
+  ]
+}

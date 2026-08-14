@@ -1,0 +1,18 @@
+{
+  "vesselId": "64f450922-27c6-1657-65cd-48384a6fd8c0",
+  "gfwImo": null,
+  "gfwCallSign": "250036",
+  "gfwName": "ECO BUSAN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "250036",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "ECO BUSAN",
+      "candidates": []
+    }
+  ]
+}

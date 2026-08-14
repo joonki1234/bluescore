@@ -1,0 +1,13 @@
+{
+  "vesselId": "4d12c74cd-de8a-246c-201e-35e0cec5140f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAN SEONG HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAN SEONG HO@",
+      "candidates": []
+    }
+  ]
+}

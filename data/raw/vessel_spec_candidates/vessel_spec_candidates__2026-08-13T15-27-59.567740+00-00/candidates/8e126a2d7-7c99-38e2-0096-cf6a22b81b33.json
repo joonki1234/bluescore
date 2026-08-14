@@ -1,0 +1,60 @@
+{
+  "vesselId": "8e126a2d7-7c99-38e2-0096-cf6a22b81b33",
+  "gfwImo": "8812227",
+  "gfwCallSign": "6MOU",
+  "gfwName": "DONGWON NO.16",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "6MOU",
+      "candidates": [
+        {
+          "vesselNameKor": "오션마스타",
+          "vesselNameEng": "OCEAN MASTER",
+          "callSign": "6MOU",
+          "vesselNo": null,
+          "imoNo": "8812227",
+          "vesselKind": "92[원양 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 1742.0,
+          "netTonnage": 611.0,
+          "internationalGrossTonnage": 1742.0,
+          "lengthM": 68.2,
+          "totalLengthM": 68.4,
+          "widthM": 13.6,
+          "depthM": 5.7,
+          "draftM": 5.0,
+          "constructionDate": "1989-06-17T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "6MOU",
+            "vsslNo": null,
+            "imoNo": "8812227",
+            "vsslKorNm": "오션마스타",
+            "vsslEngNm": "OCEAN MASTER",
+            "vsslKnd": "92[원양 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "1742",
+            "grtg": "1742",
+            "ntng": "611",
+            "vsslTotLt": "68.4",
+            "shdth": "13.6",
+            "vsslDrft": "5",
+            "vsslLt": "68.2",
+            "vsslDp": "5.7",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1989-06-17T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

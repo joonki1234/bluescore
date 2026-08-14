@@ -1,0 +1,13 @@
+{
+  "vesselId": "0651a70ef-f18b-52e5-a552-7fe4d87fccf9",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "3 KUM KANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "3 KUM KANG HO",
+      "candidates": []
+    }
+  ]
+}

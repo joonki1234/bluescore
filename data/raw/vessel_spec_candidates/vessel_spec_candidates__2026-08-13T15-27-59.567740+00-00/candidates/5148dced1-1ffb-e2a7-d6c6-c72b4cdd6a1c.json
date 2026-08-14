@@ -1,0 +1,13 @@
+{
+  "vesselId": "5148dced1-1ffb-e2a7-d6c6-c72b4cdd6a1c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NAM HAE HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NAM HAE HO",
+      "candidates": []
+    }
+  ]
+}

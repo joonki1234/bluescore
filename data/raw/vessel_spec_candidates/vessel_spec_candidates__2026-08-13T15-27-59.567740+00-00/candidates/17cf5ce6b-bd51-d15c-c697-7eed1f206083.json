@@ -1,0 +1,60 @@
+{
+  "vesselId": "17cf5ce6b-bd51-d15c-c697-7eed1f206083",
+  "gfwImo": "1022067",
+  "gfwCallSign": "D7YA",
+  "gfwName": "HAENURI",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D7YA",
+      "candidates": [
+        {
+          "vesselNameKor": "해누리",
+          "vesselNameEng": "HAENURI",
+          "callSign": "D7YA",
+          "vesselNo": "102206",
+          "imoNo": "1022067",
+          "vesselKind": "81[관공선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 3408.0,
+          "netTonnage": 3408.0,
+          "internationalGrossTonnage": 3408.0,
+          "lengthM": 80.4,
+          "totalLengthM": 80.4,
+          "widthM": 15.0,
+          "depthM": 8.2,
+          "draftM": 6.4,
+          "constructionDate": "2025-06-25T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "D7YA",
+            "vsslNo": "102206",
+            "imoNo": "1022067",
+            "vsslKorNm": "해누리",
+            "vsslEngNm": "HAENURI",
+            "vsslKnd": "81[관공선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "3408",
+            "grtg": "3408",
+            "ntng": "3408",
+            "vsslTotLt": "80.4",
+            "shdth": "15",
+            "vsslDrft": "6.4",
+            "vsslLt": "80.4",
+            "vsslDp": "8.2",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2025-06-25T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

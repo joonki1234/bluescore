@@ -1,0 +1,13 @@
+{
+  "vesselId": "e88cbd9e1-18f8-d332-582b-a4f9d8729603",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MOYERIHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MOYERIHO",
+      "candidates": []
+    }
+  ]
+}

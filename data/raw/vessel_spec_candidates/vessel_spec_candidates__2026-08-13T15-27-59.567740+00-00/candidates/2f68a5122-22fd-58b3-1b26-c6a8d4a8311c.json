@@ -1,0 +1,13 @@
+{
+  "vesselId": "2f68a5122-22fd-58b3-1b26-c6a8d4a8311c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KKACHIRI HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KKACHIRI HO",
+      "candidates": []
+    }
+  ]
+}

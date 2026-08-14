@@ -1,0 +1,13 @@
+{
+  "vesselId": "7af75b8e4-4317-f6e2-2353-5612027d1bae",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "101HEUNGSUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "101HEUNGSUNG",
+      "candidates": []
+    }
+  ]
+}

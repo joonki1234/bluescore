@@ -1,0 +1,59 @@
+{
+  "vesselId": "775f83c61-1255-d62e-728d-6c0786f84dcb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KWANG IL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KWANG IL",
+      "candidates": [
+        {
+          "vesselNameKor": "제3광일",
+          "vesselNameEng": "KWANG IL NO.3",
+          "callSign": "6LHJ",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "92[원양 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 287.0,
+          "netTonnage": 287.0,
+          "internationalGrossTonnage": null,
+          "lengthM": 42.5,
+          "totalLengthM": 42.5,
+          "widthM": 7.4,
+          "depthM": 99.9,
+          "draftM": 3.4,
+          "constructionDate": null,
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "6LHJ",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "제3광일",
+            "vsslEngNm": "KWANG IL NO.3",
+            "vsslKnd": "92[원양 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "3",
+            "tonEdycSeNm": "기타",
+            "intrlGrtg": null,
+            "grtg": "287",
+            "ntng": "287",
+            "vsslTotLt": "42.5",
+            "shdth": "7.4",
+            "vsslDrft": "3.4",
+            "vsslLt": "42.5",
+            "vsslDp": "99.9",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "vesselId": "b73967bae-ec3c-842e-b44c-0d32cfe5ecb2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAEGIL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAEGIL",
+      "candidates": [
+        {
+          "vesselNameKor": "대길1호",
+          "vesselNameEng": "DAEGIL1HO",
+          "callSign": "DSMF",
+          "vesselNo": "806419",
+          "imoNo": null,
+          "vesselKind": "61[견인용예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 69.0,
+          "netTonnage": 69.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 23.8,
+          "totalLengthM": 23.8,
+          "widthM": 5.2,
+          "depthM": 2.4,
+          "draftM": 2.4,
+          "constructionDate": "1980-03-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "DSMF",
+            "vsslNo": "806419",
+            "imoNo": null,
+            "vsslKorNm": "대길1호",
+            "vsslEngNm": "DAEGIL1HO",
+            "vsslKnd": "61[견인용예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "69",
+            "ntng": "69",
+            "vsslTotLt": "23.8",
+            "shdth": "5.2",
+            "vsslDrft": "2.4",
+            "vsslLt": "23.8",
+            "vsslDp": "2.4",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1980-03-01T00:00:00+09:00",
+            "befClsgn": "D8MF",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

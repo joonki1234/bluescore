@@ -1,0 +1,13 @@
+{
+  "vesselId": "c16ff834b-b3eb-c969-7bc0-26206cb0142f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2022DAE KYOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2022DAE KYOUNG",
+      "candidates": []
+    }
+  ]
+}

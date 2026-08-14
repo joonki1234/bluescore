@@ -1,0 +1,13 @@
+{
+  "vesselId": "485f6e248-85f0-1e6b-4c49-b3a2572461ee",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2017 GYEONG IL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2017 GYEONG IL",
+      "candidates": []
+    }
+  ]
+}

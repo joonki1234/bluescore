@@ -1,0 +1,13 @@
+{
+  "vesselId": "f7619d8db-bccc-e352-49ae-62eb516d49b2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HYUN DAE 8HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HYUN DAE 8HO",
+      "candidates": []
+    }
+  ]
+}

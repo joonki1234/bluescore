@@ -1,0 +1,13 @@
+{
+  "vesselId": "2b77a9d67-7389-5d92-7ff2-d832686b394d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "5GWANGYANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "5GWANGYANG",
+      "candidates": []
+    }
+  ]
+}

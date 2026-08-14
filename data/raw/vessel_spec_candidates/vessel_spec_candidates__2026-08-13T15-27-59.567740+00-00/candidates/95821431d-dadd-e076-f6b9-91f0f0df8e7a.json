@@ -1,0 +1,13 @@
+{
+  "vesselId": "95821431d-dadd-e076-f6b9-91f0f0df8e7a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "67 HWA CHANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "67 HWA CHANG",
+      "candidates": []
+    }
+  ]
+}

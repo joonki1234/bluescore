@@ -1,0 +1,13 @@
+{
+  "vesselId": "ffce55dc1-100b-b417-8743-767b0cce91f7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JE 3 HWANG DEOK HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JE 3 HWANG DEOK HO",
+      "candidates": []
+    }
+  ]
+}

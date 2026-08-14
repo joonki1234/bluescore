@@ -1,0 +1,60 @@
+{
+  "vesselId": "0be972204-411c-96ee-6840-735fbb63508e",
+  "gfwImo": null,
+  "gfwCallSign": "058290",
+  "gfwName": "5WOORIHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "058290",
+      "candidates": [
+        {
+          "vesselNameKor": "5우리호",
+          "vesselNameEng": null,
+          "callSign": "058290",
+          "vesselNo": "058290",
+          "imoNo": null,
+          "vesselKind": "33[폐기물 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 100.0,
+          "netTonnage": 99.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 29.95,
+          "totalLengthM": 30.0,
+          "widthM": 6.8,
+          "depthM": 3.5,
+          "draftM": 3.0,
+          "constructionDate": "2005-05-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "3[항내운항]",
+            "clsgn": "058290",
+            "vsslNo": "058290",
+            "imoNo": null,
+            "vsslKorNm": "5우리호",
+            "vsslEngNm": null,
+            "vsslKnd": "33[폐기물 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "100",
+            "ntng": "99",
+            "vsslTotLt": "30",
+            "shdth": "6.8",
+            "vsslDrft": "3",
+            "vsslLt": "29.95",
+            "vsslDp": "3.5",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2005-05-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

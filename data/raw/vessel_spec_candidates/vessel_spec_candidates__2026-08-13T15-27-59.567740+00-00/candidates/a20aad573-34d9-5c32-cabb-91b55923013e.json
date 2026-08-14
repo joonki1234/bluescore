@@ -1,0 +1,13 @@
+{
+  "vesselId": "a20aad573-34d9-5c32-cabb-91b55923013e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "6 DONG IL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "6 DONG IL",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "vesselId": "7585ab046-658e-aa1c-4e5a-6647fdda2e88",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "302 YEONCHANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "302 YEONCHANG",
+      "candidates": [
+        {
+          "vesselNameKor": "NO.302 YEONCHANG",
+          "vesselNameEng": "NO.302 YEONCHANG",
+          "callSign": "160174",
+          "vesselNo": null,
+          "imoNo": "8716540",
+          "vesselKind": "91[연근해 어선]",
+          "nationality": "BZ[벨리즈]",
+          "grossTonnage": 255.0,
+          "netTonnage": 76.0,
+          "internationalGrossTonnage": 255.0,
+          "lengthM": 43.7,
+          "totalLengthM": 43.7,
+          "widthM": 8.0,
+          "depthM": 3.91,
+          "draftM": 2.5,
+          "constructionDate": "1987-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "160174",
+            "vsslNo": null,
+            "imoNo": "8716540",
+            "vsslKorNm": "NO.302 YEONCHANG",
+            "vsslEngNm": "NO.302 YEONCHANG",
+            "vsslKnd": "91[연근해 어선]",
+            "vsslNlty": "BZ[벨리즈]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "255",
+            "grtg": "255",
+            "ntng": "76",
+            "vsslTotLt": "43.7",
+            "shdth": "8",
+            "vsslDrft": "2.5",
+            "vsslLt": "43.7",
+            "vsslDp": "3.91",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1987-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

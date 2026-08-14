@@ -1,0 +1,13 @@
+{
+  "vesselId": "1f2ba1743-3158-183c-4e41-f84d06c9538e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "103 SU GWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "103 SU GWANG",
+      "candidates": []
+    }
+  ]
+}

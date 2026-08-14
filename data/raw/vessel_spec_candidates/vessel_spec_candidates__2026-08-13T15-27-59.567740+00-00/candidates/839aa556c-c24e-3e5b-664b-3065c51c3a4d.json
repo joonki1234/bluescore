@@ -1,0 +1,13 @@
+{
+  "vesselId": "839aa556c-c24e-3e5b-664b-3065c51c3a4d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "606PUNGSUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "606PUNGSUNG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "946d4a307-7d5d-4727-a19d-6be40e46920f",
+  "gfwImo": null,
+  "gfwCallSign": "396----",
+  "gfwName": "96-SAEILHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "396----",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "96-SAEILHO",
+      "candidates": []
+    }
+  ]
+}

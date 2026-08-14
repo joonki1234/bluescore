@@ -1,0 +1,13 @@
+{
+  "vesselId": "a5fde015b-b01b-ce32-c6bb-3b2f8ef15c33",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "K TU HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "K TU HO",
+      "candidates": []
+    }
+  ]
+}

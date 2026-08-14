@@ -1,0 +1,60 @@
+{
+  "vesselId": "d0e53e2dd-d12e-52c8-27a2-2914f5d0e3d5",
+  "gfwImo": null,
+  "gfwCallSign": "065891",
+  "gfwName": "HYUNJUN@@@@@@@@@@@AQ",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "065891",
+      "candidates": [
+        {
+          "vesselNameKor": "현준호",
+          "vesselNameEng": null,
+          "callSign": "065891",
+          "vesselNo": "065891",
+          "imoNo": null,
+          "vesselKind": "69[기타 예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 70.0,
+          "netTonnage": 70.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 21.74,
+          "totalLengthM": 21.74,
+          "widthM": 6.7,
+          "depthM": 2.8,
+          "draftM": 2.0,
+          "constructionDate": "1979-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "065891",
+            "vsslNo": "065891",
+            "imoNo": null,
+            "vsslKorNm": "현준호",
+            "vsslEngNm": null,
+            "vsslKnd": "69[기타 예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "70",
+            "ntng": "70",
+            "vsslTotLt": "21.74",
+            "shdth": "6.7",
+            "vsslDrft": "2",
+            "vsslLt": "21.74",
+            "vsslDp": "2.8",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1979-01-01T00:00:00+09:00",
+            "befClsgn": "002330",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

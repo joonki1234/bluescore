@@ -1,0 +1,13 @@
+{
+  "vesselId": "5c9d5929f-f52f-3800-5a29-86752a3b8fea",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2002 JOON SUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2002 JOON SUNG",
+      "candidates": []
+    }
+  ]
+}

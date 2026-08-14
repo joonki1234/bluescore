@@ -1,0 +1,13 @@
+{
+  "vesselId": "1160bca05-5208-8e84-0a3e-dc1f85553e84",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "889CHEON BOK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "889CHEON BOK",
+      "candidates": []
+    }
+  ]
+}

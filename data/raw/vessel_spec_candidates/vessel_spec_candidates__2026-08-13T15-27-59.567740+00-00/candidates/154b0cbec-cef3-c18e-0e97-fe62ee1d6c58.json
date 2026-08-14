@@ -1,0 +1,13 @@
+{
+  "vesselId": "154b0cbec-cef3-c18e-0e97-fe62ee1d6c58",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "-27HWACHANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "-27HWACHANG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "76e69f8dc-c6c5-e895-9cbc-45c74ebef47a",
+  "gfwImo": null,
+  "gfwCallSign": "219@",
+  "gfwName": "JANG HYUN@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "219@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "JANG HYUN@",
+      "candidates": []
+    }
+  ]
+}

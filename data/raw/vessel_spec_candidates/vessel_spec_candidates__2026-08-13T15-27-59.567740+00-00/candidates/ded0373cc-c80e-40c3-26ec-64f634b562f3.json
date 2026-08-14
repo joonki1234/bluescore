@@ -1,0 +1,60 @@
+{
+  "vesselId": "ded0373cc-c80e-40c3-26ec-64f634b562f3",
+  "gfwImo": null,
+  "gfwCallSign": "226806",
+  "gfwName": "201 EASTERN GREEN HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "226806",
+      "candidates": [
+        {
+          "vesselNameKor": "201이스턴그린",
+          "vesselNameEng": null,
+          "callSign": "226806",
+          "vesselNo": "226806",
+          "imoNo": null,
+          "vesselKind": "33[폐기물 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 77.0,
+          "netTonnage": 77.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 28.11,
+          "totalLengthM": 28.11,
+          "widthM": 7.4,
+          "depthM": 2.6,
+          "draftM": 2.2,
+          "constructionDate": "1991-12-21T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "226806",
+            "vsslNo": "226806",
+            "imoNo": null,
+            "vsslKorNm": "201이스턴그린",
+            "vsslEngNm": null,
+            "vsslKnd": "33[폐기물 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "77",
+            "ntng": "77",
+            "vsslTotLt": "28.11",
+            "shdth": "7.4",
+            "vsslDrft": "2.2",
+            "vsslLt": "28.11",
+            "vsslDp": "2.6",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1991-12-21T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

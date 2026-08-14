@@ -1,0 +1,18 @@
+{
+  "vesselId": "5e229adbd-d2e8-4358-3ec0-b27a55626f07",
+  "gfwImo": null,
+  "gfwCallSign": "101@",
+  "gfwName": "SAM SAM HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SAM SAM HO@",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "467becbdb-bde6-d8a1-8698-404615e75a9f",
+  "gfwImo": null,
+  "gfwCallSign": "DTFT",
+  "gfwName": "101 HAE GEUM",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "DTFT",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "101 HAE GEUM",
+      "candidates": []
+    }
+  ]
+}

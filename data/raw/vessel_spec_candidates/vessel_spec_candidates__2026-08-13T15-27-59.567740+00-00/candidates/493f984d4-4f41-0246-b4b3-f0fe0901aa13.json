@@ -1,0 +1,13 @@
+{
+  "vesselId": "493f984d4-4f41-0246-b4b3-f0fe0901aa13",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "77 CHEONG HAE",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "77 CHEONG HAE",
+      "candidates": []
+    }
+  ]
+}

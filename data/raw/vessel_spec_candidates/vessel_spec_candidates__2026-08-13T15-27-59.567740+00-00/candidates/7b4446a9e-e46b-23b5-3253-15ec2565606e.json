@@ -1,0 +1,18 @@
+{
+  "vesselId": "7b4446a9e-e46b-23b5-3253-15ec2565606e",
+  "gfwImo": null,
+  "gfwCallSign": "601SPEC",
+  "gfwName": "SPECIAL DREAM 7HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "601SPEC",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SPECIAL DREAM 7HO",
+      "candidates": []
+    }
+  ]
+}

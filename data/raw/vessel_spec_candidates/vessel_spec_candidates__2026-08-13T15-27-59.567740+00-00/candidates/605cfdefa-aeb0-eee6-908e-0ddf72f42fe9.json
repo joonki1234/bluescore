@@ -1,0 +1,13 @@
+{
+  "vesselId": "605cfdefa-aeb0-eee6-908e-0ddf72f42fe9",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SAM SUNG W1 HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SAM SUNG W1 HO",
+      "candidates": []
+    }
+  ]
+}

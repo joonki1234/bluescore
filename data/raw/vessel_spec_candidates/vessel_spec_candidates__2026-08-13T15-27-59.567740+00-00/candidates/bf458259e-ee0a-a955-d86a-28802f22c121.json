@@ -1,0 +1,18 @@
+{
+  "vesselId": "bf458259e-ee0a-a955-d86a-28802f22c121",
+  "gfwImo": null,
+  "gfwCallSign": "300SUNG",
+  "gfwName": "SUNGHO1",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300SUNG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SUNGHO1",
+      "candidates": []
+    }
+  ]
+}

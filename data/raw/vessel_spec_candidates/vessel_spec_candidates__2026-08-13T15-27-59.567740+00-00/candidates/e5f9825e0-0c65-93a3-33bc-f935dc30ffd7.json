@@ -1,0 +1,18 @@
+{
+  "vesselId": "e5f9825e0-0c65-93a3-33bc-f935dc30ffd7",
+  "gfwImo": null,
+  "gfwCallSign": "317HAEN",
+  "gfwName": "HAENGBOKHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "317HAEN",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HAENGBOKHO",
+      "candidates": []
+    }
+  ]
+}

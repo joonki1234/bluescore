@@ -1,0 +1,13 @@
+{
+  "vesselId": "e73416b1b-bfe9-9af8-3098-12d42c6fd47c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JOYANG2HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JOYANG2HO",
+      "candidates": []
+    }
+  ]
+}

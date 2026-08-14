@@ -1,0 +1,13 @@
+{
+  "vesselId": "8143f4f33-31e8-1732-1ab1-c3809b23174f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAESINHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAESINHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "645d5fb57-74b3-5033-1b1b-ac15f04ab934",
+  "gfwImo": null,
+  "gfwCallSign": "955@",
+  "gfwName": "GGA MANG HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "955@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GGA MANG HO@",
+      "candidates": []
+    }
+  ]
+}

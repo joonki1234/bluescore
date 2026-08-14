@@ -1,0 +1,60 @@
+{
+  "vesselId": "15f68ce5b-b7ba-5763-41ac-4b4ba7b8cacf",
+  "gfwImo": "9477919",
+  "gfwCallSign": "D7DE",
+  "gfwName": "MORNING CAMILLA",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D7DE",
+      "candidates": [
+        {
+          "vesselNameKor": "모닝 카밀라",
+          "vesselNameEng": "MORNING CAMILLA",
+          "callSign": "D7DE",
+          "vesselNo": "241005",
+          "imoNo": "9477919",
+          "vesselKind": "27[자동차운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 60876.0,
+          "netTonnage": 18263.0,
+          "internationalGrossTonnage": 60876.0,
+          "lengthM": 194.11,
+          "totalLengthM": 199.94,
+          "widthM": 32.26,
+          "depthM": 24.32,
+          "draftM": 15.0,
+          "constructionDate": "2009-02-25T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D7DE",
+            "vsslNo": "241005",
+            "imoNo": "9477919",
+            "vsslKorNm": "모닝 카밀라",
+            "vsslEngNm": "MORNING CAMILLA",
+            "vsslKnd": "27[자동차운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "60876",
+            "grtg": "60876",
+            "ntng": "18263",
+            "vsslTotLt": "199.94",
+            "shdth": "32.26",
+            "vsslDrft": "15",
+            "vsslLt": "194.11",
+            "vsslDp": "24.32",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2009-02-25T00:00:00+09:00",
+            "befClsgn": "H3LJ",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

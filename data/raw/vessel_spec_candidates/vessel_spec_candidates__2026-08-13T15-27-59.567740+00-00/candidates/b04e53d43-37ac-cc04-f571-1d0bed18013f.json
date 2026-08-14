@@ -1,0 +1,13 @@
+{
+  "vesselId": "b04e53d43-37ac-cc04-f571-1d0bed18013f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "EOCHEONGDOPISINGHEU",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "EOCHEONGDOPISINGHEU",
+      "candidates": []
+    }
+  ]
+}

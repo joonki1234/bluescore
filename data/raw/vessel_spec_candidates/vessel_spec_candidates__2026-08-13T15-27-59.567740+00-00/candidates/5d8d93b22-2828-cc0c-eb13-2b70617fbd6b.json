@@ -1,0 +1,13 @@
+{
+  "vesselId": "5d8d93b22-2828-cc0c-eb13-2b70617fbd6b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "202YUNKYENG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "202YUNKYENG",
+      "candidates": []
+    }
+  ]
+}

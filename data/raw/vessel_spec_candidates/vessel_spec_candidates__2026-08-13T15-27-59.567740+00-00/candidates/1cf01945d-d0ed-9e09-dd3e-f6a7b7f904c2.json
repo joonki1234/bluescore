@@ -1,0 +1,60 @@
+{
+  "vesselId": "1cf01945d-d0ed-9e09-dd3e-f6a7b7f904c2",
+  "gfwImo": "9284829",
+  "gfwCallSign": "D7BI",
+  "gfwName": "PRINCESS CRYSTAL",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D7BI",
+      "candidates": [
+        {
+          "vesselNameKor": "프린세스 크리스탈",
+          "vesselNameEng": "PRINCESS CRYSTAL",
+          "callSign": "D7BI",
+          "vesselNo": "231020",
+          "imoNo": "9284829",
+          "vesselKind": "53[케미칼 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 4812.0,
+          "netTonnage": 2242.0,
+          "internationalGrossTonnage": 4812.0,
+          "lengthM": 101.14,
+          "totalLengthM": 108.0,
+          "widthM": 18.0,
+          "depthM": 9.4,
+          "draftM": 7.6,
+          "constructionDate": "2003-02-17T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D7BI",
+            "vsslNo": "231020",
+            "imoNo": "9284829",
+            "vsslKorNm": "프린세스 크리스탈",
+            "vsslEngNm": "PRINCESS CRYSTAL",
+            "vsslKnd": "53[케미칼 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "4812",
+            "grtg": "4812",
+            "ntng": "2242",
+            "vsslTotLt": "108",
+            "shdth": "18",
+            "vsslDrft": "7.6",
+            "vsslLt": "101.14",
+            "vsslDp": "9.4",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2003-02-17T00:00:00+09:00",
+            "befClsgn": "HPDG",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

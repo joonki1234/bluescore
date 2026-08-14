@@ -1,0 +1,13 @@
+{
+  "vesselId": "e77b5390e-eac6-256b-8ac9-229a7527fabf",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JANGEUN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JANGEUN",
+      "candidates": []
+    }
+  ]
+}

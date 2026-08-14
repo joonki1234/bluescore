@@ -1,0 +1,18 @@
+{
+  "vesselId": "773631ee3-3cc4-4cba-1d3e-a787954020b7",
+  "gfwImo": null,
+  "gfwCallSign": "6312002",
+  "gfwName": "MARUHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "6312002",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MARUHO",
+      "candidates": []
+    }
+  ]
+}

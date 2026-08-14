@@ -1,0 +1,18 @@
+{
+  "vesselId": "118436e27-75b7-d054-6f79-59d866544fad",
+  "gfwImo": null,
+  "gfwCallSign": "101@",
+  "gfwName": "WOOK SUNG HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "WOOK SUNG HO@",
+      "candidates": []
+    }
+  ]
+}

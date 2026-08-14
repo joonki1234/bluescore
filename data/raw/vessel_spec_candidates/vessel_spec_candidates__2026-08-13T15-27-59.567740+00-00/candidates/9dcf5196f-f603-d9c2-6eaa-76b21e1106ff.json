@@ -1,0 +1,65 @@
+{
+  "vesselId": "9dcf5196f-f603-d9c2-6eaa-76b21e1106ff",
+  "gfwImo": null,
+  "gfwCallSign": "121TAEY",
+  "gfwName": "TAEYANG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "121TAEY",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "TAEYANG",
+      "candidates": [
+        {
+          "vesselNameKor": "제2태양호",
+          "vesselNameEng": "2TAEYANG",
+          "callSign": "9606018",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "92[원양 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 87.0,
+          "netTonnage": 87.0,
+          "internationalGrossTonnage": 87.0,
+          "lengthM": 33.6,
+          "totalLengthM": 34.0,
+          "widthM": 5.5,
+          "depthM": 2.4,
+          "draftM": 1.5,
+          "constructionDate": "1983-03-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "9606018",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "제2태양호",
+            "vsslEngNm": "2TAEYANG",
+            "vsslKnd": "92[원양 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "87",
+            "grtg": "87",
+            "ntng": "87",
+            "vsslTotLt": "34",
+            "shdth": "5.5",
+            "vsslDrft": "1.5",
+            "vsslLt": "33.6",
+            "vsslDp": "2.4",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1983-03-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

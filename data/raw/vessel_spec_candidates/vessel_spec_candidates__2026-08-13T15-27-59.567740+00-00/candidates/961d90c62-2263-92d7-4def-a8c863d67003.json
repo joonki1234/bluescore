@@ -1,0 +1,13 @@
+{
+  "vesselId": "961d90c62-2263-92d7-4def-a8c863d67003",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "605GILJEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "605GILJEONG",
+      "candidates": []
+    }
+  ]
+}

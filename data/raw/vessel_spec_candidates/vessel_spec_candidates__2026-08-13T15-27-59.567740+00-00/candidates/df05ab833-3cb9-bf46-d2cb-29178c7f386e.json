@@ -1,0 +1,60 @@
+{
+  "vesselId": "df05ab833-3cb9-bf46-d2cb-29178c7f386e",
+  "gfwImo": null,
+  "gfwCallSign": "924911",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "924911",
+      "candidates": [
+        {
+          "vesselNameKor": "경원호",
+          "vesselNameEng": null,
+          "callSign": "924911",
+          "vesselNo": "924911",
+          "imoNo": null,
+          "vesselKind": "99[기타선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 19.0,
+          "netTonnage": 19.0,
+          "internationalGrossTonnage": 19.0,
+          "lengthM": 16.77,
+          "totalLengthM": 16.8,
+          "widthM": null,
+          "depthM": 1.75,
+          "draftM": 1.7,
+          "constructionDate": "1992-02-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "924911",
+            "vsslNo": "924911",
+            "imoNo": null,
+            "vsslKorNm": "경원호",
+            "vsslEngNm": null,
+            "vsslKnd": "99[기타선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "19",
+            "grtg": "19",
+            "ntng": "19",
+            "vsslTotLt": "16.8",
+            "shdth": null,
+            "vsslDrft": "1.7",
+            "vsslLt": "16.77",
+            "vsslDp": "1.75",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1992-02-01T00:00:00+09:00",
+            "befClsgn": "ICC924911",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

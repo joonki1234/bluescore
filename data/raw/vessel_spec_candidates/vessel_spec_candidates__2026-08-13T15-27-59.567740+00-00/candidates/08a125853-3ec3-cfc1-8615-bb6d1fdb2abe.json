@@ -1,0 +1,13 @@
+{
+  "vesselId": "08a125853-3ec3-cfc1-8615-bb6d1fdb2abe",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "107MYUNGJIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "107MYUNGJIN",
+      "candidates": []
+    }
+  ]
+}

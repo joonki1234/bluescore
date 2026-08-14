@@ -1,0 +1,13 @@
+{
+  "vesselId": "a45fff730-0440-ee46-373c-4bbeca8d1fbf",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "3 GIL JEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "3 GIL JEONG HO",
+      "candidates": []
+    }
+  ]
+}

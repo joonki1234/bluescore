@@ -1,0 +1,13 @@
+{
+  "vesselId": "c7ae24a4c-c59c-16a8-9a1f-a234485fb69f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YUNG JIN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YUNG JIN HO",
+      "candidates": []
+    }
+  ]
+}

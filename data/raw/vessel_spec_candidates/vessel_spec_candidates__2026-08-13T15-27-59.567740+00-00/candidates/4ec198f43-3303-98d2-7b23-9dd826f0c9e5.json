@@ -1,0 +1,13 @@
+{
+  "vesselId": "4ec198f43-3303-98d2-7b23-9dd826f0c9e5",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAENG UN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAENG UN HO",
+      "candidates": []
+    }
+  ]
+}

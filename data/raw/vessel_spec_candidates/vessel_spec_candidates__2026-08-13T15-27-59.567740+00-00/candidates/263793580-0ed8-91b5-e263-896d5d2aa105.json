@@ -1,0 +1,13 @@
+{
+  "vesselId": "263793580-0ed8-91b5-e263-896d5d2aa105",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KI SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KI SUNG HO",
+      "candidates": []
+    }
+  ]
+}

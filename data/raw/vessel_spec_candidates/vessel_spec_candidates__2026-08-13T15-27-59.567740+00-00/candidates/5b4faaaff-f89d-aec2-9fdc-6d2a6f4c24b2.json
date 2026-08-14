@@ -1,0 +1,13 @@
+{
+  "vesselId": "5b4faaaff-f89d-aec2-9fdc-6d2a6f4c24b2",
+  "gfwImo": null,
+  "gfwCallSign": "102WANG",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "102WANG",
+      "candidates": []
+    }
+  ]
+}

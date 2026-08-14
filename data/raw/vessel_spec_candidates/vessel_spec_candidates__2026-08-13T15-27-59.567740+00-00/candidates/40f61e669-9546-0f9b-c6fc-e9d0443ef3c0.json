@@ -1,0 +1,13 @@
+{
+  "vesselId": "40f61e669-9546-0f9b-c6fc-e9d0443ef3c0",
+  "gfwImo": null,
+  "gfwCallSign": "302HONG",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "302HONG",
+      "candidates": []
+    }
+  ]
+}

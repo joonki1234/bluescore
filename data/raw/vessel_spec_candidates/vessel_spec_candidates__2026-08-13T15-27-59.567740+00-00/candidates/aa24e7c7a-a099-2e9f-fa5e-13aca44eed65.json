@@ -1,0 +1,13 @@
+{
+  "vesselId": "aa24e7c7a-a099-2e9f-fa5e-13aca44eed65",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GEUM BI HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GEUM BI HO",
+      "candidates": []
+    }
+  ]
+}

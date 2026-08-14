@@ -1,0 +1,13 @@
+{
+  "vesselId": "4af3f7966-66e4-cbe9-09b4-d2228dea0ead",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHEONGYONGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEONGYONGHO",
+      "candidates": []
+    }
+  ]
+}

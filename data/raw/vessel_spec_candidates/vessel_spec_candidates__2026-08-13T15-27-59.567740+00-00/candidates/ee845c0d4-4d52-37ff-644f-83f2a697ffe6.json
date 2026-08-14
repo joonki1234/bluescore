@@ -1,0 +1,13 @@
+{
+  "vesselId": "ee845c0d4-4d52-37ff-644f-83f2a697ffe6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YEONGSIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YEONGSIN",
+      "candidates": []
+    }
+  ]
+}

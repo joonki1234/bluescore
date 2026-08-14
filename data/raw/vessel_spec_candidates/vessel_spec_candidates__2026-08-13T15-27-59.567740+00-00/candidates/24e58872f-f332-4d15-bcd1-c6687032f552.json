@@ -1,0 +1,18 @@
+{
+  "vesselId": "24e58872f-f332-4d15-bcd1-c6687032f552",
+  "gfwImo": null,
+  "gfwCallSign": "620MANJ",
+  "gfwName": "MANJIN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "620MANJ",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MANJIN",
+      "candidates": []
+    }
+  ]
+}

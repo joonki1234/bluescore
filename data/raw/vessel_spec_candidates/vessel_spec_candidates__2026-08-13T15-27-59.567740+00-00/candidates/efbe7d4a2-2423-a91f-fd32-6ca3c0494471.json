@@ -1,0 +1,60 @@
+{
+  "vesselId": "efbe7d4a2-2423-a91f-fd32-6ca3c0494471",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SU JIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SU JIN",
+      "candidates": [
+        {
+          "vesselNameKor": "5 수진",
+          "vesselNameEng": "SU JIN 5",
+          "callSign": "D8RG",
+          "vesselNo": "648622",
+          "imoNo": null,
+          "vesselKind": "21[산물선(벌크선)]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 429.0,
+          "netTonnage": 0.0,
+          "internationalGrossTonnage": 429.0,
+          "lengthM": 44.1,
+          "totalLengthM": 44.1,
+          "widthM": 8.4,
+          "depthM": 3.85,
+          "draftM": 3.8,
+          "constructionDate": "1964-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "D8RG",
+            "vsslNo": "648622",
+            "imoNo": null,
+            "vsslKorNm": "5 수진",
+            "vsslEngNm": "SU JIN 5",
+            "vsslKnd": "21[산물선(벌크선)]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "429",
+            "grtg": "429",
+            "ntng": "0",
+            "vsslTotLt": "44.1",
+            "shdth": "8.4",
+            "vsslDrft": "3.8",
+            "vsslLt": "44.1",
+            "vsslDp": "3.85",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1964-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

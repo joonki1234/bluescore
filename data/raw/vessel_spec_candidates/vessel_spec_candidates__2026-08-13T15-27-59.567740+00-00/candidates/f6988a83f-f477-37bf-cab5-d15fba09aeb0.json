@@ -1,0 +1,18 @@
+{
+  "vesselId": "f6988a83f-f477-37bf-cab5-d15fba09aeb0",
+  "gfwImo": null,
+  "gfwCallSign": "211CHEO",
+  "gfwName": "CHEONGJEONG16HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "211CHEO",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "CHEONGJEONG16HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "b6f6d0fb6-6687-14ab-dcb1-a1a3cbc0f809",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "101HAEANHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "101HAEANHO",
+      "candidates": []
+    }
+  ]
+}

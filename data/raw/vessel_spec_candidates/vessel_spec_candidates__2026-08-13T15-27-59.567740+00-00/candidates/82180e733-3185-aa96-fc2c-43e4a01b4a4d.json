@@ -1,0 +1,13 @@
+{
+  "vesselId": "82180e733-3185-aa96-fc2c-43e4a01b4a4d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "ROYAL MARINA1",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "ROYAL MARINA1",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "be41a4f6c-c3ff-02b4-811f-549c67caae13",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KCG P93",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KCG P93",
+      "candidates": []
+    }
+  ]
+}

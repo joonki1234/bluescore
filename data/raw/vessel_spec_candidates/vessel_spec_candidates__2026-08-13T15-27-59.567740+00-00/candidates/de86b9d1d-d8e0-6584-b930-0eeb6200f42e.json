@@ -1,0 +1,13 @@
+{
+  "vesselId": "de86b9d1d-d8e0-6584-b930-0eeb6200f42e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "31 HONG EUN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "31 HONG EUN",
+      "candidates": []
+    }
+  ]
+}

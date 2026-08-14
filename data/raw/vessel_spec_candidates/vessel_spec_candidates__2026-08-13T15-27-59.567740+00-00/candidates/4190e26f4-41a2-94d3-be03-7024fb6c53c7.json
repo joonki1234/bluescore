@@ -1,0 +1,13 @@
+{
+  "vesselId": "4190e26f4-41a2-94d3-be03-7024fb6c53c7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2YOUNG JIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2YOUNG JIN",
+      "candidates": []
+    }
+  ]
+}

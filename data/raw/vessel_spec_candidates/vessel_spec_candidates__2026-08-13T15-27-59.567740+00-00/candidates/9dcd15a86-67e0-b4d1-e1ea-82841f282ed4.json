@@ -1,0 +1,13 @@
+{
+  "vesselId": "9dcd15a86-67e0-b4d1-e1ea-82841f282ed4",
+  "gfwImo": null,
+  "gfwCallSign": "500JEON",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "500JEON",
+      "candidates": []
+    }
+  ]
+}

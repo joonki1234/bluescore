@@ -1,0 +1,18 @@
+{
+  "vesselId": "2e865bed6-658d-d0bf-893f-c78eac704c51",
+  "gfwImo": null,
+  "gfwCallSign": "800 WOO",
+  "gfwName": "108 WOO JIN",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "800 WOO",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "108 WOO JIN",
+      "candidates": []
+    }
+  ]
+}

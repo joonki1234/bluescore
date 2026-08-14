@@ -1,0 +1,18 @@
+{
+  "vesselId": "969f2258b-bb1f-007f-3647-669f369b2e84",
+  "gfwImo": null,
+  "gfwCallSign": "370KH",
+  "gfwName": "700 KYUNG HAE",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "370KH",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "700 KYUNG HAE",
+      "candidates": []
+    }
+  ]
+}

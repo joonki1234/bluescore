@@ -1,0 +1,13 @@
+{
+  "vesselId": "77f2fbd0f-f287-24bd-4a1b-6af4e3e989fc",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YONGBOGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YONGBOGHO",
+      "candidates": []
+    }
+  ]
+}

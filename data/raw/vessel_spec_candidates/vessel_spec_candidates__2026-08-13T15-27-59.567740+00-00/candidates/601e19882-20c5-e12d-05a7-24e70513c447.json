@@ -1,0 +1,60 @@
+{
+  "vesselId": "601e19882-20c5-e12d-05a7-24e70513c447",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "WINDY1973",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "WINDY1973",
+      "candidates": [
+        {
+          "vesselNameKor": "윈디1973",
+          "vesselNameEng": "WINDY1973",
+          "callSign": "WINDY1973",
+          "vesselNo": "000826",
+          "imoNo": null,
+          "vesselKind": "89[수상레저기구]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 12.0,
+          "netTonnage": 12.0,
+          "internationalGrossTonnage": 12.0,
+          "lengthM": 13.0,
+          "totalLengthM": 13.4,
+          "widthM": null,
+          "depthM": 2.3,
+          "draftM": 2.3,
+          "constructionDate": "2024-01-08T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "WINDY1973",
+            "vsslNo": "000826",
+            "imoNo": null,
+            "vsslKorNm": "윈디1973",
+            "vsslEngNm": "WINDY1973",
+            "vsslKnd": "89[수상레저기구]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "12",
+            "grtg": "12",
+            "ntng": "12",
+            "vsslTotLt": "13.4",
+            "shdth": null,
+            "vsslDrft": "2.3",
+            "vsslLt": "13",
+            "vsslDp": "2.3",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2024-01-08T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

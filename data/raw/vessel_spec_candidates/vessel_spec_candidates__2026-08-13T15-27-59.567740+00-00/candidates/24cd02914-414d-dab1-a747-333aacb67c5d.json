@@ -1,0 +1,13 @@
+{
+  "vesselId": "24cd02914-414d-dab1-a747-333aacb67c5d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MALDIVER",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MALDIVER",
+      "candidates": []
+    }
+  ]
+}

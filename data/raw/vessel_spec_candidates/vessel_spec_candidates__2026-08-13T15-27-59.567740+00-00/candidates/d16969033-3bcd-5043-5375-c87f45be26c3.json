@@ -1,0 +1,60 @@
+{
+  "vesselId": "d16969033-3bcd-5043-5375-c87f45be26c3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAIWONHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAIWONHO",
+      "candidates": [
+        {
+          "vesselNameKor": "대원호",
+          "vesselNameEng": "DAIWONHO",
+          "callSign": "020501",
+          "vesselNo": "020501",
+          "imoNo": null,
+          "vesselKind": "33[폐기물 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 638.0,
+          "netTonnage": 638.0,
+          "internationalGrossTonnage": 638.0,
+          "lengthM": 60.0,
+          "totalLengthM": 60.0,
+          "widthM": 10.4,
+          "depthM": 5.2,
+          "draftM": 5.9,
+          "constructionDate": "1976-01-18T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "020501",
+            "vsslNo": "020501",
+            "imoNo": null,
+            "vsslKorNm": "대원호",
+            "vsslEngNm": "DAIWONHO",
+            "vsslKnd": "33[폐기물 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "638",
+            "grtg": "638",
+            "ntng": "638",
+            "vsslTotLt": "60",
+            "shdth": "10.4",
+            "vsslDrft": "5.9",
+            "vsslLt": "60",
+            "vsslDp": "5.2",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "1976-01-18T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

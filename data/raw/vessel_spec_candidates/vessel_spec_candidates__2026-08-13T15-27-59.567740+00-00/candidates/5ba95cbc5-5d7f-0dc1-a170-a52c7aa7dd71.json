@@ -1,0 +1,13 @@
+{
+  "vesselId": "5ba95cbc5-5d7f-0dc1-a170-a52c7aa7dd71",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BON SEON BU RI",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BON SEON BU RI",
+      "candidates": []
+    }
+  ]
+}

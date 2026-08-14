@@ -1,0 +1,13 @@
+{
+  "vesselId": "4ebdf8cfc-cda8-3e6a-60f8-403d9a7eea12",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DOYEONHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DOYEONHO",
+      "candidates": []
+    }
+  ]
+}

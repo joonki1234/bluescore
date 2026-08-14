@@ -1,0 +1,60 @@
+{
+  "vesselId": "9c13c29f7-7218-5abf-52e7-2a09e954f149",
+  "gfwImo": null,
+  "gfwCallSign": "180002",
+  "gfwName": "SHIN SU HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "180002",
+      "candidates": [
+        {
+          "vesselNameKor": "신수호",
+          "vesselNameEng": "SIN SU",
+          "callSign": "180002",
+          "vesselNo": "180002",
+          "imoNo": null,
+          "vesselKind": "99[기타선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 68.0,
+          "netTonnage": 68.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 26.63,
+          "totalLengthM": 26.63,
+          "widthM": 5.6,
+          "depthM": 2.51,
+          "draftM": 2.5,
+          "constructionDate": "1992-03-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "180002",
+            "vsslNo": "180002",
+            "imoNo": null,
+            "vsslKorNm": "신수호",
+            "vsslEngNm": "SIN SU",
+            "vsslKnd": "99[기타선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "68",
+            "ntng": "68",
+            "vsslTotLt": "26.63",
+            "shdth": "5.6",
+            "vsslDrft": "2.5",
+            "vsslLt": "26.63",
+            "vsslDp": "2.51",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1992-03-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "1c01a0255-512a-9d05-b5fe-0482c285701b",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "703 YU GYEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "703 YU GYEONG HO",
+      "candidates": []
+    }
+  ]
+}

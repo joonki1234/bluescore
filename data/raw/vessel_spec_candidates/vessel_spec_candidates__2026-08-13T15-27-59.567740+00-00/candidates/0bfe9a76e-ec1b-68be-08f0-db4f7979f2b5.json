@@ -1,0 +1,13 @@
+{
+  "vesselId": "0bfe9a76e-ec1b-68be-08f0-db4f7979f2b5",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GYEONG CHWUN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GYEONG CHWUN HO",
+      "candidates": []
+    }
+  ]
+}

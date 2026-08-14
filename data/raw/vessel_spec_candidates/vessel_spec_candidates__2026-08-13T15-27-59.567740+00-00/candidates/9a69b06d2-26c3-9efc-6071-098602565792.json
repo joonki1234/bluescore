@@ -1,0 +1,13 @@
+{
+  "vesselId": "9a69b06d2-26c3-9efc-6071-098602565792",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "103WOLGWANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "103WOLGWANG",
+      "candidates": []
+    }
+  ]
+}

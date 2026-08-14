@@ -1,0 +1,13 @@
+{
+  "vesselId": "74a4ca794-4401-78e3-17b1-cdd24175f5dd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GEO BOOK SEON HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GEO BOOK SEON HO@",
+      "candidates": []
+    }
+  ]
+}

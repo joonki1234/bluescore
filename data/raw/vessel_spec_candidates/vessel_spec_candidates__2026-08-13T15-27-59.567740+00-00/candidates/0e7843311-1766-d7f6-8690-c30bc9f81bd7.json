@@ -1,0 +1,13 @@
+{
+  "vesselId": "0e7843311-1766-d7f6-8690-c30bc9f81bd7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HANGANG BUS 102",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HANGANG BUS 102",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "dba692b90-05be-a564-1cb4-94cece3c20f8",
+  "gfwImo": null,
+  "gfwCallSign": "622CHAN",
+  "gfwName": "CHANG DAE HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "622CHAN",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "CHANG DAE HO",
+      "candidates": []
+    }
+  ]
+}

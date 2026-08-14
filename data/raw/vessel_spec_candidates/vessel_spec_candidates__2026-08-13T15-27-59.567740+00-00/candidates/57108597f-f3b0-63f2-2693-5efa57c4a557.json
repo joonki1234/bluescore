@@ -1,0 +1,13 @@
+{
+  "vesselId": "57108597f-f3b0-63f2-2693-5efa57c4a557",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "509 MAN SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "509 MAN SEONG HO",
+      "candidates": []
+    }
+  ]
+}

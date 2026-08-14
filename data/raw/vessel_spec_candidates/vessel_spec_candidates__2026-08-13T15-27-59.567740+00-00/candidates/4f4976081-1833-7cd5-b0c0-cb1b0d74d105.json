@@ -1,0 +1,13 @@
+{
+  "vesselId": "4f4976081-1833-7cd5-b0c0-cb1b0d74d105",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YEUNGJINHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YEUNGJINHO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "vesselId": "4108c26df-ff39-6218-11f8-792b1c5efcb7",
+  "gfwImo": null,
+  "gfwCallSign": "6150",
+  "gfwName": "YEONG SEUNG H0",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "6150",
+      "candidates": [
+        {
+          "vesselNameKor": "2000해영호",
+          "vesselNameEng": "HAEYOUNG NO.2000",
+          "callSign": "786150",
+          "vesselNo": "786150",
+          "imoNo": null,
+          "vesselKind": "69[기타 예선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 28.0,
+          "netTonnage": 28.0,
+          "internationalGrossTonnage": 28.0,
+          "lengthM": 16.8,
+          "totalLengthM": 16.8,
+          "widthM": null,
+          "depthM": 2.0,
+          "draftM": 1.9,
+          "constructionDate": "1978-09-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "786150",
+            "vsslNo": "786150",
+            "imoNo": null,
+            "vsslKorNm": "2000해영호",
+            "vsslEngNm": "HAEYOUNG NO.2000",
+            "vsslKnd": "69[기타 예선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "28",
+            "grtg": "28",
+            "ntng": "28",
+            "vsslTotLt": "16.8",
+            "shdth": null,
+            "vsslDrft": "1.9",
+            "vsslLt": "16.8",
+            "vsslDp": "2",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1978-09-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YEONG SEUNG H0",
+      "candidates": []
+    }
+  ]
+}

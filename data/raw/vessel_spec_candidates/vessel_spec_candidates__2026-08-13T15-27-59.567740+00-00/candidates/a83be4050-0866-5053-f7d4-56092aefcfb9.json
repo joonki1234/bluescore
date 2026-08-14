@@ -1,0 +1,18 @@
+{
+  "vesselId": "a83be4050-0866-5053-f7d4-56092aefcfb9",
+  "gfwImo": null,
+  "gfwCallSign": "600@",
+  "gfwName": "JE DEOK HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "600@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "JE DEOK HO@",
+      "candidates": []
+    }
+  ]
+}

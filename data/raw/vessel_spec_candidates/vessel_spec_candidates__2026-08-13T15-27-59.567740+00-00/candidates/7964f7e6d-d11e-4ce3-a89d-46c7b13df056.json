@@ -1,0 +1,13 @@
+{
+  "vesselId": "7964f7e6d-d11e-4ce3-a89d-46c7b13df056",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GEUMCHANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GEUMCHANG HO",
+      "candidates": []
+    }
+  ]
+}

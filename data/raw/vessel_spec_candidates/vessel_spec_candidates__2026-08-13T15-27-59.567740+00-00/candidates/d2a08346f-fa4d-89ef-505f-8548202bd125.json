@@ -1,0 +1,13 @@
+{
+  "vesselId": "d2a08346f-fa4d-89ef-505f-8548202bd125",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEONGMIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEONGMIN",
+      "candidates": []
+    }
+  ]
+}

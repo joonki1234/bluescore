@@ -1,0 +1,13 @@
+{
+  "vesselId": "235e7e38d-d3c5-0a12-297d-fba3d5e6ff11",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GAGAHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GAGAHO",
+      "candidates": []
+    }
+  ]
+}

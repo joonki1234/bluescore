@@ -1,0 +1,13 @@
+{
+  "vesselId": "2ee5439d6-62be-2394-f2bd-c6ec74d20310",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JE2 HYO SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JE2 HYO SEONG HO",
+      "candidates": []
+    }
+  ]
+}

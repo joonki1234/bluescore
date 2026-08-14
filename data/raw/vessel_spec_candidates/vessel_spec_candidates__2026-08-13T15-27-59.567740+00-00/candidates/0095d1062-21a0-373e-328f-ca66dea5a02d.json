@@ -1,0 +1,13 @@
+{
+  "vesselId": "0095d1062-21a0-373e-328f-ca66dea5a02d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "TAESAN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "TAESAN HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "8216c794f-fb9f-1a05-6d1a-08bbdd8549ab",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2018NAM SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2018NAM SEONG",
+      "candidates": []
+    }
+  ]
+}

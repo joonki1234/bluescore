@@ -1,0 +1,60 @@
+{
+  "vesselId": "b70ad3320-047a-8b9c-f58a-f35dab2d6b86",
+  "gfwImo": "9303651",
+  "gfwCallSign": "D7IF",
+  "gfwName": "MS FREESIA",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D7IF",
+      "candidates": [
+        {
+          "vesselNameKor": "엠에스 프리지아",
+          "vesselNameEng": "MS FREESIA",
+          "callSign": "D7IF",
+          "vesselNo": "231027",
+          "imoNo": "9303651",
+          "vesselKind": "53[케미칼 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 12005.0,
+          "netTonnage": 6027.0,
+          "internationalGrossTonnage": 12005.0,
+          "lengthM": 141.21,
+          "totalLengthM": 147.8,
+          "widthM": 24.2,
+          "depthM": 12.8,
+          "draftM": 9.0,
+          "constructionDate": "2004-07-02T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D7IF",
+            "vsslNo": "231027",
+            "imoNo": "9303651",
+            "vsslKorNm": "엠에스 프리지아",
+            "vsslEngNm": "MS FREESIA",
+            "vsslKnd": "53[케미칼 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "12005",
+            "grtg": "12005",
+            "ntng": "6027",
+            "vsslTotLt": "147.8",
+            "shdth": "24.2",
+            "vsslDrft": "9",
+            "vsslLt": "141.21",
+            "vsslDp": "12.8",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2004-07-02T00:00:00+09:00",
+            "befClsgn": "LAHJ7",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

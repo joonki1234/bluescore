@@ -1,0 +1,13 @@
+{
+  "vesselId": "6f800928a-a4d6-cf5c-ccdb-5ad0860b56eb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "FORTUNA 2",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "FORTUNA 2",
+      "candidates": []
+    }
+  ]
+}

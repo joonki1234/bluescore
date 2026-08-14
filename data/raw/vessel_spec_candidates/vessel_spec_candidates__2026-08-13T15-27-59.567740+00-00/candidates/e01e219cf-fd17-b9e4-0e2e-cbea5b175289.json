@@ -1,0 +1,13 @@
+{
+  "vesselId": "e01e219cf-fd17-b9e4-0e2e-cbea5b175289",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MYEONG JIN  HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MYEONG JIN  HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "32340803a-ada8-f0ed-9e0b-20b5e4361dfd",
+  "gfwImo": null,
+  "gfwCallSign": "700PROH",
+  "gfwName": "PROHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "700PROH",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "PROHO",
+      "candidates": []
+    }
+  ]
+}

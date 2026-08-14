@@ -1,0 +1,18 @@
+{
+  "vesselId": "9a6f6fe33-3099-b252-f50a-3e9552af4388",
+  "gfwImo": null,
+  "gfwCallSign": "205@",
+  "gfwName": "MAN SUN@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "205@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MAN SUN@",
+      "candidates": []
+    }
+  ]
+}

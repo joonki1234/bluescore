@@ -1,0 +1,18 @@
+{
+  "vesselId": "132fd0bf8-8845-73fb-28d4-6a9337c2265d",
+  "gfwImo": null,
+  "gfwCallSign": "125HANG",
+  "gfwName": "HANGANG109",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "125HANG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HANGANG109",
+      "candidates": []
+    }
+  ]
+}

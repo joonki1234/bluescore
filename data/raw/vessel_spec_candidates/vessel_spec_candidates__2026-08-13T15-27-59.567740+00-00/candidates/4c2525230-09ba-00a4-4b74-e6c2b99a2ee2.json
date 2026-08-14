@@ -1,0 +1,18 @@
+{
+  "vesselId": "4c2525230-09ba-00a4-4b74-e6c2b99a2ee2",
+  "gfwImo": null,
+  "gfwCallSign": "YDB6243",
+  "gfwName": "TB OCEAN JAYA VII",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "YDB6243",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "TB OCEAN JAYA VII",
+      "candidates": []
+    }
+  ]
+}

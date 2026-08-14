@@ -1,0 +1,65 @@
+{
+  "vesselId": "ba620b615-5949-919b-075a-499f1ef8e71d",
+  "gfwImo": null,
+  "gfwCallSign": "300KORE",
+  "gfwName": "KOREA 401",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "300KORE",
+      "candidates": [
+        {
+          "vesselNameKor": "KOREX YEOSU",
+          "vesselNameEng": "KOREX YEOSU",
+          "callSign": "300KOREX",
+          "vesselNo": null,
+          "imoNo": "9791248",
+          "vesselKind": "21[산물선(벌크선)]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 9938.0,
+          "netTonnage": 2633.0,
+          "internationalGrossTonnage": 9938.0,
+          "lengthM": 103.6,
+          "totalLengthM": 109.0,
+          "widthM": 24.0,
+          "depthM": 10.35,
+          "draftM": 6.5,
+          "constructionDate": "2016-01-15T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "300KOREX",
+            "vsslNo": null,
+            "imoNo": "9791248",
+            "vsslKorNm": "KOREX YEOSU",
+            "vsslEngNm": "KOREX YEOSU",
+            "vsslKnd": "21[산물선(벌크선)]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "9938",
+            "grtg": "9938",
+            "ntng": "2633",
+            "vsslTotLt": "109",
+            "shdth": "24",
+            "vsslDrft": "6.5",
+            "vsslLt": "103.6",
+            "vsslDp": "10.35",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2016-01-15T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "KOREA 401",
+      "candidates": []
+    }
+  ]
+}

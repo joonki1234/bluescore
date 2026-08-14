@@ -1,0 +1,13 @@
+{
+  "vesselId": "9b8832a3c-c407-03f5-e730-6d620e97d371",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GANG YANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GANG YANG HO",
+      "candidates": []
+    }
+  ]
+}

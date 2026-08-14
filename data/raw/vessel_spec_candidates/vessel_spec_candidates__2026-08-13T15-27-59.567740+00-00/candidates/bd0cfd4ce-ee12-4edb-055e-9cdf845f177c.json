@@ -1,0 +1,13 @@
+{
+  "vesselId": "bd0cfd4ce-ee12-4edb-055e-9cdf845f177c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "LITTLE GIANT",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "LITTLE GIANT",
+      "candidates": []
+    }
+  ]
+}

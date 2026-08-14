@@ -1,0 +1,13 @@
+{
+  "vesselId": "fd358f87d-db53-64b4-d5d4-bce6cd672d4a",
+  "gfwImo": null,
+  "gfwCallSign": "988DURI",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "988DURI",
+      "candidates": []
+    }
+  ]
+}

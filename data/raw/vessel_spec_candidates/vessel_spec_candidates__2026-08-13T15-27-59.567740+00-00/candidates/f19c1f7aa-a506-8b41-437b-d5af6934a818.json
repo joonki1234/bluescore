@@ -1,0 +1,13 @@
+{
+  "vesselId": "f19c1f7aa-a506-8b41-437b-d5af6934a818",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "703GEUM YOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "703GEUM YOUNG",
+      "candidates": []
+    }
+  ]
+}

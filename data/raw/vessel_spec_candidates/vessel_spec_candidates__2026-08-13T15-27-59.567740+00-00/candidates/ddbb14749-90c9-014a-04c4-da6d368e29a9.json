@@ -1,0 +1,13 @@
+{
+  "vesselId": "ddbb14749-90c9-014a-04c4-da6d368e29a9",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DONG SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DONG SEONG HO",
+      "candidates": []
+    }
+  ]
+}

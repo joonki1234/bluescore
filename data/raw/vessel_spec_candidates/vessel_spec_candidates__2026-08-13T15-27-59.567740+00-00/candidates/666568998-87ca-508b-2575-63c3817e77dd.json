@@ -1,0 +1,18 @@
+{
+  "vesselId": "666568998-87ca-508b-2575-63c3817e77dd",
+  "gfwImo": "4194304",
+  "gfwCallSign": "351KS",
+  "gfwName": "NO.121 KEUM SUNG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "351KS",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.121 KEUM SUNG",
+      "candidates": []
+    }
+  ]
+}

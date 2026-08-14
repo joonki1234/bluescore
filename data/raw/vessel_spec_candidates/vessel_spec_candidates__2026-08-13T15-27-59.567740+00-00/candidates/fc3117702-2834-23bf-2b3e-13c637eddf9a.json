@@ -1,0 +1,13 @@
+{
+  "vesselId": "fc3117702-2834-23bf-2b3e-13c637eddf9a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YEONG DEOG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YEONG DEOG HO",
+      "candidates": []
+    }
+  ]
+}

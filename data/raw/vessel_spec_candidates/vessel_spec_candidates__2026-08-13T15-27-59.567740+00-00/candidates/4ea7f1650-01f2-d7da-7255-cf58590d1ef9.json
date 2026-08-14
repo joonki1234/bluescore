@@ -1,0 +1,13 @@
+{
+  "vesselId": "4ea7f1650-01f2-d7da-7255-cf58590d1ef9",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "26 DAE SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "26 DAE SUNG HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "312c4ca67-73c0-5b40-c23f-d587a54eba0c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "22 TAE SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "22 TAE SEONG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "4f04b391e-e628-17fb-5f7e-14bc3055d3de",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "CHUNSIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "CHUNSIN",
+      "candidates": []
+    }
+  ]
+}

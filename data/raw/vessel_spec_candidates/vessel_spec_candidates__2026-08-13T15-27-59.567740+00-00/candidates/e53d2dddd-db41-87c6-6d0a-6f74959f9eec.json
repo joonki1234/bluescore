@@ -1,0 +1,18 @@
+{
+  "vesselId": "e53d2dddd-db41-87c6-6d0a-6f74959f9eec",
+  "gfwImo": null,
+  "gfwCallSign": "331HANS",
+  "gfwName": "809 HAN SUNG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "331HANS",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "809 HAN SUNG",
+      "candidates": []
+    }
+  ]
+}

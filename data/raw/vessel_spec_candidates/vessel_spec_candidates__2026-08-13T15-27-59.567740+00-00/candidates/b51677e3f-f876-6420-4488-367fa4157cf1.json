@@ -1,0 +1,13 @@
+{
+  "vesselId": "b51677e3f-f876-6420-4488-367fa4157cf1",
+  "gfwImo": null,
+  "gfwCallSign": "200CHEO",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "200CHEO",
+      "candidates": []
+    }
+  ]
+}

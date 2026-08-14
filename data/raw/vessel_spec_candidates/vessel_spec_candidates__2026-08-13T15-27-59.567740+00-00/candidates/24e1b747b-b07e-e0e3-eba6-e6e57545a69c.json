@@ -1,0 +1,13 @@
+{
+  "vesselId": "24e1b747b-b07e-e0e3-eba6-e6e57545a69c",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JIN GYEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JIN GYEONG HO",
+      "candidates": []
+    }
+  ]
+}

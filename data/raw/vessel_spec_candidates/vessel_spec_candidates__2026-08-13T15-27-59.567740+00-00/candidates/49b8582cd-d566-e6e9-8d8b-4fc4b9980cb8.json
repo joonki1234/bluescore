@@ -1,0 +1,13 @@
+{
+  "vesselId": "49b8582cd-d566-e6e9-8d8b-4fc4b9980cb8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2021 WOO JEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2021 WOO JEONG",
+      "candidates": []
+    }
+  ]
+}

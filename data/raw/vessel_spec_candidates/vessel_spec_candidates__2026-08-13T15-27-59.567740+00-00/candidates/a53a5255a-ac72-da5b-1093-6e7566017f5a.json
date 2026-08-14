@@ -1,0 +1,13 @@
+{
+  "vesselId": "a53a5255a-ac72-da5b-1093-6e7566017f5a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KUMYONGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KUMYONGHO",
+      "candidates": []
+    }
+  ]
+}

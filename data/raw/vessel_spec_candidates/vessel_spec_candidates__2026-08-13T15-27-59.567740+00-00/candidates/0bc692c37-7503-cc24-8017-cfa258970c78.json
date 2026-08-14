@@ -1,0 +1,13 @@
+{
+  "vesselId": "0bc692c37-7503-cc24-8017-cfa258970c78",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "306BAEK YANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "306BAEK YANG",
+      "candidates": []
+    }
+  ]
+}

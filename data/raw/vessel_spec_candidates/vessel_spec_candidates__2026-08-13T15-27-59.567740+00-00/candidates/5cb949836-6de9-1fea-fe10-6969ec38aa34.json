@@ -1,0 +1,13 @@
+{
+  "vesselId": "5cb949836-6de9-1fea-fe10-6969ec38aa34",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "101HAE SANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "101HAE SANG HO",
+      "candidates": []
+    }
+  ]
+}

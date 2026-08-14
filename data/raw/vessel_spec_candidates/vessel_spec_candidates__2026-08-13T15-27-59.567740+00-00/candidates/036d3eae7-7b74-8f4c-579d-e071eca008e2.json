@@ -1,0 +1,13 @@
+{
+  "vesselId": "036d3eae7-7b74-8f4c-579d-e071eca008e2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "303GEUM SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "303GEUM SEONG",
+      "candidates": []
+    }
+  ]
+}

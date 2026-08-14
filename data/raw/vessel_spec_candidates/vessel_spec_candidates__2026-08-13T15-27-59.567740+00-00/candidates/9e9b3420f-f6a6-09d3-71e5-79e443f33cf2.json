@@ -1,0 +1,13 @@
+{
+  "vesselId": "9e9b3420f-f6a6-09d3-71e5-79e443f33cf2",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "1HA@JIN@HO.",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "1HA@JIN@HO.",
+      "candidates": []
+    }
+  ]
+}

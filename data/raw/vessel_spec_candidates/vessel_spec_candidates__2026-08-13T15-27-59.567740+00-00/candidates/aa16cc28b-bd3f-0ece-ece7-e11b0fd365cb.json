@@ -1,0 +1,13 @@
+{
+  "vesselId": "aa16cc28b-bd3f-0ece-ece7-e11b0fd365cb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2 CHEONKANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2 CHEONKANG",
+      "candidates": []
+    }
+  ]
+}

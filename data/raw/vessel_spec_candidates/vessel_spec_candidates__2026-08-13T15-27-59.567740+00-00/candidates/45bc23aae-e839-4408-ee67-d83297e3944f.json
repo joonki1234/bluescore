@@ -1,0 +1,13 @@
+{
+  "vesselId": "45bc23aae-e839-4408-ee67-d83297e3944f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HYUP SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HYUP SEONG HO",
+      "candidates": []
+    }
+  ]
+}

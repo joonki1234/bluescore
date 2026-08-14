@@ -1,0 +1,13 @@
+{
+  "vesselId": "1fa5cdcec-c581-2674-9872-f76ebf5f883e",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YOUNGBOK@HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YOUNGBOK@HO",
+      "candidates": []
+    }
+  ]
+}

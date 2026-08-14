@@ -1,0 +1,13 @@
+{
+  "vesselId": "571a8c6a4-41a4-9551-c8b1-c9700afb4cc8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SPECIAL DREAM 5@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SPECIAL DREAM 5@",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "1f4573e2d-dea9-222c-ff68-c6fdf5434758",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NEW ART HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NEW ART HO@",
+      "candidates": []
+    }
+  ]
+}

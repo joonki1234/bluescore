@@ -1,0 +1,13 @@
+{
+  "vesselId": "56e27194e-eb74-ac3d-add8-f3a7b74f6433",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SUN DUCK HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SUN DUCK HO",
+      "candidates": []
+    }
+  ]
+}

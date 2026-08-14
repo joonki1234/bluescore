@@ -1,0 +1,65 @@
+{
+  "vesselId": "1c8b80a92-2c3e-4131-fc2c-ca1901137b92",
+  "gfwImo": null,
+  "gfwCallSign": "392 G H",
+  "gfwName": "103 GYEONG HAE",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "392 G H",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "103 GYEONG HAE",
+      "candidates": [
+        {
+          "vesselNameKor": "103경해",
+          "vesselNameEng": "103 GYEONG HAE",
+          "callSign": "070120",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "91[연근해 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 310.0,
+          "netTonnage": 310.0,
+          "internationalGrossTonnage": 310.0,
+          "lengthM": 49.9,
+          "totalLengthM": 50.0,
+          "widthM": 8.9,
+          "depthM": 4.4,
+          "draftM": 3.5,
+          "constructionDate": "1989-10-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "070120",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "103경해",
+            "vsslEngNm": "103 GYEONG HAE",
+            "vsslKnd": "91[연근해 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "310",
+            "grtg": "310",
+            "ntng": "310",
+            "vsslTotLt": "50",
+            "shdth": "8.9",
+            "vsslDrft": "3.5",
+            "vsslLt": "49.9",
+            "vsslDp": "4.4",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1989-10-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

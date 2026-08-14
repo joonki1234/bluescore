@@ -1,0 +1,13 @@
+{
+  "vesselId": "3fe89e038-85af-66d0-54ad-54e0e86a3d20",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.1 WOORI",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.1 WOORI",
+      "candidates": []
+    }
+  ]
+}

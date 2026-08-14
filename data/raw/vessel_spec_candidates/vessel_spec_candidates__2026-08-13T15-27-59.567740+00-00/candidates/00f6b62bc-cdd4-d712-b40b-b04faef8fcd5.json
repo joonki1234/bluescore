@@ -1,0 +1,13 @@
+{
+  "vesselId": "00f6b62bc-cdd4-d712-b40b-b04faef8fcd5",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SIN SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SIN SEONG HO",
+      "candidates": []
+    }
+  ]
+}

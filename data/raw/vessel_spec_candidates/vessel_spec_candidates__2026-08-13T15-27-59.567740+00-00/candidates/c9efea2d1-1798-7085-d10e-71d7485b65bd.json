@@ -1,0 +1,18 @@
+{
+  "vesselId": "c9efea2d1-1798-7085-d10e-71d7485b65bd",
+  "gfwImo": null,
+  "gfwCallSign": "910@",
+  "gfwName": "SMARTHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "910@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SMARTHO",
+      "candidates": []
+    }
+  ]
+}

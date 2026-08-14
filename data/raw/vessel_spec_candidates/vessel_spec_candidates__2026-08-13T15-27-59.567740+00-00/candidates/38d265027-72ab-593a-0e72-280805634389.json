@@ -1,0 +1,13 @@
+{
+  "vesselId": "38d265027-72ab-593a-0e72-280805634389",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "208 DAE YANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "208 DAE YANG HO",
+      "candidates": []
+    }
+  ]
+}

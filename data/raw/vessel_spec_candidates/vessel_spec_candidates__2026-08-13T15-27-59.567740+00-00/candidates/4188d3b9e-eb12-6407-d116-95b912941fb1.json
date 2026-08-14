@@ -1,0 +1,13 @@
+{
+  "vesselId": "4188d3b9e-eb12-6407-d116-95b912941fb1",
+  "gfwImo": null,
+  "gfwCallSign": "927NARA",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "927NARA",
+      "candidates": []
+    }
+  ]
+}

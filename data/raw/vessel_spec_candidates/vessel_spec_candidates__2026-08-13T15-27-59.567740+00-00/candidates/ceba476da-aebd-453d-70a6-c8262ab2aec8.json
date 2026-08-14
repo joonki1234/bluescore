@@ -1,0 +1,13 @@
+{
+  "vesselId": "ceba476da-aebd-453d-70a6-c8262ab2aec8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "JE16BORYUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "JE16BORYUNGHO",
+      "candidates": []
+    }
+  ]
+}

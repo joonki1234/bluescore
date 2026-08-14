@@ -1,0 +1,13 @@
+{
+  "vesselId": "0f4109f32-2ef9-6dc2-17bd-5e2c2f404e4a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "WOOSEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "WOOSEONG HO",
+      "candidates": []
+    }
+  ]
+}

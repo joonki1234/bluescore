@@ -1,0 +1,13 @@
+{
+  "vesselId": "1e60a61d4-4167-26ea-ca33-0d1ecbc66a71",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO98KEUMYANGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO98KEUMYANGHO",
+      "candidates": []
+    }
+  ]
+}

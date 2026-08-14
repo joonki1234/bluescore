@@ -1,0 +1,13 @@
+{
+  "vesselId": "7ecad8aac-cb27-da0e-c31c-e3f35325f143",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SINJU",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SINJU",
+      "candidates": []
+    }
+  ]
+}

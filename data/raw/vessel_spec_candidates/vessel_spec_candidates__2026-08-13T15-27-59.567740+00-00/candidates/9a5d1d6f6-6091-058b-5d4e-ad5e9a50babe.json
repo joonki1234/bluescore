@@ -1,0 +1,13 @@
+{
+  "vesselId": "9a5d1d6f6-6091-058b-5d4e-ad5e9a50babe",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEUNGMYEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEUNGMYEONG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "e0bddae18-8f5b-cf0e-6451-991ca4bb5d9b",
+  "gfwImo": null,
+  "gfwCallSign": "123HAHA",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "123HAHA",
+      "candidates": []
+    }
+  ]
+}

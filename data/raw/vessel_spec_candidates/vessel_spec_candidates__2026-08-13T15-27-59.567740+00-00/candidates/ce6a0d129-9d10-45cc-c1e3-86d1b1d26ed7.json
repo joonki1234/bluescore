@@ -1,0 +1,60 @@
+{
+  "vesselId": "ce6a0d129-9d10-45cc-c1e3-86d1b1d26ed7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE SUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE SUNG HO",
+      "candidates": [
+        {
+          "vesselNameKor": "해성호",
+          "vesselNameEng": "HAE SUNG HO",
+          "callSign": "201838",
+          "vesselNo": null,
+          "imoNo": "2018380",
+          "vesselKind": "91[연근해 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 158.0,
+          "netTonnage": 158.0,
+          "internationalGrossTonnage": 158.0,
+          "lengthM": 32.6,
+          "totalLengthM": 32.6,
+          "widthM": 6.6,
+          "depthM": 3.4,
+          "draftM": 3.0,
+          "constructionDate": "1983-03-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "201838",
+            "vsslNo": null,
+            "imoNo": "2018380",
+            "vsslKorNm": "해성호",
+            "vsslEngNm": "HAE SUNG HO",
+            "vsslKnd": "91[연근해 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "158",
+            "grtg": "158",
+            "ntng": "158",
+            "vsslTotLt": "32.6",
+            "shdth": "6.6",
+            "vsslDrft": "3",
+            "vsslLt": "32.6",
+            "vsslDp": "3.4",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1983-03-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

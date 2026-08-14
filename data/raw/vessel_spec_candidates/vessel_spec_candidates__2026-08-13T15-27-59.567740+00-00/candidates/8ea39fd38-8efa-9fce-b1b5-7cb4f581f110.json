@@ -1,0 +1,13 @@
+{
+  "vesselId": "8ea39fd38-8efa-9fce-b1b5-7cb4f581f110",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "55JEONGSUN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "55JEONGSUN",
+      "candidates": []
+    }
+  ]
+}

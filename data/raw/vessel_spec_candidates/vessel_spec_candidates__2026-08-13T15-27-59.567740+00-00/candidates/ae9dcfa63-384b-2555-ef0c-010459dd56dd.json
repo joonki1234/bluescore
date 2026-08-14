@@ -1,0 +1,13 @@
+{
+  "vesselId": "ae9dcfa63-384b-2555-ef0c-010459dd56dd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.101 MYEONG SIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.101 MYEONG SIN",
+      "candidates": []
+    }
+  ]
+}

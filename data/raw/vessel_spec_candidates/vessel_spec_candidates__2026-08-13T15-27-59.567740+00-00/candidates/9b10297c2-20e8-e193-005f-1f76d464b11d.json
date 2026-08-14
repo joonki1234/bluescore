@@ -1,0 +1,13 @@
+{
+  "vesselId": "9b10297c2-20e8-e193-005f-1f76d464b11d",
+  "gfwImo": null,
+  "gfwCallSign": "203YONG",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "203YONG",
+      "candidates": []
+    }
+  ]
+}

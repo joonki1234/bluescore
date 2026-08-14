@@ -1,0 +1,18 @@
+{
+  "vesselId": "d76d950a2-23e8-49e4-0ad6-30c33d5dd7bc",
+  "gfwImo": null,
+  "gfwCallSign": "600S-39",
+  "gfwName": "S-39JUNG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "600S-39",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "S-39JUNG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "6251786b1-1a94-594c-8668-a4c757688a59",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "ROK GOV VESSEL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "ROK GOV VESSEL",
+      "candidates": []
+    }
+  ]
+}

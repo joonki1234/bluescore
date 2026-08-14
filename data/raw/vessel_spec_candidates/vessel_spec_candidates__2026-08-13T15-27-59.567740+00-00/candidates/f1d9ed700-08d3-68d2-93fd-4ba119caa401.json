@@ -1,0 +1,13 @@
+{
+  "vesselId": "f1d9ed700-08d3-68d2-93fd-4ba119caa401",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "A REUM HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "A REUM HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "4baf8f42d-df79-1d63-b98b-900b8b83039d",
+  "gfwImo": null,
+  "gfwCallSign": "500M/S",
+  "gfwName": "MISOHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "500M/S",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "MISOHO",
+      "candidates": []
+    }
+  ]
+}

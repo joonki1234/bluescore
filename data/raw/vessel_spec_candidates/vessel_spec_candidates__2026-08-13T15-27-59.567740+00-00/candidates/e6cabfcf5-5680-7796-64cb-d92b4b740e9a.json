@@ -1,0 +1,13 @@
+{
+  "vesselId": "e6cabfcf5-5680-7796-64cb-d92b4b740e9a",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "95 SEIL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "95 SEIL",
+      "candidates": []
+    }
+  ]
+}

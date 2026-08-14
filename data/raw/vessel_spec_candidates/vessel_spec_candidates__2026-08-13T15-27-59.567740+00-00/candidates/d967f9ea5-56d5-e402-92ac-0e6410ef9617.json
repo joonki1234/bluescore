@@ -1,0 +1,13 @@
+{
+  "vesselId": "d967f9ea5-56d5-e402-92ac-0e6410ef9617",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "1 TEA KWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "1 TEA KWANG HO",
+      "candidates": []
+    }
+  ]
+}

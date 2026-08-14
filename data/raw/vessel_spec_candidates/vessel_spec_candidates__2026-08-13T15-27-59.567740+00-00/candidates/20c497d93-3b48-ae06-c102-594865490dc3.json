@@ -1,0 +1,13 @@
+{
+  "vesselId": "20c497d93-3b48-ae06-c102-594865490dc3",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "UGA A    HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "UGA A    HO",
+      "candidates": []
+    }
+  ]
+}

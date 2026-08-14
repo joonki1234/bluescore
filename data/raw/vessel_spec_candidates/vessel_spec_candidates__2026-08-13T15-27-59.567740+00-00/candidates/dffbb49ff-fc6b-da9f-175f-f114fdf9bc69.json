@@ -1,0 +1,13 @@
+{
+  "vesselId": "dffbb49ff-fc6b-da9f-175f-f114fdf9bc69",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "101HAEJIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "101HAEJIN",
+      "candidates": []
+    }
+  ]
+}

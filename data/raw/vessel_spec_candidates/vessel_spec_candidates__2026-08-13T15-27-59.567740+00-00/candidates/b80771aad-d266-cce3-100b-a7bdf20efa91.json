@@ -1,0 +1,13 @@
+{
+  "vesselId": "b80771aad-d266-cce3-100b-a7bdf20efa91",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GEON YEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GEON YEONG HO",
+      "candidates": []
+    }
+  ]
+}

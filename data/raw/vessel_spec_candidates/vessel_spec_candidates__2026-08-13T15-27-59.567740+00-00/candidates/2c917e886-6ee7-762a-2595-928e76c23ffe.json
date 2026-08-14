@@ -1,0 +1,13 @@
+{
+  "vesselId": "2c917e886-6ee7-762a-2595-928e76c23ffe",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GEUM RYONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GEUM RYONG HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "62ae1e3f6-6309-471f-cade-f2aa1af50786",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KCG P126",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KCG P126",
+      "candidates": []
+    }
+  ]
+}

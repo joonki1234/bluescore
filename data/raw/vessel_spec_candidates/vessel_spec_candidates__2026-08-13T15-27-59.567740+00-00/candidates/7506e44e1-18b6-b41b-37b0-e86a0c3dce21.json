@@ -1,0 +1,13 @@
+{
+  "vesselId": "7506e44e1-18b6-b41b-37b0-e86a0c3dce21",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NOK DONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NOK DONG HO",
+      "candidates": []
+    }
+  ]
+}

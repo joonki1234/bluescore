@@ -1,0 +1,60 @@
+{
+  "vesselId": "2847c06e2-2e7f-23e0-cfb8-8426342e1c4a",
+  "gfwImo": null,
+  "gfwCallSign": "224809",
+  "gfwName": "DONGHAE SEASTAR",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "224809",
+      "candidates": [
+        {
+          "vesselNameKor": "동해씨스타",
+          "vesselNameEng": "DONGHAE SEASTAR",
+          "callSign": "224809",
+          "vesselNo": "224809",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 791.0,
+          "netTonnage": 791.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 66.0,
+          "totalLengthM": 66.0,
+          "widthM": 12.5,
+          "depthM": 4.95,
+          "draftM": 4.9,
+          "constructionDate": "1998-12-25T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "224809",
+            "vsslNo": "224809",
+            "imoNo": null,
+            "vsslKorNm": "동해씨스타",
+            "vsslEngNm": "DONGHAE SEASTAR",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "791",
+            "ntng": "791",
+            "vsslTotLt": "66",
+            "shdth": "12.5",
+            "vsslDrft": "4.9",
+            "vsslLt": "66",
+            "vsslDp": "4.95",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1998-12-25T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

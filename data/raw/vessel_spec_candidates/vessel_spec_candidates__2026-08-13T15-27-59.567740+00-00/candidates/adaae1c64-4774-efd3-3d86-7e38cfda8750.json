@@ -1,0 +1,13 @@
+{
+  "vesselId": "adaae1c64-4774-efd3-3d86-7e38cfda8750",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "62 DAEDONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "62 DAEDONG",
+      "candidates": []
+    }
+  ]
+}

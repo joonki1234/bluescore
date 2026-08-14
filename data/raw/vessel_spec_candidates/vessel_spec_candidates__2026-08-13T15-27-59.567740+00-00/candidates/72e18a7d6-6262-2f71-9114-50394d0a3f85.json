@@ -1,0 +1,65 @@
+{
+  "vesselId": "72e18a7d6-6262-2f71-9114-50394d0a3f85",
+  "gfwImo": null,
+  "gfwCallSign": "203YONG",
+  "gfwName": "YONGSUNGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "203YONG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YONGSUNGHO",
+      "candidates": [
+        {
+          "vesselNameKor": "용성호",
+          "vesselNameEng": "YONGSUNGHO",
+          "callSign": "YONGS",
+          "vesselNo": "015724",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 626.0,
+          "netTonnage": 626.0,
+          "internationalGrossTonnage": 626.0,
+          "lengthM": 54.92,
+          "totalLengthM": 55.0,
+          "widthM": 11.0,
+          "depthM": 5.1,
+          "draftM": 5.0,
+          "constructionDate": "1975-07-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "YONGS",
+            "vsslNo": "015724",
+            "imoNo": null,
+            "vsslKorNm": "용성호",
+            "vsslEngNm": "YONGSUNGHO",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "626",
+            "grtg": "626",
+            "ntng": "626",
+            "vsslTotLt": "55",
+            "shdth": "11",
+            "vsslDrft": "5",
+            "vsslLt": "54.92",
+            "vsslDp": "5.1",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1975-07-01T00:00:00+09:00",
+            "befClsgn": "015724",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "vesselId": "7e25c1f33-35f1-87af-b601-3fb73a40f14b",
+  "gfwImo": null,
+  "gfwCallSign": "201434",
+  "gfwName": "HAE WON",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "201434",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE WON",
+      "candidates": [
+        {
+          "vesselNameKor": "해원호",
+          "vesselNameEng": "HAE WON HO",
+          "callSign": "250006",
+          "vesselNo": "250006",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 499.0,
+          "netTonnage": 499.0,
+          "internationalGrossTonnage": 499.0,
+          "lengthM": 61.8,
+          "totalLengthM": 61.8,
+          "widthM": 10.0,
+          "depthM": 4.5,
+          "draftM": 4.0,
+          "constructionDate": "2003-12-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "250006",
+            "vsslNo": "250006",
+            "imoNo": null,
+            "vsslKorNm": "해원호",
+            "vsslEngNm": "HAE WON HO",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "499",
+            "grtg": "499",
+            "ntng": "499",
+            "vsslTotLt": "61.8",
+            "shdth": "10",
+            "vsslDrft": "4",
+            "vsslLt": "61.8",
+            "vsslDp": "4.5",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2003-12-01T00:00:00+09:00",
+            "befClsgn": "201434",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

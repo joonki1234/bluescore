@@ -1,0 +1,18 @@
+{
+  "vesselId": "e4eb45c90-0508-01aa-ee60-c589eebbea54",
+  "gfwImo": null,
+  "gfwCallSign": "262@",
+  "gfwName": "IL JIN@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "262@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "IL JIN@",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "e827a2168-8121-e46c-73de-57d622d73b4f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GWANG JIN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GWANG JIN",
+      "candidates": []
+    }
+  ]
+}

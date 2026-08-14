@@ -1,0 +1,18 @@
+{
+  "vesselId": "4b6e3cd66-6f99-2a38-93d0-95ffacf4910c",
+  "gfwImo": null,
+  "gfwCallSign": "600SARA",
+  "gfwName": "SARANGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "600SARA",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SARANGHO",
+      "candidates": []
+    }
+  ]
+}

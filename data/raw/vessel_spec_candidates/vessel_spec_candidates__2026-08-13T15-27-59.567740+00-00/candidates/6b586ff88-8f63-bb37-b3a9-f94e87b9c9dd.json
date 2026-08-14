@@ -1,0 +1,13 @@
+{
+  "vesselId": "6b586ff88-8f63-bb37-b3a9-f94e87b9c9dd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "302CHUNGGWANGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "302CHUNGGWANGHO",
+      "candidates": []
+    }
+  ]
+}

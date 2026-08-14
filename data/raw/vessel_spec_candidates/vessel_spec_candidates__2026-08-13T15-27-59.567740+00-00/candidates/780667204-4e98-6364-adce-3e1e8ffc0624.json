@@ -1,0 +1,13 @@
+{
+  "vesselId": "780667204-4e98-6364-adce-3e1e8ffc0624",
+  "gfwImo": null,
+  "gfwCallSign": "101CHAN",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101CHAN",
+      "candidates": []
+    }
+  ]
+}

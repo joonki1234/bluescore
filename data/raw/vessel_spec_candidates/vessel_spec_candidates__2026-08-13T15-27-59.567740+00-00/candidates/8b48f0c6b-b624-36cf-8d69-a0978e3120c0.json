@@ -1,0 +1,65 @@
+{
+  "vesselId": "8b48f0c6b-b624-36cf-8d69-a0978e3120c0",
+  "gfwImo": null,
+  "gfwCallSign": "226@",
+  "gfwName": "YEONG GWANG HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "226@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YEONG GWANG HO",
+      "candidates": [
+        {
+          "vesselNameKor": "1명광호",
+          "vesselNameEng": "1 MYEONG GWANG HO",
+          "callSign": "240029",
+          "vesselNo": "240029",
+          "imoNo": null,
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 238.0,
+          "netTonnage": 238.0,
+          "internationalGrossTonnage": 238.0,
+          "lengthM": 43.4,
+          "totalLengthM": 43.4,
+          "widthM": 8.7,
+          "depthM": 3.9,
+          "draftM": 3.3,
+          "constructionDate": "2024-07-13T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "240029",
+            "vsslNo": "240029",
+            "imoNo": null,
+            "vsslKorNm": "1명광호",
+            "vsslEngNm": "1 MYEONG GWANG HO",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "238",
+            "grtg": "238",
+            "ntng": "238",
+            "vsslTotLt": "43.4",
+            "shdth": "8.7",
+            "vsslDrft": "3.3",
+            "vsslLt": "43.4",
+            "vsslDp": "3.9",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "2024-07-13T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

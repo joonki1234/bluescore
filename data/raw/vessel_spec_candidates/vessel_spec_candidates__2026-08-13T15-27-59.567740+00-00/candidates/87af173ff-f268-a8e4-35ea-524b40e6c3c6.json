@@ -1,0 +1,65 @@
+{
+  "vesselId": "87af173ff-f268-a8e4-35ea-524b40e6c3c6",
+  "gfwImo": null,
+  "gfwCallSign": "318 G H",
+  "gfwName": "903 GYEONG HAE",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "318 G H",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "903 GYEONG HAE",
+      "candidates": [
+        {
+          "vesselNameKor": "903 경해",
+          "vesselNameEng": "903 GYEONG HAE",
+          "callSign": "071016",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "91[연근해 어선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 85.0,
+          "netTonnage": 85.0,
+          "internationalGrossTonnage": 85.0,
+          "lengthM": 34.9,
+          "totalLengthM": 34.9,
+          "widthM": 6.4,
+          "depthM": 3.1,
+          "draftM": 2.5,
+          "constructionDate": "1991-04-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "071016",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "903 경해",
+            "vsslEngNm": "903 GYEONG HAE",
+            "vsslKnd": "91[연근해 어선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "85",
+            "grtg": "85",
+            "ntng": "85",
+            "vsslTotLt": "34.9",
+            "shdth": "6.4",
+            "vsslDrft": "2.5",
+            "vsslLt": "34.9",
+            "vsslDp": "3.1",
+            "brbtSe": "9",
+            "brbtSeNm": "기타용선",
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1991-04-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

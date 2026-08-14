@@ -1,0 +1,18 @@
+{
+  "vesselId": "92528e8b3-3d65-a037-123b-e08be8bf1d1b",
+  "gfwImo": null,
+  "gfwCallSign": "3333@@8",
+  "gfwName": "YONG JIN HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "3333@@8",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YONG JIN HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "vesselId": "2971c1c4a-aecb-edd5-dcbf-9ba7b3168612",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "AN SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "AN SEONG HO",
+      "candidates": [
+        {
+          "vesselNameKor": "HAN SEONG HO",
+          "vesselNameEng": "HAN SEONG HO",
+          "callSign": "JVNM7",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "99[기타선]",
+          "nationality": "MN[몽골]",
+          "grossTonnage": 65.0,
+          "netTonnage": 65.0,
+          "internationalGrossTonnage": 65.0,
+          "lengthM": 26.2,
+          "totalLengthM": 26.2,
+          "widthM": 6.4,
+          "depthM": 2.55,
+          "draftM": 2.5,
+          "constructionDate": "1989-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "JVNM7",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "HAN SEONG HO",
+            "vsslEngNm": "HAN SEONG HO",
+            "vsslKnd": "99[기타선]",
+            "vsslNlty": "MN[몽골]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "65",
+            "grtg": "65",
+            "ntng": "65",
+            "vsslTotLt": "26.2",
+            "shdth": "6.4",
+            "vsslDrft": "2.5",
+            "vsslLt": "26.2",
+            "vsslDp": "2.55",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1989-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

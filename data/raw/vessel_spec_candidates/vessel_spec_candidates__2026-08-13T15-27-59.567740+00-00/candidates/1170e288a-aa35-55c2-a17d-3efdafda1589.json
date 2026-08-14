@@ -1,0 +1,13 @@
+{
+  "vesselId": "1170e288a-aa35-55c2-a17d-3efdafda1589",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "5 SAM SEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "5 SAM SEONG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "9b8f5a3a7-7384-9736-4f66-e0d5959d2da1",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2021 MAN JO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2021 MAN JO",
+      "candidates": []
+    }
+  ]
+}

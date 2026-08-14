@@ -1,0 +1,13 @@
+{
+  "vesselId": "1bb83e15f-f2a4-754d-8a8a-b0b6e4b09073",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAERIMHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAERIMHO",
+      "candidates": []
+    }
+  ]
+}

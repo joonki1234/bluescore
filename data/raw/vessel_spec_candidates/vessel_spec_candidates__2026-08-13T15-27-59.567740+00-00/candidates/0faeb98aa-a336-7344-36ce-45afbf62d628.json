@@ -1,0 +1,13 @@
+{
+  "vesselId": "0faeb98aa-a336-7344-36ce-45afbf62d628",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NAMSUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NAMSUNG HO",
+      "candidates": []
+    }
+  ]
+}

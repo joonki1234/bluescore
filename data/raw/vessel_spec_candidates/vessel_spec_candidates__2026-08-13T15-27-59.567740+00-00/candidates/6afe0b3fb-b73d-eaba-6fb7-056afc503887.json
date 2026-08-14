@@ -1,0 +1,13 @@
+{
+  "vesselId": "6afe0b3fb-b73d-eaba-6fb7-056afc503887",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE IN HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE IN HO",
+      "candidates": []
+    }
+  ]
+}

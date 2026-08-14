@@ -1,0 +1,18 @@
+{
+  "vesselId": "f6f7a0dbd-d20c-b653-7dcc-6687d5425e5e",
+  "gfwImo": null,
+  "gfwCallSign": "264@",
+  "gfwName": "POSEIDON@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "264@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "POSEIDON@",
+      "candidates": []
+    }
+  ]
+}

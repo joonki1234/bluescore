@@ -1,0 +1,13 @@
+{
+  "vesselId": "c23efa385-598d-77e2-d330-8cd25c361928",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "26SUN GYEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "26SUN GYEONG",
+      "candidates": []
+    }
+  ]
+}

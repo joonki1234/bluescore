@@ -1,0 +1,18 @@
+{
+  "vesselId": "dfc4d0e4c-c3d1-fbb3-e217-9ea8ebcc557f",
+  "gfwImo": null,
+  "gfwCallSign": "230@",
+  "gfwName": "HAE SIN 7 HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "230@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE SIN 7 HO@",
+      "candidates": []
+    }
+  ]
+}

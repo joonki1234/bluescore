@@ -1,0 +1,13 @@
+{
+  "vesselId": "62d51449a-a222-4b98-3241-a9502284451f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SHINHYUNHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SHINHYUNHO",
+      "candidates": []
+    }
+  ]
+}

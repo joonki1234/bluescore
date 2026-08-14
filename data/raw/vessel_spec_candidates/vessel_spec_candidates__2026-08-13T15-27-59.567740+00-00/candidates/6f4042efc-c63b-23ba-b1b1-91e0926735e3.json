@@ -1,0 +1,13 @@
+{
+  "vesselId": "6f4042efc-c63b-23ba-b1b1-91e0926735e3",
+  "gfwImo": null,
+  "gfwCallSign": "600SARA",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "600SARA",
+      "candidates": []
+    }
+  ]
+}

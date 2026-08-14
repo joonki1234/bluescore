@@ -1,0 +1,18 @@
+{
+  "vesselId": "b56f474ca-a8d2-4a4f-3864-df7f7f2c1fcc",
+  "gfwImo": null,
+  "gfwCallSign": "9$Q8",
+  "gfwName": "SUBOK",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "9$Q8",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SUBOK",
+      "candidates": []
+    }
+  ]
+}

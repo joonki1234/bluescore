@@ -1,0 +1,60 @@
+{
+  "vesselId": "82792fd3b-be9f-04a0-ba99-f6871a33a7b7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE JEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE JEONG",
+      "candidates": [
+        {
+          "vesselNameKor": "대정",
+          "vesselNameEng": "DAE JEONG",
+          "callSign": "130079",
+          "vesselNo": "130079",
+          "imoNo": "9699531",
+          "vesselKind": "52[석유제품 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 424.0,
+          "netTonnage": 424.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 55.61,
+          "totalLengthM": 55.61,
+          "widthM": 9.2,
+          "depthM": 4.35,
+          "draftM": 3.6,
+          "constructionDate": "2013-06-28T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "130079",
+            "vsslNo": "130079",
+            "imoNo": "9699531",
+            "vsslKorNm": "대정",
+            "vsslEngNm": "DAE JEONG",
+            "vsslKnd": "52[석유제품 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "0",
+            "grtg": "424",
+            "ntng": "424",
+            "vsslTotLt": "55.61",
+            "shdth": "9.2",
+            "vsslDrft": "3.6",
+            "vsslLt": "55.61",
+            "vsslDp": "4.35",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2013-06-28T00:00:00+09:00",
+            "befClsgn": "T3KD2",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

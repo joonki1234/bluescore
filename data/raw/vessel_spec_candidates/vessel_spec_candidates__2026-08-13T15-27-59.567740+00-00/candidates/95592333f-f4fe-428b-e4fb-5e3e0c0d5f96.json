@@ -1,0 +1,13 @@
+{
+  "vesselId": "95592333f-f4fe-428b-e4fb-5e3e0c0d5f96",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO.303 KUM YOUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO.303 KUM YOUNG",
+      "candidates": []
+    }
+  ]
+}

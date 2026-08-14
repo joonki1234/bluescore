@@ -1,0 +1,13 @@
+{
+  "vesselId": "47f1c30df-f49e-cab3-d1e0-4b4c68fb2585",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GWANG BOK 1 HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GWANG BOK 1 HO",
+      "candidates": []
+    }
+  ]
+}

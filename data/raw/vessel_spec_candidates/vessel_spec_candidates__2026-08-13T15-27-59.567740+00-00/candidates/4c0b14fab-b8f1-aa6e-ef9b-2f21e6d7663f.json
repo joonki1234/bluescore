@@ -1,0 +1,13 @@
+{
+  "vesselId": "4c0b14fab-b8f1-aa6e-ef9b-2f21e6d7663f",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SAM IL",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SAM IL",
+      "candidates": []
+    }
+  ]
+}

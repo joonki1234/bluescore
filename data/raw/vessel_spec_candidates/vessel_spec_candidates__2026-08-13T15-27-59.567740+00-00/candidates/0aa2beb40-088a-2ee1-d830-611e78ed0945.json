@@ -1,0 +1,13 @@
+{
+  "vesselId": "0aa2beb40-088a-2ee1-d830-611e78ed0945",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NEW HEAI",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NEW HEAI",
+      "candidates": []
+    }
+  ]
+}

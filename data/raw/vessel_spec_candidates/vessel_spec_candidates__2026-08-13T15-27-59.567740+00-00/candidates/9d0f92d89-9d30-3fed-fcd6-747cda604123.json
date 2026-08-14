@@ -1,0 +1,13 @@
+{
+  "vesselId": "9d0f92d89-9d30-3fed-fcd6-747cda604123",
+  "gfwImo": null,
+  "gfwCallSign": "601SPEC",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "601SPEC",
+      "candidates": []
+    }
+  ]
+}

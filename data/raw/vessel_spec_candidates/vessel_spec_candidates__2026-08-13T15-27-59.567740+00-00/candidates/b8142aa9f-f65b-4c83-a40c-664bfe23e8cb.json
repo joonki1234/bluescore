@@ -1,0 +1,13 @@
+{
+  "vesselId": "b8142aa9f-f65b-4c83-a40c-664bfe23e8cb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KYUNG IL HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KYUNG IL HO@",
+      "candidates": []
+    }
+  ]
+}

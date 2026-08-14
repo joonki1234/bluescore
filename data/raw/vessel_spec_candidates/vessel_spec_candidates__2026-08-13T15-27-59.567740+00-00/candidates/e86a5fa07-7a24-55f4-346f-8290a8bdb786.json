@@ -1,0 +1,13 @@
+{
+  "vesselId": "e86a5fa07-7a24-55f4-346f-8290a8bdb786",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GUMDONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GUMDONG",
+      "candidates": []
+    }
+  ]
+}

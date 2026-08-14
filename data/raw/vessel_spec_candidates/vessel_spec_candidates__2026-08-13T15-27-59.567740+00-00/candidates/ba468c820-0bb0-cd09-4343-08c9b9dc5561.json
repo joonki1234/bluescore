@@ -1,0 +1,13 @@
+{
+  "vesselId": "ba468c820-0bb0-cd09-4343-08c9b9dc5561",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "MY WAY",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "MY WAY",
+      "candidates": []
+    }
+  ]
+}

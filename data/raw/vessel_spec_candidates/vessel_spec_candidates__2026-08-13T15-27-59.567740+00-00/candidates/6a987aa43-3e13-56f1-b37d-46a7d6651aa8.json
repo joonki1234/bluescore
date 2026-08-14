@@ -1,0 +1,13 @@
+{
+  "vesselId": "6a987aa43-3e13-56f1-b37d-46a7d6651aa8",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE WOO HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE WOO HO",
+      "candidates": []
+    }
+  ]
+}

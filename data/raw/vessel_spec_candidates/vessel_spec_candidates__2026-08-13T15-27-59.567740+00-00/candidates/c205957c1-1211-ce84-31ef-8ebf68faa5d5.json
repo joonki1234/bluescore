@@ -1,0 +1,13 @@
+{
+  "vesselId": "c205957c1-1211-ce84-31ef-8ebf68faa5d5",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GEUN YOUNG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GEUN YOUNG HO",
+      "candidates": []
+    }
+  ]
+}

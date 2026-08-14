@@ -1,0 +1,18 @@
+{
+  "vesselId": "7e80e28bc-cda6-d2ed-8831-3d393f65baf7",
+  "gfwImo": null,
+  "gfwCallSign": "122@",
+  "gfwName": "YOUNG SIN HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "122@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YOUNG SIN HO@",
+      "candidates": []
+    }
+  ]
+}

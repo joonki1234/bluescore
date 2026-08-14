@@ -1,0 +1,13 @@
+{
+  "vesselId": "22697e151-1eb8-32a1-c656-f0f49eebb5b7",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HAE YEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HAE YEONG",
+      "candidates": []
+    }
+  ]
+}

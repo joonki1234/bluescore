@@ -1,0 +1,13 @@
+{
+  "vesselId": "0a42f9d81-122d-9b5b-633c-05ee25811ee6",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "508HAINGBOK",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "508HAINGBOK",
+      "candidates": []
+    }
+  ]
+}

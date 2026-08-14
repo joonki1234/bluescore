@@ -1,0 +1,13 @@
+{
+  "vesselId": "1c128f15c-cdde-908a-eb41-1b23c3892ffb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "NO2 SAMSUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "NO2 SAMSUNG",
+      "candidates": []
+    }
+  ]
+}

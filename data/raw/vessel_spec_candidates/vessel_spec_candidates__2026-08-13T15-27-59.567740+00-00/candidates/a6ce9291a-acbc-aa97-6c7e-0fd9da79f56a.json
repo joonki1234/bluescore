@@ -1,0 +1,13 @@
+{
+  "vesselId": "a6ce9291a-acbc-aa97-6c7e-0fd9da79f56a",
+  "gfwImo": null,
+  "gfwCallSign": "101GYEO",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101GYEO",
+      "candidates": []
+    }
+  ]
+}

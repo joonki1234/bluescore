@@ -1,0 +1,13 @@
+{
+  "vesselId": "b75e93395-5146-77ec-e797-71fa991d7191",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "DAE SEONG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "DAE SEONG HO",
+      "candidates": []
+    }
+  ]
+}

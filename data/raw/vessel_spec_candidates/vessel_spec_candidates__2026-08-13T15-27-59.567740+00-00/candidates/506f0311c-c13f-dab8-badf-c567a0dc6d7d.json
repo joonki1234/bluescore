@@ -1,0 +1,13 @@
+{
+  "vesselId": "506f0311c-c13f-dab8-badf-c567a0dc6d7d",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "668PUNGSUN",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "668PUNGSUN",
+      "candidates": []
+    }
+  ]
+}

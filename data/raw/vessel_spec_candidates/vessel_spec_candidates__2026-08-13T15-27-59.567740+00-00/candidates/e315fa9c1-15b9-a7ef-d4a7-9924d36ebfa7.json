@@ -1,0 +1,18 @@
+{
+  "vesselId": "e315fa9c1-15b9-a7ef-d4a7-9924d36ebfa7",
+  "gfwImo": null,
+  "gfwCallSign": "228@",
+  "gfwName": "RED MAEN HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "228@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "RED MAEN HO",
+      "candidates": []
+    }
+  ]
+}

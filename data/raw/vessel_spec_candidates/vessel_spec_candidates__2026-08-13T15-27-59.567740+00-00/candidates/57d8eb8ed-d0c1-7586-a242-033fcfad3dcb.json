@@ -1,0 +1,13 @@
+{
+  "vesselId": "57d8eb8ed-d0c1-7586-a242-033fcfad3dcb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "500 DONG YANG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "500 DONG YANG",
+      "candidates": []
+    }
+  ]
+}

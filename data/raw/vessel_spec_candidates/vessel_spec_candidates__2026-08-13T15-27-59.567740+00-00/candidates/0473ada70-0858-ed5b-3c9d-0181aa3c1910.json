@@ -1,0 +1,13 @@
+{
+  "vesselId": "0473ada70-0858-ed5b-3c9d-0181aa3c1910",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "301 MAN GANG HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "301 MAN GANG HO",
+      "candidates": []
+    }
+  ]
+}

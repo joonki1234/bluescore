@@ -1,0 +1,18 @@
+{
+  "vesselId": "19dbcc049-9b92-0a3a-2f83-23c58796053d",
+  "gfwImo": null,
+  "gfwCallSign": "122@",
+  "gfwName": "BAEK HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "122@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "BAEK HO@",
+      "candidates": []
+    }
+  ]
+}

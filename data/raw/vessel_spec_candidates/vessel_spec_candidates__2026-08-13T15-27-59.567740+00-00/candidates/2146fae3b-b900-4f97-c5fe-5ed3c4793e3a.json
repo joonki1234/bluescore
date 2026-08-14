@@ -1,0 +1,60 @@
+{
+  "vesselId": "2146fae3b-b900-4f97-c5fe-5ed3c4793e3a",
+  "gfwImo": "9959905",
+  "gfwCallSign": "D7CT",
+  "gfwName": "PRETTY HANA",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D7CT",
+      "candidates": [
+        {
+          "vesselNameKor": "프리티 하나",
+          "vesselNameEng": "PRETTY HANA",
+          "callSign": "D7CT",
+          "vesselNo": "231003",
+          "imoNo": "9959905",
+          "vesselKind": "53[케미칼 운반선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 1546.0,
+          "netTonnage": 758.0,
+          "internationalGrossTonnage": 1946.0,
+          "lengthM": 74.0,
+          "totalLengthM": 79.84,
+          "widthM": 13.0,
+          "depthM": 6.5,
+          "draftM": 5.7,
+          "constructionDate": "2023-01-26T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D7CT",
+            "vsslNo": "231003",
+            "imoNo": "9959905",
+            "vsslKorNm": "프리티 하나",
+            "vsslEngNm": "PRETTY HANA",
+            "vsslKnd": "53[케미칼 운반선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "1946",
+            "grtg": "1546",
+            "ntng": "758",
+            "vsslTotLt": "79.84",
+            "shdth": "13",
+            "vsslDrft": "5.7",
+            "vsslLt": "74",
+            "vsslDp": "6.5",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "2023-01-26T00:00:00+09:00",
+            "befClsgn": "D7XQ",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "d160390f0-01ea-56b3-b8bd-003042de4295",
+  "gfwImo": null,
+  "gfwCallSign": "305SCH",
+  "gfwName": "SINCHANG HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "305SCH",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SINCHANG HO",
+      "candidates": []
+    }
+  ]
+}

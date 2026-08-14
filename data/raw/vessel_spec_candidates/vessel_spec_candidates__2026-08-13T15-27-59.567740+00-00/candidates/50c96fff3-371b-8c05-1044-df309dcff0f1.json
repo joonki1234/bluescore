@@ -1,0 +1,18 @@
+{
+  "vesselId": "50c96fff3-371b-8c05-1044-df309dcff0f1",
+  "gfwImo": null,
+  "gfwCallSign": "319^5E2",
+  "gfwName": "HYUN DAI",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "319^5E2",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HYUN DAI",
+      "candidates": []
+    }
+  ]
+}

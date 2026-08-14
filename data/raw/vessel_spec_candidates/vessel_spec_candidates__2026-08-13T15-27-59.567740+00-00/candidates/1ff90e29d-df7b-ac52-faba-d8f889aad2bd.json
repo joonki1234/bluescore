@@ -1,0 +1,13 @@
+{
+  "vesselId": "1ff90e29d-df7b-ac52-faba-d8f889aad2bd",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "YONG BYUNG HO@",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "YONG BYUNG HO@",
+      "candidates": []
+    }
+  ]
+}

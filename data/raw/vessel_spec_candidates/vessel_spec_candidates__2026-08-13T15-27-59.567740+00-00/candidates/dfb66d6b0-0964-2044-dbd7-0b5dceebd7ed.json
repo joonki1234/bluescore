@@ -1,0 +1,13 @@
+{
+  "vesselId": "dfb66d6b0-0964-2044-dbd7-0b5dceebd7ed",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "GEUMGWANGHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "GEUMGWANGHO",
+      "candidates": []
+    }
+  ]
+}

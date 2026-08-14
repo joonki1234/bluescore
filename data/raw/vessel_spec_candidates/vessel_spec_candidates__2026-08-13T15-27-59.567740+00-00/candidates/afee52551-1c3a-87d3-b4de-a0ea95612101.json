@@ -1,0 +1,13 @@
+{
+  "vesselId": "afee52551-1c3a-87d3-b4de-a0ea95612101",
+  "gfwImo": null,
+  "gfwCallSign": "125GOGA",
+  "gfwName": null,
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "125GOGA",
+      "candidates": []
+    }
+  ]
+}

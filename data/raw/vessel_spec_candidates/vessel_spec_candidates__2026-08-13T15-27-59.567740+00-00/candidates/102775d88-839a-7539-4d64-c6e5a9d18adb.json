@@ -1,0 +1,13 @@
+{
+  "vesselId": "102775d88-839a-7539-4d64-c6e5a9d18adb",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "KCG122",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "KCG122",
+      "candidates": []
+    }
+  ]
+}

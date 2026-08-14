@@ -1,0 +1,18 @@
+{
+  "vesselId": "a0de941e0-0b65-0f38-2f3c-5746cea674ca",
+  "gfwImo": null,
+  "gfwCallSign": "101HAPP",
+  "gfwName": "HAPPYHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101HAPP",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HAPPYHO",
+      "candidates": []
+    }
+  ]
+}

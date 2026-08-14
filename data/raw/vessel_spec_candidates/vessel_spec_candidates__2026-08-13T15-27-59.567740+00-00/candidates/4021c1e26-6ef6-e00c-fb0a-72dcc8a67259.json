@@ -1,0 +1,18 @@
+{
+  "vesselId": "4021c1e26-6ef6-e00c-fb0a-72dcc8a67259",
+  "gfwImo": null,
+  "gfwCallSign": "OTTOGI",
+  "gfwName": "OTTOGI",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "OTTOGI",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "OTTOGI",
+      "candidates": []
+    }
+  ]
+}

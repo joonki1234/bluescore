@@ -1,0 +1,18 @@
+{
+  "vesselId": "cb4a355d1-1c9b-160f-395e-56433909af0d",
+  "gfwImo": null,
+  "gfwCallSign": "995SONG",
+  "gfwName": "SONGKANGHO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "995SONG",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SONGKANGHO",
+      "candidates": []
+    }
+  ]
+}

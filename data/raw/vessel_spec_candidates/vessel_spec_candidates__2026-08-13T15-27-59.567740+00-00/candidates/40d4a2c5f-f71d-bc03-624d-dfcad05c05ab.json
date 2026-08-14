@@ -1,0 +1,65 @@
+{
+  "vesselId": "40d4a2c5f-f71d-bc03-624d-dfcad05c05ab",
+  "gfwImo": null,
+  "gfwCallSign": "1294",
+  "gfwName": "GEUMHWA HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "1294",
+      "candidates": [
+        {
+          "vesselNameKor": "제2 대림호",
+          "vesselNameEng": null,
+          "callSign": "921294",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "95[용달선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 9.0,
+          "netTonnage": 0.0,
+          "internationalGrossTonnage": 9.0,
+          "lengthM": null,
+          "totalLengthM": 12.4,
+          "widthM": null,
+          "depthM": null,
+          "draftM": null,
+          "constructionDate": "1992-07-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "2[내항]",
+            "clsgn": "921294",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "제2 대림호",
+            "vsslEngNm": null,
+            "vsslKnd": "95[용달선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "2",
+            "tonEdycSeNm": "국적증서",
+            "intrlGrtg": "9",
+            "grtg": "9",
+            "ntng": "0",
+            "vsslTotLt": "12.4",
+            "shdth": null,
+            "vsslDrft": null,
+            "vsslLt": null,
+            "vsslDp": null,
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": null,
+            "nvgShapNm": "-",
+            "vsslCnstrDt": "1992-07-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "GEUMHWA HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "5a4d4e2e7-7746-b975-44ec-44cc7d00ec74",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "FISHING GUID 2",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "FISHING GUID 2",
+      "candidates": []
+    }
+  ]
+}

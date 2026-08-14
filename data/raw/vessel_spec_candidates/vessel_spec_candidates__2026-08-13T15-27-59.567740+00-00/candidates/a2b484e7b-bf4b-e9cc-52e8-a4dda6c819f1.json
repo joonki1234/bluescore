@@ -1,0 +1,13 @@
+{
+  "vesselId": "a2b484e7b-bf4b-e9cc-52e8-a4dda6c819f1",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "109KYUNG GUKHO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "109KYUNG GUKHO",
+      "candidates": []
+    }
+  ]
+}

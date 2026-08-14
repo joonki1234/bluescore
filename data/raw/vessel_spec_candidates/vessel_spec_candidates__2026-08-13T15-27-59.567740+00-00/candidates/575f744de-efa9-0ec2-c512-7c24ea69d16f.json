@@ -1,0 +1,18 @@
+{
+  "vesselId": "575f744de-efa9-0ec2-c512-7c24ea69d16f",
+  "gfwImo": null,
+  "gfwCallSign": "101@",
+  "gfwName": "HYEON SOO 2HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "101@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "HYEON SOO 2HO@",
+      "candidates": []
+    }
+  ]
+}

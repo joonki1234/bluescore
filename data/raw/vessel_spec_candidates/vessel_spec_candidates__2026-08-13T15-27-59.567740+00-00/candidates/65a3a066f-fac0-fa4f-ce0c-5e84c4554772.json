@@ -1,0 +1,13 @@
+{
+  "vesselId": "65a3a066f-fac0-fa4f-ce0c-5e84c4554772",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "88PUNGSEONG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "88PUNGSEONG",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "a1c032f17-7a77-f70b-3558-bce31f0eac77",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "HYUN DEA HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "HYUN DEA HO",
+      "candidates": []
+    }
+  ]
+}

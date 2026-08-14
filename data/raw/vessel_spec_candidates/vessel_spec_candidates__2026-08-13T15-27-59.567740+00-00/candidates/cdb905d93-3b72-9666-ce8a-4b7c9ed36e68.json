@@ -1,0 +1,18 @@
+{
+  "vesselId": "cdb905d93-3b72-9666-ce8a-4b7c9ed36e68",
+  "gfwImo": null,
+  "gfwCallSign": "345@",
+  "gfwName": "SU SUNG HO@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "345@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "SU SUNG HO@",
+      "candidates": []
+    }
+  ]
+}

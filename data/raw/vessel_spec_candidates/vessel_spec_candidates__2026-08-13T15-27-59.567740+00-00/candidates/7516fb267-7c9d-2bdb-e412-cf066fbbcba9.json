@@ -1,0 +1,13 @@
+{
+  "vesselId": "7516fb267-7c9d-2bdb-e412-cf066fbbcba9",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "2 SU DEOK HO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "2 SU DEOK HO",
+      "candidates": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "vesselId": "261bf6f7f-fe6e-8905-8f4b-f9a585059d16",
+  "gfwImo": null,
+  "gfwCallSign": "04057",
+  "gfwName": "YUE ZHAN YU 04057",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "04057",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "YUE ZHAN YU 04057",
+      "candidates": []
+    }
+  ]
+}

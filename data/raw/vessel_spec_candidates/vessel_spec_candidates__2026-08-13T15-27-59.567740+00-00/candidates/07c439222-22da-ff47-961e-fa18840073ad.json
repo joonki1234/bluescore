@@ -1,0 +1,13 @@
+{
+  "vesselId": "07c439222-22da-ff47-961e-fa18840073ad",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "TAE GEON",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "TAE GEON",
+      "candidates": []
+    }
+  ]
+}

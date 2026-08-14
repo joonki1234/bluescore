@@ -1,0 +1,13 @@
+{
+  "vesselId": "b44da64bb-b32f-7613-2db8-c25e97cfafb0",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "707 SAM WOO",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "707 SAM WOO",
+      "candidates": []
+    }
+  ]
+}

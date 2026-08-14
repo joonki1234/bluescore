@@ -1,0 +1,65 @@
+{
+  "vesselId": "8a908ca33-3b45-ad10-6013-e2de7d8607f3",
+  "gfwImo": null,
+  "gfwCallSign": "206UNBO",
+  "gfwName": "UNBONG",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "206UNBO",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "UNBONG",
+      "candidates": [
+        {
+          "vesselNameKor": "JANGGUNBONG",
+          "vesselNameEng": "JANGGUNBONG",
+          "callSign": "V3WS5",
+          "vesselNo": null,
+          "imoNo": null,
+          "vesselKind": "92[원양 어선]",
+          "nationality": "BZ[벨리즈]",
+          "grossTonnage": 848.0,
+          "netTonnage": 254.0,
+          "internationalGrossTonnage": 0.0,
+          "lengthM": 50.8,
+          "totalLengthM": 51.0,
+          "widthM": 9.8,
+          "depthM": 6.1,
+          "draftM": 6.1,
+          "constructionDate": "1983-01-01T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "V3WS5",
+            "vsslNo": null,
+            "imoNo": null,
+            "vsslKorNm": "JANGGUNBONG",
+            "vsslEngNm": "JANGGUNBONG",
+            "vsslKnd": "92[원양 어선]",
+            "vsslNlty": "BZ[벨리즈]",
+            "tonEdycSe": "3",
+            "tonEdycSeNm": "기타",
+            "intrlGrtg": "0",
+            "grtg": "848",
+            "ntng": "254",
+            "vsslTotLt": "51",
+            "shdth": "9.8",
+            "vsslDrft": "6.1",
+            "vsslLt": "50.8",
+            "vsslDp": "6.1",
+            "brbtSe": null,
+            "brbtSeNm": null,
+            "nvgShapCd": "2",
+            "nvgShapNm": "부정기선",
+            "vsslCnstrDt": "1983-01-01T00:00:00+09:00",
+            "befClsgn": null,
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "2251fc751-1bd4-8de6-9c60-ff2eccb63a91",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "SEATRIAL JEONNAM512",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "SEATRIAL JEONNAM512",
+      "candidates": []
+    }
+  ]
+}

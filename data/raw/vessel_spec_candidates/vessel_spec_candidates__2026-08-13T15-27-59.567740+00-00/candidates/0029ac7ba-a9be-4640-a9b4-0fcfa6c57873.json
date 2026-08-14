@@ -1,0 +1,13 @@
+{
+  "vesselId": "0029ac7ba-a9be-4640-a9b4-0fcfa6c57873",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "FISHING MASTER",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "FISHING MASTER",
+      "candidates": []
+    }
+  ]
+}

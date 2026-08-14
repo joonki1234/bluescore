@@ -1,0 +1,60 @@
+{
+  "vesselId": "e2a68043c-c64d-f633-6530-58667e4503f4",
+  "gfwImo": "9689665",
+  "gfwCallSign": "D7NE",
+  "gfwName": "SUNNY ACACIA",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "D7NE",
+      "candidates": [
+        {
+          "vesselNameKor": "써니 아카시아",
+          "vesselNameEng": "SUNNY ACACIA",
+          "callSign": "D7NE",
+          "vesselNo": "251017",
+          "imoNo": "9689665",
+          "vesselKind": "41[풀컨테이너선]",
+          "nationality": "KR[대한민국]",
+          "grossTonnage": 9867.0,
+          "netTonnage": 4663.0,
+          "internationalGrossTonnage": 9867.0,
+          "lengthM": 129.92,
+          "totalLengthM": 129.92,
+          "widthM": 25.0,
+          "depthM": 11.0,
+          "draftM": 8.2,
+          "constructionDate": "2014-09-12T00:00:00+09:00",
+          "isNewShip": "N",
+          "raw": {
+            "ibobprt": "1[외항]",
+            "clsgn": "D7NE",
+            "vsslNo": "251017",
+            "imoNo": "9689665",
+            "vsslKorNm": "써니 아카시아",
+            "vsslEngNm": "SUNNY ACACIA",
+            "vsslKnd": "41[풀컨테이너선]",
+            "vsslNlty": "KR[대한민국]",
+            "tonEdycSe": "1",
+            "tonEdycSeNm": "국제톤수증서",
+            "intrlGrtg": "9867",
+            "grtg": "9867",
+            "ntng": "4663",
+            "vsslTotLt": "129.92",
+            "shdth": "25",
+            "vsslDrft": "8.2",
+            "vsslLt": "129.92",
+            "vsslDp": "11",
+            "brbtSe": "3",
+            "brbtSeNm": "정기용선",
+            "nvgShapCd": "1",
+            "nvgShapNm": "정기선",
+            "vsslCnstrDt": "2014-09-12T00:00:00+09:00",
+            "befClsgn": "3FUU5",
+            "nwshipAt": "N"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "vesselId": "11426e308-8fc7-e688-878b-f8dc400a81de",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "97HUIYUNG",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "97HUIYUNG",
+      "candidates": []
+    }
+  ]
+}

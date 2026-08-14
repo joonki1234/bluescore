@@ -1,0 +1,18 @@
+{
+  "vesselId": "f135f96f8-8373-210d-2d2b-e83f0621cafd",
+  "gfwImo": null,
+  "gfwCallSign": "205@",
+  "gfwName": "TEAM BAIT@",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "205@",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "TEAM BAIT@",
+      "candidates": []
+    }
+  ]
+}

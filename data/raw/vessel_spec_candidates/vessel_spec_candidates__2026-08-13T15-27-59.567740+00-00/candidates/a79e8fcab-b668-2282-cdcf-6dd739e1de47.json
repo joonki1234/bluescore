@@ -1,0 +1,18 @@
+{
+  "vesselId": "a79e8fcab-b668-2282-cdcf-6dd739e1de47",
+  "gfwImo": null,
+  "gfwCallSign": "700DREA",
+  "gfwName": "DREAM HO",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "700DREA",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "DREAM HO",
+      "candidates": []
+    }
+  ]
+}

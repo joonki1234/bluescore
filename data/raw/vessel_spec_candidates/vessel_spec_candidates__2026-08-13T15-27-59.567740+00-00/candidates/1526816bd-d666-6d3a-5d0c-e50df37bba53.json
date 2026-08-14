@@ -1,0 +1,13 @@
+{
+  "vesselId": "1526816bd-d666-6d3a-5d0c-e50df37bba53",
+  "gfwImo": null,
+  "gfwCallSign": null,
+  "gfwName": "BADASORI",
+  "attempts": [
+    {
+      "searchedBy": "name",
+      "searchValue": "BADASORI",
+      "candidates": []
+    }
+  ]
+}

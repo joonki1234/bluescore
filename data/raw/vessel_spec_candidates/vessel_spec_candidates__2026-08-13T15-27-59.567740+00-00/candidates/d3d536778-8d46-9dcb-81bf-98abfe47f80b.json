@@ -1,0 +1,18 @@
+{
+  "vesselId": "d3d536778-8d46-9dcb-81bf-98abfe47f80b",
+  "gfwImo": null,
+  "gfwCallSign": "319KH",
+  "gfwName": "900KYEONGHAE",
+  "attempts": [
+    {
+      "searchedBy": "callSign",
+      "searchValue": "319KH",
+      "candidates": []
+    },
+    {
+      "searchedBy": "name",
+      "searchValue": "900KYEONGHAE",
+      "candidates": []
+    }
+  ]
+}
