@@ -109,7 +109,7 @@ def _parse_xml_response(xml_text: str) -> List[Dict[str, Optional[str]]]:
         root = ElementTree.fromstring(xml_text)
     except ElementTree.ParseError as exc:
         raise VesselSpecApiError(
-            "Failed to parse vessel spec API XML response.", status_code=502, details=str(exc)
+            "Failed to parse vessel spec API XML response.", status_code=None, details=str(exc)
         ) from exc
 
     result_code = root.findtext("header/resultCode")
@@ -118,7 +118,7 @@ def _parse_xml_response(xml_text: str) -> List[Dict[str, Optional[str]]]:
     if result_code is not None and result_code != "00":
         raise VesselSpecApiError(
             f"Vessel spec API returned an error: {result_msg}",
-            status_code=502,
+            status_code=None,
             details={"resultCode": result_code, "resultMsg": result_msg},
         )
 

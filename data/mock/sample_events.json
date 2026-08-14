@@ -1,0 +1,58 @@
+[
+  {
+    "eventId": "cd864a397dbf294199cd58f6486e7d76",
+    "vesselId": "66566d3bd-d6fb-5bec-4904-a7ce397496bb",
+    "eventType": "fishing",
+    "start": "2026-05-31T19:15:28.000Z",
+    "end": "2026-06-02T08:35:05.000Z",
+    "latitude": -46.4029,
+    "longitude": -60.3972,
+    "durationHours": 37.32694444444444,
+    "averageSpeedKnots": 2.9057003198258267,
+    "totalDistanceKm": 193.70014470310338,
+    "mpaRelated": false,
+    "isGap": false
+  },
+  {
+    "eventId": "9e00274caa51cd60bdb84ef4b8af1d91",
+    "vesselId": "66566d3bd-d6fb-5bec-4904-a7ce397496bb",
+    "eventType": "port_visit",
+    "start": "2026-06-30T12:06:45.000Z",
+    "end": "2026-07-01T12:55:43.000Z",
+    "latitude": -35.2194,
+    "longitude": -55.4882,
+    "durationHours": 24.816111111111113,
+    "averageSpeedKnots": null,
+    "totalDistanceKm": null,
+    "mpaRelated": false,
+    "isGap": false
+  },
+  {
+    "eventId": "9edc0b3109d8b9807f33e7c6c540286e.1",
+    "vesselId": "66566d3bd-d6fb-5bec-4904-a7ce397496bb",
+    "eventType": "encounter",
+    "start": "2026-06-22T21:10:00.000Z",
+    "end": "2026-06-22T23:40:00.000Z",
+    "latitude": -46.9099,
+    "longitude": -60.6921,
+    "durationHours": 2.5,
+    "averageSpeedKnots": null,
+    "totalDistanceKm": null,
+    "mpaRelated": false,
+    "isGap": false
+  },
+  {
+    "eventId": "c05699d95ad335668bb703642b378faa",
+    "vesselId": "66566d3bd-d6fb-5bec-4904-a7ce397496bb",
+    "eventType": "loitering",
+    "start": "2026-05-31T20:41:16.000Z",
+    "end": "2026-06-01T06:59:22.000Z",
+    "latitude": -46.01,
+    "longitude": -60.2585,
+    "durationHours": 10.301666666666666,
+    "averageSpeedKnots": null,
+    "totalDistanceKm": null,
+    "mpaRelated": false,
+    "isGap": false
+  }
+]
