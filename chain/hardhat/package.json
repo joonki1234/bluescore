@@ -1,0 +1,17 @@
+{
+  "name": "bluescore-chain-hardhat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BlueScore 온체인 증적 - 로컬 Hardhat 테스트넷 + 해시 레지스트리 컨트랙트",
+  "scripts": {
+    "test": "hardhat test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.7",
+    "hardhat": "^3.13.0"
+  }
+}
