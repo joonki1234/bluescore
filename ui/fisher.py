@@ -189,10 +189,11 @@ def render() -> None:
                 unsafe_allow_html=True,
             )
         with right:
+            explanation = adapter.explanation(vessel)
             st.markdown("##### 요약")
             st.markdown(
                 f'<div class="bs-card"><div style="font-size:14px; line-height:1.85;">'
-                f'{vessel["summary"]}</div>'
+                f'{explanation["summary"]}</div>'
                 f'<div class="bs-note" style="margin-top:12px;">공개 데이터에 기반한 '
                 f'추정입니다.</div></div>',
                 unsafe_allow_html=True,
@@ -202,9 +203,10 @@ def render() -> None:
                 f'<div style="display:flex; gap:8px; padding:6px 0;">'
                 f'<span style="color:{theme.axis_color(r["axis"])}; font-weight:800;">·</span>'
                 f'<span style="font-size:13.5px;">{r["action"]}</span></div>'
-                for r in vessel["recommendations"]
+                for r in explanation["recommendations"]
             )
             st.markdown(f'<div class="bs-card">{items}</div>', unsafe_allow_html=True)
+            components.explanation_source(explanation)
 
     with tab_sim:
         _simulator(vessel)

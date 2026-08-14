@@ -333,3 +333,63 @@ def hash_payload(vessel: Dict, simulation: Optional[Simulation] = None) -> Dict:
 def document_id(vessel: Dict, issued_date: str) -> str:
     digest = score_hash(hash_payload(vessel))[2:10].upper()
     return f"BS-{issued_date.replace('-', '')}-{digest}"
+
+
+# ─── 설명 계층 (explain/) ────────────────────────────────────────────────────
+def _build_explain_input(vessel: Dict):
+    """mock 선박 레코드를 explain/의 입력 계약으로 옮긴다."""
+    from explain.contract import ExplainInput, ShapFactor
+
+    return ExplainInput(
+        vessel_id=vessel["vesselId"],
+        vessel_label=vessel["meta"],
+        fleet_label=vessel["fleetLabel"],
+        blue_score=vessel["blueScore"],
+        axis_a_score=vessel["axisA"]["score"],
+        axis_b_score=vessel["axisB"]["score"],
+        peer_count=vessel["peerGroup"]["count"],
+        top_percent=vessel["peerGroup"]["topPercent"],
+        fuel_delta_percent=vessel["fuelDeltaPercent"],
+        shap_factors=[
+            ShapFactor(label=f["label"], value=f["value"], axis=f["axis"])
+            for f in vessel["shapFactors"]
+        ],
+    )
+
+
+def _explain_uncached(vessel_id: str, _mtime: float) -> Dict:
+    """
+    설명 생성 실제 호출.
+
+    `_mtime`은 캐시 키 전용이다 (mock JSON이 바뀌면 설명도 다시 만든다).
+    LLM 호출은 느리고 유료라 선박당 한 번만 하고 캐시에 태운다.
+    """
+    from explain.explain import explain as run_explain
+
+    vessel = get_vessel(vessel_id)
+    return run_explain(_build_explain_input(vessel)).as_dict()
+
+
+try:
+    import streamlit as st
+
+    _explain_uncached = st.cache_data(show_spinner="설명을 생성하는 중...")(  # type: ignore[assignment]
+        _explain_uncached
+    )
+except ImportError:  # pragma: no cover
+    pass
+
+
+def explanation(vessel: Dict) -> Dict:
+    """
+    선박의 설명 문구를 가져온다.
+
+    반환 형태는 `data/mock/README_mock_data 제안.md` 5번과 같다:
+    `summary` / `shapFactors` / `recommendations`, 그리고 `source`.
+
+    `source`는 이 문구가 LLM이 쓴 것인지 템플릿 폴백인지 알려준다. 화면에
+    그대로 표시해, 시연 중 무엇이 생성이고 무엇이 대체인지 숨기지 않는다.
+    """
+    if not is_scored(vessel):
+        return {"summary": "", "shapFactors": [], "recommendations": [], "source": ""}
+    return _explain_uncached(vessel["vesselId"], MOCK_PATH.stat().st_mtime)

@@ -21,6 +21,17 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+# .env를 환경변수로 올린다. Streamlit은 .env를 자동으로 읽지 않기 때문에,
+# 이게 없으면 파일에 키를 넣어도 os.getenv()가 못 본다.
+# python-dotenv가 없어도 앱은 돌아간다 — 환경변수를 직접 export한 경우도 있고,
+# 키 없이 폴백으로 도는 것이 정상 동작이기 때문이다.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except ImportError:  # pragma: no cover
+    pass
+
 from ui import adapter, theme  # noqa: E402
 
 st.set_page_config(

@@ -532,6 +532,34 @@ def provenance(compact: bool = False) -> None:
     st.markdown(f'<div class="bs-prov">{title}{rows}</div>', unsafe_allow_html=True)
 
 
+def explanation_source(explanation: Dict) -> None:
+    """
+    설명 문구가 LLM 생성인지 템플릿 폴백인지 표시한다.
+
+    산출 경로 표시와 같은 이유다 — 시연 중 무엇이 생성이고 무엇이 대체인지
+    숨기지 않는다. `source`는 "llm:openai" 또는 "fallback:<사유>" 형태다.
+    """
+    source = explanation.get("source", "")
+    if not source:
+        return
+
+    if source.startswith("llm:"):
+        label = f"AI가 생성한 문구입니다 ({source.split(':', 1)[1]})"
+        color = theme.POSITIVE
+        mark = "●"
+    else:
+        reason = source.split(":", 1)[1] if ":" in source else source
+        label = f"LLM을 사용할 수 없어 기본 문구로 표시했습니다 ({reason})"
+        color = theme.AXIS_B
+        mark = "○"
+
+    st.markdown(
+        f'<div class="bs-note"><span style="color:{color}; font-weight:700;">{mark}</span> '
+        f"{label}</div>",
+        unsafe_allow_html=True,
+    )
+
+
 def backend_footer() -> None:
     """
     지금 보고 있는 숫자가 실산출인지 임시값인지 항상 표시한다.

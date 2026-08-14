@@ -10,3 +10,5 @@
 # A축·B축 실산출까지 돌려보려면 requirements.txt(전체)를 설치해야 한다.
 streamlit
 plotly
+python-dotenv
+openai
