@@ -65,7 +65,13 @@ ownership changes.
 5. **해시 규칙** (`chain/`의 SHA-256 해시 생성 대상 JSON에 적용):
    - JSON은 `sort_keys=True`로 직렬화한다.
    - 소수점이 있는 값은 둘째 자리까지 반올림한 뒤 문자열로 변환한다.
-   - 빈 값(`None`/누락)은 값을 `null`로 넣지 않고 키 자체를 제외한다.
+   - 빈 값(`None`/누락)은 값을 `null`로 넣지 않고 제외한다 — dict 키뿐 아니라
+     리스트 요소도 마찬가지다(재귀적으로 적용).
+   - 구분자는 공백 없는 압축형(`","`, `":"`)을 쓴다.
+   - (2026-08-14 추가: `chain/hashing.py`와 `ui/adapter.py`의 `score_hash()`가
+     이 규칙을 각자 구현했는데 리스트 None 처리·구분자가 서로 달라 해시가
+     갈리는 게 발견돼 통일했다. 위 네 항목은 그 이후 명확히 정리한 버전이다.
+     `chain/test_hash_matches_ui_adapter.py`가 두 구현의 일치를 계속 지켜본다.)
 6. **congestion_density_raw는 자기 자신 이벤트를 제외**하고, revisit_interval_raw와
    가중합이 아니라 상호작용(interaction)항을 포함해 결합한다 (2026-08-13, 오동규·김준기
    결정, `score/axis_a_pressure.py`에 반영 완료). "이미 혼잡한 곳을 반복 착취"하는 경우를

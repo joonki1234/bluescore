@@ -51,6 +51,15 @@ class TestCanonicalJson:
         parsed = json.loads(result)
         assert parsed["events"] == [{"value": "1.50"}]
 
+    def test_none_excluded_from_lists_too(self):
+        result = canonical_json({"tags": ["a", None, "b"]})
+        parsed = json.loads(result)
+        assert parsed["tags"] == ["a", "b"]
+
+    def test_output_has_no_whitespace(self):
+        result = canonical_json({"a": 1, "b": [1, 2]})
+        assert " " not in result
+
 
 class TestComputeResultHash:
     def test_returns_64_char_hex_digest(self):

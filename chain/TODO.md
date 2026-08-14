@@ -20,3 +20,11 @@
       `verify_score_result`). score/가 아직 mock 폴백이라 실제로 호출하는 곳은
       없지만, 실산출 전환 시 바로 쓸 수 있게 미리 준비. record_id 정책(예:
       `f"{vesselId}:{period}"`)은 호출부(예정된 main.py)가 정함. 테스트 3개.
+- [x] `ui/adapter.py`의 `score_hash()`와 `chain/hashing.py` 해시 일치 검증
+      (`explain/TODO.md`의 `TODO(chain/ 김준기·오동규)` 대응) — 실제로 값이
+      갈리는 걸 발견함(구분자, 리스트 안 None 처리). `chain/hashing.py`를
+      `ui/adapter.py`에 맞춰 통일하고 CLAUDE.md 해시 규칙 문구도 명확히 함.
+      `test_hash_matches_ui_adapter.py`로 회귀 방지. **`ui/adapter.score_hash()`를
+      `chain.hashing.compute_result_hash()` 호출로 교체하는 배선은 아직 안
+      했음 — 최지희님과 조율 필요(TODO 원문: "일치하는지 검증할 것"까지가
+      요청 범위였고, 배선 교체는 별도 확인 후).

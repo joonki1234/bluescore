@@ -7,7 +7,16 @@
 해시 대상 JSON의 정규화 규칙은 CLAUDE.md "확정된 규칙" 5번을 그대로 따른다:
     - JSON은 sort_keys=True로 직렬화한다.
     - 소수점이 있는 값(float)은 둘째 자리까지 반올림한 뒤 문자열로 변환한다.
-    - 빈 값(None/누락)은 값을 null로 넣지 않고 키 자체를 제외한다(재귀적으로 적용).
+    - 빈 값(None/누락)은 값을 null로 넣지 않고 제외한다(dict 키·list 요소 모두,
+      재귀적으로 적용).
+    - 구분자는 공백 없는 압축형(",", ":")을 쓴다 — 사람이 읽기 위한 JSON이 아니라
+      해시 입력이라 공백 유무가 값을 바꾸면 안 되기 때문이다.
+
+2026-08-14: `ui/adapter.py`의 `score_hash()`가 이 규칙을 독립적으로 구현했는데,
+리스트 안 None 처리(제외 vs null 유지)와 구분자(압축 vs 기본)가 서로 달라 같은
+입력에 다른 해시가 나오는 게 발견됐다. `ui/adapter.py` 쪽이 이미 화면에 반영돼
+있어 이쪽을 거기 맞춰 통일했다 — `chain/test_hash_matches_ui_adapter.py`가 두
+구현이 계속 일치하는지 지켜본다.
 
 이 규칙대로 정규화해야, 같은 결과를 나중에 다시 만들어도 항상 같은 해시가 나와서
 검증(verify)이 가능해진다. int/str/bool은 그대로 두고, dict/list는 재귀적으로
@@ -16,14 +25,16 @@
 
 import hashlib
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
+
+JsonValue = Union[Dict[str, Any], List[Any], str, int, float, bool, None]
 
 
-def _normalize_value(value: Any) -> Any:
+def _normalize_value(value: JsonValue) -> JsonValue:
     if isinstance(value, dict):
         return _normalize_dict(value)
     if isinstance(value, list):
-        return [_normalize_value(item) for item in value]
+        return [_normalize_value(item) for item in value if item is not None]
     if isinstance(value, float):
         return f"{round(value, 2):.2f}"
     return value
@@ -42,7 +53,9 @@ def canonical_json(data: Dict[str, Any]) -> str:
     """CLAUDE.md 해시 규칙에 따라 dict를 정규화된 JSON 문자열로 직렬화한다."""
     if not isinstance(data, dict):
         raise TypeError("data는 dict여야 합니다.")
-    return json.dumps(_normalize_dict(data), sort_keys=True, ensure_ascii=False)
+    return json.dumps(
+        _normalize_dict(data), sort_keys=True, ensure_ascii=False, separators=(",", ":")
+    )
 
 
 def compute_result_hash(data: Dict[str, Any]) -> str:
