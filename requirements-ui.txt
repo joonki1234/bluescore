@@ -1,0 +1,12 @@
+# 담당: 최지희
+#
+# 대시보드(app.py)만 실행할 때 필요한 최소 패키지.
+# 화면은 score/·explain/를 직접 임포트하지 않고 mock으로 돌기 때문에
+# geopandas·lightgbm·shap 없이도 전 기능이 동작한다.
+#
+#   pip install -r requirements-ui.txt
+#   streamlit run app.py
+#
+# A축·B축 실산출까지 돌려보려면 requirements.txt(전체)를 설치해야 한다.
+streamlit
+plotly
