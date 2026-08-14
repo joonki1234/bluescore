@@ -39,3 +39,13 @@
       코드베이스에 속도-재방문 연결 공식이 아예 없어 못 끌어냄 — 근거 없이
       숫자를 만드는 대신 미모델링 상태임을 명시함, 0에 가깝게 두는 걸 권장.
       테스트 9개.
+- [x] 실제 데이터로 A축 실산출 검증 (`explain/TODO.md` P0-3 "실산출 1척" 대응)
+      — `scripts/run_real_axis_a.py`. 실제 수집 데이터(`data/raw/gfw_events_
+      2026-01-01_2026-08-13.jsonl.gz`, 91.4만 건 + `gfw_vessels_enriched.jsonl.gz`,
+      3.1만 척)로 `compute_axis_a_pressure` → `build_peer_groups` →
+      `raw_to_score`까지 전체 파이프라인이 실제로 동작함을 확인(9,723척 계산,
+      42초). 예시 선박 1척이 유사군 137척(기준 20척 이상) 중 백분위 48.9점으로
+      실산출됨. **화면(`ui/adapter.scoring_backend()`) 배선 전환은 최지희님
+      담당 — 여기서는 "된다"만 증명, 배선은 안 건드림.**
+      주의: 대부분 선박의 톤수 매칭이 아직 안 끝나서(tonnage_band=None인 채로
+      그룹핑됨) 정식 실행 전 매칭 완료를 기다리는 게 맞다.
