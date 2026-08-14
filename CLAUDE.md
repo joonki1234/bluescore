@@ -9,15 +9,25 @@ BlueScore는 어선의 조업 데이터를 기반으로 두 축(A축: 자원 압
 구현되어 있으며, 나머지는 각 모듈의 `TODO.md`에 남은 작업으로 진행 중이다.
 
 - `data/gfw_client.py` — Global Fishing Watch (GFW) API v3 클라이언트 (Vessels Search,
-  Events 엔드포인트). 원본은 `~/Downloads/bluescore-demo/server.js` (Node/Express)이며
-  Python(requests)으로 이식했다.
-- `score/axis_a_pressure.py` — A축(자원 압력) raw 값 산출: 재방문 간격 + 혼잡가중압력.
+  Events 엔드포인트, GET+kebab-case 20척 배치 방식). 원본은
+  `~/Downloads/bluescore-demo/server.js` (Node/Express)이며 Python(requests)으로 이식했다.
+  이 외에도 `data/`에는 국내 선박제원정보(MOF), TAC 할당승인정보, 해양기상, 해양수산부
+  AIS 위치정보 통계, 어업별어선 등 공공데이터 클라이언트/로더가 추가돼 있다(김태윤 담당,
+  현황은 `data/TODO.md` 참고).
+- `score/axis_a_pressure.py` — A축(자원 압력) raw 값 산출: 재방문 간격 + 혼잡가중압력
+  (self-exclusion + 상호작용항 반영 완료). GFW 이벤트만 있으면 바로 실행 가능.
 - `score/axis_b_physics.py` — Coello et al. (2015) 계수 기반 물리식 연료 소비 추정.
+  톤수 매칭된 선박만 커버.
 - `score/axis_b_baseline.py` — B축(운항 효율) raw 값 산출: LightGBM 기준선 대비 잔차.
-- `chain/`, `explain/` — 아직 코드 없이 `TODO.md`만 있는 상태 (온체인 증적 / SHAP·LLM 설명).
-- `app.py`, `requirements.txt`는 파일은 있으나 `app.py`는 비어 있다 (`requirements.txt`에는
-  fastapi, streamlit, lightgbm, shap, pandas, geopandas, python-dotenv, requests, plotly,
-  pytest가 명시되어 있음).
+  파이프라인 코드는 구현 완료했으나, 해양기상 미부착·어업종 매핑표 부재로 아직 실데이터로
+  돌리지는 못하는 상태.
+- `chain/` — 아직 코드 없이 `TODO.md`만 있는 상태 (온체인 증적, `score/` 결과물 대기 중).
+- `explain/` — SHAP 기여도 연계, LLM 프롬프트/strict JSON 파싱/폴백 문구, 프로바이더 중립
+  구조, `ui/adapter.py` 연결까지 대부분 구현 완료(최지희 담당, 테스트 27개). 남은 일은
+  `explain/TODO.md` 참고(실제 LLM 키 검증, SHAP 라벨 정합 등).
+- `app.py` — Streamlit 앱 진입점(어업인/금융기관 화면 분리, `ui/` 모듈 사용). 지금은
+  `ui/adapter.py`가 `data/mock/dashboard_mock.json`을 읽어 화면을 채우고, `score/`가
+  실산출 가능해지면 그쪽으로 자동 전환되는 구조다(최지희 담당).
 - `conftest.py`(루트)는 내용 없이, pytest가 리포지토리 루트를 `sys.path`에 넣어
   `score/`, `data/` 등에 `__init__.py` 없이도 `from score.xxx import ...` 절대 임포트가
   테스트에서 동작하도록 하기 위한 용도다.
@@ -56,6 +66,13 @@ ownership changes.
    - JSON은 `sort_keys=True`로 직렬화한다.
    - 소수점이 있는 값은 둘째 자리까지 반올림한 뒤 문자열로 변환한다.
    - 빈 값(`None`/누락)은 값을 `null`로 넣지 않고 키 자체를 제외한다.
+6. **congestion_density_raw는 자기 자신 이벤트를 제외**하고, revisit_interval_raw와
+   가중합이 아니라 상호작용(interaction)항을 포함해 결합한다 (2026-08-13, 오동규·김준기
+   결정, `score/axis_a_pressure.py`에 반영 완료). "이미 혼잡한 곳을 반복 착취"하는 경우를
+   단순 가중합보다 더 크게 반영하기 위함이며, 결합 가중치 자체는 여전히 미확정이다.
+7. **GFW `regions.mpa` 필드 존재 확인 완료** (김태윤, 2026-08-14 실제 라이브 호출로 검증 —
+   리스트 형태로 실존, 표본 70,747건 중 14.7%에 실값 있음). 보호구역 침범 판정 데이터
+   소스로 사용 가능하다는 전제가 확정되었다.
 
 ## 미확정 항목 (하드코딩 금지)
 
@@ -69,3 +86,7 @@ ownership changes.
 - 유사군 최소 표본 기준 (유사 선박군으로 인정할 최소 표본 수)
 - GAP 비율 임계값
 - 매칭 신뢰도 임계값 (선박 식별자 매칭 exact/fuzzy 판정 기준)
+
+추가로, GAP 이벤트 자체가 실측 91만 건 중 140건(0.015%)으로 극히 희소해 GAP 비율을
+리스크 지표로 쓰는 것이 유의미한지 자체도 판단2 회의에서 함께 재검토가 필요하다
+(단순히 임계값만 정하면 되는 문제가 아닐 수 있음).
