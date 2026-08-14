@@ -10,3 +10,4 @@ python-dotenv
 requests
 plotly
 pytest
+web3

@@ -26,11 +26,15 @@ npx hardhat run scripts/verify-deployed.js --network localhost                  
 - 컨트랙트 작성 + 컴파일 + 테스트(6개) 완료
 - 로컬 Hardhat 테스트넷에 실제 배포 + commit/get/verify 호출까지 확인함
   (`scripts/verify-deployed.js`)
-- **Python 쪽 연동은 아직 안 함**: `chain/ledger.py`의 `HashLedger`는 여전히
-  인메모리다. 이 컨트랙트를 실제로 호출하도록 바꾸려면 `web3.py`(또는 유사
-  라이브러리)를 추가하고, ABI(`artifacts/contracts/HashRegistry.sol/HashRegistry.json`,
-  gitignore됨 — `npx hardhat compile`로 재생성)를 읽어와 트랜잭션을 보내는
-  코드가 필요하다. 다음 단계로 남겨둔다.
+- **Python 쪽 연동 완료**: `chain/ledger.py`의 `OnChainHashLedger`가 web3.py로
+  이 컨트랙트를 실제로 호출한다(`chain/hash_registry_abi.json`에 ABI를 손으로
+  작성해 커밋해둠 — `artifacts/`가 gitignore라 컴파일 없이 Python만으로 쓰려면
+  이 방법이 필요했다). `BLUESCORE_CHAIN_RPC_URL` / `BLUESCORE_HASH_REGISTRY_ADDRESS`
+  환경변수로 접속 정보를 받는다.
+  **2026-08-14 end-to-end 확인 완료**: Node 설치 → `npm install` → 로컬 노드 →
+  `npx hardhat ignition deploy` → `python -m pytest chain/test_onchain_ledger.py -v`
+  순서로 실제 커밋/조회/검증/중복커밋 revert까지 전부 확인함
+  (`TestLiveHardhatNodeIfAvailable::test_commit_get_verify_round_trip` PASS).
 - `artifacts/`, `cache/`, `types/`, `ignition/deployments/`, `node_modules/`는
   로컬 빌드 산출물이라 `.gitignore`에 넣었다 — 클론 후 `npm install` +
   `npx hardhat compile`로 다시 만들 수 있다.

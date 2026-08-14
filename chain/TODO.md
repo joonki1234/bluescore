@@ -13,9 +13,23 @@
       — `hardhat/` 참고. Node.js 설치, Hardhat 3 프로젝트 세팅, `HashRegistry.sol`
       작성(`ledger.py`의 HashLedger와 같은 규칙 — 중복 커밋 revert), 테스트 6개
       통과, 로컬 테스트넷에 실제 배포 + commit/get/verify 호출까지 확인함
-      (`hardhat/scripts/verify-deployed.js`). **아직 안 한 것: Python 쪽
-      (`ledger.py`)이 이 컨트랙트를 실제로 호출하도록 바꾸는 연동**(web3.py 추가
-      필요) — 지금 `HashLedger`는 여전히 인메모리다. 상세는 `hardhat/README.md`.
+      (`hardhat/scripts/verify-deployed.js`). 상세는 `hardhat/README.md`.
+      **2026-08-14 Python 쪽 연동 완료**: `ledger.py`에 `OnChainHashLedger` 추가
+      (web3.py, `requirements.txt`에 추가). 기존 `HashLedger`(인메모리)는 그대로
+      두고 나란히 둔 새 클래스다 — Node 없는 컴퓨터에서도 기존 테스트가 깨지지
+      않게 하기 위함. ABI는 `chain/hash_registry_abi.json`에 손으로 작성해
+      커밋해둠(Hardhat의 `artifacts/`는 gitignore라 컴파일 없이 Python만으로
+      못 씀). `commit_score_result.py`는 `LedgerLike` 구조적 타입으로 바꿔서
+      두 구현 다 받는다. 테스트 18개(hex↔bytes32 변환, revert 셀렉터 판별,
+      mock 컨트랙트로 commit/get/verify 로직 검증) — 전부 네트워크 없이 통과.
+      **2026-08-14 end-to-end 확인 완료**: 이 컴퓨터에 Node.js(winget으로 설치)를
+      새로 깔고, `npx hardhat node`로 로컬 테스트넷을 띄운 뒤 `HashRegistry`를
+      배포(`0x5FbDB...80aa3`, 결정론적 첫 배포 주소)하고
+      `test_onchain_ledger.py::TestLiveHardhatNodeIfAvailable`을 실제로 돌려
+      commit→get→verify→중복커밋 revert까지 전부 실제 컨트랙트에 대고 확인함.
+      `pytest -q` 전체 186개 통과(스킵 없음). 이 클래스는 로컬 노드가 안 떠
+      있으면 자동으로 skip되니, 평소 개발 중에는 Node/노드 실행 없이도 항상
+      `pytest`가 잘 돈다.
 - [x] score/ ↔ chain/ 연결부 — `commit_score_result.py`(`commit_score_result`/
       `verify_score_result`). score/가 아직 mock 폴백이라 실제로 호출하는 곳은
       없지만, 실산출 전환 시 바로 쓸 수 있게 미리 준비. record_id 정책(예:
