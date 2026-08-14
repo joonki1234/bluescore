@@ -9,7 +9,7 @@
       — `ledger.py`. 지금은 인메모리 원장(`HashLedger`)이며, Hardhat 연동 전까지의
       임시 구현. commit/get/verify 인터페이스는 유지한 채 나중에 내부만 스마트컨트랙트
       호출로 교체 예정. 테스트 8개.
-- [~] Hardhat 테스트넷 연동 (기획서: 온체인 증적 - 테스트넷 환경에서 스마트컨트랙트 배포 및 연동)
+- [x] Hardhat 테스트넷 연동 (기획서: 온체인 증적 - 테스트넷 환경에서 스마트컨트랙트 배포 및 연동)
       — `hardhat/` 참고. Node.js 설치, Hardhat 3 프로젝트 세팅, `HashRegistry.sol`
       작성(`ledger.py`의 HashLedger와 같은 규칙 — 중복 커밋 revert), 테스트 6개
       통과, 로컬 테스트넷에 실제 배포 + commit/get/verify 호출까지 확인함
