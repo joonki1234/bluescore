@@ -8,6 +8,9 @@
     · 자격 요건 판정, 데이터 출처·기준일자, 산출 이력을 전면에 둔다
     · 해시와 재현성 정보를 노출한다
     · 개선 시뮬레이터는 참고용으로 접어 둔다
+    · '산출 근거 요약'은 explain/이 생성한 문장을 어업인 화면과 공유한다.
+      LLM 생성인지 템플릿 폴백인지도 함께 표시한다 — 심사역에게는 이 구분 자체가
+      심사 근거의 출처 정보다.
 
 기획서 9번 — "AI는 점수와 근거만 산출한다. 금리 구간은 은행이 사전 승인한
 규칙표가 매핑하고, 여신 최종 승인은 심사역이 한다. 자동화한 것은 '결정'이
@@ -162,12 +165,19 @@ def render() -> None:
                         unsafe_allow_html=True,
                     )
         with right:
+            # 어업인 화면과 같은 explain/ 결과를 쓴다. adapter.explanation()이 선박당
+            # 한 번만 생성해 캐시하므로, 두 화면이 같은 문장을 본다 — 화면마다 다른
+            # 설명이 나오면 "제3자가 관측한 동일한 점수"라는 전제가 문장 층에서 깨진다.
+            # 개선 코칭(recommendations)은 여기 두지 않는다. 설계 공유 문서의 노출
+            # 범위표대로 코칭은 어업인 화면 몫이고, 여기서는 4번 탭에 참고로만 둔다.
+            explanation = adapter.explanation(vessel)
             st.markdown("##### 산출 근거 요약")
             st.markdown(
                 f'<div class="bs-card"><div style="font-size:13.5px; line-height:1.85;">'
-                f'{vessel["summary"]}</div></div>',
+                f'{explanation["summary"]}</div></div>',
                 unsafe_allow_html=True,
             )
+            components.explanation_source(explanation)
             st.markdown("##### 요인 상세")
             rows = "".join(
                 f'<div style="display:grid; grid-template-columns:1fr auto auto; gap:8px;'
