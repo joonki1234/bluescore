@@ -84,12 +84,14 @@ def _auth_params() -> dict:
 
 
 def _to_float(value: Optional[str]) -> Optional[float]:
-    """공공데이터포털 응답의 숫자 필드는 문자열이며, 값이 없으면 빈 문자열("")로 온다."""
+    """공공데이터포털 응답의 숫자 필드는 문자열이며, 값이 없으면 빈 문자열("")로
+    오거나 앞뒤 공백이 섞여 있을 수 있다(예: TAC CSV) — str() 캐스팅 +
+    strip() 후 변환한다(숫자 타입 입력도 그대로 통과)."""
     if value is None or value == "":
         return None
     try:
-        return float(value)
-    except ValueError:
+        return float(str(value).strip())
+    except (TypeError, ValueError):
         return None
 
 

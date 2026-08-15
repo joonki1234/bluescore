@@ -38,9 +38,9 @@ import math
 import os
 from typing import Iterable, List, Optional, Union
 
-import requests
 from dotenv import load_dotenv
 
+from data.http_retry import request_with_retry
 from data.marine_weather_stations import MARINE_WEATHER_STATIONS, MarineWeatherStation
 
 load_dotenv()
@@ -56,6 +56,13 @@ RESULT_TYPE = "json"
 DATA_TYPE_EXPLICIT_MISSING = 2
 
 REQUEST_TIMEOUT_SECONDS = 30
+
+# rules_common.md 3번 재시도 정책. 이 API는 지금까지 확인된 에러가 전부
+# HTTP 레벨(response.ok)이라 (resultCode 방식 에러 형식은 아직 못 봄),
+# status_code를 그대로 이 표와 비교하면 된다.
+RETRYABLE_HTTP_STATUS_CODES = {429, 500, 502, 503, 524}
+MAX_RETRIES = 3
+BACKOFF_SECONDS = [2, 4, 8]
 
 # 응답에서 결측을 나타내는 마커 문자열 -> None으로 치환한다.
 MISSING_VALUE_MARKERS = {"데이터없음", "미제공"}
@@ -170,23 +177,35 @@ def _normalize_station_codes(station_codes: Union[str, Iterable[str]]) -> List[s
 
 def _call_weather_endpoint(url: str, params: dict) -> List[dict]:
     """get_latest_weather()/get_weather_by_date()가 공유하는 호출부.
-    요청을 보내고, 정규화된 레코드 리스트를 반환한다."""
-    response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT_SECONDS)
+    요청을 보내고, 정규화된 레코드 리스트를 반환한다.
+
+    rules_common.md 3번: 429/5xx는 최대 3회, 2s/4s/8s 백오프 재시도
+    (data/http_retry.py의 공통 구현을 쓴다).
+    """
+    response = request_with_retry(
+        "GET",
+        url,
+        params=params,
+        retryable_status_codes=RETRYABLE_HTTP_STATUS_CODES,
+        max_retries=MAX_RETRIES,
+        backoff_seconds=BACKOFF_SECONDS,
+        timeout=REQUEST_TIMEOUT_SECONDS,
+    )
 
     try:
         body = response.json()
     except ValueError:
         body = None
 
-    if not response.ok:
-        raise MarineWeatherApiError(
-            "Marine weather API returned an HTTP error.",
-            status_code=response.status_code,
-            details=body if body is not None else response.text,
-        )
+    if response.ok:
+        records = _extract_records(body)
+        return [_normalize_weather_record(record) for record in records]
 
-    records = _extract_records(body)
-    return [_normalize_weather_record(record) for record in records]
+    raise MarineWeatherApiError(
+        "Marine weather API returned an HTTP error.",
+        status_code=response.status_code,
+        details=body if body is not None else response.text,
+    )
 
 
 def get_latest_weather(

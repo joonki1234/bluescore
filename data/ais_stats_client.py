@@ -4,43 +4,60 @@
 해양수산부_선박위치정보(연안AIS) 통계정보 서비스 (공공데이터포털, data.go.kr/data/15084033)
 클라이언트.
 
-연안 AIS 기반으로 1시간 단위 해양구역별 선박 척수 통계를 제공하는 XML OpenAPI다.
-data/gfw_client.py와 동일하게 requests 기반 함수형 스타일로 작성했다.
+2026-08-14 실제 활용가이드(엑셀)로 스펙 확정 — 이전 버전(추측)의 End Point는
+NO_OPENAPI_SERVICE_ERROR로 틀린 것이 실측 확인됨. data.go.kr에 이 서비스가
+"API 유형: LINK"로 분류돼 있던 이유: apis.data.go.kr 게이트웨이가 아니라
+해사안전관리과가 자체 운영하는 GICOMS 서버(gicoms.go.kr)에 있다
+(data/marine_weather_client.py와 동일한 패턴).
 
-주의 (공공데이터포털 서비스키):
-    data/vessel_spec_client.py와 동일하게, .env의 COASTAL_AIS_API_KEY에는 반드시
-    공공데이터포털에서 발급한 "Decoding" 인증키를 넣어야 한다 (Encoding 키를 넣으면
-    requests가 이중 인코딩해 인증 오류가 난다).
+data.go.kr 활용신청 상세엔 실제로 3개 오퍼레이션이 있는데 그중 2개(구역별
+통계 WMS, 해양구역 GRID WMS)는 응답이 image/png(지도 이미지)라 데이터
+파이프라인에 못 쓴다. 이 클라이언트는 JSON을 주는 **"날짜별 선박위치정보
+(AIS) 통계정보 WFS"** 하나만 다룬다.
 
-TODO(김태윤): 아래는 아직 실제 API 명세로 검증되지 않은 잠정 스켈레톤이다.
-    - BASE_URL / OPERATION_PATH: 활용신청 상세 페이지의 End Point/Operation명으로
-      교체 확인 필요 (data/TODO.md 참고).
-    - 요청 파라미터명(기준일자/기준시각/해역코드 등)과 응답 XML의 item 필드명은
-      활용가이드 문서를 보고 확정해야 한다.
+요청 URL: http://www.gicoms.go.kr/kodispub/openApi/wfs.do
+파라미터: domain(신청한 도메인, 필수), apikey(발급키, 필수),
+    typeName(레이어명, 필수, 예: "lage_ship_stats_view"),
+    offeryear(요청 데이터 년도, 선택, 예: 2019)
+응답 필드(활용가이드 기준): geom(공간정보), ais(AIS 통계값), ship_dt(통계
+    날짜), ship_time(통계 시각), map_gb_cd(맵 구분, 예: "2 대해구도"),
+    ctgr_cd(카테고리구분, 예: "13 연안AIS"), map_nm(구역번호)
+
+TODO(김태윤): 위 응답 필드 설명은 활용가이드 표 기준이고, 실제 라이브
+응답의 최상위 구조(단순 배열인지 GeoJSON FeatureCollection인지 등)와
+geom/각 필드의 정확한 타입은 아직 실제 응답으로 검증 전이다 — 소규모
+테스트 호출로 확정할 것(rules_common.md 8번).
 """
 
 import os
-from typing import Dict, List, Optional
-from xml.etree import ElementTree
+from typing import List, Optional
 
-import requests
 from dotenv import load_dotenv
+
+from data.http_retry import request_with_retry
 
 load_dotenv()
 
 COASTAL_AIS_API_KEY = os.getenv("COASTAL_AIS_API_KEY")
 
-# TODO(김태윤): 실제 End Point로 교체 필요 (data.go.kr/data/15084033 활용신청 상세 참고)
-BASE_URL = "https://apis.data.go.kr/1192000/CoastalAisStatsService"
-OPERATION_PATH = "/getVesselCountBySeaArea"  # TODO(김태윤): 정확한 오퍼레이션명 확인 필요
+# 활용신청 시 등록한 도메인. 비밀값은 아니지만(공개 저장소 주소), 신청
+# 시점의 값과 반드시 일치해야 통과한다 — 바뀌면 재신청 필요.
+REGISTERED_DOMAIN = "github.com/joonki1234/bluescore"
+
+BASE_URL = "http://www.gicoms.go.kr/kodispub/openApi/wfs.do"
+DEFAULT_TYPE_NAME = "lage_ship_stats_view"  # 활용가이드 샘플값 — 실제 레이어명인지 라이브로 확인 필요
 
 REQUEST_TIMEOUT_SECONDS = 30
 
+RETRYABLE_HTTP_STATUS_CODES = {429, 500, 502, 503, 524}  # rules_common.md 3번
+MAX_RETRIES = 3
+BACKOFF_SECONDS = [2, 4, 8]
+
 
 class AisStatsApiError(Exception):
-    """연안AIS 통계정보 API가 에러(HTTP 에러 또는 resultCode != 00)를 반환했을 때 발생시키는 예외."""
+    """연안AIS 통계정보 API가 에러(HTTP 에러 등)를 반환했을 때 발생시키는 예외."""
 
-    def __init__(self, message: str, status_code: int, details=None):
+    def __init__(self, message: str, status_code: Optional[int], details=None):
         super().__init__(message)
         self.status_code = status_code
         self.details = details
@@ -50,104 +67,46 @@ def _auth_params() -> dict:
     if not COASTAL_AIS_API_KEY:
         raise RuntimeError(
             "Missing COASTAL_AIS_API_KEY in environment. "
-            ".env.example을 .env로 복사하고 COASTAL_AIS_API_KEY(Decoding 키)를 설정하세요."
+            ".env.example을 .env로 복사하고 COASTAL_AIS_API_KEY를 설정하세요."
         )
-    return {"serviceKey": COASTAL_AIS_API_KEY}
+    return {"domain": REGISTERED_DOMAIN, "apikey": COASTAL_AIS_API_KEY}
 
 
-def _element_to_dict(item_element: ElementTree.Element) -> Dict[str, Optional[str]]:
-    """<item> 엘리먼트의 자식 태그들을 {태그명: 텍스트} 딕셔너리로 변환한다."""
-    return {child.tag: child.text for child in item_element}
+def get_ais_vessel_stats_raw(type_name: str = DEFAULT_TYPE_NAME, offer_year: Optional[int] = None) -> dict:
+    """WFS 오퍼레이션을 호출해 파싱 없이 원본 JSON 바디를 그대로 반환한다
+    (rules_common.md 1번 — 응답 구조가 아직 미확정이라, 구조를 안다고
+    전제하는 파싱/정규화 함수를 만들기 전에 원본부터 확보).
 
-
-def _parse_xml_response(xml_text: str) -> List[Dict[str, Optional[str]]]:
+    429/5xx는 최대 3회, 2s/4s/8s 백오프 재시도한다(data/http_retry.py의
+    공통 구현을 쓴다).
     """
-    공공데이터포털 표준 XML 응답(response/header/body/items/item)을 파싱해
-    item 딕셔너리 리스트로 반환한다.
-
-    resultCode가 "00"(정상)이 아니면 AisStatsApiError를 발생시킨다.
-    """
-    try:
-        root = ElementTree.fromstring(xml_text)
-    except ElementTree.ParseError as exc:
-        raise AisStatsApiError(
-            "Failed to parse coastal AIS stats API XML response.", status_code=502, details=str(exc)
-        ) from exc
-
-    result_code = root.findtext("header/resultCode") or root.findtext("cmmMsgHeader/returnReasonCode")
-    result_msg = root.findtext("header/resultMsg") or root.findtext("cmmMsgHeader/returnAuthMsg")
-
-    if result_code is not None and result_code != "00":
-        raise AisStatsApiError(
-            f"Coastal AIS stats API returned an error: {result_msg}",
-            status_code=502,
-            details={"resultCode": result_code, "resultMsg": result_msg},
-        )
-
-    items = root.findall("body/items/item")
-    return [_element_to_dict(item) for item in items]
-
-
-def _normalize_ais_stat(item: Dict[str, Optional[str]]) -> dict:
-    """item 딕셔너리를 내부 표준 형태로 정규화한다.
-
-    TODO(김태윤): 실제 XML 필드명 확정 후 아래 매핑을 교체할 것. 지금은 흔히 쓰이는
-    필드명(기준일자/기준시각/해역명/척수 등)을 추정해 넣어둔 잠정값이다.
-    """
-    return {
-        "baseDate": item.get("baseDe") or item.get("baseDate"),
-        "baseTime": item.get("baseTm") or item.get("baseTime"),
-        "seaAreaCode": item.get("seaAreaCd") or item.get("seaAreaCode"),
-        "seaAreaName": item.get("seaAreaNm") or item.get("seaAreaName"),
-        "vesselCount": item.get("vslCnt") or item.get("vesselCnt"),
-        "raw": item,
-    }
-
-
-def get_ais_vessel_counts(
-    base_date: str,
-    base_time: str,
-    sea_area_code: Optional[str] = None,
-    page_no: int = 1,
-    num_of_rows: int = 100,
-) -> List[dict]:
-    """
-    기준일자·기준시각(1시간 단위)의 해양구역별 선박 척수 통계를 조회한다.
-
-    Args:
-        base_date: 기준일자, "YYYYMMDD" 형식 문자열.
-        base_time: 기준시각, "HH00" 형식 문자열 (1시간 단위).
-        sea_area_code: 특정 해양구역으로 좁히고 싶을 때 지정 (TODO(김태윤): 코드 체계 확인 필요).
-
-    Returns:
-        정규화된 해역별 선박 척수 통계 딕셔너리 리스트.
-    """
-    base_date = (base_date or "").strip()
-    base_time = (base_time or "").strip()
-
-    if not base_date or not base_time:
-        raise ValueError("base_date와 base_time은 모두 필요합니다.")
-
     params = _auth_params()
-    params["pageNo"] = page_no
-    params["numOfRows"] = num_of_rows
-    params["baseDe"] = base_date  # TODO(김태윤): 실제 파라미터명 확인 필요
-    params["baseTm"] = base_time  # TODO(김태윤): 실제 파라미터명 확인 필요
-    if sea_area_code:
-        params["seaAreaCd"] = sea_area_code  # TODO(김태윤): 실제 파라미터명 확인 필요
+    params["typeName"] = type_name
+    if offer_year is not None:
+        params["offeryear"] = offer_year
 
-    response = requests.get(
-        f"{BASE_URL}{OPERATION_PATH}",
+    response = request_with_retry(
+        "GET",
+        BASE_URL,
         params=params,
+        retryable_status_codes=RETRYABLE_HTTP_STATUS_CODES,
+        max_retries=MAX_RETRIES,
+        backoff_seconds=BACKOFF_SECONDS,
         timeout=REQUEST_TIMEOUT_SECONDS,
     )
 
-    if not response.ok:
-        raise AisStatsApiError(
-            "Coastal AIS stats API returned an HTTP error.",
-            status_code=response.status_code,
-            details=response.text,
-        )
+    if response.ok:
+        try:
+            return response.json()
+        except ValueError as exc:
+            raise AisStatsApiError(
+                "Coastal AIS stats API did not return valid JSON.",
+                status_code=response.status_code,
+                details=response.text[:1000],
+            ) from exc
 
-    items = _parse_xml_response(response.text)
-    return [_normalize_ais_stat(item) for item in items]
+    raise AisStatsApiError(
+        "Coastal AIS stats API returned an HTTP error.",
+        status_code=response.status_code,
+        details=response.text[:1000],
+    )

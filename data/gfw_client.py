@@ -39,12 +39,13 @@ Global Fishing Watch (GFW) API v3 클라이언트.
 """
 
 import os
-import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 import requests
 from dotenv import load_dotenv
+
+from data.http_retry import request_with_retry
 
 load_dotenv()
 
@@ -101,25 +102,23 @@ def _auth_headers() -> dict:
 def _request_with_retry(method: str, url: str, **kwargs) -> requests.Response:
     """429/500/502/503/524와 네트워크 오류만 재시도(최대 3회, 2s/4s/8s
     백오프)한다. 401 등 인증/요청 자체가 잘못된 응답은 즉시 그대로 반환한다
-    — 재시도해도 같은 결과이기 때문이다.
+    — 재시도해도 같은 결과이기 때문이다. 재시도 루프 자체는
+    data/http_retry.py의 공통 구현을 쓴다.
     """
-    response = None
-    for attempt in range(MAX_RETRIES + 1):
-        try:
-            response = requests.request(method, url, timeout=REQUEST_TIMEOUT_SECONDS, **kwargs)
-        except requests.exceptions.RequestException as exc:
-            if attempt < MAX_RETRIES:
-                time.sleep(RETRY_BACKOFF_SECONDS[attempt])
-                continue
-            raise GfwApiError(
-                f"Network error calling Global Fishing Watch API: {exc}", status_code=0
-            ) from exc
-
-        if response.ok or response.status_code not in RETRYABLE_STATUS_CODES or attempt >= MAX_RETRIES:
-            return response
-        time.sleep(RETRY_BACKOFF_SECONDS[attempt])
-
-    return response
+    try:
+        return request_with_retry(
+            method,
+            url,
+            retryable_status_codes=RETRYABLE_STATUS_CODES,
+            max_retries=MAX_RETRIES,
+            backoff_seconds=RETRY_BACKOFF_SECONDS,
+            timeout=REQUEST_TIMEOUT_SECONDS,
+            **kwargs,
+        )
+    except requests.exceptions.RequestException as exc:
+        raise GfwApiError(
+            f"Network error calling Global Fishing Watch API: {exc}", status_code=0
+        ) from exc
 
 
 def _as_number(value):

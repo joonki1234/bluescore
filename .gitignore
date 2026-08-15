@@ -219,3 +219,7 @@ __marimo__/
 
 # Claude Code local settings (machine-specific permissions/paths)
 .claude/settings.local.json
+
+# 해양기상 API 원본 캐시 — 재수집 없이 attach 로직 재판정용으로 로컬에만 둠
+# (434MB, 최종 산출물 gfw_events_with_weather.jsonl.gz만 커밋하면 충분— 2026-08-15)
+data/raw/event_weather/

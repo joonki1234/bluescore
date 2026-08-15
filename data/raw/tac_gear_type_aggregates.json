@@ -1,0 +1,83 @@
+{
+  "SET_GILLNETS": {
+    "domesticGearTypes": [
+      "근해안강망어업",
+      "근해자망어업",
+      "연안자망어업"
+    ],
+    "mappingConfidence": "approximate",
+    "sourceVesselCount": 901,
+    "avgTonnageGt": 28.7,
+    "avgEnginePowerHp": 805.3
+  },
+  "SET_LONGLINES": {
+    "domesticGearTypes": [
+      "근해연승어업"
+    ],
+    "mappingConfidence": "approximate",
+    "sourceVesselCount": 255,
+    "avgTonnageGt": 34.6,
+    "avgEnginePowerHp": 809.4
+  },
+  "SQUID_JIGGER": {
+    "domesticGearTypes": [
+      "근해채낚기어업"
+    ],
+    "mappingConfidence": "approximate",
+    "sourceVesselCount": 358,
+    "avgTonnageGt": 36.4,
+    "avgEnginePowerHp": 716.7
+  },
+  "SEINERS": {
+    "domesticGearTypes": [
+      "기선권현망어업"
+    ],
+    "mappingConfidence": "approximate",
+    "sourceVesselCount": 48,
+    "avgTonnageGt": 28.5,
+    "avgEnginePowerHp": 352.8
+  },
+  "POTS_AND_TRAPS": {
+    "domesticGearTypes": [
+      "기타통발어업",
+      "연안통발어업"
+    ],
+    "mappingConfidence": "direct",
+    "sourceVesselCount": 53,
+    "avgTonnageGt": 56.3,
+    "avgEnginePowerHp": 884.5
+  },
+  "PURSE_SEINES": {
+    "domesticGearTypes": [
+      "대형선망어업",
+      "소형선망어업"
+    ],
+    "mappingConfidence": "direct",
+    "sourceVesselCount": 39,
+    "avgTonnageGt": 67.1,
+    "avgEnginePowerHp": 1073.6
+  },
+  "TRAWLERS": {
+    "domesticGearTypes": [
+      "대형트롤어업",
+      "동해구기선저인망어업",
+      "동해구트롤어업",
+      "쌍끌이대형기선저인망어업",
+      "쌍끌이서남해구기선저인망어업",
+      "외끌이대형기선저인망어업"
+    ],
+    "mappingConfidence": "approximate",
+    "sourceVesselCount": 188,
+    "avgTonnageGt": 80.5,
+    "avgEnginePowerHp": 1106.2
+  },
+  "DREDGE_FISHING": {
+    "domesticGearTypes": [
+      "패류형망어업"
+    ],
+    "mappingConfidence": "direct",
+    "sourceVesselCount": 56,
+    "avgTonnageGt": 10.7,
+    "avgEnginePowerHp": 654.3
+  }
+}

@@ -71,10 +71,12 @@ if hasattr(sys.stdout, "reconfigure"):
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from data.snapshot_utils import find_latest  # noqa: E402
 from data.vessel_spec_client import VesselSpecApiError, search_vessel_spec  # noqa: E402
 
-GFW_EVENTS_FILE = PROJECT_ROOT / "data" / "raw" / "gfw_events_2026-01-01_2026-08-13.jsonl.gz"
-GFW_VESSELS_FLAT = PROJECT_ROOT / "data" / "raw" / "gfw_vessels_kor_fishing__2026-08-13.jsonl.gz"
+_RAW_DIR = PROJECT_ROOT / "data" / "raw"
+GFW_EVENTS_FILE = find_latest(_RAW_DIR, "gfw_events_20*.jsonl.gz")
+GFW_VESSELS_FLAT = find_latest(_RAW_DIR, "gfw_vessels_kor_fishing__*.jsonl.gz")
 
 OUTPUT_BASE = PROJECT_ROOT / "data" / "raw" / "vessel_spec_candidates"
 
@@ -294,6 +296,18 @@ def main(limit=None):
     consecutive_api_errors = 0
     stop_flag = False
     done_count = 0
+    # 2026-08-14 버그 수정: completed_count를 "already_done"/"ok"마다 +=1로
+    # 누적하면, 재개(resume) 실행마다 이전에 이미 세어둔 것까지 또 세어져
+    # 값이 목표치를 훌쩍 넘어버린다(실제 사례: 7,327개 파일인데
+    # completed_count가 13,351까지 부풀려짐 — 재개할 때마다 기존 6,024개가
+    # "already_done"으로 다시 잡혀 매번 더해졌기 때문). 그래서 이제
+    # completed_count는 누적 카운터가 아니라, candidates_dir의 실제 파일
+    # 개수를 그때그때 다시 세어 구한다 — 몇 번을 재개해도 항상 정확하다.
+    # skipped_no_identifier도 같은 이유로 set으로 관리해 중복 추가를 막는다.
+    skipped_set = set(progress.get("skipped_no_identifier", []))
+
+    def recount_completed() -> int:
+        return sum(1 for _ in candidates_dir.glob("*.json"))
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = {
@@ -313,12 +327,9 @@ def main(limit=None):
 
             with progress_lock:
                 if result["status"] == "already_done":
-                    # 이전 실행이 크래시 등으로 중단됐다가 재개된 경우 —
-                    # 파일은 이미 있으니 완료로 집계해야 completed_count가
-                    # 실제 처리량을 반영하고, fully_done 판정도 정확해진다.
-                    progress["completed_count"] += 1
+                    pass  # candidates_dir 파일 개수로 이미 반영됨 (recount_completed 참고)
                 elif result["status"] == "skipped_no_identifier":
-                    progress["skipped_no_identifier"].append(result["vesselId"])
+                    skipped_set.add(result["vesselId"])
                 elif result["status"] == "error":
                     progress["failed"].append(result["error_entry"])
                     consecutive_api_errors += 1
@@ -328,16 +339,20 @@ def main(limit=None):
                         for pending_future in futures:
                             pending_future.cancel()
                 elif result["status"] == "ok":
-                    progress["completed_count"] += 1
                     consecutive_api_errors = 0
 
                 if done_count % 200 == 0:
+                    progress["completed_count"] = recount_completed()
+                    progress["skipped_no_identifier"] = sorted(skipped_set)
                     progress["updated_at"] = now_iso()
                     (run_dir / "_progress.json").write_text(json.dumps(progress, indent=2), encoding="utf-8")
                     print(
                         f"  [progress] {done_count}/{len(targets)}, 완료={progress['completed_count']}, "
                         f"실패={len(progress['failed'])}"
                     )
+
+    progress["completed_count"] = recount_completed()
+    progress["skipped_no_identifier"] = sorted(skipped_set)
 
     # 전체 대상(progress['total_target'], limit과 무관하게 원래 목표) 기준으로
     # 실제로 다 끝났는지 확인한다 — limit으로 일부만 돌린 실행을 "complete"로

@@ -45,10 +45,14 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
-MATCHES_PATH = PROJECT_ROOT / "data" / "raw" / "vessel_spec_matches__2026-08-13T15-27-59.567740+00-00.jsonl.gz"
-GFW_VESSELS_PATH = PROJECT_ROOT / "data" / "raw" / "gfw_vessels_kor_fishing__2026-08-13.jsonl.gz"
-OUT_PATH = PROJECT_ROOT / "data" / "raw" / "gfw_vessels_enriched.jsonl.gz"
+from data.snapshot_utils import find_latest  # noqa: E402
+
+RAW_DIR = PROJECT_ROOT / "data" / "raw"
+MATCHES_PATH = find_latest(RAW_DIR, "vessel_spec_matches__*.jsonl.gz")
+GFW_VESSELS_PATH = find_latest(RAW_DIR, "gfw_vessels_kor_fishing__*.jsonl.gz")
+OUT_PATH = RAW_DIR / "gfw_vessels_enriched.jsonl.gz"
 
 CONFIDENT_METHODS = {"imo_exact", "callsign_exact", "name_fuzzy"}
 

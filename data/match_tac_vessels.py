@@ -50,15 +50,24 @@ TAC는 선박 1척(어선번호)당 여러 행(할당/어업종별로 나뉨)이
 평균 내지 않고 원본 보존 — 팀 공유 데이터검증 문서의 원칙과 동일) 첫
 값을 대표값으로 쓰고 충돌 여부만 별도 필드에 기록한다.
 
-출력 (두 파일 공통 레코드 구조): 한 줄에 GFW 선박 하나, {vesselId,
-    matchMethod, matchConfidence, numberStatus, tacVesselNo, tacName,
-    tonnageGt, enginePowerHp, gearTypes, tonnageConflict,
-    enginePowerConflict}
+출력 (세 파일):
+    data/raw/tac_vessel_matches__<날짜>.jsonl.gz      경로 A 전체 결과
+    data/raw/tac_vessel_matches_direct__<날짜>.jsonl.gz 경로 B 전체 결과
+    data/raw/tac_vessel_matches_confirmed__<날짜>.jsonl.gz
+        위 두 결과 중 "바로 신뢰 가능" 등급만 뽑아 중복 제거한 최종본
+        (build_confirmed_tier() 참고) — data/merge_tac_into_enriched.py가
+        이 파일을 읽어 gfw_vessels_enriched.jsonl.gz에 병합한다.
+    공통 레코드 구조: {vesselId, matchMethod, matchConfidence, numberStatus,
+    tacVesselNo, tacName, tonnageGt, enginePowerHp, gearTypes,
+    tonnageConflict, enginePowerConflict}
 
-실측 결과 요약(2026-08-14, 두 경로 합쳐 중복 제거 399척 기준): 80척은
-바로 신뢰 가능(경로 A 중 numberStatus!=mismatch, 또는 경로 B 중
-numberStatus=match), 257척은 이름은 맞으나 교차검증 신호가 없어 검토
-필요, 62척은 numberStatus=mismatch로 제외 권장.
+실측 결과 요약(2026-08-14, 선박제원정보 100% 수집 반영한 최종 실행 기준,
+두 경로 합쳐 중복 제거 418척): **93척 바로 신뢰 가능**(경로 A 중
+numberStatus!=mismatch, 또는 경로 A와 안 겹치는 경로 B 중
+numberStatus=match), 나머지 325척은 이름은 맞으나 교차검증 신호가
+없거나(numberStatus=none/one_side_missing) 숫자가 안 맞아서
+(numberStatus=mismatch) 검토 필요 — 정확한 세부 건수는 스크립트 실행
+시 출력되는 요약 참고(하드코딩하지 않음, 재실행 때마다 바뀔 수 있어서).
 """
 
 import csv
@@ -80,10 +89,12 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from data.collect_vessel_spec_candidates import clean_vessel_name, load_target_vessels  # noqa: E402
 from data.match_vessel_spec import normalize_name as normalize_gfw_name  # noqa: E402
+from data.snapshot_utils import find_latest  # noqa: E402
+from data.vessel_spec_client import _to_float  # noqa: E402
 
-TAC_CSV_PATH = PROJECT_ROOT / "data" / "raw" / "해양수산부_수산정보_TAC 할당 승인 정보_20251105.csv"
-MOF_MATCHES_PATH = PROJECT_ROOT / "data" / "raw" / "vessel_spec_matches__2026-08-13T15-27-59.567740+00-00.jsonl.gz"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "raw"
+TAC_CSV_PATH = find_latest(OUTPUT_DIR, "해양수산부_수산정보_TAC 할당 승인 정보_*.csv")
+MOF_MATCHES_PATH = find_latest(OUTPUT_DIR, "vessel_spec_matches__*.jsonl.gz")
 
 CONFIDENT_MOF_METHODS = {"imo_exact", "callsign_exact", "name_fuzzy"}
 
@@ -175,15 +186,6 @@ def normalize_korean_name(name: str) -> str:
     return name
 
 
-def _to_float(value):
-    if value in (None, ""):
-        return None
-    try:
-        return float(str(value).strip())
-    except ValueError:
-        return None
-
-
 def load_tac_vessels(csv_path: Path = TAC_CSV_PATH) -> list:
     """TAC CSV를 어선번호 기준으로 집계한다."""
     by_vessel_no = {}
@@ -225,27 +227,43 @@ def load_tac_vessels(csv_path: Path = TAC_CSV_PATH) -> list:
     return vessels
 
 
-def load_mof_confirmed_matches(path: Path = MOF_MATCHES_PATH) -> list:
-    """match_vessel_spec.py의 확정 매칭(imo_exact/callsign_exact/name_fuzzy)만
-    로드한다. 각 항목은 이미 GFW vesselId와 연결돼 있다."""
-    results = []
+def load_mof_matches_and_misclassification_flags(path: Path = MOF_MATCHES_PATH) -> tuple:
+    """MOF_MATCHES_PATH를 한 번만 읽어 (확정 매칭 목록, 비어선 의심 vesselId
+    집합) 튜플을 반환한다. 원래 이 둘을 각자 파일을 처음부터 다시 읽는
+    별도 함수(load_mof_confirmed_matches/load_mof_misclassification_flags)로
+    나눠뒀었는데, 같은 ~740KB gzip 파일을 두 번 열고 파싱하는 낭비라 하나로
+    합쳤다(2026-08-14).
+
+    - 확정 매칭: match_vessel_spec.py의 확정 매칭(imo_exact/callsign_exact/
+      name_fuzzy)만, GFW vesselId와 이미 연결돼 있다.
+    - 비어선 의심 집합: matchMethod와 무관하게 matchedSpec이 있고
+      possibleMisclassification=True인 적이 있는 GFW vesselId 전부.
+      2026-08-14 발견: TAC 확정매칭 93척 중 72척이 하필 이 집합과 겹쳤다 —
+      실제 vesselKind를 까보니 석유제품운반선/화물선/예선 등 진짜 비어선
+      이었다. TAC 쪽 이름 매칭이 흔한 이름("OO호") 때문에 실제로는
+      다른(비어선) 배로 잘못 연결됐을 가능성이 높다는 뜻 —
+      build_confirmed_tier()에서 이 집합과 겹치는 건 "확정"에서 빼고
+      별도로 표시한다.
+    """
+    confirmed_matches = []
+    misclassified_ids = set()
     with gzip.open(path, "rt", encoding="utf-8") as f:
         for line in f:
             r = json.loads(line)
-            if r["matchMethod"] not in CONFIDENT_MOF_METHODS:
-                continue
-            spec = r.get("matchedSpec") or {}
-            kor_name = spec.get("vesselNameKor")
-            if not kor_name:
-                continue
-            results.append(
-                {
-                    "vesselId": r["vesselId"],
-                    "vesselNameKor": kor_name,
-                    "mofMatchMethod": r["matchMethod"],
-                }
-            )
-    return results
+            if r.get("possibleMisclassification"):
+                misclassified_ids.add(r["vesselId"])
+            if r["matchMethod"] in CONFIDENT_MOF_METHODS:
+                spec = r.get("matchedSpec") or {}
+                kor_name = spec.get("vesselNameKor")
+                if kor_name:
+                    confirmed_matches.append(
+                        {
+                            "vesselId": r["vesselId"],
+                            "vesselNameKor": kor_name,
+                            "mofMatchMethod": r["matchMethod"],
+                        }
+                    )
+    return confirmed_matches, misclassified_ids
 
 
 def _best_match_normalized(norm_name: str, candidate_names_normalized: list) -> tuple:
@@ -388,6 +406,47 @@ def match_tac_to_gfw_direct(tac_vessels: list, gfw_vessels: list) -> list:
     return results
 
 
+def build_confirmed_tier(results_via_mof: list, results_direct: list, mof_misclassified_ids: set) -> tuple:
+    """두 경로 결과에서 "바로 신뢰 가능" 등급만 뽑아 vesselId 기준으로
+    중복 제거한 최종본을 만든다. (확정 리스트, 충돌로 걸러진 리스트) 튜플을
+    반환한다.
+
+    등급 기준(2026-08-14 결정):
+        - 경로 A(MOF 경유) mutual + numberStatus != "mismatch"
+        - 경로 B(직접) mutual + numberStatus == "match" (숫자까지 정확히
+          일치 — MOF 검증 없이 로마자 비교만으로 신뢰하려면 이 정도는
+          돼야 함)
+    두 경로 다 해당하는 vesselId는 A를 우선한다(경로 A vs B 비교 항목
+    참고 — 실측상 A가 더 신뢰도 높았음).
+
+    추가 교차검증(2026-08-14): mof_misclassified_ids(load_mof_misclassification_flags()
+    참고)와 겹치는 건 확정에서 빼고 conflicting 리스트로 따로 보낸다 —
+    실측 사례: 93척 중 72척이 이 경우였고, 실제 vesselKind가 석유제품
+    운반선/화물선 등 진짜 비어선이었다. TAC 이름 매칭이 흔한 이름 때문에
+    실제로는 다른(비어선) 배로 잘못 연결됐을 가능성이 높다는 뜻.
+    """
+    confirmed_by_id = {}
+
+    for r in results_via_mof:
+        if r["matchMethod"] == "name_fuzzy_mutual" and r["numberStatus"] != "mismatch":
+            confirmed_by_id[r["vesselId"]] = dict(r, source="mof")
+
+    for r in results_direct:
+        if r["vesselId"] in confirmed_by_id:
+            continue  # 경로 A가 이미 확정했으면 그대로 우선
+        if r["matchMethod"] == "name_fuzzy_mutual" and r["numberStatus"] == "match":
+            confirmed_by_id[r["vesselId"]] = dict(r, source="direct")
+
+    confirmed, conflicting = [], []
+    for vessel_id, record in confirmed_by_id.items():
+        if vessel_id in mof_misclassified_ids:
+            conflicting.append(dict(record, conflictReason="mof_possible_misclassification"))
+        else:
+            confirmed.append(record)
+
+    return confirmed, conflicting
+
+
 def _write_and_summarize(results: list, out_path: Path, label: str) -> dict:
     counts = defaultdict(int)
     with gzip.open(out_path, "wt", encoding="utf-8") as out:
@@ -396,7 +455,7 @@ def _write_and_summarize(results: list, out_path: Path, label: str) -> dict:
             out.write(json.dumps(r, ensure_ascii=False) + "\n")
     print(f"[output:{label}] {out_path}")
     for method, count in sorted(counts.items(), key=lambda x: -x[1]):
-        print(f"  {method}: {count} ({100*count/len(results):.1f}%)")
+        print(f"  {method}: {count} ({100*count/len(results):.1f}%)" if results else f"  {method}: {count}")
     return counts
 
 
@@ -405,9 +464,9 @@ def main():
     tac_vessels = load_tac_vessels()
     print(f"  TAC 고유 선박: {len(tac_vessels)}척")
 
-    print("[2/4] MOF 확정 매칭(GFW 연결된 것) 로드...")
-    mof_matches = load_mof_confirmed_matches()
-    print(f"  MOF 확정 매칭(vesselNameKor 보유): {len(mof_matches)}척")
+    print("[2/4] MOF 확정 매칭(GFW 연결된 것) + 비어선 의심 플래그 로드...")
+    mof_matches, mof_misclassified_ids = load_mof_matches_and_misclassification_flags()
+    print(f"  MOF 확정 매칭(vesselNameKor 보유): {len(mof_matches)}척, 플래그된 GFW vesselId: {len(mof_misclassified_ids)}개")
 
     print("[3/4] 경로 A: TAC <-> MOF(한글) -> GFW (상호 최고매칭만 확정)...")
     results_via_mof = match_tac_to_mof(tac_vessels, mof_matches)
@@ -432,6 +491,24 @@ def main():
     print(
         f"\n[비교] MOF 경유 상호매칭 {mutual_via_mof}척 (모집단 {len(mof_matches)}척 중) "
         f"vs 직접 상호매칭 {mutual_direct}척 (모집단 {len(gfw_vessels)}척 중)"
+    )
+
+    confirmed, conflicting = build_confirmed_tier(results_via_mof, results_direct, mof_misclassified_ids)
+
+    confirmed_path = OUTPUT_DIR / f"tac_vessel_matches_confirmed__{date.today().isoformat()}.jsonl.gz"
+    _write_and_summarize(confirmed, confirmed_path, "확정본")
+
+    conflicting_path = OUTPUT_DIR / f"tac_vessel_matches_conflicting__{date.today().isoformat()}.jsonl.gz"
+    _write_and_summarize(conflicting, conflicting_path, "충돌(비어선 의심과 겹침)")
+
+    # "전체 후보"는 상호매칭(mutual)된 것만 기준으로 잡는다 — below_threshold/
+    # non_mutual까지 포함하면 분모가 너무 넓어져(예: 5,862척) "검토해볼 만한
+    # 후보"라는 의미가 흐려진다.
+    mutual_union = len({r["vesselId"] for r in results_via_mof if r["matchMethod"] == "name_fuzzy_mutual"}
+                        | {r["vesselId"] for r in results_direct if r["matchMethod"] == "name_fuzzy_mutual"})
+    print(
+        f"  바로 신뢰 가능: {len(confirmed)}척 / MOF와 충돌(재검토 필요): {len(conflicting)}척 "
+        f"(상호매칭 중복제거 {mutual_union}척 중, 나머지 {mutual_union - len(confirmed) - len(conflicting)}척은 검토/제외 대상)"
     )
 
 
