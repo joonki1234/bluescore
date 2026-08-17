@@ -12,3 +12,4 @@ requests
 plotly
 pytest
 web3
+httpx
