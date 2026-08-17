@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS score_runs (
     report_json TEXT,
     result_hash TEXT,
     report_hash TEXT,
+    report_source TEXT,
+    report_generated_at TEXT,
     created_at TEXT NOT NULL
 );
 
@@ -33,6 +35,9 @@ CREATE TABLE IF NOT EXISTS appeals (
     vessel_id TEXT NOT NULL,
     reason TEXT NOT NULL,
     detail TEXT NOT NULL DEFAULT '',
+    ai_response TEXT NOT NULL DEFAULT '',
+    ai_response_source TEXT NOT NULL DEFAULT '',
+    response_sent_at TEXT,
     status TEXT NOT NULL CHECK(status IN ('submitted', 'approved', 'held')),
     submitted_at TEXT NOT NULL,
     updated_at TEXT NOT NULL

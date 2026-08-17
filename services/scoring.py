@@ -15,24 +15,34 @@ from typing import Dict, List
 
 from api.schemas import (
     AxisScore,
+    ConfigResponse,
     DetailedReportItem,
     EligibilityItem,
     ExplanationResponse,
     FactorMetricSchema,
+    ImprovementPlan,
     PeerContext,
     RateBand,
+    RateLookupResponse,
     RecommendationSchema,
     ScoreResponse,
     ShapFactorSchema,
     SimulationRequest,
     SimulationResponse,
+    SimulationSurfaceResponse,
+    TextResponse,
     VesselListResponse,
     VesselSummary,
 )
-from explain import fallback
 from explain.contract import ExplainInput, FactorMetric, ShapFactor
 from explain.explain import explain as run_explain
-from score.rate_mapping import RateGrade, grade_for_score
+from explain.explain import (
+    answer_question as generate_answer,
+    generate_detailed_report,
+    generate_improvement_tip,
+    respond_to_objection as generate_objection_response,
+)
+from score.rate_mapping import RATE_GRADES, RateGrade, grade_for_score
 from services.exceptions import BackendUnavailableError, InvalidStateError, NotFoundError
 from services.metadata import response_metadata
 from services.real_scoring import RealAxisAAdapter
@@ -51,6 +61,12 @@ AXIS_A_COST_PER_KNOT = 0.8
 FUEL_PERCENT_PER_AXIS_B_POINT = 0.55
 AXIS_SCORE_FLOOR = 4.0
 AXIS_SCORE_CEIL = 97.0
+SIM_REVISIT_RANGE = (1, 5)
+SIM_SPEED_DELTA_DOWN = 3.0
+SIM_SPEED_DELTA_UP = 2.0
+SIM_SPEED_STEP = 0.1
+EXAMPLE_PRINCIPAL_WON = 100_000_000
+EXAMPLE_TERM_YEARS = 3
 
 
 def _rate_band(grade: RateGrade) -> RateBand:
@@ -66,6 +82,10 @@ def _top_percent(value: float, population: List[float]) -> int:
     if not population:
         return 1
     return max(1, round(sum(1 for score in population if score > value) / len(population) * 100))
+
+
+def _discount_text(band: RateBand) -> str:
+    return f"{band.grade} · 우대 없음" if band.discount_bp <= 0 else f"{band.grade} · −{band.discount_bp}bp"
 
 
 class ScoringService:
@@ -90,6 +110,24 @@ class ScoringService:
             if vessel["vesselId"] == vessel_id:
                 return vessel
         raise NotFoundError(f"선박을 찾을 수 없습니다: {vessel_id}")
+
+    def config(self) -> ConfigResponse:
+        data = self._demo_data()
+        return ConfigResponse(
+            axis_weights=data["axisWeights"],
+            rate_grades=[_rate_band(item) for item in RATE_GRADES],
+            data_freshness=data["dataFreshness"],
+            min_peer_sample=data["minPeerSample"],
+            example_principal_won=EXAMPLE_PRINCIPAL_WON,
+            example_term_years=EXAMPLE_TERM_YEARS,
+        )
+
+    def rate_lookup(self, score: float) -> RateLookupResponse:
+        return RateLookupResponse(
+            band=_rate_band(grade_for_score(score)),
+            source="rules:score.rate_mapping",
+            **response_metadata("demo"),
+        )
 
     def score_run_id(self, vessel_id: str, source_type: str = "demo") -> str:
         if source_type == "demo":
@@ -156,11 +194,13 @@ class ScoringService:
             blue_score=vessel.get("blueScore"),
             axis_a=AxisScore(
                 score=vessel.get("axisA", {}).get("score"),
+                top_percent=vessel.get("axisA", {}).get("topPercent"),
                 state="demo" if scored else "unavailable",
                 missing_reason=message,
             ),
             axis_b=AxisScore(
                 score=vessel.get("axisB", {}).get("score"),
+                top_percent=vessel.get("axisB", {}).get("topPercent"),
                 state="demo" if scored else "unavailable",
                 missing_reason=message,
             ),
@@ -169,6 +209,10 @@ class ScoringService:
                 count=peer.get("count", 0),
                 top_percent=peer.get("topPercent"),
                 top_percent_interval=peer.get("topPercentInterval"),
+                scores=peer.get("scores", []),
+                self_index=peer.get("selfIndex"),
+                axis_a_scores=peer.get("axisAScores", []),
+                axis_b_scores=peer.get("axisBScores", []),
             ),
             matching_confidence=None,
             matching_method="demoFixture",
@@ -186,6 +230,14 @@ class ScoringService:
             fishing_segments=vessel.get("fishingSegments", []),
             revisit_count=vessel.get("revisitCount"),
             average_speed_knots=vessel.get("averageSpeedKnots"),
+            anchor=vessel.get("anchor"),
+            total_distance_km=vessel.get("totalDistanceKm"),
+            fishing_hours=vessel.get("fishingHours"),
+            estimated_fuel_kl=vessel.get("estimatedFuelKl"),
+            sail_calls=vessel.get("sailCalls"),
+            fishing_days=vessel.get("fishingDays"),
+            gap_index=vessel.get("gapIndex"),
+            mpa_index=vessel.get("mpaIndex"),
             message=message,
             created_at=datetime.now(timezone.utc),
             **response_metadata("demo"),
@@ -233,7 +285,9 @@ class ScoringService:
             **response_metadata("real"),
         )
 
-    def simulate(self, vessel_id: str, request: SimulationRequest) -> SimulationResponse:
+    def simulate(
+        self, vessel_id: str, request: SimulationRequest, *, include_tradeoff: bool = True
+    ) -> SimulationResponse:
         vessel = self._demo_vessel(vessel_id)
         if vessel["status"] != "success":
             raise InvalidStateError("점수가 산출되지 않은 선박은 시뮬레이션할 수 없습니다.")
@@ -244,8 +298,9 @@ class ScoringService:
         speed_steps = vessel["averageSpeedKnots"] - request.speed_knots
         axis_a = base_a + revisit_steps * AXIS_A_GAIN_PER_REVISIT_STEP
         axis_b = base_b + speed_steps * AXIS_B_GAIN_PER_KNOT
-        axis_a -= speed_steps * AXIS_A_COST_PER_KNOT
-        axis_b -= revisit_steps * AXIS_B_COST_PER_REVISIT_STEP
+        if include_tradeoff:
+            axis_a -= speed_steps * AXIS_A_COST_PER_KNOT
+            axis_b -= revisit_steps * AXIS_B_COST_PER_REVISIT_STEP
         axis_a = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_a)), 1)
         axis_b = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_b)), 1)
         score = round(AXIS_A_WEIGHT * axis_a + AXIS_B_WEIGHT * axis_b, 1)
@@ -255,12 +310,12 @@ class ScoringService:
         after = _rate_band(grade_for_score(score))
 
         notes = []
-        if revisit_steps > 0:
+        if include_tradeoff and revisit_steps > 0:
             notes.append(
                 f"어장을 더 자주 옮기면 이동거리가 늘어 운항 효율이 "
                 f"{revisit_steps * AXIS_B_COST_PER_REVISIT_STEP:.1f}점 깎입니다."
             )
-        if speed_steps > 0:
+        if include_tradeoff and speed_steps > 0:
             notes.append(
                 f"속도를 낮추면 해상 체류가 길어져 자원 압력이 "
                 f"{speed_steps * AXIS_A_COST_PER_KNOT:.1f}점 깎입니다."
@@ -290,11 +345,8 @@ class ScoringService:
             **response_metadata("demo"),
         )
 
-    def explain(self, score: ScoreResponse) -> ExplanationResponse:
-        if score.status != "success" or score.blue_score is None:
-            raise InvalidStateError("완전한 점수가 없는 산출 건은 설명을 만들 수 없습니다.")
-        vessel = self._demo_vessel(score.vessel.vessel_id)
-        explain_input = ExplainInput(
+    def _explain_input(self, vessel: dict) -> ExplainInput:
+        return ExplainInput(
             vessel_id=vessel["vesselId"],
             vessel_label=vessel["meta"],
             fleet_label=vessel["fleetLabel"],
@@ -307,22 +359,131 @@ class ScoringService:
             shap_factors=[ShapFactor(**item) for item in vessel.get("shapFactors", [])],
             factor_metrics=[
                 FactorMetric(
-                    label=item["label"],
-                    axis=item["axis"],
-                    self_value=item["selfValue"],
-                    peer_average=item["peerAverage"],
+                    label=item["label"], axis=item["axis"],
+                    self_value=item["selfValue"], peer_average=item["peerAverage"],
                     unit=item["unit"],
                 )
                 for item in vessel.get("factorMetrics", [])
             ],
         )
-        generated = run_explain(explain_input, use_llm=False)
-        report_sentences = fallback.build_report_fallback(explain_input)
+
+    def simulation_surface(self, vessel_id: str) -> SimulationSurfaceResponse:
+        vessel = self._demo_vessel(vessel_id)
+        if vessel["status"] != "success":
+            raise InvalidStateError("점수가 산출되지 않은 선박은 시뮬레이션할 수 없습니다.")
+        base_speed = vessel["averageSpeedKnots"]
+        lo = round(base_speed - SIM_SPEED_DELTA_DOWN, 1)
+        step_count = int(round((SIM_SPEED_DELTA_DOWN + SIM_SPEED_DELTA_UP) / SIM_SPEED_STEP))
+        speeds = [round(lo + i * SIM_SPEED_STEP, 1) for i in range(step_count + 1)]
+        revisits = list(range(SIM_REVISIT_RANGE[0], SIM_REVISIT_RANGE[1] + 1))
+        base_band = _rate_band(grade_for_score(vessel["blueScore"]))
+        grid: Dict[str, Dict] = {}
+        for revisit in revisits:
+            for speed in speeds:
+                request = SimulationRequest(revisit_count=revisit, speed_knots=speed)
+                sim = self.simulate(vessel_id, request)
+                no_tradeoff = self.simulate(vessel_id, request, include_tradeoff=False)
+                gained_bp = sim.after_band.discount_bp - base_band.discount_bp
+                yearly = int(EXAMPLE_PRINCIPAL_WON * gained_bp / 10000)
+                grid[f"{revisit}|{speed:.1f}"] = {
+                    "score": sim.simulated_score,
+                    "axisA": sim.axis_a,
+                    "axisB": sim.axis_b,
+                    "topPercent": sim.top_percent,
+                    "scoreDelta": sim.score_delta,
+                    "fuelDeltaPercent": sim.fuel_delta_percent,
+                    "tradeoffNotes": sim.tradeoff_notes,
+                    "grade": sim.after_band.grade,
+                    "discountBp": sim.after_band.discount_bp,
+                    "yearlyWon": yearly,
+                    "totalWon": yearly * EXAMPLE_TERM_YEARS,
+                    "scoreNoTradeoff": no_tradeoff.simulated_score,
+                }
+        return SimulationSurfaceResponse(
+            score_run_id=self.score_run_id(vessel_id), vessel_id=vessel_id,
+            revisits=revisits, speeds=speeds, grid=grid,
+            base={
+                "revisit": vessel["revisitCount"], "speed": base_speed,
+                "score": vessel["blueScore"], "topPercent": vessel["peerGroup"]["topPercent"],
+                "grade": base_band.grade, "discountBp": base_band.discount_bp,
+            },
+            rate_grades=[_rate_band(item) for item in RATE_GRADES],
+            peer_scores=vessel["peerGroup"]["scores"],
+            principal_won=EXAMPLE_PRINCIPAL_WON, term_years=EXAMPLE_TERM_YEARS,
+            **response_metadata("demo"),
+        )
+
+    def _improvement_candidates(self, vessel_id: str) -> List[tuple]:
+        vessel = self._demo_vessel(vessel_id)
+        candidates = []
+        base_speed = vessel["averageSpeedKnots"]
+        for revisit in range(1, 6):
+            for step in range(21):
+                speed = round(base_speed - 3.0 + step * 0.25, 2)
+                sim = self.simulate(
+                    vessel_id, SimulationRequest(revisit_count=revisit, speed_knots=speed)
+                )
+                candidates.append((revisit, speed, sim))
+        return candidates
+
+    def improvement_plans(self, vessel_id: str, *, use_llm: bool = False) -> List[ImprovementPlan]:
+        vessel = self._demo_vessel(vessel_id)
+        explain_input = self._explain_input(vessel)
+        revisit = max(1, vessel["revisitCount"] - 1)
+        revisit_sim = self.simulate(
+            vessel_id, SimulationRequest(revisit_count=revisit, speed_knots=vessel["averageSpeedKnots"])
+        )
+        speed_sim = self.simulate(
+            vessel_id, SimulationRequest(revisit_count=vessel["revisitCount"], speed_knots=vessel["averageSpeedKnots"] - 1.0)
+        )
+        easiest_tuple = (
+            (revisit, vessel["averageSpeedKnots"], revisit_sim)
+            if revisit_sim.score_delta >= speed_sim.score_delta
+            else (vessel["revisitCount"], vessel["averageSpeedKnots"] - 1.0, speed_sim)
+        )
+        current_band = _rate_band(grade_for_score(vessel["blueScore"]))
+        candidates = self._improvement_candidates(vessel_id)
+        upgraded = [item for item in candidates if item[2].band_changed and item[2].score_delta > 0]
+        best_tuple = min(upgraded, key=lambda item: item[2].simulated_score) if upgraded else max(
+            candidates, key=lambda item: item[2].simulated_score
+        )
+        specs = [
+            ("easiest", "지금 할 수 있는 가장 쉬운 개선", "한 걸음만 바꿔도 되는 조합", easiest_tuple),
+            ("best", "최고의 인센티브를 위한 개선", "다음 우대 구간까지 필요한 조합", best_tuple),
+        ]
+        plans: List[ImprovementPlan] = []
+        for key, title, desc, (target_revisit, target_speed, sim) in specs:
+            actions = []
+            if target_revisit < vessel["revisitCount"]:
+                actions.append("같은 어장에서 연달아 조업하는 횟수를 줄인다")
+            if target_speed < vessel["averageSpeedKnots"]:
+                actions.append("어장을 오갈 때의 평균 항해 속도를 낮춘다")
+            tip = generate_improvement_tip(
+                explain_input, "가장 쉬운 개선" if key == "easiest" else "다음 우대 구간까지",
+                actions, use_llm=use_llm,
+            )
+            plans.append(ImprovementPlan(
+                key=key, title=title, desc=desc, base_score=vessel["blueScore"],
+                score=sim.simulated_score, score_delta=sim.score_delta,
+                before_band=_discount_text(current_band), after_band=_discount_text(sim.after_band),
+                band_changed=sim.band_changed, actions=actions, tip=tip.text, tip_source=tip.source,
+            ))
+        return plans
+
+    def explain(self, score: ScoreResponse, *, use_llm: bool = False) -> ExplanationResponse:
+        if score.status != "success" or score.blue_score is None:
+            raise InvalidStateError("완전한 점수가 없는 산출 건은 설명을 만들 수 없습니다.")
+        vessel = self._demo_vessel(score.vessel.vessel_id)
+        explain_input = self._explain_input(vessel)
+        generated = run_explain(explain_input, use_llm=use_llm)
+        generated_report = generate_detailed_report(explain_input, use_llm=use_llm)
+        report_sentences = generated_report.items
         contributions = {item["label"]: item["value"] for item in vessel.get("shapFactors", [])}
         report = [
             DetailedReportItem(
                 **metric,
                 contribution=contributions.get(metric["label"]),
+                diff=round(metric["selfValue"] - metric["peerAverage"], 2),
                 sentence=report_sentences.get(metric["label"], ""),
             )
             for metric in vessel.get("factorMetrics", [])
@@ -336,6 +497,27 @@ class ScoringService:
                 RecommendationSchema(**item.as_dict()) for item in generated.recommendations
             ],
             detailed_report=report,
+            improvement_plans=self.improvement_plans(vessel["vesselId"], use_llm=use_llm),
             explanation_source=generated.source,
+            report_source=generated_report.source,
+            generated_at=datetime.now(timezone.utc),
             **response_metadata("demo"),
         )
+
+    def answer_question(
+        self, vessel_id: str, question: str, *, use_llm: bool = False
+    ) -> TextResponse:
+        vessel = self._demo_vessel(vessel_id)
+        generated = generate_answer(
+            self._explain_input(vessel), question, use_llm=use_llm
+        )
+        return TextResponse(text=generated.text, source=generated.source, **response_metadata("demo"))
+
+    def respond_to_objection(
+        self, vessel_id: str, reason: str, detail: str, *, use_llm: bool = False
+    ) -> TextResponse:
+        vessel = self._demo_vessel(vessel_id)
+        generated = generate_objection_response(
+            self._explain_input(vessel), reason, detail, use_llm=use_llm
+        )
+        return TextResponse(text=generated.text, source=generated.source, **response_metadata("demo"))

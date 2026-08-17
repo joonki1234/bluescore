@@ -24,6 +24,9 @@ def seed_demo(database: Database, *, reset: bool = True) -> WorkflowService:
     service = WorkflowService(repository=repository, scoring=ScoringService())
     service.get_score("VESSEL_A")
     service.get_score("VESSEL_B")
+    # 발표 당일 외부 LLM이 없어도 두 화면은 같은 고정 설명을 즉시 읽는다.
+    service.explanation("VESSEL_A", use_llm=False, refresh=True)
+    service.explanation("VESSEL_B", use_llm=False, refresh=True)
     return service
 
 

@@ -8,6 +8,7 @@ BlueScore FastAPI 애플리케이션.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -21,12 +22,18 @@ from api.schemas import (
     AppealListResponse,
     ChainCommitResponse,
     ChainRecordResponse,
+    ConfigResponse,
     ErrorResponse,
     ExplanationResponse,
+    ObjectionDraftRequest,
+    QuestionRequest,
+    RateLookupResponse,
     ReviewDecision,
     ScoreResponse,
     SimulationRequest,
     SimulationResponse,
+    SimulationSurfaceResponse,
+    TextResponse,
     VesselListResponse,
 )
 from services.exceptions import (
@@ -38,15 +45,30 @@ from services.exceptions import (
 )
 from services.scoring import ScoringService
 from services.workflow import WorkflowService
+from chain.ledger import HashLedger, LedgerLike, OnChainHashLedger
 from storage.database import Database
 from storage.repository import Repository
 
 
-def create_app(db_path: Optional[Path] = None, *, seed_if_empty: bool = True) -> FastAPI:
+def _runtime_llm_enabled() -> bool:
+    return os.getenv("BLUESCORE_LLM_RUNTIME_ENABLED", "false").lower() in {"1", "true", "yes"}
+
+
+def _configured_ledger() -> LedgerLike:
+    mode = os.getenv("BLUESCORE_CHAIN_MODE", "local").lower()
+    if mode == "onchain":
+        return OnChainHashLedger()
+    return HashLedger()
+
+
+def create_app(
+    db_path: Optional[Path] = None, *, seed_if_empty: bool = True,
+    ledger: Optional[LedgerLike] = None,
+) -> FastAPI:
     database = Database(db_path)
     repository = Repository(database)
     scoring = ScoringService()
-    workflow = WorkflowService(repository=repository, scoring=scoring)
+    workflow = WorkflowService(repository=repository, scoring=scoring, ledger=ledger or _configured_ledger())
 
     if seed_if_empty:
         # 삭제 없이 초기 점수만 보장한다. 이의제기·심사·체인 기록은 보존된다.
@@ -90,7 +112,17 @@ def create_app(db_path: Optional[Path] = None, *, seed_if_empty: bool = True) ->
             "status": "ok",
             "database": str(database.path),
             "realAxisASnapshotAvailable": scoring.real_adapter.available,
+            "chainMode": "onchain" if isinstance(workflow.ledger, OnChainHashLedger) else "local",
+            "runtimeLlmEnabled": _runtime_llm_enabled(),
         }
+
+    @api.get("/config", response_model=ConfigResponse)
+    def config() -> ConfigResponse:
+        return workflow.config()
+
+    @api.get("/rates/lookup", response_model=RateLookupResponse)
+    def rate_lookup(score: float = Query(ge=0, le=100)) -> RateLookupResponse:
+        return workflow.rate_lookup(score)
 
     @api.get("/vessels", response_model=VesselListResponse)
     def list_vessels(
@@ -110,9 +142,21 @@ def create_app(db_path: Optional[Path] = None, *, seed_if_empty: bool = True) ->
     def simulate(vessel_id: str, request: SimulationRequest) -> SimulationResponse:
         return workflow.simulate(vessel_id, request)
 
+    @api.get(
+        "/vessels/{vessel_id}/simulation-surface", response_model=SimulationSurfaceResponse
+    )
+    def simulation_surface(vessel_id: str) -> SimulationSurfaceResponse:
+        return workflow.simulation_surface(vessel_id)
+
     @api.get("/vessels/{vessel_id}/explanation", response_model=ExplanationResponse)
     def explanation(vessel_id: str) -> ExplanationResponse:
         return workflow.explanation(vessel_id)
+
+    @api.post("/vessels/{vessel_id}/questions", response_model=TextResponse)
+    def answer_question(vessel_id: str, request: QuestionRequest) -> TextResponse:
+        return workflow.answer_question(
+            vessel_id, request.question, use_llm=_runtime_llm_enabled()
+        )
 
     @api.post("/appeals", response_model=AppealDetail, status_code=201)
     def submit_appeal(request: AppealCreate) -> AppealDetail:
@@ -128,6 +172,12 @@ def create_app(db_path: Optional[Path] = None, *, seed_if_empty: bool = True) ->
     def get_appeal(appeal_id: str) -> AppealDetail:
         return workflow.get_appeal(appeal_id)
 
+    @api.post("/appeals/{appeal_id}/draft-response", response_model=AppealDetail)
+    def objection_draft(appeal_id: str, request: ObjectionDraftRequest) -> AppealDetail:
+        return workflow.objection_draft(
+            appeal_id, use_llm=_runtime_llm_enabled(), refresh=request.refresh
+        )
+
     @api.post("/appeals/{appeal_id}/review", response_model=AppealDetail)
     def review_appeal(appeal_id: str, request: ReviewDecision) -> AppealDetail:
         return workflow.review_appeal(appeal_id, request)
@@ -135,6 +185,10 @@ def create_app(db_path: Optional[Path] = None, *, seed_if_empty: bool = True) ->
     @api.post("/reports/{score_run_id}/commit", response_model=ChainCommitResponse)
     def commit_report(score_run_id: str) -> ChainCommitResponse:
         return workflow.commit_report(score_run_id)
+
+    @api.get("/reports/{score_run_id}/commit", response_model=ChainRecordResponse)
+    def get_report_commit(score_run_id: str) -> ChainRecordResponse:
+        return workflow.get_chain_record_for_score_run(score_run_id)
 
     @api.get("/chain/records/{record_id}", response_model=ChainRecordResponse)
     def get_chain_record(record_id: str) -> ChainRecordResponse:
@@ -144,4 +198,3 @@ def create_app(db_path: Optional[Path] = None, *, seed_if_empty: bool = True) ->
 
 
 app = create_app()
-

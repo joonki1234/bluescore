@@ -48,7 +48,17 @@ def _header(vessel: dict, issued: str) -> None:
 
 
 def _decision_panel(vessel: dict, draft: str = "") -> None:
+    objection = adapter.get_objection(vessel["vesselId"])
     st.markdown("##### 심사 의견")
+    if not objection:
+        st.info("접수된 이의제기가 없어 심사 결정을 저장할 수 없습니다.")
+        return
+    if objection.get("review"):
+        review = objection["review"]
+        status_text = "승인" if review["decision"] == "approve" else "보류"
+        st.success(f"{status_text} 결정이 SQLite에 저장되었습니다 · {review['reviewer']}")
+        st.caption(review["reason"])
+        return
     st.text_area(
         "의견",
         value=draft,
@@ -59,20 +69,16 @@ def _decision_panel(vessel: dict, draft: str = "") -> None:
         help="AI가 초안을 작성했습니다. 그대로 쓰거나 자유롭게 수정하세요." if draft else None,
     )
     col_a, col_b = st.columns(2)
-    decided = st.session_state.get(f"decision_{vessel['vesselId']}")
     with col_a:
         if st.button("승인", key=f"approve_{vessel['vesselId']}", width="stretch"):
-            st.session_state[f"decision_{vessel['vesselId']}"] = "approve"
-            decided = "approve"
+            opinion = st.session_state.get(f"opinion_{vessel['vesselId']}") or "제출 근거 확인"
+            adapter.review_objection(vessel["vesselId"], "approve", opinion)
+            st.rerun()
     with col_b:
         if st.button("보류", key=f"hold_{vessel['vesselId']}", width="stretch"):
-            st.session_state[f"decision_{vessel['vesselId']}"] = "hold"
-            decided = "hold"
-
-    if decided == "approve":
-        st.success("승인 처리되었습니다 (심사 보조자료 기준).")
-    elif decided == "hold":
-        st.info("보류 처리되었습니다. 추가 소명 자료를 요청할 수 있습니다.")
+            opinion = st.session_state.get(f"opinion_{vessel['vesselId']}") or "추가 소명 필요"
+            adapter.review_objection(vessel["vesselId"], "hold", opinion)
+            st.rerun()
 
     st.markdown(
         '<div class="bs-note">본 리포트는 <b>심사 보조자료</b>입니다. 금리 구간은 사전 '
@@ -100,7 +106,7 @@ def _final_rate_decision(vessel: dict, band: dict, issued: str) -> None:
         components.objection_panel_bank(vessel)
         st.markdown("##### 금리 구간표")
         components.rate_table(vessel["blueScore"])
-        st.markdown("##### 스마트컨트랙트 조회")
+        st.markdown("##### 금리 규칙 조회")
         components.smart_contract_lookup_card(vessel, vessel["blueScore"])
 
     with right:
@@ -130,18 +136,33 @@ def _final_rate_decision(vessel: dict, band: dict, issued: str) -> None:
         _decision_panel(vessel, draft=draft)
 
         st.markdown("##### 온체인 기록 · 조회")
-        payload = adapter.hash_payload(vessel)
-        doc_id = adapter.document_id(vessel, issued)
-        st.markdown(
-            f'<div class="bs-note">문서번호 <span class="bs-mono">{doc_id}</span></div>'
-            f'<div class="bs-hash">{adapter.score_hash(payload)}</div>'
-            f'<div class="bs-note" style="margin-top:10px;">승인·보류가 결정되면 이 해시가 '
-            f'온체인에 커밋됩니다. 문서번호로 해시·블록번호·기록시각을 조회할 수 있습니다. '
-            f'항적 원본이나 식별정보는 기록하지 않습니다.</div>',
-            unsafe_allow_html=True,
+        objection = adapter.get_objection(vessel["vesselId"])
+        commit = adapter.get_report_commit(vessel["scoreRunId"])
+        if objection and objection.get("review") and not commit:
+            if st.button("심사 결과 온체인 커밋", key=f"commit_{vessel['vesselId']}", width="stretch"):
+                adapter.commit_report(vessel["scoreRunId"])
+                st.rerun()
+        elif not objection or not objection.get("review"):
+            st.caption("승인·보류 결정 후 커밋할 수 있습니다.")
+
+        if commit:
+            st.markdown(
+                f'<div class="bs-card"><div class="bs-label">Record ID</div>'
+                f'<div class="bs-hash">{commit["recordId"]}</div>'
+                f'<div class="bs-label" style="margin-top:10px;">Result hash</div>'
+                f'<div class="bs-hash">{commit["resultHash"]}</div>'
+                f'<div class="bs-note" style="margin-top:10px;">원장 {commit["ledgerMode"]} · '
+                f'블록 {commit.get("blockNumber") or "-"} · {commit["committedAt"]}<br>'
+                f'트랜잭션 {commit.get("transactionHash") or "로컬 모드"}<br>'
+                f'컨트랙트 {commit.get("contractAddress") or "-"}</div></div>',
+                unsafe_allow_html=True,
+            )
+        record_id = st.text_input(
+            "Record ID 조회", value=commit["recordId"] if commit else "",
+            key=f"record_lookup_{vessel['vesselId']}", placeholder="BS-demo-score-...",
         )
-        with st.expander("해시 대상 원문 보기"):
-            st.json(payload)
+        if st.button("기록 조회", key=f"record_lookup_btn_{vessel['vesselId']}") and record_id:
+            st.json(adapter.get_chain_record(record_id))
 
 
 def render() -> None:

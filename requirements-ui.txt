@@ -1,8 +1,7 @@
 # 담당: 최지희
 #
 # 대시보드(app.py)만 실행할 때 필요한 최소 패키지.
-# 화면은 score/·explain/를 직접 임포트하지 않고 mock으로 돌기 때문에
-# geopandas·lightgbm·shap 없이도 전 기능이 동작한다.
+# 화면은 계산 모듈을 직접 임포트하지 않고 FastAPI REST 응답만 사용한다.
 #
 #   pip install -r requirements-ui.txt
 #   streamlit run app.py
@@ -12,3 +11,4 @@ streamlit
 plotly
 python-dotenv
 openai
+requests

@@ -15,6 +15,7 @@ from typing import Any, Dict
 
 from explain import facts
 from explain.contract import ExplainInput
+from explain.recommendation_rules import allowed_rules
 
 SYSTEM_PROMPT = """\
 당신은 어선의 지속가능성 점수(BlueScore)를 어업인에게 설명하는 역할입니다.
@@ -90,14 +91,20 @@ def build_user_prompt(data: ExplainInput) -> str:
     positives = ", ".join(f.label for f in data.top_positive()) or "없음"
     negatives = ", ".join(f.label for f in data.top_negative()) or "없음"
 
+    allowed = [
+        {"factorCode": r.factor_code, "factorLabel": r.factor_label, "axis": r.axis, "action": r.action}
+        for r in allowed_rules(data)
+    ]
+
     return (
         f"{build_facts_block()}\n\n"
         f"{build_data_block(data)}\n\n"
         f"점수를 올린 주요 요인: {positives}\n"
         f"점수를 깎은 주요 요인: {negatives}\n\n"
-        "위 계산 결과를 바탕으로 요약과 개선 제안을 작성하세요. "
-        "개선 제안은 점수를 깎은 요인부터 다루되, 깎은 요인이 없으면 "
-        "지금의 좋은 패턴을 유지하라는 쪽으로 씁니다."
+        "허용된 개선 제안(문구와 axis를 그대로 복사해야 함)\n"
+        + json.dumps(allowed, ensure_ascii=False, indent=2)
+        + "\n\n위 계산 결과를 바탕으로 요약과 개선 제안을 작성하세요. "
+        "recommendations에는 허용된 개선 제안만 넣고 action 문구와 axis를 바꾸지 마세요."
     )
 
 

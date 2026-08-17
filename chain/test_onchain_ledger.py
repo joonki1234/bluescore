@@ -160,6 +160,9 @@ class TestCommitWithMockedContract:
         assert isinstance(record, HashRecord)
         assert record.record_id == "vessel-A"
         assert record.result_hash == VALID_HASH
+        assert record.ledger_mode == "onchain"
+        assert record.block_number == 1
+        assert record.contract_address == ledger._contract.address
         commit_call.transact.assert_called_once_with({"from": sender})
 
 

@@ -42,7 +42,7 @@ st.set_page_config(
 )
 
 
-def _sidebar() -> None:
+def _sidebar(*, appeal_inbox: bool = False) -> None:
     with st.sidebar:
         st.markdown(
             f'<div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">'
@@ -54,6 +54,33 @@ def _sidebar() -> None:
             unsafe_allow_html=True,
         )
         st.divider()
+
+        if appeal_inbox:
+            appeals = adapter.list_objections()
+            if appeals:
+                appeal_by_id = {item["appealId"]: item for item in appeals}
+
+                def _open_selected_appeal() -> None:
+                    selected = st.session_state.get("selected_appeal_id")
+                    if selected in appeal_by_id:
+                        st.session_state["vessel_id"] = appeal_by_id[selected]["vesselId"]
+
+                st.selectbox(
+                    "이의제기 업무함",
+                    options=list(appeal_by_id),
+                    format_func=lambda appeal_id: (
+                        f"{appeal_by_id[appeal_id]['vesselId']} · "
+                        f"{appeal_by_id[appeal_id]['status']} · "
+                        f"{appeal_by_id[appeal_id]['scoreRunId']}"
+                    ),
+                    key="selected_appeal_id",
+                    on_change=_open_selected_appeal,
+                )
+                if not st.session_state.get("appeal_inbox_initialized"):
+                    _open_selected_appeal()
+                    st.session_state["appeal_inbox_initialized"] = True
+            else:
+                st.caption("접수된 이의제기가 없습니다.")
 
         options = adapter.vessel_options()
         st.selectbox(
@@ -80,15 +107,23 @@ def _sidebar() -> None:
 def _fisher_page() -> None:
     from ui import fisher
 
-    _sidebar()
-    fisher.render()
+    try:
+        _sidebar()
+        fisher.render()
+    except adapter.ApiClientError as exc:
+        st.error(str(exc))
+        st.code("uvicorn api.main:app --reload --port 8000\nstreamlit run app.py")
 
 
 def _bank_page() -> None:
     from ui import bank
 
-    _sidebar()
-    bank.render()
+    try:
+        _sidebar(appeal_inbox=True)
+        bank.render()
+    except adapter.ApiClientError as exc:
+        st.error(str(exc))
+        st.code("uvicorn api.main:app --reload --port 8000\nstreamlit run app.py")
 
 
 def main() -> None:

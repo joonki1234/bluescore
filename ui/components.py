@@ -780,7 +780,7 @@ def axis_breakdown(vessel: Dict, simulation: Optional[adapter.Simulation] = None
 
     st.markdown(
         f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
-        f'color:{theme.INK_SOFT};">{adapter.formula_text(vessel["axisA"]["score"], vessel["axisB"]["score"])}</span>'
+        f'color:{theme.INK_SOFT};">{adapter.formula_text(vessel["axisA"]["score"], vessel["axisB"]["score"], vessel["blueScore"])}</span>'
         f'<div class="bs-note" style="margin-top:8px;">축 간 비중은 검증 전 잠정치이며, '
         f'은행이 상품 설계에 따라 조정하는 정책 파라미터입니다.</div></div>',
         unsafe_allow_html=True,
@@ -1776,8 +1776,7 @@ def objection_panel_bank(vessel: Dict) -> None:
     )
 
     if st.button("AI 답변 초안 생성", key=f"objection_ai_{vessel['vesselId']}"):
-        result = adapter.objection_ai_response(vessel, objection["reason"], objection["detail"])
-        adapter.resolve_objection(vessel["vesselId"], result["text"], result["source"])
+        adapter.objection_ai_response(vessel, objection["reason"], objection["detail"])
         st.rerun()
 
     refreshed = adapter.get_objection(vessel["vesselId"])
@@ -1794,22 +1793,18 @@ def objection_panel_bank(vessel: Dict) -> None:
 
 def smart_contract_lookup_card(vessel: Dict, score: float) -> None:
     """
-    최종금리결정 탭 — 점수→금리 조회 연출.
-
-    지금은 `adapter.rate_lookup()`이 규칙표를 감싼 mock이다. 실제 온체인
-    컨트랙트가 배포되면 이 컴포넌트는 그대로 두고 `rate_lookup()` 내부만
-    바뀐다.
+    최종금리결정 탭 — FastAPI의 사전 승인 규칙표 조회 결과.
     """
     with st.spinner("스마트컨트랙트에서 금리 구간 조회 중..."):
         result = adapter.rate_lookup(score)
     band = result["band"]
     st.markdown(
-        f'<div class="bs-card"><div class="bs-label">스마트컨트랙트 조회 결과 · '
+        f'<div class="bs-card"><div class="bs-label">사전 승인 금리 규칙 조회 · '
         f'점수 {score:g} → 금리 구간</div>'
         f'<div style="display:flex; align-items:baseline; gap:10px; margin-top:4px;">'
         f'<span style="font-size:22px; font-weight:800;">{theme.discount_text(band)}</span></div>'
-        f'<div class="bs-note" style="margin-top:8px;">현재는 은행 사전 승인 규칙표를 조회한 '
-        f'결과입니다. 점수→금리 매핑 온체인 컨트랙트는 팀 검토 후 이 조회를 대체할 예정입니다.</div>'
+        f'<div class="bs-note" style="margin-top:8px;">FastAPI의 버전 고정 은행 사전 승인 '
+        f'규칙표 조회 결과입니다. 온체인에는 최종 심사 결과 해시만 기록합니다.</div>'
         f"</div>",
         unsafe_allow_html=True,
     )

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from chain.hashing import compute_result_hash
@@ -101,10 +102,14 @@ class Repository:
         with self.database.transaction() as connection:
             cursor = connection.execute(
                 """
-                UPDATE score_runs SET report_json = ?, report_hash = ?
+                UPDATE score_runs SET report_json = ?, report_hash = ?,
+                    report_source = ?, report_generated_at = ?
                 WHERE score_run_id = ?
                 """,
-                (_json(report), compute_result_hash(report), score_run_id),
+                (
+                    _json(report), compute_result_hash(report),
+                    report.get("explanationSource"), report.get("generatedAt"), score_run_id,
+                ),
             )
             if cursor.rowcount != 1:
                 raise KeyError(score_run_id)
@@ -183,6 +188,18 @@ class Repository:
                 "UPDATE appeals SET status = ?, updated_at = ? WHERE appeal_id = ?",
                 (appeal_status, review["decided_at"], review["appeal_id"]),
             )
+
+    def save_appeal_response(self, appeal_id: str, text: str, source: str) -> None:
+        with self.database.transaction() as connection:
+            cursor = connection.execute(
+                """
+                UPDATE appeals SET ai_response = ?, ai_response_source = ?, updated_at = ?
+                WHERE appeal_id = ?
+                """,
+                (text, source, datetime.now(timezone.utc).isoformat(), appeal_id),
+            )
+            if cursor.rowcount != 1:
+                raise KeyError(appeal_id)
 
     def save_chain_commit(self, record: Dict[str, Any]) -> None:
         with self.database.transaction() as connection:

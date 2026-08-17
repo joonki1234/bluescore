@@ -11,6 +11,7 @@ import sqlite3
 import uuid
 from datetime import datetime, timezone
 from typing import List, Optional
+from pydantic import ValidationError
 
 from api.schemas import (
     AppealCreate,
@@ -18,12 +19,16 @@ from api.schemas import (
     AppealListResponse,
     ChainCommitResponse,
     ChainRecordResponse,
+    ConfigResponse,
     ExplanationResponse,
+    RateLookupResponse,
     ReviewDecision,
     ReviewDetail,
     ScoreResponse,
     SimulationRequest,
     SimulationResponse,
+    SimulationSurfaceResponse,
+    TextResponse,
     VesselListResponse,
 )
 from chain.hashing import compute_result_hash
@@ -62,6 +67,12 @@ class WorkflowService:
     def list_vessels(self, source_type: str = "demo", limit: int = 50) -> VesselListResponse:
         return self.scoring.list_vessels(source_type, limit)
 
+    def config(self) -> ConfigResponse:
+        return self.scoring.config()
+
+    def rate_lookup(self, score: float) -> RateLookupResponse:
+        return self.scoring.rate_lookup(score)
+
     def get_score(self, vessel_id: str, source_type: str = "demo") -> ScoreResponse:
         score_run_id = self.scoring.score_run_id(vessel_id, source_type)
         stored = self.repository.get_score_run(score_run_id)
@@ -81,16 +92,31 @@ class WorkflowService:
         self.get_score(vessel_id, "demo")
         return self.scoring.simulate(vessel_id, request)
 
-    def explanation(self, vessel_id: str) -> ExplanationResponse:
+    def simulation_surface(self, vessel_id: str) -> SimulationSurfaceResponse:
+        self.get_score(vessel_id, "demo")
+        return self.scoring.simulation_surface(vessel_id)
+
+    def explanation(
+        self, vessel_id: str, *, use_llm: bool = False, refresh: bool = False
+    ) -> ExplanationResponse:
         score = self.get_score(vessel_id, "demo")
         stored = self.repository.get_score_run(score.score_run_id)
-        if stored and stored.get("report"):
-            return ExplanationResponse.model_validate(stored["report"])
-        report = self.scoring.explain(score)
+        if stored and stored.get("report") and not refresh:
+            try:
+                return ExplanationResponse.model_validate(stored["report"])
+            except ValidationError:
+                # 이전 스키마 캐시는 새 필드가 없을 수 있다. 런타임 LLM을 부르지
+                # 않고 현재 계약의 결정론적 폴백으로 안전하게 다시 만든다.
+                pass
+        report = self.scoring.explain(score, use_llm=use_llm)
         self.repository.save_report(
             score.score_run_id, report.model_dump(mode="json", by_alias=True)
         )
         return report
+
+    def answer_question(self, vessel_id: str, question: str, *, use_llm: bool = False) -> TextResponse:
+        self.get_score(vessel_id, "demo")
+        return self.scoring.answer_question(vessel_id, question, use_llm=use_llm)
 
     def submit_appeal(self, request: AppealCreate) -> AppealDetail:
         score = self.get_score_run(request.score_run_id)
@@ -123,6 +149,20 @@ class WorkflowService:
         if row is None:
             raise NotFoundError(f"이의제기를 찾을 수 없습니다: {appeal_id}")
         return self._appeal_detail(row)
+
+    def objection_draft(
+        self, appeal_id: str, *, use_llm: bool = False, refresh: bool = False
+    ) -> AppealDetail:
+        appeal = self.repository.get_appeal(appeal_id)
+        if appeal is None:
+            raise NotFoundError(f"이의제기를 찾을 수 없습니다: {appeal_id}")
+        if appeal.get("ai_response") and not refresh:
+            return self._appeal_detail(appeal)
+        generated = self.scoring.respond_to_objection(
+            appeal["vessel_id"], appeal["reason"], appeal["detail"], use_llm=use_llm
+        )
+        self.repository.save_appeal_response(appeal_id, generated.text, generated.source)
+        return self.get_appeal(appeal_id)
 
     def review_appeal(self, appeal_id: str, request: ReviewDecision) -> AppealDetail:
         appeal = self.repository.get_appeal(appeal_id)
@@ -186,10 +226,10 @@ class WorkflowService:
             "score_run_id": score_run_id,
             "review_id": review["review_id"],
             "result_hash": result_hash,
-            "ledger_mode": "local",
-            "transaction_hash": None,
-            "block_number": None,
-            "contract_address": None,
+            "ledger_mode": committed.ledger_mode,
+            "transaction_hash": committed.transaction_hash,
+            "block_number": committed.block_number,
+            "contract_address": committed.contract_address,
             "committed_at": committed.committed_at.isoformat(),
         }
         try:
@@ -202,7 +242,20 @@ class WorkflowService:
         record = self.repository.get_chain_commit(record_id)
         if record is None:
             raise NotFoundError(f"체인 기록을 찾을 수 없습니다: {record_id}")
+        if record["ledger_mode"] == "onchain":
+            onchain = self.ledger.get(record_id)
+            if onchain is None:
+                raise NotFoundError(f"온체인 컨트랙트에서 기록을 찾을 수 없습니다: {record_id}")
+            record = dict(record)
+            record["result_hash"] = onchain.result_hash
+            record["committed_at"] = onchain.committed_at.isoformat()
         return self._chain_response(record, record_model=ChainRecordResponse)
+
+    def get_chain_record_for_score_run(self, score_run_id: str) -> ChainRecordResponse:
+        record = self.repository.get_chain_commit_for_score_run(score_run_id)
+        if record is None:
+            raise NotFoundError(f"점수 산출 건의 체인 기록을 찾을 수 없습니다: {score_run_id}")
+        return self.get_chain_record(record["record_id"])
 
     def _appeal_detail(self, row: dict) -> AppealDetail:
         score = self.get_score_run(row["score_run_id"])
@@ -226,6 +279,9 @@ class WorkflowService:
             detail=row["detail"],
             submitted_at=row["submitted_at"],
             updated_at=row["updated_at"],
+            ai_response=row.get("ai_response") or "",
+            ai_response_source=row.get("ai_response_source") or "",
+            response_sent_at=row.get("response_sent_at"),
             review=review_detail,
             **_metadata_from_score(score),
         )
@@ -244,4 +300,3 @@ class WorkflowService:
             committed_at=row["committed_at"],
             **_metadata_from_score(score),
         )
-

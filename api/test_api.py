@@ -42,6 +42,11 @@ def test_persona_one_reaches_a_band(tmp_path):
     assert body["bandChanged"] is True
     assert body["assumptions"]
 
+    surface = client.get("/vessels/VESSEL_A/simulation-surface")
+    assert surface.status_code == 200
+    assert len(surface.json()["grid"]) == 255
+    assert surface.json()["scoreRunId"] == "demo-score-persona-1-v1"
+
 
 def test_persona_two_appeal_review_commit_and_lookup(tmp_path):
     client = _client(tmp_path)
@@ -62,6 +67,14 @@ def test_persona_two_appeal_review_commit_and_lookup(tmp_path):
     )
     assert created.status_code == 201
     appeal_id = created.json()["appealId"]
+    assert created.json()["scoreRunId"] == score["scoreRunId"]
+
+    listed = client.get("/appeals").json()["appeals"]
+    assert listed[0]["scoreRunId"] == score["scoreRunId"]
+
+    drafted = client.post(f"/appeals/{appeal_id}/draft-response", json={"refresh": False})
+    assert drafted.status_code == 200
+    assert drafted.json()["aiResponse"]
 
     reviewed = client.post(
         f"/appeals/{appeal_id}/review",
@@ -79,6 +92,10 @@ def test_persona_two_appeal_review_commit_and_lookup(tmp_path):
     lookup = client.get(f"/chain/records/{commit_body['recordId']}")
     assert lookup.status_code == 200
     assert lookup.json()["resultHash"] == commit_body["resultHash"]
+
+    by_score_run = client.get(f"/reports/{score['scoreRunId']}/commit")
+    assert by_score_run.status_code == 200
+    assert by_score_run.json()["recordId"] == commit_body["recordId"]
 
 
 def test_api_restart_keeps_appeal_state(tmp_path):

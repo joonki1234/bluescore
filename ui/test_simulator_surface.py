@@ -14,9 +14,49 @@
 그래서 전수로 대조한다.
 """
 
+import pytest
+from fastapi.testclient import TestClient
+
+from api.main import create_app
 from ui import adapter, theme
 
 VESSEL_ID = "V-001"
+
+
+class _InProcessApi:
+    """HTTP 서버 대신 TestClient를 쓰되 adapter에는 REST 응답만 보이게 한다."""
+
+    def __init__(self, client):
+        self.client = client
+
+    def config(self):
+        return self.client.get("/config").json()
+
+    def list_vessels(self, source_type="demo"):
+        return self.client.get("/vessels", params={"sourceType": source_type}).json()
+
+    def score(self, vessel_id, source_type="demo"):
+        return self.client.get(
+            f"/vessels/{vessel_id}/score", params={"sourceType": source_type}
+        ).json()
+
+    def simulation_surface(self, vessel_id):
+        return self.client.get(f"/vessels/{vessel_id}/simulation-surface").json()
+
+    def simulate(self, vessel_id, revisit_count, speed_knots):
+        return self.client.post(
+            f"/vessels/{vessel_id}/simulate",
+            json={"revisitCount": revisit_count, "speedKnots": speed_knots},
+        ).json()
+
+
+@pytest.fixture(autouse=True)
+def _api_backend(monkeypatch, tmp_path):
+    client = TestClient(create_app(tmp_path / "ui.db"))
+    monkeypatch.setattr(adapter, "_api", _InProcessApi(client))
+    adapter.clear_cache()
+    yield
+    adapter.clear_cache()
 
 
 def _vessel():

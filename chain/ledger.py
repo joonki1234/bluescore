@@ -33,6 +33,10 @@ class HashRecord:
     record_id: str
     result_hash: str
     committed_at: datetime
+    ledger_mode: str = "local"
+    transaction_hash: Optional[str] = None
+    block_number: Optional[int] = None
+    contract_address: Optional[str] = None
 
 
 class HashLedger:
@@ -216,6 +220,10 @@ class OnChainHashLedger:
             record_id=record_id,
             result_hash=result_hash,
             committed_at=datetime.fromtimestamp(block["timestamp"], tz=timezone.utc),
+            ledger_mode="onchain",
+            transaction_hash=tx_hash.hex() if hasattr(tx_hash, "hex") else str(tx_hash),
+            block_number=int(receipt["blockNumber"]),
+            contract_address=self._contract.address,
         )
 
     def get(self, record_id: str) -> Optional[HashRecord]:
@@ -226,6 +234,8 @@ class OnChainHashLedger:
             record_id=record_id,
             result_hash=self._bytes32_to_hex(result_hash_bytes),
             committed_at=datetime.fromtimestamp(committed_at, tz=timezone.utc),
+            ledger_mode="onchain",
+            contract_address=self._contract.address,
         )
 
     def verify(self, record_id: str, expected_hash: str) -> bool:

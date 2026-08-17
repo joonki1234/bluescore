@@ -2,13 +2,11 @@
 
 # chain TODO
 
-## 진행 현황 정리 (2026-08-15)
+## 진행 현황 정리 (2026-08-17)
 
-해시 생성·인메모리 원장·Hardhat 실배포·Python(web3.py) 연동·score/ 연결부까지
-전부 구현·테스트·end-to-end 검증 완료. **남은 건 딱 하나, `ui/adapter.score_hash()`를
-`chain.hashing.compute_result_hash()` 호출로 교체하는 배선뿐이고, 이건 최지희님과
-조율이 필요하다** (아래 마지막 항목 참고). 오동규·김준기 단독으로 chain/에서
-더 할 일은 없다.
+해시 생성·인메모리 원장·Hardhat 실배포·Python(web3.py) 연동에 이어 FastAPI 업무
+흐름 배선까지 완료했다. UI의 중복 해시 계산은 제거했고 WorkflowService가
+`chain.hashing.compute_result_hash()`와 주입된 `OnChainHashLedger`를 사용한다.
 
 ---
 
@@ -44,11 +42,8 @@
       `verify_score_result`). score/가 아직 mock 폴백이라 실제로 호출하는 곳은
       없지만, 실산출 전환 시 바로 쓸 수 있게 미리 준비. record_id 정책(예:
       `f"{vesselId}:{period}"`)은 호출부(예정된 main.py)가 정함. 테스트 3개.
-- [x] `ui/adapter.py`의 `score_hash()`와 `chain/hashing.py` 해시 일치 검증
-      (`explain/TODO.md`의 `TODO(chain/ 김준기·오동규)` 대응) — 실제로 값이
-      갈리는 걸 발견함(구분자, 리스트 안 None 처리). `chain/hashing.py`를
-      `ui/adapter.py`에 맞춰 통일하고 CLAUDE.md 해시 규칙 문구도 명확히 함.
-      `test_hash_matches_ui_adapter.py`로 회귀 방지. **`ui/adapter.score_hash()`를
-      `chain.hashing.compute_result_hash()` 호출로 교체하는 배선은 아직 안
-      했음 — 최지희님과 조율 필요(TODO 원문: "일치하는지 검증할 것"까지가
-      요청 범위였고, 배선 교체는 별도 확인 후).
+- [x] UI 중복 해시 구현 제거 및 FastAPI 업무 흐름 연결.
+      `WorkflowService.commit_report()`가 승인/보류 뒤 온체인 커밋하고 트랜잭션
+      해시·블록번호·기록시각·컨트랙트 주소를 SQLite에 저장한다. 금융기관 화면은
+      Record ID 조회 API의 결과만 표시한다. `verify_api_onchain.py`로 로컬 Hardhat
+      실제 트랜잭션과 조회까지 검증 완료.

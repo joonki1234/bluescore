@@ -87,6 +87,7 @@ class VesselListResponse(VersionedResponse):
 
 class AxisScore(ApiModel):
     score: Optional[float] = None
+    top_percent: Optional[int] = None
     state: AxisState
     raw_value: Optional[float] = None
     used_event_count: Optional[int] = None
@@ -105,6 +106,10 @@ class PeerContext(ApiModel):
     count: int
     top_percent: Optional[int] = None
     top_percent_interval: Optional[Dict[str, int]] = None
+    scores: List[float] = Field(default_factory=list)
+    self_index: Optional[int] = None
+    axis_a_scores: List[float] = Field(default_factory=list)
+    axis_b_scores: List[float] = Field(default_factory=list)
 
 
 class ShapFactorSchema(ApiModel):
@@ -154,6 +159,14 @@ class ScoreResponse(VersionedResponse):
     fishing_segments: List[List[int]] = Field(default_factory=list)
     revisit_count: Optional[int] = None
     average_speed_knots: Optional[float] = None
+    anchor: Optional[List[float]] = None
+    total_distance_km: Optional[float] = None
+    fishing_hours: Optional[float] = None
+    estimated_fuel_kl: Optional[float] = None
+    sail_calls: Optional[int] = None
+    fishing_days: Optional[int] = None
+    gap_index: Optional[int] = None
+    mpa_index: Optional[int] = None
     message: Optional[str] = None
     created_at: datetime
 
@@ -182,6 +195,34 @@ class SimulationResponse(VersionedResponse):
     assumptions: List[str]
 
 
+class SimulationSurfaceResponse(VersionedResponse):
+    score_run_id: str
+    vessel_id: str
+    revisits: List[int]
+    speeds: List[float]
+    grid: Dict[str, Dict[str, Any]]
+    base: Dict[str, Any]
+    rate_grades: List[RateBand]
+    peer_scores: List[float]
+    principal_won: int
+    term_years: int
+
+
+class ImprovementPlan(ApiModel):
+    key: str
+    title: str
+    desc: str
+    base_score: float
+    score: float
+    score_delta: float
+    before_band: str
+    after_band: str
+    band_changed: bool
+    actions: List[str]
+    tip: str
+    tip_source: str
+
+
 class DetailedReportItem(ApiModel):
     label: str
     axis: str
@@ -189,6 +230,7 @@ class DetailedReportItem(ApiModel):
     peer_average: float
     unit: str
     contribution: Optional[float] = None
+    diff: float
     sentence: str
 
 
@@ -199,7 +241,23 @@ class ExplanationResponse(VersionedResponse):
     shap_factors: List[ShapFactorSchema]
     recommendations: List[RecommendationSchema]
     detailed_report: List[DetailedReportItem]
+    improvement_plans: List[ImprovementPlan] = Field(default_factory=list)
     explanation_source: str
+    report_source: str
+    generated_at: datetime
+
+
+class QuestionRequest(ApiModel):
+    question: str = Field(min_length=1, max_length=2000)
+
+
+class TextResponse(VersionedResponse):
+    text: str
+    source: str
+
+
+class ObjectionDraftRequest(ApiModel):
+    refresh: bool = False
 
 
 class AppealCreate(ApiModel):
@@ -232,6 +290,9 @@ class AppealDetail(VersionedResponse):
     detail: str
     submitted_at: datetime
     updated_at: datetime
+    ai_response: str = ""
+    ai_response_source: str = ""
+    response_sent_at: Optional[datetime] = None
     review: Optional[ReviewDetail] = None
 
 
@@ -253,6 +314,21 @@ class ChainCommitResponse(VersionedResponse):
 
 class ChainRecordResponse(ChainCommitResponse):
     pass
+
+
+class ConfigResponse(ApiModel):
+    axis_weights: Dict[str, float]
+    rate_grades: List[RateBand]
+    data_freshness: Dict[str, str]
+    min_peer_sample: int
+    example_principal_won: int
+    example_term_years: int
+    api_base_path: str = "/"
+
+
+class RateLookupResponse(VersionedResponse):
+    band: RateBand
+    source: str
 
 
 class ErrorResponse(ApiModel):

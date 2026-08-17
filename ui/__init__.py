@@ -5,7 +5,8 @@ BlueScore 대시보드 화면 계층.
 
     app.py          진입점 · 페이지 네비게이션
     ui/theme.py     색 토큰 · CSS · 포맷 헬퍼
-    ui/adapter.py   유일한 계산 창구 (score/·explain/ 호출 + mock 폴백)
+    ui/api_client.py  FastAPI HTTP 클라이언트
+    ui/adapter.py     API 응답의 화면 키 변환
     ui/components.py 두 화면이 공유하는 컴포넌트
     ui/fisher.py    어업인 화면
     ui/bank.py      심사역(금융기관) 화면

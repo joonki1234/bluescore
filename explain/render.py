@@ -23,6 +23,7 @@ import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from explain.contract import AXIS_CODES, ExplainInput, Recommendation
+from explain.recommendation_rules import is_allowed
 
 # 문장에서 숫자를 뽑는 패턴. 부호와 소수점을 포함한다.
 _NUMBER_PATTERN = re.compile(r"-?\d+(?:\.\d+)?")
@@ -103,7 +104,7 @@ def parse_json(raw: str) -> Dict[str, Any]:
     return parsed
 
 
-def _validate_recommendations(raw: Any) -> List[Recommendation]:
+def _validate_recommendations(raw: Any, data: ExplainInput) -> List[Recommendation]:
     if not isinstance(raw, list):
         raise RenderError("recommendations가 배열이 아닙니다.")
 
@@ -119,7 +120,18 @@ def _validate_recommendations(raw: Any) -> List[Recommendation]:
             raise RenderError(
                 f"recommendations[{index}].axis가 {AXIS_CODES} 중 하나가 아닙니다: {axis!r}"
             )
-        recommendations.append(Recommendation(action=action.strip(), axis=axis))
+        recommendation = Recommendation(action=action.strip(), axis=axis)
+        invented = find_invented_numbers(recommendation.action, data)
+        if invented:
+            raise RenderError(
+                "입력에 없는 수치가 포함되어 있습니다: "
+                + ", ".join(f"{n:g}" for n in invented)
+            )
+        if not is_allowed(data, recommendation):
+            raise RenderError(
+                f"recommendations[{index}]가 allowedRecommendations 규칙에 없습니다."
+            )
+        recommendations.append(recommendation)
 
     return recommendations
 
@@ -143,7 +155,7 @@ def parse_and_validate(
         raise RenderError("summary가 비어 있습니다.")
     summary = summary.strip()
 
-    recommendations = _validate_recommendations(parsed.get("recommendations"))
+    recommendations = _validate_recommendations(parsed.get("recommendations"), data)
     if not recommendations:
         raise RenderError("recommendations가 비어 있습니다.")
 

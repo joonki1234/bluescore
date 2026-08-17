@@ -43,6 +43,22 @@ class Database:
             }
             if "report_hash" not in columns:
                 connection.execute("ALTER TABLE score_runs ADD COLUMN report_hash TEXT")
+            if "report_source" not in columns:
+                connection.execute("ALTER TABLE score_runs ADD COLUMN report_source TEXT")
+            if "report_generated_at" not in columns:
+                connection.execute("ALTER TABLE score_runs ADD COLUMN report_generated_at TEXT")
+
+            appeal_columns = {
+                row["name"] for row in connection.execute("PRAGMA table_info(appeals)")
+            }
+            if "ai_response" not in appeal_columns:
+                connection.execute("ALTER TABLE appeals ADD COLUMN ai_response TEXT NOT NULL DEFAULT ''")
+            if "ai_response_source" not in appeal_columns:
+                connection.execute(
+                    "ALTER TABLE appeals ADD COLUMN ai_response_source TEXT NOT NULL DEFAULT ''"
+                )
+            if "response_sent_at" not in appeal_columns:
+                connection.execute("ALTER TABLE appeals ADD COLUMN response_sent_at TEXT")
 
     @contextmanager
     def transaction(self) -> Iterator[sqlite3.Connection]:

@@ -117,6 +117,7 @@ def _generate_text(
     field: str,
     fallback_text: str,
     provider: Optional[LLMProvider] = None,
+    use_llm: bool = True,
 ) -> TextOutput:
     """
     문장 하나만 생성하는 흐름(질의응답·이의제기 응답·상세 리포트)의 공통 뼈대.
@@ -124,6 +125,9 @@ def _generate_text(
     `explain()`과 같은 원칙을 따른다 — 어떤 실패든 절대 예외를 던지지 않고
     `fallback_text`로 흡수하며, 사유는 `source`에 남는다.
     """
+    if not use_llm:
+        return TextOutput(text=fallback_text, source="fallback:llm_disabled")
+
     try:
         llm = provider or get_provider()
     except ProviderUnavailable as exc:
@@ -157,7 +161,8 @@ def _generate_text(
 
 
 def answer_question(
-    data: ExplainInput, question: str, provider: Optional[LLMProvider] = None
+    data: ExplainInput, question: str, provider: Optional[LLMProvider] = None,
+    use_llm: bool = True,
 ) -> TextOutput:
     """어업인의 자유 질문에 답한다. `explain()`과 같은 LLM 프로바이더를 재사용한다."""
     return _generate_text(
@@ -169,11 +174,13 @@ def answer_question(
         field="answer",
         fallback_text=fallback.build_qa_fallback(data, question),
         provider=provider,
+        use_llm=use_llm,
     )
 
 
 def respond_to_objection(
-    data: ExplainInput, reason: str, detail: str, provider: Optional[LLMProvider] = None
+    data: ExplainInput, reason: str, detail: str, provider: Optional[LLMProvider] = None,
+    use_llm: bool = True,
 ) -> TextOutput:
     """이의제기에 대한 답변 초안을 만든다. 심사역이 검토 후 전달한다."""
     return _generate_text(
@@ -185,11 +192,12 @@ def respond_to_objection(
         field="response",
         fallback_text=fallback.build_objection_fallback(data, reason, detail),
         provider=provider,
+        use_llm=use_llm,
     )
 
 
 def generate_detailed_report(
-    data: ExplainInput, provider: Optional[LLMProvider] = None
+    data: ExplainInput, provider: Optional[LLMProvider] = None, use_llm: bool = True
 ) -> ReportOutput:
     """
     요인별 실측값(factor_metrics)을 근거로 요인마다 한 항목씩 설명을 만든다.
@@ -198,6 +206,9 @@ def generate_detailed_report(
     매핑이라 별도로 둔다. 실패는 전부 폴백으로 흡수하며 예외를 던지지 않는다.
     """
     fallback_items = fallback.build_report_fallback(data)
+
+    if not use_llm:
+        return ReportOutput(items=fallback_items, source="fallback:llm_disabled")
 
     try:
         llm = provider or get_provider()
@@ -239,6 +250,7 @@ def generate_improvement_tip(
     plan_label: str,
     actions: List[str],
     provider: Optional[LLMProvider] = None,
+    use_llm: bool = True,
 ) -> TextOutput:
     """
     개선 조합 하나를 실제 조업에서 어떻게 실천하는지 알려주는 팁.
@@ -257,4 +269,5 @@ def generate_improvement_tip(
         field="tip",
         fallback_text=fallback.build_improvement_tip_fallback(actions),
         provider=provider,
+        use_llm=use_llm,
     )

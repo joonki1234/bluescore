@@ -16,25 +16,7 @@ from __future__ import annotations
 from typing import Dict, List
 
 from explain.contract import ExplainInput, ExplainOutput, Recommendation, ShapFactor
-
-# 요인 라벨 → 개선 행동 문구. 라벨은 score/의 SHAP 출력과 맞춰야 한다.
-# TODO(score/): SHAP 요인 라벨이 확정되면 이 표를 실제 라벨로 맞출 것.
-_ACTION_BY_LABEL = {
-    "항해 속도": "평균 항해 속도를 1노트 정도 낮춰 보세요",
-    "조업 시간당 연료": "조업 중 공회전과 대기 시간을 줄여 보세요",
-    "표류·대기 시간 비중": "어장 도착 전 대기 시간을 줄여 보세요",
-    "동일 격자 재방문 간격": "같은 어장을 연속으로 조업하는 횟수를 한 번 줄여 보세요",
-    "혼잡 어장 회피": "배가 몰리는 시간대를 피해 조업해 보세요",
-    "조업 시간 배분": "조업과 항해 시간 배분을 고르게 가져가 보세요",
-    "어장 이동 거리": "가까운 어장 위주로 동선을 짜 보세요",
-    "입출항 규칙성": "입출항 시각을 일정하게 유지해 보세요",
-    "해황 보정(유속·풍속)": "해황이 급변하는 구간은 미리 피해 보세요",
-    "경제속도 준수": "지금의 경제속도 운항을 유지하세요",
-    "재방문 간격 확보": "지금처럼 재방문 간격을 넉넉히 유지하세요",
-    "혼잡 해역 회피": "지금처럼 혼잡한 해역을 피해 조업하세요",
-}
-
-_GENERIC_ACTION = "이 항목의 조업 패턴을 조금씩 조정해 보세요"
+from explain.recommendation_rules import allowed_recommendations
 
 
 def _has_batchim(word: str) -> bool:
@@ -96,28 +78,7 @@ def build_recommendations(data: ExplainInput, limit: int = 3) -> List[Recommenda
     깎은 요인이 부족하면 올린 요인을 '유지하세요' 쪽으로 채운다 — 이미 잘하는
     배에게 억지로 개선 지시를 만들어내지 않기 위한 것이다.
     """
-    recommendations: List[Recommendation] = []
-
-    for factor in data.top_negative(limit=limit):
-        recommendations.append(
-            Recommendation(
-                action=_ACTION_BY_LABEL.get(factor.label, _GENERIC_ACTION),
-                axis=factor.axis,
-            )
-        )
-
-    if not recommendations:
-        for factor in data.top_positive(limit=limit):
-            recommendations.append(
-                Recommendation(
-                    action=_ACTION_BY_LABEL.get(
-                        factor.label, "지금의 조업 패턴을 그대로 유지하세요"
-                    ),
-                    axis=factor.axis,
-                )
-            )
-
-    return recommendations[:limit]
+    return allowed_recommendations(data, limit)
 
 
 def build(data: ExplainInput, reason: str) -> ExplainOutput:
