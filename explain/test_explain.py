@@ -312,16 +312,55 @@ def test_이의제기_응답_정상_응답은_그대로_쓴다():
 def test_상세리포트_LLM_없으면_factor_metrics로_폴백한다():
     result = generate_detailed_report(make_input(), provider=StubProvider(available=False))
     assert result.is_fallback
-    assert "동일 격자 재방문 간격" in result.text
+    # 요인마다 한 항목씩 — 화면이 요인별로 끊어 그릴 수 있어야 한다.
+    assert set(result.items) == {"동일 격자 재방문 간격", "항해 속도"}
+    assert all(v.strip() for v in result.items.values())
 
 
 def test_상세리포트_정상_응답은_그대로_쓴다():
     raw = json.dumps(
-        {"report": "동일 격자 재방문 간격이 유사군 평균보다 길어 자원 압력이 낮습니다."},
+        {"items": [
+            {"label": "동일 격자 재방문 간격",
+             "sentence": "유사군 평균보다 간격이 길어 자원 압력이 낮습니다."},
+            {"label": "항해 속도",
+             "sentence": "유사군 평균보다 조금 빠르게 다녔습니다."},
+        ]},
         ensure_ascii=False,
     )
     result = generate_detailed_report(make_input(), provider=StubProvider(response=raw))
     assert result.source == "llm:stub"
+    assert result.items["항해 속도"] == "유사군 평균보다 조금 빠르게 다녔습니다."
+
+
+def test_상세리포트_입력에_없는_요인은_통째로_폴백한다():
+    """모델이 계산에 없는 요인을 지어내면 그 응답 전체를 버린다."""
+    raw = json.dumps(
+        {"items": [{"label": "존재하지 않는 요인", "sentence": "그럴듯한 설명입니다."}]},
+        ensure_ascii=False,
+    )
+    result = generate_detailed_report(make_input(), provider=StubProvider(response=raw))
+    assert result.source == "fallback:validation_failed"
+    assert "존재하지 않는 요인" not in result.items
+
+
+def test_상세리포트_창작된_수치가_있으면_폴백한다():
+    raw = json.dumps(
+        {"items": [{"label": "동일 격자 재방문 간격", "sentence": "평균 대비 999.9시간 깁니다."}]},
+        ensure_ascii=False,
+    )
+    result = generate_detailed_report(make_input(), provider=StubProvider(response=raw))
+    assert result.source == "fallback:validation_failed"
+
+
+def test_상세리포트_일부_요인만_오면_나머지는_폴백_문장으로_채운다():
+    raw = json.dumps(
+        {"items": [{"label": "동일 격자 재방문 간격", "sentence": "간격이 넉넉합니다."}]},
+        ensure_ascii=False,
+    )
+    result = generate_detailed_report(make_input(), provider=StubProvider(response=raw))
+    assert result.source == "llm:stub"
+    assert result.items["동일 격자 재방문 간격"] == "간격이 넉넉합니다."
+    assert result.items["항해 속도"], "빠진 요인이 화면에서 빈칸이 되면 안 된다"
 
 
 def test_어떤_경우에도_텍스트_생성_함수는_예외를_던지지_않는다():
@@ -333,10 +372,11 @@ def test_어떤_경우에도_텍스트_생성_함수는_예외를_던지지_않�
         for fn, args in [
             (answer_question, ("질문",)),
             (respond_to_objection, ("사유", "상세")),
-            (generate_detailed_report, ()),
         ]:
             result = fn(make_input(), *args, provider=provider)
             assert result.text
+        report = generate_detailed_report(make_input(), provider=provider)
+        assert report.items
 
 
 def test_mock_스키마와_같은_키로_직렬화된다():

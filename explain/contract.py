@@ -151,7 +151,7 @@ class ExplainOutput:
 @dataclass(frozen=True)
 class TextOutput:
     """
-    질의응답 / 이의제기 응답 / 상세 리포트처럼 문장 하나만 생성하는 흐름의 결과.
+    질의응답 / 이의제기 응답처럼 문장 하나만 생성하는 흐름의 결과.
 
     `ExplainOutput`과 같은 `source` 규약을 쓴다 — "llm:<provider>" 또는
     "fallback:<사유>". 화면은 이 값으로 LLM 생성인지 템플릿인지 표시한다.
@@ -166,6 +166,27 @@ class TextOutput:
 
     def as_dict(self) -> Dict[str, Any]:
         return {"text": self.text, "source": self.source}
+
+
+@dataclass(frozen=True)
+class ReportOutput:
+    """
+    요인별 상세 리포트의 결과.
+
+    `items`는 `{요인 라벨: 설명 문장}`이다. 한 덩어리 문자열이 아니라 라벨로
+    묶여 있어야 화면이 요인별 실측값 옆에 해당 문장을 붙일 수 있다 — 줄글
+    한 문단으로는 어느 문장이 어느 수치를 설명하는지 독자가 맞춰야 했다.
+    """
+
+    items: Dict[str, str]
+    source: str
+
+    @property
+    def is_fallback(self) -> bool:
+        return self.source.startswith("fallback")
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {"items": dict(self.items), "source": self.source}
 
 
 # ─── LLM 응답 스키마 ─────────────────────────────────────────────────────────
@@ -235,17 +256,51 @@ OBJECTION_OUTPUT_SCHEMA: Dict[str, Any] = {
     "additionalProperties": False,
 }
 
+# 상세 리포트는 요인마다 한 항목씩 돌려받는다. 한 덩어리 줄글로 받으면 화면이
+# 그것을 그대로 문단으로 뿌릴 수밖에 없어 읽히지 않았다. 구조는 문자열을 나중에
+# 쪼개서 만드는 것이 아니라 생성 단계에서 정한다.
 REPORT_OUTPUT_SCHEMA: Dict[str, Any] = {
     "type": "object",
     "properties": {
-        "report": {
+        "items": {
+            "type": "array",
+            "description": "요인별 설명. 주어진 요인 하나당 정확히 한 항목.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "label": {
+                        "type": "string",
+                        "description": "설명 대상 요인의 라벨. 주어진 라벨을 그대로 쓴다.",
+                    },
+                    "sentence": {
+                        "type": "string",
+                        "description": (
+                            "그 요인 하나에 대한 1~2문장 설명. 주어진 실측값(선박 자신 "
+                            "값·유사군 평균값) 외의 수치를 쓰지 않는다."
+                        ),
+                    },
+                },
+                "required": ["label", "sentence"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["items"],
+    "additionalProperties": False,
+}
+
+TIP_OUTPUT_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "tip": {
             "type": "string",
             "description": (
-                "요인별 상세 리포트. 주어진 요인별 실측값(선박 자신 값과 유사군 "
-                "평균값)을 근거로 5~8문장 분량으로 각 요인을 풀어 설명한다."
+                "개선 조합을 실제 조업에서 어떻게 실천하는지 알려주는 두 문장. "
+                "숫자(점수·속도·퍼센트·금리)를 포함하지 않는다 — 수치는 화면이 "
+                "따로 표시하므로 여기서는 행동만 설명한다."
             ),
         },
     },
-    "required": ["report"],
+    "required": ["tip"],
     "additionalProperties": False,
 }

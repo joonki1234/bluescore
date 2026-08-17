@@ -13,7 +13,7 @@ LLM 없이 설명을 만드는 템플릿 폴백.
 
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List
 
 from explain.contract import ExplainInput, ExplainOutput, Recommendation, ShapFactor
 
@@ -166,26 +166,36 @@ def build_objection_fallback(data: ExplainInput, reason: str, detail: str) -> st
     )
 
 
-def build_report_fallback(data: ExplainInput) -> str:
+def build_report_fallback(data: ExplainInput) -> Dict[str, str]:
     """
-    LLM 없이 요인별 실측값을 문장으로 나열한다.
+    LLM 없이 요인별 설명을 `{요인 라벨: 문장}`으로 만든다.
 
     `factor_metrics`(선박 자신 값 vs 유사군 평균)를 계산 결과 그대로 문장
     틀에 끼워 넣는다 — 숫자를 만들어낼 여지가 없어 검증이 필요 없다.
     """
-    if not data.factor_metrics:
-        return build_summary(data)
-
-    sentences: List[str] = []
+    out: Dict[str, str] = {}
     for metric in data.factor_metrics:
         axis_name = "자원 압력" if metric.axis == "a" else "운항 효율"
         diff = metric.self_value - metric.peer_average
         direction = "높습니다" if diff > 0 else "낮습니다" if diff < 0 else "비슷합니다"
-        sentences.append(
-            f"{metric.label}({axis_name})은 귀 선박이 {metric.self_value:g}{metric.unit}, "
+        out[metric.label] = (
+            f"{axis_name} 요인입니다. 귀 선박이 {metric.self_value:g}{metric.unit}, "
             f"유사 선박군 평균은 {metric.peer_average:g}{metric.unit}로 평균보다 {direction}."
         )
-    return " ".join(sentences)
+    return out
+
+
+def build_improvement_tip_fallback(actions: List[str]) -> str:
+    """
+    LLM 없이 개선 조합의 실행 팁을 만든다.
+
+    계산이 정한 변경 방향(`actions`)을 그대로 이어 붙일 뿐이라 숫자를 만들어낼
+    여지가 없다. LLM 팁과 마찬가지로 수치는 넣지 않는다.
+    """
+    if not actions:
+        return "지금 조업 방식을 그대로 유지하면 됩니다."
+    joined = ", ".join(actions)
+    return f"{joined}. 한 번에 다 바꾸기보다 다음 출항에서 한 가지씩 시도해 보세요."
 
 
 def merge_partial(

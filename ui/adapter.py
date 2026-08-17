@@ -219,16 +219,49 @@ class Simulation:
     score_delta: float
     fuel_delta_percent: float
     tradeoff_notes: List[str]
+    # 이 결과를 만든 슬라이더 위치. 개선 추천 카드가 "무엇을 바꾼 조합인지"를
+    # 말하려면 결과만으로는 부족해서 함께 들고 다닌다.
+    revisit_count: int = 0
+    speed_knots: float = 0.0
+
+    def actions(self, vessel: Dict) -> List[str]:
+        """
+        기준 조업 방식 대비 무엇을 바꾸는 조합인지 문장으로 만든다.
+
+        숫자는 넣지 않는다 — 이 문장이 그대로 LLM 개선팁 프롬프트의 입력이 되고,
+        팁은 수치를 쓰지 않는 것이 규칙이기 때문이다(`explain/prompt.py` 참고).
+        """
+        out: List[str] = []
+        if self.revisit_count < vessel["revisitCount"]:
+            out.append("같은 어장에서 연달아 조업하는 횟수를 줄인다")
+        elif self.revisit_count > vessel["revisitCount"]:
+            out.append("같은 어장에서 연달아 조업하는 횟수를 늘린다")
+        if self.speed_knots < vessel["averageSpeedKnots"]:
+            out.append("어장을 오갈 때의 평균 항해 속도를 낮춘다")
+        elif self.speed_knots > vessel["averageSpeedKnots"]:
+            out.append("어장을 오갈 때의 평균 항해 속도를 높인다")
+        return out
 
 
-def simulate(vessel: Dict, revisit_count: int, speed_knots: float) -> Simulation:
+def simulate(
+    vessel: Dict, revisit_count: int, speed_knots: float, *, include_tradeoff: bool = True
+) -> Simulation:
     """
     조업 방식을 바꿨을 때의 예상 점수.
 
     한쪽 축의 개선이 다른 축에 주는 **반작용**을 함께 반영한다. 어장을 자주
     바꾸면 이동거리가 늘어 연료를 더 쓰고(B축 하락), 속도를 낮추면 해상
-    체류가 길어진다(A축 소폭 하락). 반작용을 빼면 두 슬라이더를 모두 끝까지
-    밀었을 때 물리적으로 불가능한 조합이 최고점으로 나온다.
+    체류가 길어진다(A축 소폭 하락).
+
+    `include_tradeoff=False`는 그 반작용을 뺀 값이다 — 화면이 "반작용을 넣지
+    않았다면 이만큼 올라간다고 착각했을 곡선"을 점선으로 나란히 그려 대가를
+    눈에 보이게 하는 용도이며, 점수 표시에는 쓰지 않는다.
+
+    주의(2026-08-17 실측): 현재 잠정 계수에서는 반작용이 이득을 **줄이기만 할 뿐
+    부호를 뒤집지 못한다** — 속도 1노트 감속당 순 +0.60점(반작용 없으면 +1.12),
+    연속조업 1회 감축당 순 +3.71점(반작용 없으면 +4.55). 즉 두 슬라이더 모두
+    끝까지 미는 것이 실제로 최고점이며, "최고점은 중간에 있다"는 시연 논지는
+    지금 계수로는 성립하지 않는다. `ui/test_simulator_surface.py` 참고.
     """
     base_a = vessel["axisA"]["score"]
     base_b = vessel["axisB"]["score"]
@@ -237,9 +270,10 @@ def simulate(vessel: Dict, revisit_count: int, speed_knots: float) -> Simulation
     speed_steps = vessel["averageSpeedKnots"] - speed_knots  # 낮출수록 양수
 
     axis_a = base_a + revisit_steps * AXIS_A_GAIN_PER_REVISIT_STEP
-    axis_a -= speed_steps * AXIS_A_COST_PER_KNOT
     axis_b = base_b + speed_steps * AXIS_B_GAIN_PER_KNOT
-    axis_b -= revisit_steps * AXIS_B_COST_PER_REVISIT_STEP
+    if include_tradeoff:
+        axis_a -= speed_steps * AXIS_A_COST_PER_KNOT
+        axis_b -= revisit_steps * AXIS_B_COST_PER_REVISIT_STEP
 
     axis_a = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_a)), 1)
     axis_b = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_b)), 1)
@@ -276,7 +310,90 @@ def simulate(vessel: Dict, revisit_count: int, speed_knots: float) -> Simulation
         score_delta=round(score - vessel["blueScore"], 1),
         fuel_delta_percent=round(fuel_delta, 1),
         tradeoff_notes=notes,
+        revisit_count=revisit_count,
+        speed_knots=speed_knots,
     )
+
+
+# 시뮬레이터 슬라이더의 정의역. 화면(ui/fisher.py)이 아니라 여기서 정한다 —
+# 사전계산한 격자와 슬라이더의 눈금이 어긋나면 조회가 빈칸을 만나기 때문이다.
+SIM_REVISIT_RANGE = (1, 5)
+SIM_SPEED_DELTA_DOWN = 3.0
+SIM_SPEED_DELTA_UP = 2.0
+SIM_SPEED_STEP = 0.1
+
+
+def simulate_speed_axis(vessel: Dict) -> List[float]:
+    """속도 슬라이더가 취할 수 있는 값 전체."""
+    base = vessel["averageSpeedKnots"]
+    lo = round(base - SIM_SPEED_DELTA_DOWN, 1)
+    steps = int(round((SIM_SPEED_DELTA_DOWN + SIM_SPEED_DELTA_UP) / SIM_SPEED_STEP))
+    return [round(lo + i * SIM_SPEED_STEP, 1) for i in range(steps + 1)]
+
+
+def simulate_surface(vessel: Dict) -> Dict:
+    """
+    슬라이더 전 구간의 시뮬레이션 결과를 미리 계산한다.
+
+    `simulate()`를 격자 전체(연속조업 5칸 × 속도 51칸)에 돌린 표다. 화면이
+    이 표를 통째로 받아 브라우저에서 조회만 하면, 슬라이더를 움직일 때마다
+    서버를 왕복하지 않아도 된다 — 실측상 왕복 1회가 300~570ms였고 그때마다
+    결과 카드 iframe이 다시 로드돼 카운트업 애니메이션이 처음부터 재생됐다.
+
+    **계산은 여전히 전부 여기(파이썬)서 한다.** 브라우저는 이 표를 읽기만 하며
+    새 숫자를 만들지 않는다 — adapter가 유일한 계산 창구라는 전제를 지킨다.
+
+    `simulate()`가 순수 산술이라 255개 조합을 다 돌려도 비용이 무시할 수준이다.
+    """
+    from ui import theme  # 이 파일의 다른 함수들과 같은 지연 임포트 방식
+
+    grades = load_dataset()["rateGrades"]
+    base_band = theme.grade_band(vessel["blueScore"], grades)
+    speeds = simulate_speed_axis(vessel)
+    revisits = list(range(SIM_REVISIT_RANGE[0], SIM_REVISIT_RANGE[1] + 1))
+
+    grid: Dict[str, Dict] = {}
+    for revisit in revisits:
+        for speed in speeds:
+            sim = simulate(vessel, revisit, speed)
+            band = theme.grade_band(sim.score, grades)
+            gained_bp = band["discountBp"] - base_band["discountBp"]
+            yearly = int(EXAMPLE_PRINCIPAL_WON * gained_bp / 10000)
+            grid[f"{revisit}|{speed:.1f}"] = {
+                "score": sim.score,
+                "axisA": sim.axis_a,
+                "axisB": sim.axis_b,
+                "topPercent": sim.top_percent,
+                "scoreDelta": sim.score_delta,
+                "fuelDeltaPercent": sim.fuel_delta_percent,
+                "tradeoffNotes": sim.tradeoff_notes,
+                "grade": band["grade"],
+                "discountBp": band["discountBp"],
+                "yearlyWon": yearly,
+                "totalWon": yearly * EXAMPLE_TERM_YEARS,
+                # 반작용을 뺀 값. 곡선에 점선으로 겹쳐 그려 "대가"를 보이게 한다.
+                "scoreNoTradeoff": simulate(
+                    vessel, revisit, speed, include_tradeoff=False
+                ).score,
+            }
+
+    return {
+        "revisits": revisits,
+        "speeds": speeds,
+        "grid": grid,
+        "base": {
+            "revisit": vessel["revisitCount"],
+            "speed": vessel["averageSpeedKnots"],
+            "score": vessel["blueScore"],
+            "topPercent": vessel["peerGroup"]["topPercent"],
+            "grade": base_band["grade"],
+            "discountBp": base_band["discountBp"],
+        },
+        "rateGrades": grades,
+        "peerScores": vessel["peerGroup"]["scores"],
+        "principalWon": EXAMPLE_PRINCIPAL_WON,
+        "termYears": EXAMPLE_TERM_YEARS,
+    }
 
 
 # ─── 해시 (CLAUDE.md 확정 규칙 5번) ───────────────────────────────────────────
@@ -423,10 +540,36 @@ except ImportError:  # pragma: no cover
 
 
 def detailed_report(vessel: Dict) -> Dict:
-    """요인별 실측값을 근거로 한 상세 리포트. 선박당 한 번만 생성해 캐시한다."""
+    """
+    요인별 상세 리포트. 선박당 한 번만 생성해 캐시한다.
+
+    반환 형태는 `{"rows": [...], "source": ...}`이며 `rows`의 각 항목은
+    요인 하나다 — 실측값(내 값·유사군 평균), 기여도, 그리고 그 요인에 대한
+    설명 문장이 한 줄에 묶여 있다. 화면이 요인별로 끊어 그릴 수 있게 여기서
+    미리 합쳐 둔다.
+    """
     if not is_scored(vessel):
-        return {"text": "", "source": ""}
-    return _detailed_report_uncached(vessel["vesselId"], MOCK_PATH.stat().st_mtime)
+        return {"rows": [], "source": ""}
+
+    result = _detailed_report_uncached(vessel["vesselId"], MOCK_PATH.stat().st_mtime)
+    sentences = result.get("items", {})
+    contributions = {f["label"]: f["value"] for f in vessel.get("shapFactors", [])}
+
+    rows = []
+    for metric in vessel.get("factorMetrics", []):
+        label = metric["label"]
+        diff = metric["selfValue"] - metric["peerAverage"]
+        rows.append({
+            "label": label,
+            "axis": metric["axis"],
+            "selfValue": metric["selfValue"],
+            "peerAverage": metric["peerAverage"],
+            "unit": metric["unit"],
+            "diff": round(diff, 2),
+            "contribution": contributions.get(label),
+            "sentence": sentences.get(label, ""),
+        })
+    return {"rows": rows, "source": result.get("source", "")}
 
 
 def ask_ai(vessel: Dict, question: str) -> Dict:
@@ -543,3 +686,69 @@ def best_incentive_improvement(vessel: Dict) -> Simulation:
         return min(upgraded, key=lambda c: c.score)
     # 어떤 조합도 다음 등급에 못 미치면, 그중 가장 점수가 높은 조합을 보여준다.
     return max(candidates, key=lambda c: c.score)
+
+
+def _improvement_tip_uncached(vessel_id: str, plan_key: str, _mtime: float) -> Dict[str, str]:
+    """
+    개선 조합 하나의 실행 팁 생성.
+
+    `explanation()`과 같은 이유로 캐시에 태운다 — LLM 호출은 느리고 유료라
+    선박·조합당 한 번만 한다. `_mtime`은 캐시 키 전용이다.
+    """
+    from explain.explain import generate_improvement_tip
+
+    vessel = get_vessel(vessel_id)
+    sim = easiest_improvement(vessel) if plan_key == "easiest" else best_incentive_improvement(vessel)
+    label = "가장 쉬운 개선" if plan_key == "easiest" else "다음 우대 구간까지"
+    result = generate_improvement_tip(_build_explain_input(vessel), label, sim.actions(vessel))
+    return {"text": result.text, "source": result.source}
+
+
+try:
+    import streamlit as st
+
+    _improvement_tip_uncached = st.cache_data(show_spinner=False)(  # type: ignore[assignment]
+        _improvement_tip_uncached
+    )
+except ImportError:  # pragma: no cover
+    pass
+
+
+def improvement_plans(vessel: Dict) -> List[Dict]:
+    """
+    개선 시뮬레이터의 추천 카드 두 장에 필요한 것 전부.
+
+    점수·등급·금리 변화는 `simulate()`가 계산하고, "그래서 배에서 뭘 하면
+    되는지"만 `explain/`이 문장으로 만든다. 숫자와 문장의 출처를 나누는 것이
+    `explain/TODO.md`의 원칙이라(LLM은 숫자를 만들지 않는다) 여기서도 지킨다.
+    """
+    from ui import theme
+
+    dataset = load_dataset()
+    before = theme.grade_band(vessel["blueScore"], dataset["rateGrades"])
+    plans = [
+        ("easiest", "지금 할 수 있는 가장 쉬운 개선", "한 걸음만 바꿔도 되는 조합",
+         easiest_improvement(vessel)),
+        ("best", "최고의 인센티브를 위한 개선", "다음 우대 구간까지 필요한 조합",
+         best_incentive_improvement(vessel)),
+    ]
+
+    out: List[Dict] = []
+    for key, title, desc, sim in plans:
+        after = theme.grade_band(sim.score, dataset["rateGrades"])
+        tip = _improvement_tip_uncached(vessel["vesselId"], key, MOCK_PATH.stat().st_mtime)
+        out.append({
+            "key": key,
+            "title": title,
+            "desc": desc,
+            "baseScore": vessel["blueScore"],
+            "score": sim.score,
+            "scoreDelta": sim.score_delta,
+            "beforeBand": theme.discount_text(before),
+            "afterBand": theme.discount_text(after),
+            "bandChanged": after["grade"] != before["grade"],
+            "actions": sim.actions(vessel),
+            "tip": tip["text"],
+            "tipSource": tip["source"],
+        })
+    return out

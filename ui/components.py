@@ -286,67 +286,151 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
     origin_x, origin_y = track[0]
     anchor_lat, anchor_lng = vessel["anchor"]
 
-    # 동일 구역 반복조업 히트 — 격자좌표를 셀 단위로 묶어 재방문 횟수를 센다.
-    # 값이 클수록 같은 자리를 자주 긁는다는 뜻이라 A축(자원 압력) 감점 신호다.
-    # 히트맵 레이어의 가중치로 쓴다(GFW의 조업강도 히트맵과 같은 접근).
+    def _to_latlng(gx: float, gy: float) -> tuple:
+        return (anchor_lat - (gy - origin_y) * _SCALE_LAT,
+                anchor_lng + (gx - origin_x) * _SCALE_LNG)
+
+    # 동일 구역 반복조업 — 격자좌표를 셀 단위로 묶는다.
+    # TODO(score/): 셀 크기는 화면 표현용 임시값이다. A축의 GRID_CELL_SIZE_DEG가
+    # 확정되면 그 격자를 그대로 그려야 화면과 계산이 같은 격자를 말하게 된다.
     cell_size = 40
-    visit_counts: Dict[tuple, int] = {}
-    for gx, gy in track:
-        cell = (gx // cell_size, gy // cell_size)
-        visit_counts[cell] = visit_counts.get(cell, 0) + 1
+    cell_members: Dict[tuple, List[int]] = {}
+    for idx, (gx, gy) in enumerate(track):
+        cell_members.setdefault((gx // cell_size, gy // cell_size), []).append(idx)
+
+    # 재방문 '횟수'는 그 격자의 이벤트 개수가 아니라 **연속 구간(방문)의 개수**다.
+    # 한 번 들어가 이벤트가 세 건 찍힌 것은 세 번 돌아온 것이 아니다 — A축이
+    # 재방문 '간격'을 보는 지표이므로 이 구분이 곧 지표의 정의다.
+    def _visit_runs(members: List[int]) -> List[List[int]]:
+        runs: List[List[int]] = []
+        for idx in members:
+            if runs and idx == runs[-1][-1] + 1:
+                runs[-1].append(idx)
+            else:
+                runs.append([idx])
+        return runs
+
+    cell_visits: Dict[tuple, List[List[int]]] = {
+        cell: _visit_runs(members) for cell, members in cell_members.items()
+    }
 
     shap_by_axis = {"a": [], "b": []}
     for factor in vessel.get("shapFactors", []):
         shap_by_axis.setdefault(factor["axis"], []).append(factor)
     top_a_factor = max(shap_by_axis["a"], key=lambda f: abs(f["value"]), default=None)
     top_b_factor = max(shap_by_axis["b"], key=lambda f: abs(f["value"]), default=None)
+    # 반복조업 지점에는 재방문 관련 요인을 붙인다. 없으면 A축 최대 요인으로 대체.
+    revisit_factor = next(
+        (f for f in shap_by_axis["a"] if "재방문" in f["label"]), top_a_factor
+    )
+
+    def _impact_of(factor: Optional[Dict]) -> str:
+        """
+        점수를 올린 요인인지 내린 요인인지는 **실제 기여도 부호**로 정한다.
+
+        "반복 조업 = 점수 하락"으로 단정하면, 재방문 간격을 충분히 확보해
+        기여도가 양수인 선박에서 화면이 사실과 반대되는 말을 하게 된다
+        (실제로 선박 A가 그랬다 — 재방문 간격 +6.2점인데 '하락 요인'으로 표시됨).
+        """
+        if not factor:
+            return "neutral"
+        return "up" if factor["value"] > 0 else "down" if factor["value"] < 0 else "neutral"
+
+    def _factor_note(factor: Optional[Dict]) -> str:
+        if not factor:
+            return ""
+        direction = "올린" if factor["value"] > 0 else "내린" if factor["value"] < 0 else "영향이 없는"
+        return f"{factor['label']} {factor['value']:+.1f}점 — 점수를 {direction} 요인입니다."
 
     events = []
     heat_points = []
     for idx, (gx, gy) in enumerate(track):
-        lat = anchor_lat - (gy - origin_y) * _SCALE_LAT
-        lng = anchor_lng + (gx - origin_x) * _SCALE_LNG
+        lat, lng = _to_latlng(gx, gy)
         is_fishing = any(s <= idx <= e for s, e in vessel["fishingSegments"])
         is_gap = idx == vessel.get("gapIndex", -1)
         is_mpa = idx == vessel.get("mpaIndex", -1)
         cell = (gx // cell_size, gy // cell_size)
-        revisits = visit_counts[cell]
+        revisits = len(cell_visits[cell])
 
         if is_gap:
             kind, radius = "신호두절(GAP)", 5
         elif is_fishing:
-            kind, radius = "조업 이벤트", 6
+            kind, radius = "조업", 6
             heat_points.append([lat, lng, min(1.0, 0.35 + 0.25 * revisits)])
         else:
-            kind, radius = "항해 이벤트", 4
+            kind, radius = "항해", 4
 
-        tip = f"#{idx + 1} {kind}"
-        if is_fishing and revisits > 1:
-            tip += f" · 이 구역 재방문 {revisits}회"
-            if top_a_factor:
-                tip += f" · 자원압력 요인: {top_a_factor['label']} ({top_a_factor['value']:+.1f})"
-        elif not is_fishing and top_b_factor:
-            tip += f" · 운항효율 요인: {top_b_factor['label']} ({top_b_factor['value']:+.1f})"
+        # 무슨 일이 있었는지(headline)는 관측 사실만 쓰고, 점수를 올렸는지
+        # 내렸는지(impact)는 실제 기여도 부호에서 가져온다. 둘을 섞어 단정하면
+        # 화면이 계산 결과와 반대되는 말을 하게 된다.
         if is_mpa:
-            tip += " · 해양보호구역 태그"
+            impact = "down"
+            headline = "해양보호구역에서 조업 신호가 잡혔어요"
+            detail = "보호구역 진입은 우대 자격 요건에서 감점 요인입니다."
+        elif is_gap:
+            impact = "warn"
+            headline = "이 지점에서 위치 신호가 끊겼어요"
+            detail = "신호두절 구간은 관측 커버리지를 떨어뜨립니다."
+        elif is_fishing and revisits > 1:
+            impact = _impact_of(revisit_factor)
+            verb = {"down": "그만큼 자원압력 점수가 깎였어요",
+                    "up": "그래도 되돌아오는 간격은 넉넉했어요",
+                    "neutral": ""}[impact]
+            headline = f"이 구역을 {revisits}번 반복 조업했어요"
+            if verb:
+                headline += f" — {verb}"
+            detail = _factor_note(revisit_factor)
+        elif is_fishing:
+            impact = _impact_of(revisit_factor)
+            headline = "이 구역에서는 한 번만 조업했어요"
+            detail = _factor_note(revisit_factor)
+        else:
+            impact = _impact_of(top_b_factor)
+            headline = "어장을 오가는 항해 구간이에요"
+            detail = _factor_note(top_b_factor)
 
-        events.append(
-            {
-                "lat": lat,
-                "lng": lng,
-                "radius": radius,
-                "fishing": is_fishing,
-                "dashed": is_gap,
-                "mpa": is_mpa,
-                "home": idx == 0,
-                "tip": tip,
-            }
-        )
+        events.append({
+            "lat": lat, "lng": lng, "radius": radius,
+            "fishing": is_fishing, "dashed": is_gap, "mpa": is_mpa,
+            "home": idx == 0, "seq": idx + 1, "kind": kind,
+            "revisits": revisits, "impact": impact,
+            "headline": headline, "detail": detail,
+        })
+
+    # 반복조업 경로 — 같은 격자를 **다시 찾아온** 순서를 이어, 근사 항적 위에
+    # "이 배가 여기를 또 왔다"를 선으로 덧댄다. A축이 무엇을 재는지가 이 선이다.
+    # 방문마다 첫 이벤트만 이어서 '돌아온 경로'만 남긴다.
+    revisit_paths = [
+        {
+            "points": [[events[v[0]]["lat"], events[v[0]]["lng"]] for v in visits],
+            "count": len(visits),
+            "impact": _impact_of(revisit_factor),
+            "note": _factor_note(revisit_factor),
+        }
+        for cell, visits in cell_visits.items()
+        if len(visits) > 1 and any(events[i]["fishing"] for v in visits for i in v)
+    ]
+
+    # 재방문 격자 — A축이 실제로 쓰는 단위(격자)를 눈에 보이게 한다.
+    revisit_cells = []
+    for cell, visits in cell_visits.items():
+        if len(visits) < 2:
+            continue
+        cx, cy = cell
+        lat_a, lng_a = _to_latlng(cx * cell_size, cy * cell_size)
+        lat_b, lng_b = _to_latlng((cx + 1) * cell_size, (cy + 1) * cell_size)
+        revisit_cells.append({
+            "bounds": [[min(lat_a, lat_b), min(lng_a, lng_b)],
+                       [max(lat_a, lat_b), max(lng_a, lng_b)]],
+            "count": len(visits),
+        })
 
     center, zoom = _fit_view(events, height)
     payload = {
         "events": events,
         "heatPoints": heat_points,
+        "revisitPaths": revisit_paths,
+        "revisitCells": revisit_cells,
         "landmarks": _LANDMARKS,
         "center": center,
         "zoom": zoom,
@@ -354,23 +438,32 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
         "mpaColor": MAP_MPA,
         "pathColor": MAP_SAILING,
         "gapColor": MAP_GAP,
+        "positiveColor": theme.POSITIVE,
+        "axisAColor": theme.AXIS_A,
         "tileUrl": ESRI_WORLD_IMAGERY_URL,
         "attribution": ESRI_ATTRIBUTION,
     }
 
-    components_html(
-        _leaflet_html(payload, height),
-        height=height,
-        scrolling=False,
-    )
+    components_html(_leaflet_html(payload, height), height=height, scrolling=False)
+
+    if vessel.get("mpaIndex", -1) >= 0:
+        st.markdown(
+            f'<div class="bs-card" style="border-left:4px solid {theme.NEGATIVE}; '
+            f'background:{theme.NEGATIVE_SOFT};">'
+            f'<div style="font-weight:700; color:{theme.NEGATIVE}; margin-bottom:3px;">'
+            f'해양보호구역 진입 신호</div>'
+            f'<div class="bs-note">지도의 빨간 원 지점에서 해양보호구역 태그가 붙은 조업 '
+            f'이벤트가 관측됐습니다. 우대 자격 요건에서 감점 요인이며, 관측 기반 추정이므로 '
+            f'실제 진입 여부는 확인이 필요합니다. 최신 구역 현황은 '
+            f'<a href="https://www.meis.go.kr/mes/marineSanctuary/situation.do" target="_blank">'
+            f'해양수산부 해양보호구역 통합정보시스템</a>에서 확인할 수 있습니다.</div></div>',
+            unsafe_allow_html=True,
+        )
+
     st.markdown(
-        '<div class="bs-note">파란 히트맵 = 동일 구역 반복조업(진할수록 재방문 잦음) · '
-        '점선 = 이벤트를 이은 근사 경로 · 회색 점선 원 = 신호두절 · 빨간 원 = 해양보호구역 태그<br>'
-        'GFW는 연속 항적이 아니라 이산 이벤트만 제공해, 이벤트 지점을 점선으로 이어 '
-        '근사 경로를 표시합니다. 점에 마우스를 올리면 이 지점이 점수에 준 영향이 함께 '
-        '표시됩니다.<br>해양보호구역 최신 현황은 '
-        '<a href="https://www.meis.go.kr/mes/marineSanctuary/situation.do" target="_blank">'
-        '해양수산부 해양보호구역 통합정보시스템</a>에서 확인할 수 있습니다.</div>',
+        '<div class="bs-note">GFW는 연속 항적이 아니라 이산 이벤트만 제공해, 이벤트 지점을 '
+        '점선으로 이어 근사 경로를 표시합니다. '
+        '점에 마우스를 올리면 그 지점이 점수를 올렸는지 내렸는지 함께 표시됩니다.</div>',
         unsafe_allow_html=True,
     )
 
@@ -420,7 +513,8 @@ def _leaflet_html(payload: Dict, height: int) -> str:
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <style>
   html, body {{ margin:0; padding:0; }}
-  #bsmap {{ width:100%; height:{height}px; border-radius:8px; background:#0B1B2B; }}
+  /* 범례가 지도 좌하단에 붙도록 기준 컨테이너로 삼는다. */
+  #bsmap {{ position:relative; width:100%; height:{height}px; border-radius:8px; background:#0B1B2B; }}
   .geo-label {{
     background:rgba(16,24,40,.78) !important; border:none !important; box-shadow:none !important;
     color:#FFFFFF !important; font-size:11px !important; padding:2px 6px !important;
@@ -430,6 +524,48 @@ def _leaflet_html(payload: Dict, height: int) -> str:
   .leaflet-control-attribution {{ font-size:9.5px; }}
   .bs-heat-layer {{ opacity:0; transition:opacity 1.1s ease-out; }}
   .bs-glow-dot {{ filter:drop-shadow(0 0 4px var(--dot-color)); }}
+
+  /* 점수를 내린 지점은 계속 맥동시켜 지도에서 먼저 눈에 띄게 한다. */
+  @keyframes bs-pulse {{
+    0%   {{ stroke-opacity:0.95; stroke-width:2; }}
+    55%  {{ stroke-opacity:0.25; stroke-width:6; }}
+    100% {{ stroke-opacity:0.95; stroke-width:2; }}
+  }}
+  .bs-pulse {{ animation:bs-pulse 2.1s ease-in-out infinite; }}
+
+  /* 반복조업 경로는 흐르는 점선으로 "다시 왔다"는 움직임을 준다. */
+  @keyframes bs-flow {{ to {{ stroke-dashoffset:-100; }} }}
+  .bs-revisit-path {{ animation:bs-flow 3.2s linear infinite; }}
+
+  /* 이벤트 점이 순서대로 나타난다 — 항적을 시간순으로 읽게 만든다. */
+  .bs-drop {{ opacity:0; animation:bs-fadein .45s ease-out forwards; }}
+  @keyframes bs-fadein {{ to {{ opacity:1; }} }}
+
+  .bs-tip {{
+    background:rgba(255,255,255,.97) !important; border:none !important;
+    border-radius:9px !important; box-shadow:0 4px 14px rgba(16,24,40,.28) !important;
+    padding:9px 11px !important; max-width:260px !important;
+    color:{theme.INK} !important; font-size:12px !important; line-height:1.6 !important;
+  }}
+  .bs-tip .bs-tip-badge {{
+    display:inline-block; font-size:10.5px; font-weight:700; padding:1px 7px;
+    border-radius:999px; margin-bottom:5px;
+  }}
+  .bs-tip .bs-tip-head {{ font-weight:700; display:block; margin-bottom:3px; }}
+  .bs-tip .bs-tip-detail {{ color:{theme.INK_SOFT}; font-size:11.5px; }}
+
+  .bs-legend {{
+    position:absolute; left:10px; bottom:12px; z-index:600;
+    background:rgba(16,24,40,.82); color:#fff; border-radius:8px;
+    padding:8px 10px; font-size:10.5px; line-height:1.75; pointer-events:none;
+  }}
+  .bs-legend i {{
+    display:inline-block; width:9px; height:9px; border-radius:50%;
+    margin-right:5px; vertical-align:middle;
+  }}
+  .bs-legend .bar {{
+    display:inline-block; width:14px; height:0; margin-right:5px; vertical-align:middle;
+  }}
 </style>
 <div id="bsmap"></div>
 <script>
@@ -460,35 +596,118 @@ D.landmarks.forEach(function(m) {{
   }});
 }});
 
+// A축이 실제로 쓰는 단위(격자)를 그린다 — 재방문이 잦은 칸일수록 진하다.
+D.revisitCells.forEach(function(c) {{
+  L.rectangle(c.bounds, {{
+    color:D.axisAColor, weight:1, opacity:0.55, dashArray:'3 3',
+    fillColor:D.axisAColor, fillOpacity:Math.min(0.30, 0.07 * c.count)
+  }}).addTo(map).bindTooltip(
+    '<span class="bs-tip-head">이 격자에서 ' + c.count + '번 조업했어요</span>' +
+    '<span class="bs-tip-detail">A축(자원 압력)은 같은 격자를 다시 찾는 간격으로 계산합니다. ' +
+    '간격이 짧을수록 점수가 내려갑니다.</span>',
+    {{ className:'bs-tip', sticky:true }}
+  );
+}});
+
+// 근사 항적 — 이벤트를 시간순으로 이은 보조선(연속 항적이 아님).
 const latlngs = D.events.map(function(e) {{ return [e.lat, e.lng]; }});
 L.polyline(latlngs, {{
   color:D.pathColor, weight:2, opacity:0.7, dashArray:'2 6', lineCap:'round'
 }}).addTo(map);
 
-D.events.forEach(function(e) {{
-  if (e.mpa) {{
-    L.circle([e.lat, e.lng], {{
-      radius:900, color:D.mpaColor, weight:2, dashArray:'3 4', fill:false, opacity:0.95
-    }}).addTo(map);
+// 점수를 올린 요인인지 내린 요인인지는 파이썬이 실제 기여도 부호로 정해 넘긴다.
+const BADGE = {{
+  down: {{ text:'점수 하락 요인', bg:'#FBE9E9', fg:D.mpaColor }},
+  up:   {{ text:'점수 상승 요인', bg:'#E6F4F1', fg:D.positiveColor }},
+  warn: {{ text:'관측 품질 주의', bg:'#FDF0DC', fg:'#B45309' }},
+  neutral: {{ text:'', bg:'', fg:'' }}
+}};
+
+// 반복조업 경로 — 같은 격자를 다시 찾아온 순서대로 덧댄 흐르는 선.
+D.revisitPaths.forEach(function(p) {{
+  if (p.points.length < 2) return;
+  const line = L.polyline(p.points, {{
+    color:D.axisAColor, weight:3, opacity:0.9, dashArray:'7 6',
+    lineCap:'round', className:'bs-revisit-path'
+  }}).addTo(map);
+  const pb = BADGE[p.impact] || BADGE.neutral;
+  line.bindTooltip(
+    (pb.text ? '<span class="bs-tip-badge" style="background:' + pb.bg + '; color:' + pb.fg + ';">' +
+      pb.text + '</span>' : '') +
+    '<span class="bs-tip-head">같은 구역으로 ' + p.count + '번 돌아온 경로예요</span>' +
+    '<span class="bs-tip-detail">A축은 되돌아오는 <b>간격</b>으로 계산합니다. ' +
+    (p.note || '') + '</span>',
+    {{ className:'bs-tip', sticky:true }}
+  );
+}});
+
+function tipHtml(e) {{
+  const b = BADGE[e.impact] || BADGE.neutral;
+  let html = '';
+  if (b.text) {{
+    html += '<span class="bs-tip-badge" style="background:' + b.bg + '; color:' + b.fg + ';">' +
+            b.text + '</span>';
   }}
+  html += '<span class="bs-tip-head">' + e.headline + '</span>';
+  if (e.detail) html += '<span class="bs-tip-detail">' + e.detail + '</span>';
+  html += '<span class="bs-tip-detail" style="display:block; margin-top:4px;">#' + e.seq +
+          ' · ' + e.kind + '</span>';
+  return html;
+}}
+
+D.events.forEach(function(e, i) {{
+  // 이벤트를 시간순으로 하나씩 떨어뜨려 항적이 그려지는 것처럼 보이게 한다.
+  const delay = Math.min(i * 45, 1400);
+
+  if (e.mpa) {{
+    const ring = L.circle([e.lat, e.lng], {{
+      radius:900, color:D.mpaColor, weight:2, dashArray:'3 4', fill:false, opacity:0.95,
+      className:'bs-pulse'
+    }}).addTo(map);
+    ring.bindTooltip(tipHtml(e), {{ className:'bs-tip', sticky:true }});
+  }}
+
+  let marker;
   if (e.dashed) {{
-    L.circleMarker([e.lat, e.lng], {{
+    marker = L.circleMarker([e.lat, e.lng], {{
       radius:e.radius, color:'#98A2B3', weight:1.6, dashArray:'2 2',
       fillColor:D.gapColor, fillOpacity:0.5
-    }}).addTo(map).bindTooltip(e.tip, {{ direction:'top' }});
+    }});
   }} else {{
     const color = e.fishing ? D.fishingColor : D.pathColor;
-    const marker = L.circleMarker([e.lat, e.lng], {{
+    marker = L.circleMarker([e.lat, e.lng], {{
       radius:e.radius, color:'#FFFFFF', weight:1.3, fillColor:color, fillOpacity:1,
       className:'bs-glow-dot'
-    }}).addTo(map).bindTooltip(e.tip, {{ direction:'top' }});
-    if (marker._path) {{ marker._path.style.setProperty('--dot-color', color); }}
+    }});
   }}
+  marker.addTo(map).bindTooltip(tipHtml(e), {{ className:'bs-tip', direction:'top', sticky:true }});
+  if (marker._path) {{
+    if (!e.dashed) {{
+      marker._path.style.setProperty('--dot-color', e.fishing ? D.fishingColor : D.pathColor);
+    }}
+    marker._path.classList.add('bs-drop');
+    marker._path.style.animationDelay = delay + 'ms';
+  }}
+
+  // 마우스를 올리면 그 지점만 커져서, 어느 점을 읽고 있는지 헷갈리지 않는다.
+  marker.on('mouseover', function() {{ marker.setRadius(e.radius + 3); }});
+  marker.on('mouseout',  function() {{ marker.setRadius(e.radius); }});
+
   if (e.home) {{
     L.circleMarker([e.lat, e.lng], {{ radius:0, opacity:0 }}).addTo(map)
       .bindTooltip('모항', {{ permanent:true, direction:'right', offset:[8,0], className:'geo-label' }});
   }}
 }});
+
+// 범례 — 색과 선이 무엇을 뜻하는지 지도 안에서 바로 확인한다.
+const legend = L.DomUtil.create('div', 'bs-legend');
+legend.innerHTML =
+  '<div><i style="background:' + D.fishingColor + ';"></i>조업 이벤트</div>' +
+  '<div><i style="background:' + D.pathColor + ';"></i>항해 이벤트</div>' +
+  '<div><i style="background:' + D.gapColor + '; border:1px dashed #98A2B3;"></i>신호두절</div>' +
+  '<div><span class="bar" style="border-top:3px dashed ' + D.axisAColor + ';"></span>반복조업 경로</div>' +
+  '<div><span class="bar" style="border-top:2px dashed ' + D.mpaColor + ';"></span>해양보호구역</div>';
+document.getElementById('bsmap').appendChild(legend);
 
 // 중심·줌은 파이썬에서 계산해 넘겨받았다. 여기서는 컨테이너 크기가 확정된 뒤
 // 타일이 빈칸으로 남지 않도록 크기만 다시 잡아 준다.
@@ -622,6 +841,537 @@ def peer_distribution(
         f'표본이 작아 순위에는 폭이 있습니다 — {theme.interval_text(peer["topPercentInterval"])}.</div>',
         unsafe_allow_html=True,
     )
+
+
+# 시뮬레이터 iframe 템플릿. f-string을 쓰지 않는다 — CSS·JS 중괄호를 전부
+# 이중으로 escape 해야 해서 읽을 수 없게 된다. 대신 __SURFACE__ 등을 치환한다.
+_SIMULATOR_HTML = """
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0; background: transparent;
+    font-family: var(--font-sans); color: var(--ink);
+  }
+  .wrap { display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; }
+  @media (max-width: 820px) { .wrap { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .label { font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .h5 { font-size: 14px; font-weight: 700; margin: 0 0 8px; }
+  .note { font-size: 12px; color: var(--ink-soft); line-height: 1.65; }
+  .mono { font-family: var(--font-mono); }
+
+  .slider-row { margin-bottom: 14px; }
+  .slider-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 2px;
+  }
+  .slider-head b { font-size: 13px; font-weight: 600; }
+  .slider-val {
+    font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--axis-a);
+  }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 22px;
+    background: transparent; cursor: pointer; margin: 0;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 5px; border-radius: 3px; background: var(--track);
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 17px; height: 17px;
+    border-radius: 50%; background: var(--axis-a); border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(16,24,40,.35); margin-top: -6px;
+  }
+  .ticks {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--ink-soft); font-family: var(--font-mono);
+  }
+
+  .big {
+    font-family: var(--font-mono); font-weight: 700; font-size: 30px; line-height: 1.15;
+  }
+  .from { font-size: 17px; color: var(--ink-soft); font-family: var(--font-mono); }
+  .arrow { color: var(--ink-soft); margin: 0 6px; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 11px; }
+  .stat .v { font-family: var(--font-mono); font-weight: 700; font-size: 17px; }
+  .stat .u { font-size: 11px; color: var(--ink-soft); font-weight: 500; margin-left: 2px; }
+
+  .grade-row {
+    display: grid; grid-template-columns: 26px 1fr auto auto; gap: 9px;
+    align-items: center; padding: 7px 9px; border-radius: 6px; font-size: 13px;
+  }
+  .grade-row.cur { background: var(--bg); }
+  .pill {
+    font-size: 10.5px; padding: 1px 7px; border-radius: 999px;
+    background: #EEF2FF; color: #3538CD; font-weight: 600; white-space: nowrap;
+  }
+  .pill.up { background: var(--positive-soft); color: var(--positive); }
+  .tnote { font-size: 12.5px; line-height: 1.7; }
+  svg { display: block; width: 100%; }
+  .fade { animation: fadein .45s ease-out; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+</style>
+
+<div class="wrap fade">
+  <div>
+    <div class="card">
+      <div class="h5">조업 방식을 바꿔 보세요</div>
+
+      <div class="slider-row">
+        <div class="slider-head">
+          <b>같은 어장 연속 조업</b><span class="slider-val"><span id="rv">3</span> 회</span>
+        </div>
+        <input type="range" id="revisit">
+        <div class="ticks"><span id="rvmin"></span><span id="rvmax"></span></div>
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-head">
+          <b>평균 항해 속도</b><span class="slider-val"><span id="sp">10.4</span> 노트</span>
+        </div>
+        <input type="range" id="speed">
+        <div class="ticks"><span id="spmin"></span><span id="spmax"></span></div>
+      </div>
+
+      <div class="note">
+        줄일수록 자원에 회복 여지가 생기고(연속 조업), 낮출수록 연료를 덜 씁니다(속도).
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="h5">속도에 따른 점수 곡선</div>
+      <svg id="curve" viewBox="0 0 520 190" preserveAspectRatio="none" height="190"></svg>
+      <div class="note" id="curvenote"></div>
+    </div>
+
+    <div class="card" id="tradeoff" style="border-left:4px solid var(--axis-b);">
+      <div class="label">바꾸면 따라오는 대가</div>
+      <div id="tnotes"></div>
+      <div class="note" style="margin-top:8px;">
+        한쪽을 좋게 하면 다른 쪽이 조금 깎입니다. 두 슬라이더를 끝까지 미는 것이 항상 최선은 아닙니다.
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:13px; font-weight:700; margin-bottom:6px;">
+        금리 구간표 <span style="font-weight:400; color:var(--ink-soft); font-size:11.5px;">· 은행 사전 승인</span>
+      </div>
+      <div id="grades"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="h5">예상 결과</div>
+
+    <div class="card">
+      <div class="label">예상 BlueScore</div>
+      <div style="display:flex; align-items:baseline;">
+        <span class="from" id="basescore"></span><span class="arrow">→</span>
+        <span class="big" id="score"></span>
+      </div>
+      <div class="note" style="margin-top:6px;" id="scorenote"></div>
+    </div>
+
+    <div class="card">
+      <div class="label">예상 우대 구간</div>
+      <div style="display:flex; align-items:baseline;">
+        <span class="from" id="baseband"></span><span class="arrow">→</span>
+        <span style="font-size:21px; font-weight:800;" id="band"></span>
+      </div>
+      <div class="note" style="margin-top:6px;" id="bandnote"></div>
+    </div>
+
+    <div class="note" style="margin-bottom:6px;" id="principal"></div>
+    <div class="stats">
+      <div class="stat">
+        <div class="label">연간 절감</div>
+        <div><span class="v" id="yearly" style="color:var(--positive);">0</span><span class="u">만원</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">만기까지</div>
+        <div><span class="v" id="total" style="color:var(--positive);">0</span><span class="u">만원</span></div>
+      </div>
+      <div class="stat">
+        <div class="label">기대 대비 연료</div>
+        <div><span class="v" id="fuel">0</span><span class="u">%</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="h5">비슷한 배들 사이에서</div>
+      <svg id="peer" viewBox="0 0 400 150" preserveAspectRatio="none" height="150"></svg>
+      <div class="note" id="peernote"></div>
+    </div>
+
+    <div class="h5" style="margin-top:16px;">추천 개선 조합</div>
+    <div id="plans"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var S = __SURFACE__;
+  var T = __TOKENS__;
+
+  var root = document.documentElement.style;
+  root.setProperty('--font-sans', T.fontSans);
+  root.setProperty('--font-mono', T.fontMono);
+  root.setProperty('--ink', T.ink);
+  root.setProperty('--ink-soft', T.inkSoft);
+  root.setProperty('--surface', T.surface);
+  root.setProperty('--line', T.line);
+  root.setProperty('--bg', T.bg);
+  root.setProperty('--axis-a', T.axisA);
+  root.setProperty('--axis-b', T.axisB);
+  root.setProperty('--positive', T.positive);
+  root.setProperty('--positive-soft', T.positiveSoft);
+  root.setProperty('--track', T.line);
+
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (n, d) { return n.toFixed(d === undefined ? 1 : d); };
+  var signed = function (n, d) { return (n >= 0 ? '+' : '') + fmt(n, d); };
+  var man = function (won) { return Math.round(won / 10000); };
+
+  // ── 상태 ────────────────────────────────────────────────────────────────
+  var iRevisit = S.revisits.indexOf(S.base.revisit);
+  var iSpeed = 0, best = 1e9;
+  S.speeds.forEach(function (v, i) {
+    var d = Math.abs(v - S.base.speed);
+    if (d < best) { best = d; iSpeed = i; }
+  });
+
+  function cell() {
+    return S.grid[S.revisits[iRevisit] + '|' + S.speeds[iSpeed].toFixed(1)];
+  }
+
+  // ── 숫자 트윈 ───────────────────────────────────────────────────────────
+  // 0부터 다시 세지 않고 "지금 보이는 값"에서 목표로 이어 달린다. 드래그
+  // 중에도 숫자가 끊기지 않고 따라온다.
+  var shown = {};
+  function tween(id, target, decimals, opts) {
+    opts = opts || {};
+    var el = $(id);
+    if (shown[id] === undefined) shown[id] = opts.from !== undefined ? opts.from : target;
+    var from = shown[id];
+    if (Math.abs(from - target) < 1e-9) {
+      el.textContent = (opts.sign ? signed(target, decimals) : fmt(target, decimals));
+      return;
+    }
+    var dur = opts.duration || 240, t0 = null;
+    if (el.__raf) cancelAnimationFrame(el.__raf);
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1);
+      var e = 1 - Math.pow(1 - p, 3);
+      var v = from + (target - from) * e;
+      shown[id] = v;
+      el.textContent = opts.sign ? signed(v, decimals) : fmt(v, decimals);
+      if (p < 1) el.__raf = requestAnimationFrame(step); else shown[id] = target;
+    }
+    el.__raf = requestAnimationFrame(step);
+  }
+
+  // ── 점수 곡선 ───────────────────────────────────────────────────────────
+  function drawCurve() {
+    var W = 520, H = 190, PL = 34, PR = 10, PT = 14, PB = 26;
+    var rv = S.revisits[iRevisit];
+    var pts = S.speeds.map(function (sp) { return S.grid[rv + '|' + sp.toFixed(1)].score; });
+    var raw = S.speeds.map(function (sp) { return S.grid[rv + '|' + sp.toFixed(1)].scoreNoTradeoff; });
+    var all = pts.concat(raw);
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
+    var pad = Math.max((hi - lo) * 0.15, 0.5);
+    lo -= pad; hi += pad;
+    var x = function (i) { return PL + i / (pts.length - 1) * (W - PL - PR); };
+    var y = function (v) { return PT + (1 - (v - lo) / (hi - lo)) * (H - PT - PB); };
+
+    var optIdx = 0;
+    pts.forEach(function (v, i) { if (v > pts[optIdx]) optIdx = i; });
+
+    var d = pts.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+    var area = d + ' L' + x(pts.length - 1).toFixed(1) + ' ' + (H - PB) + ' L' + PL + ' ' + (H - PB) + ' Z';
+
+    var g = '';
+    // y축 눈금 (최저·최고)
+    [lo + pad, hi - pad].forEach(function (v) {
+      g += '<line x1="' + PL + '" y1="' + y(v).toFixed(1) + '" x2="' + (W - PR) + '" y2="' + y(v).toFixed(1) +
+           '" stroke="' + T.line + '" stroke-width="1"/>';
+      g += '<text x="' + (PL - 6) + '" y="' + (y(v) + 3.5).toFixed(1) + '" text-anchor="end" font-size="10" ' +
+           'font-family="' + T.fontMono + '" fill="' + T.inkSoft + '">' + v.toFixed(0) + '</text>';
+    });
+    g += '<path d="' + area + '" fill="' + T.axisA + '" opacity="0.07"/>';
+
+    // 반작용을 뺐을 때의 곡선(점선). 실선과의 간격이 곧 "대가"다.
+    var dRaw = raw.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+    g += '<path d="' + dRaw + '" fill="none" stroke="' + T.axisB + '" stroke-width="1.6" ' +
+         'stroke-dasharray="5 4" opacity="0.85"/>';
+    g += '<path d="' + d + '" fill="none" stroke="' + T.axisA + '" stroke-width="2.2" stroke-linejoin="round"/>';
+
+    // 두 곡선의 간격을 현재 위치에서 세로선으로 강조
+    if (Math.abs(raw[iSpeed] - pts[iSpeed]) > 0.05) {
+      g += '<line x1="' + x(iSpeed).toFixed(1) + '" y1="' + y(pts[iSpeed]).toFixed(1) + '" x2="' +
+           x(iSpeed).toFixed(1) + '" y2="' + y(raw[iSpeed]).toFixed(1) + '" stroke="' + T.axisB +
+           '" stroke-width="4" opacity="0.28" stroke-linecap="round"/>';
+    }
+
+    // 최적점
+    g += '<circle cx="' + x(optIdx).toFixed(1) + '" cy="' + y(pts[optIdx]).toFixed(1) + '" r="6" fill="none" ' +
+         'stroke="' + T.positive + '" stroke-width="2"/>';
+    g += '<text x="' + x(optIdx).toFixed(1) + '" y="' + (y(pts[optIdx]) - 11).toFixed(1) + '" text-anchor="' +
+         (optIdx === 0 ? 'start' : (optIdx === pts.length - 1 ? 'end' : 'middle')) + '" ' +
+         'font-size="10.5" font-weight="700" fill="' + T.positive + '">최적 ' + S.speeds[optIdx].toFixed(1) + 'kn</text>';
+
+    // 범례
+    g += '<text x="' + (W - PR) + '" y="' + (PT - 2) + '" text-anchor="end" font-size="10" fill="' + T.axisB +
+         '">┄ 반작용을 빼면</text>';
+
+    // 현재 위치
+    g += '<line x1="' + x(iSpeed).toFixed(1) + '" y1="' + PT + '" x2="' + x(iSpeed).toFixed(1) + '" y2="' + (H - PB) +
+         '" stroke="' + T.axisA + '" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>';
+    g += '<circle cx="' + x(iSpeed).toFixed(1) + '" cy="' + y(pts[iSpeed]).toFixed(1) + '" r="5" fill="' + T.axisA + '" ' +
+         'stroke="#fff" stroke-width="2"/>';
+
+    // x축 라벨
+    [0, pts.length - 1].forEach(function (i) {
+      g += '<text x="' + x(i).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="' + (i ? 'end' : 'start') +
+           '" font-size="10" font-family="' + T.fontMono + '" fill="' + T.inkSoft + '">' +
+           S.speeds[i].toFixed(1) + 'kn</text>';
+    });
+
+    $('curve').innerHTML = g;
+
+    // 문구는 실선과 점선의 간격(= 반작용이 깎아간 몫)을 말한다. 곡선이 어디서
+    // 꺾이는지는 계수에 달린 문제라 단정하지 않는다 — 현재 잠정 계수에서는
+    // 최적점이 구간 끝에 놓인다(adapter.simulate 주석 참고).
+    var cost = raw[iSpeed] - pts[iSpeed];
+    var gap = raw[optIdx] - pts[optIdx];
+    var atEdge = (optIdx === 0 || optIdx === pts.length - 1);
+    var head = optIdx === iSpeed
+      ? '지금이 이 구간의 <b>최고점</b>입니다. '
+      : '최고점은 <b>' + S.speeds[optIdx].toFixed(1) + '노트</b>(' + pts[optIdx].toFixed(1) + '점)이고, ' +
+        '지금은 거기서 ' + Math.abs(pts[iSpeed] - pts[optIdx]).toFixed(1) + '점 낮습니다. ';
+    var tail = cost > 0.05
+      ? '점선은 축 사이 반작용을 빼고 계산한 곡선입니다 — 지금 위치에서 <b>' + cost.toFixed(1) +
+        '점</b>이 그 대가로 깎였습니다.'
+      : '점선은 축 사이 반작용을 빼고 계산한 곡선입니다.';
+    var edge = atEdge
+      ? ' <b>현재 잠정 계수에서는 최적점이 구간 끝에 있습니다</b> — 반작용이 이득을 줄이기만 하고 ' +
+        '뒤집지는 못하기 때문입니다(끝에서 ' + gap.toFixed(1) + '점 상실). 계수가 확정되면 달라질 수 있습니다.'
+      : '';
+    $('curvenote').innerHTML = head + tail + edge;
+  }
+
+  // ── 유사군 분포 ─────────────────────────────────────────────────────────
+  function drawPeer(simScore) {
+    var W = 400, H = 150, PL = 6, PR = 6, PT = 20, PB = 22;
+    var sc = S.peerScores;
+    if (!sc || !sc.length) { $('peer').innerHTML = ''; return; }
+    var lo = Math.min.apply(null, sc.concat([S.base.score, simScore]));
+    var hi = Math.max.apply(null, sc.concat([S.base.score, simScore]));
+    var pad = Math.max((hi - lo) * 0.06, 1);
+    lo -= pad; hi += pad;
+    var nb = Math.max(8, Math.min(16, Math.floor(sc.length / 3)));
+    var bins = new Array(nb).fill(0);
+    sc.forEach(function (v) {
+      var i = Math.min(nb - 1, Math.floor((v - lo) / (hi - lo) * nb));
+      bins[i]++;
+    });
+    var top = Math.max.apply(null, bins);
+    var bw = (W - PL - PR) / nb;
+    var g = '';
+    bins.forEach(function (n, i) {
+      var h = n / top * (H - PT - PB);
+      g += '<rect x="' + (PL + i * bw + 0.8).toFixed(1) + '" y="' + (H - PB - h).toFixed(1) +
+           '" width="' + (bw - 1.6).toFixed(1) + '" height="' + h.toFixed(1) + '" fill="' + T.line + '"/>';
+    });
+    var xs = function (v) { return PL + (v - lo) / (hi - lo) * (W - PL - PR); };
+    g += '<line x1="' + xs(S.base.score).toFixed(1) + '" y1="' + PT + '" x2="' + xs(S.base.score).toFixed(1) +
+         '" y2="' + (H - PB) + '" stroke="' + T.axisA + '" stroke-width="2.5"/>';
+    g += '<text x="' + xs(S.base.score).toFixed(1) + '" y="' + (PT - 6) + '" text-anchor="middle" font-size="10.5" ' +
+         'fill="' + T.axisA + '" font-weight="700">지금 ' + S.base.score.toFixed(1) + '</text>';
+    if (Math.abs(simScore - S.base.score) >= 0.05) {
+      g += '<line x1="' + xs(simScore).toFixed(1) + '" y1="' + PT + '" x2="' + xs(simScore).toFixed(1) +
+           '" y2="' + (H - PB) + '" stroke="' + T.positive + '" stroke-width="2.5" stroke-dasharray="4 3"/>';
+      g += '<text x="' + xs(simScore).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="10.5" ' +
+           'fill="' + T.positive + '" font-weight="700">개선 시 ' + simScore.toFixed(1) + '</text>';
+    }
+    $('peer').innerHTML = g;
+  }
+
+  // ── 추천 개선 조합 카드 ─────────────────────────────────────────────────
+  // 슬라이더와 무관하게 선박당 고정이라 한 번만 그린다. 점수·구간은 파이썬이
+  // 계산했고, tip 문장만 explain/(LLM 또는 폴백)이 만든 것이다.
+  function drawPlans() {
+    var el = $('plans');
+    if (!el || !S.plans || !S.plans.length) return;
+    el.innerHTML = S.plans.map(function (p) {
+      var up = p.scoreDelta >= 0;
+      var arrowColor = up ? T.positive : T.negative;
+      var bandHtml = p.bandChanged
+        ? p.beforeBand + ' <span style="color:' + T.inkSoft + ';">→</span> <b style="color:' +
+          T.positive + ';">' + p.afterBand + '</b>'
+        : p.beforeBand + ' <span style="color:' + T.inkSoft + ';">→</span> <b>' + p.afterBand + '</b>';
+      var src = p.tipSource && p.tipSource.indexOf('llm:') === 0 ? 'AI 생성' : '기본 안내문';
+      return '<div class="card" style="margin-bottom:10px;">' +
+        '<div class="label">' + p.title + '</div>' +
+        '<div class="note" style="margin:-2px 0 8px;">' + p.desc + '</div>' +
+        '<div style="display:flex; align-items:baseline; gap:7px;">' +
+          '<span class="from">' + p.baseScore.toFixed(1) + '</span>' +
+          '<span class="arrow">→</span>' +
+          '<span class="mono" style="font-size:24px; font-weight:700; color:' + arrowColor + ';">' +
+            p.score.toFixed(1) + '</span>' +
+        '</div>' +
+        '<div class="note" style="margin-top:5px;">' + bandHtml + '</div>' +
+        '<div style="margin-top:9px; padding-top:9px; border-top:1px solid ' + T.line + ';">' +
+          '<div class="tnote">' + p.tip + '</div>' +
+          '<div class="note" style="margin-top:5px; font-size:11px;">개선팁 · ' + src + '</div>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  // ── 금리 구간표 ─────────────────────────────────────────────────────────
+  function drawGrades(c) {
+    $('grades').innerHTML = S.rateGrades.map(function (b) {
+      var tags = '';
+      if (b.grade === S.base.grade) tags += '<span class="pill">현재</span> ';
+      if (b.grade === c.grade && c.grade !== S.base.grade) tags += '<span class="pill up">개선 시</span>';
+      var bp = b.discountBp <= 0 ? '우대 없음' : '−' + b.discountBp + ' bp';
+      return '<div class="grade-row' + (b.grade === S.base.grade ? ' cur' : '') + '">' +
+             '<span style="font-weight:800;">' + b.grade + '</span>' +
+             '<span style="color:' + T.inkSoft + '; font-size:12.5px;">' + b.label + '</span>' +
+             '<span>' + tags + '</span>' +
+             '<span class="mono" style="font-size:12.5px;">' + bp + '</span></div>';
+    }).join('');
+  }
+
+  // ── 렌더 ────────────────────────────────────────────────────────────────
+  function render(first) {
+    var c = cell();
+    $('rv').textContent = S.revisits[iRevisit];
+    $('sp').textContent = S.speeds[iSpeed].toFixed(1);
+
+    var d = first ? 900 : 240;
+    tween('score', c.score, 1, { from: first ? S.base.score : undefined, duration: d });
+    tween('yearly', man(c.yearlyWon), 0, { duration: d });
+    tween('total', man(c.totalWon), 0, { duration: d });
+    tween('fuel', c.fuelDeltaPercent, 1, { sign: true, duration: d });
+
+    $('score').style.color = c.scoreDelta >= 0 ? T.positive : T.negative;
+    $('fuel').style.color = c.fuelDeltaPercent <= 0 ? T.positive : T.negative;
+    $('scorenote').innerHTML = '상위 ' + S.base.topPercent + '% → <b>상위 ' + c.topPercent + '%</b> · 점수 ' +
+                               signed(c.scoreDelta, 1) + 'p';
+
+    var bandText = c.discountBp <= 0 ? c.grade + ' · 우대 없음' : c.grade + ' · −' + c.discountBp + 'bp';
+    $('band').textContent = bandText;
+    $('band').style.color = c.grade !== S.base.grade ? T.positive : T.ink;
+    $('bandnote').textContent = '최종 여신 승인은 은행 심사역이 수행합니다. 위 구간은 규칙표가 매핑한 제안값입니다.';
+
+    $('tnotes').innerHTML = c.tradeoffNotes.length
+      ? c.tradeoffNotes.map(function (n) { return '<div class="tnote">· ' + n + '</div>'; }).join('')
+      : '<div class="tnote" style="color:' + T.inkSoft + ';">지금은 기준 조업 방식 그대로입니다.</div>';
+
+    drawGrades(c);
+    drawCurve();
+    drawPeer(c.score);
+  }
+
+  // ── 초기화 ──────────────────────────────────────────────────────────────
+  var rvEl = $('revisit'), spEl = $('speed');
+  rvEl.min = 0; rvEl.max = S.revisits.length - 1; rvEl.step = 1; rvEl.value = iRevisit;
+  spEl.min = 0; spEl.max = S.speeds.length - 1; spEl.step = 1; spEl.value = iSpeed;
+  $('rvmin').textContent = S.revisits[0] + '회';
+  $('rvmax').textContent = S.revisits[S.revisits.length - 1] + '회';
+  $('spmin').textContent = S.speeds[0].toFixed(1) + 'kn';
+  $('spmax').textContent = S.speeds[S.speeds.length - 1].toFixed(1) + 'kn';
+
+  $('basescore').textContent = S.base.score.toFixed(1);
+  $('baseband').textContent = S.base.discountBp <= 0
+    ? S.base.grade + ' · 우대 없음' : S.base.grade + ' · −' + S.base.discountBp + 'bp';
+  $('principal').textContent = (S.principalWon / 100000000) + '억 원 · ' + S.termYears + '년 만기 기준 예시';
+
+  rvEl.addEventListener('input', function () { iRevisit = +rvEl.value; render(false); });
+  spEl.addEventListener('input', function () { iSpeed = +spEl.value; render(false); });
+
+  drawPlans();
+  render(true);
+
+  // ── 높이 맞추기 ─────────────────────────────────────────────────────────
+  // components.v1.html은 높이를 고정으로 받기 때문에, 폭이 좁아 2단이 1단으로
+  // 접히면 내용이 잘린다(실측: 데스크톱에서도 104px 넘침). srcdoc iframe은
+  // 부모와 동일 출처라 자기 높이를 직접 고칠 수 있다. 실패해도 파이썬이 넘긴
+  // 기본 높이로 그대로 돌아가도록 조용히 넘어간다.
+  function fitHeight() {
+    try {
+      var el = window.frameElement;
+      if (!el) return;
+      var h = document.body.scrollHeight;
+      if (!h || Math.abs(el.getBoundingClientRect().height - h) < 2) return;
+      el.style.height = h + 'px';
+      el.height = h;
+      // Streamlit은 파이썬이 넘긴 높이를 iframe 바깥 stElementContainer에도
+      // 그대로 물린다. 여기를 같이 늘리지 않으면 iframe만 커져서 컨테이너를
+      // 삐져나오고, 뒤따르는 요소와 겹친다(모바일 1단 레이아웃에서 실제로 겹쳤다).
+      var box = el.parentElement, hops = 0;
+      while (box && box !== document.body && hops < 3) {
+        if (box.getAttribute('data-testid') === 'stElementContainer') {
+          box.style.height = h + 'px';
+          break;
+        }
+        box = box.parentElement; hops++;
+      }
+    } catch (e) { /* 출처가 갈리면 기본 높이 사용 */ }
+  }
+  fitHeight();
+  window.addEventListener('resize', fitHeight);
+  if (window.ResizeObserver) new ResizeObserver(fitHeight).observe(document.body);
+})();
+</script>
+"""
+
+
+def live_simulator(vessel: Dict, height: int = 880) -> None:
+    """
+    개선 시뮬레이터 전체를 iframe 하나에 담아 서버 왕복 없이 돌린다.
+
+    왜 통째로 옮겼나 — `st.slider`는 한 칸 움직일 때마다 Python을 왕복하고
+    페이지 전체를 다시 그린다. 실측(2026-08-17, 로컬)으로 왕복 1회에
+    300~570ms, DOM 변경 약 2,400건, 결과 카드 iframe 2개가 매번 다시 로드됐다.
+    카운트업 애니메이션이 900ms인데 왕복이 320ms마다 들어오니, 드래그하는
+    동안 숫자가 목표값에 **한 번도 도달하지 못하고** 계속 0부터 다시 셌다.
+
+    대신 `adapter.simulate_surface()`가 슬라이더 전 구간을 미리 계산해 넘기고,
+    브라우저는 그 표를 조회만 한다. 계산은 여전히 adapter 한 곳에서만 나온다.
+
+    사전계산한 표가 있으니 점수 곡선과 최적점도 같이 그린다 — "슬라이더를
+    끝까지 밀면 만점"이 아니라는 것을 문장이 아니라 곡선으로 보여준다.
+    """
+    surface = adapter.simulate_surface(vessel)
+    # 추천 개선 조합은 슬라이더와 무관하게 선박당 고정이라 표에 함께 실어 보낸다.
+    # 점수는 adapter가 계산하고 팁 문장만 explain/이 만든다.
+    surface["plans"] = adapter.improvement_plans(vessel)
+    tokens = {
+        "axisA": theme.AXIS_A,
+        "axisB": theme.AXIS_B,
+        "positive": theme.POSITIVE,
+        "positiveSoft": theme.POSITIVE_SOFT,
+        "negative": theme.NEGATIVE,
+        "bg": theme.BG,
+        "surface": theme.SURFACE,
+        "line": theme.LINE,
+        "ink": theme.INK,
+        "inkSoft": theme.INK_SOFT,
+        "fontSans": theme.FONT_SANS,
+        "fontMono": theme.FONT_MONO,
+    }
+    html = (
+        _SIMULATOR_HTML.replace("__SURFACE__", json.dumps(surface, ensure_ascii=False))
+        .replace("__TOKENS__", json.dumps(tokens, ensure_ascii=False))
+        .replace("__HEIGHT__", str(height))
+    )
+    components_html(html, height=height, scrolling=False)
 
 
 def shap_contributions(vessel: Dict, height: int = 300) -> None:
@@ -864,16 +1614,81 @@ def peer_metric_comparison(vessel: Dict, height_per_row: int = 46) -> None:
 
 
 def detailed_report(vessel: Dict) -> None:
-    """점수리포트 탭 — 요인별 실측값을 근거로 한 LLM 상세 리포트."""
+    """
+    점수리포트 탭 — 요인별 상세 리포트.
+
+    예전에는 LLM이 만든 5~8문장을 한 문단으로 그대로 뿌렸는데, 어느 문장이
+    어느 수치를 설명하는지 독자가 직접 맞춰야 해서 읽히지 않았다. 지금은
+    `explain/`이 요인별로 문장을 돌려주므로(요인 라벨이 키다) 요인 하나를
+    한 줄로 묶어 그린다 — 실측값·유사군 평균·기여도·설명이 같은 줄에 있다.
+    """
     report = adapter.detailed_report(vessel)
-    if not report.get("text"):
+    rows = report.get("rows", [])
+    if not rows:
         return
+
     st.markdown("##### 상세 리포트")
     st.markdown(
-        f'<div class="bs-card"><div style="font-size:13.5px; line-height:1.85;">'
-        f'{report["text"]}</div></div>',
+        '<div class="bs-note">요인 하나가 한 칸입니다. 막대는 유사 선박군 평균 대비 '
+        '내 값의 위치이고, 오른쪽 숫자는 그 요인이 점수에 준 영향입니다.</div>',
         unsafe_allow_html=True,
     )
+
+    blocks = []
+    for row in rows:
+        color = theme.axis_color(row["axis"])
+        axis_name = "자원 압력" if row["axis"] == "a" else "운항 효율"
+
+        # 막대 — 유사군 평균을 가운데 기준선으로 두고 내 값의 상대 위치를 그린다.
+        peer, mine = row["peerAverage"], row["selfValue"]
+        span = max(abs(mine - peer), abs(peer) * 0.35, 1e-6)
+        ratio = max(-1.0, min(1.0, (mine - peer) / (span * 2)))
+        left = 50 + ratio * 50
+        lo, hi = (min(50, left), max(50, left))
+
+        contribution = row.get("contribution")
+        if contribution is None:
+            contrib_html = '<span style="color:#667085; font-size:12px;">—</span>'
+        else:
+            contrib_html = (
+                f'<span class="bs-mono" style="font-weight:700; font-size:14px; '
+                f'color:{theme.direction_color(contribution)};">'
+                f'{theme.signed(contribution)}</span>'
+            )
+
+        diff_text = (
+            f'평균보다 {abs(row["diff"]):g}{row["unit"]} '
+            f'{"높음" if row["diff"] > 0 else "낮음" if row["diff"] < 0 else "동일"}'
+        )
+
+        blocks.append(
+            f'<div class="bs-card" style="padding:13px 15px; margin-bottom:9px; '
+            f'border-left:3px solid {color};">'
+            f'  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px;">'
+            f'    <div><span style="font-weight:700; font-size:13.5px;">{row["label"]}</span>'
+            f'    <span class="bs-note" style="margin-left:6px;">{axis_name}</span></div>'
+            f'    {contrib_html}'
+            f'  </div>'
+            f'  <div style="display:flex; align-items:center; gap:9px; margin:9px 0 5px;">'
+            f'    <span class="bs-mono" style="font-size:12px; color:#667085; min-width:74px;">'
+            f'      평균 {peer:g}{row["unit"]}</span>'
+            f'    <div style="position:relative; flex:1; height:7px; background:{theme.BG}; '
+            f'         border-radius:4px;">'
+            f'      <div style="position:absolute; left:50%; top:-3px; width:1px; height:13px; '
+            f'           background:#98A2B3;"></div>'
+            f'      <div style="position:absolute; left:{lo}%; width:{hi - lo}%; top:0; '
+            f'           height:7px; background:{color}; border-radius:4px;"></div>'
+            f'    </div>'
+            f'    <span class="bs-mono" style="font-size:12.5px; font-weight:700; '
+            f'          color:{color}; min-width:64px; text-align:right;">'
+            f'      내 값 {mine:g}{row["unit"]}</span>'
+            f'  </div>'
+            f'  <div class="bs-note" style="margin-bottom:6px;">{diff_text}</div>'
+            f'  <div style="font-size:13px; line-height:1.75;">{row["sentence"]}</div>'
+            f'</div>'
+        )
+
+    st.markdown("".join(blocks), unsafe_allow_html=True)
     explanation_source(report)
 
 
@@ -939,31 +1754,6 @@ def objection_form(vessel: Dict) -> None:
         adapter.submit_objection(vessel["vesselId"], reason, detail)
         st.success("이의제기가 접수되었습니다. 금융기관 심사역이 검토합니다.")
         st.rerun()
-
-
-def improvement_recommendation_cards(vessel: Dict) -> None:
-    """개선 시뮬레이터 탭 상단 — 가장 쉬운 개선 / 최고의 인센티브 두 카드."""
-    easiest = adapter.easiest_improvement(vessel)
-    best = adapter.best_incentive_improvement(vessel)
-    dataset = adapter.load_dataset()
-    before_band = theme.grade_band(vessel["blueScore"], dataset["rateGrades"])
-
-    left, right = st.columns(2, gap="medium")
-    for col, title, sim, desc in [
-        (left, "🟢 지금 할 수 있는 가장 쉬운 개선", easiest, "한 걸음만 바꿔도 되는 조합"),
-        (right, "🏆 최고의 인센티브를 위한 개선", best, "다음 우대 구간까지 필요한 조합"),
-    ]:
-        after_band = theme.grade_band(sim.score, dataset["rateGrades"])
-        with col:
-            st.markdown(
-                f'<div class="bs-label" style="margin-bottom:2px;">{title}</div>'
-                f'<div class="bs-note" style="margin-bottom:6px;">{desc}</div>',
-                unsafe_allow_html=True,
-            )
-            animated_transition_card(
-                "BlueScore", vessel["blueScore"], sim.score,
-                note_html=f'{theme.discount_text(before_band)} → <b>{theme.discount_text(after_band)}</b>',
-            )
 
 
 def objection_panel_bank(vessel: Dict) -> None:

@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from explain import fallback, prompt, render
 from explain.contract import (
@@ -27,8 +27,10 @@ from explain.contract import (
     OBJECTION_OUTPUT_SCHEMA,
     QA_OUTPUT_SCHEMA,
     REPORT_OUTPUT_SCHEMA,
+    TIP_OUTPUT_SCHEMA,
     ExplainInput,
     ExplainOutput,
+    ReportOutput,
     TextOutput,
 )
 from explain.provider import (
@@ -44,6 +46,7 @@ SCHEMA_NAME = "bluescore_explanation"
 QA_SCHEMA_NAME = "bluescore_qa"
 OBJECTION_SCHEMA_NAME = "bluescore_objection_response"
 REPORT_SCHEMA_NAME = "bluescore_detailed_report"
+TIP_SCHEMA_NAME = "bluescore_improvement_tip"
 
 
 def explain(
@@ -187,15 +190,71 @@ def respond_to_objection(
 
 def generate_detailed_report(
     data: ExplainInput, provider: Optional[LLMProvider] = None
+) -> ReportOutput:
+    """
+    요인별 실측값(factor_metrics)을 근거로 요인마다 한 항목씩 설명을 만든다.
+
+    `_generate_text`와 흐름은 같지만 결과가 문장 하나가 아니라 라벨→문장
+    매핑이라 별도로 둔다. 실패는 전부 폴백으로 흡수하며 예외를 던지지 않는다.
+    """
+    fallback_items = fallback.build_report_fallback(data)
+
+    try:
+        llm = provider or get_provider()
+    except ProviderUnavailable as exc:
+        logger.info("프로바이더를 만들 수 없어 폴백합니다: %s", exc)
+        return ReportOutput(items=fallback_items, source="fallback:provider_unavailable")
+
+    if not llm.is_available():
+        logger.info("프로바이더 %s를 사용할 수 없어 폴백합니다.", llm.name)
+        return ReportOutput(items=fallback_items, source=f"fallback:{llm.name}_unavailable")
+
+    try:
+        raw = llm.generate_json(
+            system_prompt=prompt.REPORT_SYSTEM_PROMPT,
+            user_prompt=prompt.build_report_prompt(data),
+            schema=REPORT_OUTPUT_SCHEMA,
+            schema_name=REPORT_SCHEMA_NAME,
+        )
+    except ProviderUnavailable as exc:
+        logger.info("프로바이더 %s 사용 불가: %s", llm.name, exc)
+        return ReportOutput(items=fallback_items, source=f"fallback:{llm.name}_unavailable")
+    except ProviderError as exc:
+        logger.warning("프로바이더 %s 호출 실패: %s", llm.name, exc)
+        return ReportOutput(items=fallback_items, source=f"fallback:{llm.name}_error")
+
+    items, error = render.safe_parse_report_items(raw, data)
+    if error is not None:
+        logger.warning("상세 리포트 검증 실패, 폴백합니다: %s", error)
+        return ReportOutput(items=fallback_items, source="fallback:validation_failed")
+
+    # 모델이 일부 요인을 빠뜨려도 화면에 구멍이 나지 않도록 폴백 문장으로 채운다.
+    merged = dict(fallback_items)
+    merged.update(items)
+    return ReportOutput(items=merged, source=f"llm:{llm.name}")
+
+
+def generate_improvement_tip(
+    data: ExplainInput,
+    plan_label: str,
+    actions: List[str],
+    provider: Optional[LLMProvider] = None,
 ) -> TextOutput:
-    """요인별 실측값(factor_metrics)을 근거로 상세 리포트를 만든다."""
+    """
+    개선 조합 하나를 실제 조업에서 어떻게 실천하는지 알려주는 팁.
+
+    점수 변화·금리 변화 같은 수치는 `score/`(지금은 `ui/adapter.simulate`)가
+    계산해 카드에 이미 표시된다. 여기서 만드는 것은 **행동 설명뿐**이며,
+    프롬프트가 숫자 사용을 금지하고 `render.safe_parse_text`의 숫자 검증이
+    그물 역할을 한다.
+    """
     return _generate_text(
         data,
-        system_prompt=prompt.REPORT_SYSTEM_PROMPT,
-        user_prompt=prompt.build_report_prompt(data),
-        schema=REPORT_OUTPUT_SCHEMA,
-        schema_name=REPORT_SCHEMA_NAME,
-        field="report",
-        fallback_text=fallback.build_report_fallback(data),
+        system_prompt=prompt.TIP_SYSTEM_PROMPT,
+        user_prompt=prompt.build_improvement_tip_prompt(data, plan_label, actions),
+        schema=TIP_OUTPUT_SCHEMA,
+        schema_name=TIP_SCHEMA_NAME,
+        field="tip",
+        fallback_text=fallback.build_improvement_tip_fallback(actions),
         provider=provider,
     )

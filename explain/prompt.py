@@ -187,15 +187,52 @@ REPORT_SYSTEM_PROMPT = """\
 - 유사군 평균과 비교했을 때 좋은 방향인지 개선이 필요한 방향인지 함께 씁니다.
 - 자원 압력(A축) 요인은 간격이 길거나 회피율이 높을수록 좋다는 방향을 지키고,
   "같은 자리를 더 반복하라"는 식의 해석은 하지 않습니다.
-- 5~8문장으로, 요인을 하나씩 짚어가며 씁니다.
+- **요인마다 항목을 하나씩** 만들고, `label`에는 주어진 요인 라벨을 그대로 \
+씁니다. 주어지지 않은 요인을 만들지 마세요.
+- 각 `sentence`는 1~2문장입니다. 문단으로 길게 잇지 마세요.
 """
 
 
 def build_report_prompt(data: ExplainInput) -> str:
     metrics_block = build_factor_metrics_block(data)
+    labels = "\n".join(f"- {m.label}" for m in data.factor_metrics)
     return (
         f"{build_facts_block()}\n\n"
         f"{build_data_block(data)}\n\n"
         + (f"{metrics_block}\n\n" if metrics_block else "")
-        + "위 요인별 실측값을 근거로 상세 리포트를 작성하세요."
+        + f"설명해야 할 요인 목록(이 라벨을 그대로 쓰세요):\n{labels}\n\n"
+        "위 요인별 실측값을 근거로, 요인마다 한 항목씩 설명을 작성하세요."
+    )
+
+
+# ─── 개선 팁 (개선 시뮬레이터 탭의 추천 카드) ──────────────────────────────────
+TIP_SYSTEM_PROMPT = """\
+당신은 어선의 지속가능성 점수(BlueScore)를 올리려는 어업인에게, 배 위에서 \
+당장 무엇을 하면 되는지 알려주는 역할입니다.
+
+지켜야 할 것
+- **숫자를 쓰지 마세요.** 점수·속도·노트·퍼센트·금리 같은 수치는 화면이 이미 \
+따로 보여줍니다. 당신은 '무엇을 하는 행동인지'만 씁니다.
+- 주어진 '바꿀 것'에 적힌 방향만 씁니다. 거기 없는 행동을 지어내지 마세요.
+- 자원 압력(A축)은 같은 자리를 다시 긁는 주기가 길수록 좋습니다. \
+"같은 어장에 더 머무르라"는 식의 반대 조언은 절대 하지 마세요.
+- 법률 위반 여부나 처벌을 언급하지 마세요.
+- 어업인이 조타실에서 바로 읽고 이해할 수 있는 평이한 문장 2개로 씁니다.
+"""
+
+
+def build_improvement_tip_prompt(data: ExplainInput, plan_label: str, actions: list) -> str:
+    """
+    개선 조합 하나에 대한 실행 팁 프롬프트.
+
+    `actions`는 계산이 이미 정한 변경 방향(예: "같은 어장 연속 조업을 줄인다")
+    문자열 목록이다. 수치는 넘기지 않는다 — 숫자를 안 쓰게 하는 것이 이 팁의
+    규칙이고, 넘기지 않으면 애초에 쓸 수가 없다.
+    """
+    action_lines = "\n".join(f"- {a}" for a in actions) or "- (변경 없음)"
+    return (
+        f"{build_facts_block()}\n\n"
+        f"개선 조합 이름: {plan_label}\n"
+        f"바꿀 것:\n{action_lines}\n\n"
+        "위 변경을 실제 조업에서 어떻게 실천하는지, 숫자 없이 두 문장으로 알려주세요."
     )

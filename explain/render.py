@@ -209,3 +209,52 @@ def safe_parse_text(
     except RenderError as exc:
         return None, str(exc)
     return text, None
+
+
+def parse_and_validate_report_items(raw: str, data: ExplainInput) -> Dict[str, str]:
+    """
+    요인별 상세 리포트 응답을 `{요인 라벨: 설명 문장}`으로 검증해 돌려준다.
+
+    라벨은 입력에 있는 요인만 받는다 — 모델이 없는 요인을 지어내면 화면이
+    계산에 없는 항목을 근거처럼 보여주게 된다. 숫자 검증은 문장마다 건다.
+    """
+    parsed = parse_json(raw)
+
+    items = parsed.get("items")
+    if not isinstance(items, list) or not items:
+        raise RenderError("items가 비어 있습니다.")
+
+    known = {m.label for m in data.factor_metrics}
+    out: Dict[str, str] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            raise RenderError("items 원소가 객체가 아닙니다.")
+        label, sentence = item.get("label"), item.get("sentence")
+        if not isinstance(label, str) or not isinstance(sentence, str):
+            raise RenderError("label 또는 sentence가 문자열이 아닙니다.")
+        label, sentence = label.strip(), sentence.strip()
+        if label not in known:
+            raise RenderError(f"입력에 없는 요인입니다: {label}")
+        if not sentence:
+            raise RenderError(f"{label}의 설명이 비어 있습니다.")
+        invented = find_invented_numbers(sentence, data)
+        if invented:
+            raise RenderError(
+                f"{label} 설명에 입력에 없는 수치가 있습니다: "
+                + ", ".join(f"{n:g}" for n in invented)
+            )
+        out[label] = sentence
+
+    if not out:
+        raise RenderError("유효한 요인 설명이 없습니다.")
+    return out
+
+
+def safe_parse_report_items(
+    raw: str, data: ExplainInput
+) -> Tuple[Optional[Dict[str, str]], Optional[str]]:
+    """예외를 던지지 않는 요인별 리포트 파싱. Returns: (items, error)."""
+    try:
+        return parse_and_validate_report_items(raw, data), None
+    except RenderError as exc:
+        return None, str(exc)

@@ -19,93 +19,18 @@ import streamlit as st
 
 from ui import adapter, components, theme
 
-SIM_PRINCIPAL_WON = adapter.EXAMPLE_PRINCIPAL_WON
-SIM_TERM_YEARS = adapter.EXAMPLE_TERM_YEARS
-
-
 def _simulator(vessel: dict) -> None:
-    base_revisit = vessel["revisitCount"]
-    base_speed = vessel["averageSpeedKnots"]
-    key = vessel["vesselId"]
+    """
+    개선 시뮬레이터.
 
-    left, right = st.columns([1.25, 1], gap="medium")
-
-    with left:
-        st.markdown("##### 조업 방식을 바꿔 보세요")
-        revisit = st.slider(
-            "같은 어장 연속 조업 (회)",
-            min_value=1,
-            max_value=5,
-            value=base_revisit,
-            step=1,
-            key=f"revisit_{key}",
-            help="같은 자리를 연속으로 몇 번 조업하는지. 줄일수록 자원에 회복 여지가 생깁니다.",
-        )
-        speed = st.slider(
-            "평균 항해 속도 (노트)",
-            min_value=round(base_speed - 3.0, 1),
-            max_value=round(base_speed + 2.0, 1),
-            value=base_speed,
-            step=0.1,
-            key=f"speed_{key}",
-            help="어장을 오갈 때의 평균 속도. 낮출수록 연료를 덜 씁니다.",
-        )
-
-        sim = adapter.simulate(vessel, revisit, speed)
-
-        if sim.tradeoff_notes:
-            st.markdown(
-                '<div class="bs-card" style="border-left:4px solid ' + theme.AXIS_B + ';">'
-                '<div class="bs-label">바꾸면 따라오는 대가</div>'
-                + "".join(f'<div class="bs-note">· {n}</div>' for n in sim.tradeoff_notes)
-                + '<div class="bs-note" style="margin-top:8px;">한쪽을 좋게 하면 다른 쪽이 '
-                '조금 깎입니다. 두 슬라이더를 끝까지 미는 것이 항상 최선은 아닙니다.</div></div>',
-                unsafe_allow_html=True,
-            )
-
-        components.rate_table(vessel["blueScore"], sim.score)
-
-    with right:
-        st.markdown("##### 예상 결과")
-        components.animated_transition_card(
-            "예상 BlueScore", vessel["blueScore"], sim.score,
-            note_html=(
-                f'{theme.top_percent_text(vessel["peerGroup"]["topPercent"])} → '
-                f'<b>{theme.top_percent_text(sim.top_percent)}</b> · 점수 {theme.signed(sim.score_delta)}'
-            ),
-        )
-
-        dataset = adapter.load_dataset()
-        before_band = theme.grade_band(vessel["blueScore"], dataset["rateGrades"])
-        after_band = theme.grade_band(sim.score, dataset["rateGrades"])
-        changed = after_band["grade"] != before_band["grade"]
-
-        components.animated_transition_card(
-            "예상 우대 구간",
-            theme.discount_text(before_band), theme.discount_text(after_band),
-            color=theme.POSITIVE if changed else theme.INK,
-            note_html="최종 여신 승인은 은행 심사역이 수행합니다. 위 구간은 규칙표가 매핑한 제안값입니다.",
-        )
-
-        gained_bp = after_band["discountBp"] - before_band["discountBp"]
-        yearly, total = theme.interest_saving(gained_bp, SIM_PRINCIPAL_WON, SIM_TERM_YEARS)
-        st.markdown(
-            f'<div class="bs-note">{SIM_PRINCIPAL_WON // 100_000_000}억 원 · '
-            f'{SIM_TERM_YEARS}년 만기 기준 예시</div>',
-            unsafe_allow_html=True,
-        )
-        components.animated_stat_cards(
-            [
-                {"label": "연간 절감", "value": yearly // 10_000, "unit": "만원", "color": theme.POSITIVE},
-                {"label": "만기까지", "value": total // 10_000, "unit": "만원", "color": theme.POSITIVE},
-                {"label": "기대 대비 연료", "value": sim.fuel_delta_percent, "unit": "%",
-                 "decimals": 1, "signed": True,
-                 "color": theme.direction_color(-sim.fuel_delta_percent)},
-            ]
-        )
-
-        components.peer_distribution(vessel, simulated_score=sim.score, height=200)
-
+    슬라이더·결과 카드·곡선·구간표를 iframe 하나(`components.live_simulator`)에
+    통째로 담는다. 예전에는 `st.slider` 두 개를 놓고 매 칸마다 Python을 왕복했는데,
+    실측상 왕복 1회가 300~570ms였고 그때마다 결과 카드 iframe이 다시 로드돼
+    900ms짜리 카운트업이 처음부터 재생됐다 — 드래그하는 동안 숫자가 목표값에
+    도달하지 못했다. 지금은 `adapter.simulate_surface()`가 전 구간을 미리 계산해
+    넘기고 브라우저는 조회만 하므로 왕복이 없다. 계산 창구는 여전히 adapter 한 곳이다.
+    """
+    components.live_simulator(vessel)
     st.markdown(
         '<div class="bs-note">시뮬레이션 결과는 예상치이며 확정된 조건이 아닙니다. '
         '축 간 반작용 계수는 검증 전 잠정값입니다.</div>',
@@ -206,7 +131,10 @@ def render() -> None:
             components.objection_form(vessel)
 
     with tab_sim:
-        components.improvement_recommendation_cards(vessel)
+        # 개선 추천 카드는 시뮬레이터 위젯 안(유사군 분포 아래)으로 옮겼다.
+        # 슬라이더로 조합을 만지기 전에 "추천 조합"이 먼저 눈에 들어오면
+        # 시뮬레이터가 답을 미리 알려주는 꼴이 되고, 분포를 본 직후에 놓여야
+        # "내 위치 → 그래서 뭘 바꾸면 되는지" 순서로 읽힌다.
         st.markdown("##### 우대 요인")
         components.eligibility_card(
             vessel,
