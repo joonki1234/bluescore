@@ -136,6 +136,58 @@ def build(data: ExplainInput, reason: str) -> ExplainOutput:
     )
 
 
+def build_qa_fallback(data: ExplainInput, question: str) -> str:
+    """
+    LLM 없이 질문에 답한다.
+
+    자유 질문에 정확히 답할 수는 없으므로, 리포트 요약을 그대로 안내하고
+    담당자 확인이 필요하다는 것을 알린다 — 지어내지 않는 것이 우선이다.
+    """
+    return (
+        f"지금은 AI 답변을 생성할 수 없어 자동으로 답변드리기 어렵습니다. "
+        f"참고로 현재 리포트 요약은 다음과 같습니다 — {build_summary(data)} "
+        f"'{question.strip()}'에 대한 구체적인 답이 필요하시면 점수리포트의 "
+        f"요인별 설명을 확인하시거나 담당자에게 문의해 주세요."
+    )
+
+
+def build_objection_fallback(data: ExplainInput, reason: str, detail: str) -> str:
+    """
+    LLM 없이 이의제기 접수만 확인한다.
+
+    답을 지어내는 대신 "심사역이 검토한다"는 사실만 안내한다 — 이의제기의
+    최종 판단은 어차피 AI가 아니라 심사역이 하기 때문에, 폴백이라도
+    서비스 전제를 벗어나지 않는다.
+    """
+    return (
+        f"'{reason}' 사유로 접수된 이의제기입니다. 지금은 AI 초안을 생성할 수 "
+        "없어, 담당 심사역이 데이터 출처와 산출 근거를 직접 검토한 뒤 답변을 "
+        "안내해 드릴 예정입니다."
+    )
+
+
+def build_report_fallback(data: ExplainInput) -> str:
+    """
+    LLM 없이 요인별 실측값을 문장으로 나열한다.
+
+    `factor_metrics`(선박 자신 값 vs 유사군 평균)를 계산 결과 그대로 문장
+    틀에 끼워 넣는다 — 숫자를 만들어낼 여지가 없어 검증이 필요 없다.
+    """
+    if not data.factor_metrics:
+        return build_summary(data)
+
+    sentences: List[str] = []
+    for metric in data.factor_metrics:
+        axis_name = "자원 압력" if metric.axis == "a" else "운항 효율"
+        diff = metric.self_value - metric.peer_average
+        direction = "높습니다" if diff > 0 else "낮습니다" if diff < 0 else "비슷합니다"
+        sentences.append(
+            f"{metric.label}({axis_name})은 귀 선박이 {metric.self_value:g}{metric.unit}, "
+            f"유사 선박군 평균은 {metric.peer_average:g}{metric.unit}로 평균보다 {direction}."
+        )
+    return " ".join(sentences)
+
+
 def merge_partial(
     data: ExplainInput,
     summary: str,

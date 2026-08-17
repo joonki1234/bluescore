@@ -22,7 +22,15 @@ import logging
 from typing import Optional
 
 from explain import fallback, prompt, render
-from explain.contract import LLM_OUTPUT_SCHEMA, ExplainInput, ExplainOutput
+from explain.contract import (
+    LLM_OUTPUT_SCHEMA,
+    OBJECTION_OUTPUT_SCHEMA,
+    QA_OUTPUT_SCHEMA,
+    REPORT_OUTPUT_SCHEMA,
+    ExplainInput,
+    ExplainOutput,
+    TextOutput,
+)
 from explain.provider import (
     LLMProvider,
     ProviderError,
@@ -33,6 +41,9 @@ from explain.provider import (
 logger = logging.getLogger(__name__)
 
 SCHEMA_NAME = "bluescore_explanation"
+QA_SCHEMA_NAME = "bluescore_qa"
+OBJECTION_SCHEMA_NAME = "bluescore_objection_response"
+REPORT_SCHEMA_NAME = "bluescore_detailed_report"
 
 
 def explain(
@@ -90,4 +101,101 @@ def explain(
         shap_factors=list(data.shap_factors),
         recommendations=recommendations,
         source=f"llm:{llm.name}",
+    )
+
+
+def _generate_text(
+    data: ExplainInput,
+    *,
+    system_prompt: str,
+    user_prompt: str,
+    schema: dict,
+    schema_name: str,
+    field: str,
+    fallback_text: str,
+    provider: Optional[LLMProvider] = None,
+) -> TextOutput:
+    """
+    문장 하나만 생성하는 흐름(질의응답·이의제기 응답·상세 리포트)의 공통 뼈대.
+
+    `explain()`과 같은 원칙을 따른다 — 어떤 실패든 절대 예외를 던지지 않고
+    `fallback_text`로 흡수하며, 사유는 `source`에 남는다.
+    """
+    try:
+        llm = provider or get_provider()
+    except ProviderUnavailable as exc:
+        logger.info("프로바이더를 만들 수 없어 폴백합니다: %s", exc)
+        return TextOutput(text=fallback_text, source="fallback:provider_unavailable")
+
+    if not llm.is_available():
+        logger.info("프로바이더 %s를 사용할 수 없어 폴백합니다.", llm.name)
+        return TextOutput(text=fallback_text, source=f"fallback:{llm.name}_unavailable")
+
+    try:
+        raw = llm.generate_json(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            schema=schema,
+            schema_name=schema_name,
+        )
+    except ProviderUnavailable as exc:
+        logger.info("프로바이더 %s 사용 불가: %s", llm.name, exc)
+        return TextOutput(text=fallback_text, source=f"fallback:{llm.name}_unavailable")
+    except ProviderError as exc:
+        logger.warning("프로바이더 %s 호출 실패: %s", llm.name, exc)
+        return TextOutput(text=fallback_text, source=f"fallback:{llm.name}_error")
+
+    text, error = render.safe_parse_text(raw, data, field)
+    if error is not None:
+        logger.warning("응답 검증 실패, 폴백합니다: %s", error)
+        return TextOutput(text=fallback_text, source="fallback:validation_failed")
+
+    return TextOutput(text=text, source=f"llm:{llm.name}")
+
+
+def answer_question(
+    data: ExplainInput, question: str, provider: Optional[LLMProvider] = None
+) -> TextOutput:
+    """어업인의 자유 질문에 답한다. `explain()`과 같은 LLM 프로바이더를 재사용한다."""
+    return _generate_text(
+        data,
+        system_prompt=prompt.QA_SYSTEM_PROMPT,
+        user_prompt=prompt.build_qa_prompt(data, question),
+        schema=QA_OUTPUT_SCHEMA,
+        schema_name=QA_SCHEMA_NAME,
+        field="answer",
+        fallback_text=fallback.build_qa_fallback(data, question),
+        provider=provider,
+    )
+
+
+def respond_to_objection(
+    data: ExplainInput, reason: str, detail: str, provider: Optional[LLMProvider] = None
+) -> TextOutput:
+    """이의제기에 대한 답변 초안을 만든다. 심사역이 검토 후 전달한다."""
+    return _generate_text(
+        data,
+        system_prompt=prompt.OBJECTION_SYSTEM_PROMPT,
+        user_prompt=prompt.build_objection_prompt(data, reason, detail),
+        schema=OBJECTION_OUTPUT_SCHEMA,
+        schema_name=OBJECTION_SCHEMA_NAME,
+        field="response",
+        fallback_text=fallback.build_objection_fallback(data, reason, detail),
+        provider=provider,
+    )
+
+
+def generate_detailed_report(
+    data: ExplainInput, provider: Optional[LLMProvider] = None
+) -> TextOutput:
+    """요인별 실측값(factor_metrics)을 근거로 상세 리포트를 만든다."""
+    return _generate_text(
+        data,
+        system_prompt=prompt.REPORT_SYSTEM_PROMPT,
+        user_prompt=prompt.build_report_prompt(data),
+        schema=REPORT_OUTPUT_SCHEMA,
+        schema_name=REPORT_SCHEMA_NAME,
+        field="report",
+        fallback_text=fallback.build_report_fallback(data),
+        provider=provider,
     )

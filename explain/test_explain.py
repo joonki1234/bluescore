@@ -17,8 +17,8 @@ from typing import Any, Dict, List
 import pytest
 
 from explain import fallback, render
-from explain.contract import ExplainInput, ExplainOutput, ShapFactor
-from explain.explain import explain
+from explain.contract import ExplainInput, ExplainOutput, FactorMetric, ShapFactor
+from explain.explain import answer_question, explain, generate_detailed_report, respond_to_objection
 from explain.provider import LLMProvider, ProviderError, ProviderUnavailable
 
 
@@ -38,6 +38,10 @@ def make_input(**overrides: Any) -> ExplainInput:
             ShapFactor("혼잡 어장 회피", 3.1, "a"),
             ShapFactor("조업 시간당 연료", -3.6, "b"),
             ShapFactor("항해 속도", -5.4, "b"),
+        ],
+        "factor_metrics": [
+            FactorMetric("동일 격자 재방문 간격", "a", 18.4, 14.2, "시간"),
+            FactorMetric("항해 속도", "b", 10.4, 9.1, "노트"),
         ],
     }
     defaults.update(overrides)
@@ -268,6 +272,73 @@ def test_어떤_경우에도_예외를_던지지_않는다():
 
 
 # ─── 직렬화 ──────────────────────────────────────────────────────────────────
+# ─── 질의응답 / 이의제기 응답 / 상세 리포트 ────────────────────────────────────
+def test_QA_LLM_없으면_폴백한다():
+    result = answer_question(make_input(), "왜 점수가 깎였나요?", provider=StubProvider(available=False))
+    assert result.is_fallback
+    assert result.text
+
+
+def test_QA_정상_응답은_그대로_쓴다():
+    raw = json.dumps({"answer": "항해 속도가 빨라 연료를 더 씁니다."}, ensure_ascii=False)
+    result = answer_question(make_input(), "왜 점수가 깎였나요?", provider=StubProvider(response=raw))
+    assert result.source == "llm:stub"
+    assert "항해 속도" in result.text
+
+
+def test_QA_창작된_숫자는_폴백한다():
+    raw = json.dumps({"answer": "연료를 99% 더 씁니다."}, ensure_ascii=False)
+    result = answer_question(make_input(), "질문", provider=StubProvider(response=raw))
+    assert result.source == "fallback:validation_failed"
+
+
+def test_이의제기_응답_LLM_없으면_폴백한다():
+    result = respond_to_objection(
+        make_input(), "데이터 매칭 오류", "어업종이 다르게 매칭됐습니다.",
+        provider=StubProvider(available=False),
+    )
+    assert result.is_fallback
+    assert "데이터 매칭 오류" in result.text
+
+
+def test_이의제기_응답_정상_응답은_그대로_쓴다():
+    raw = json.dumps({"response": "말씀하신 매칭 오류 가능성을 확인 중입니다."}, ensure_ascii=False)
+    result = respond_to_objection(
+        make_input(), "데이터 매칭 오류", "상세", provider=StubProvider(response=raw)
+    )
+    assert result.source == "llm:stub"
+
+
+def test_상세리포트_LLM_없으면_factor_metrics로_폴백한다():
+    result = generate_detailed_report(make_input(), provider=StubProvider(available=False))
+    assert result.is_fallback
+    assert "동일 격자 재방문 간격" in result.text
+
+
+def test_상세리포트_정상_응답은_그대로_쓴다():
+    raw = json.dumps(
+        {"report": "동일 격자 재방문 간격이 유사군 평균보다 길어 자원 압력이 낮습니다."},
+        ensure_ascii=False,
+    )
+    result = generate_detailed_report(make_input(), provider=StubProvider(response=raw))
+    assert result.source == "llm:stub"
+
+
+def test_어떤_경우에도_텍스트_생성_함수는_예외를_던지지_않는다():
+    for provider in [
+        StubProvider(response="깨진 응답"),
+        StubProvider(error=ProviderError("네트워크 오류")),
+        StubProvider(available=False),
+    ]:
+        for fn, args in [
+            (answer_question, ("질문",)),
+            (respond_to_objection, ("사유", "상세")),
+            (generate_detailed_report, ()),
+        ]:
+            result = fn(make_input(), *args, provider=provider)
+            assert result.text
+
+
 def test_mock_스키마와_같은_키로_직렬화된다():
     """data/mock/README_mock_data 제안.md 5번의 키 이름을 따른다."""
     result = fallback.build(make_input(), "test")

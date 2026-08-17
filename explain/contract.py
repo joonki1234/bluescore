@@ -45,6 +45,26 @@ class Recommendation:
 
 
 @dataclass(frozen=True)
+class FactorMetric:
+    """요인 하나의 선박 자신 값 vs 유사군 평균값. 계산 결과이며 LLM을 거치지 않는다."""
+
+    label: str
+    axis: str  # "a" | "b"
+    self_value: float
+    peer_average: float
+    unit: str
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "label": self.label,
+            "axis": self.axis,
+            "selfValue": self.self_value,
+            "peerAverage": self.peer_average,
+            "unit": self.unit,
+        }
+
+
+@dataclass(frozen=True)
 class ExplainInput:
     """
     설명 생성에 필요한 계산 결과 일체.
@@ -62,6 +82,7 @@ class ExplainInput:
     top_percent: int
     fuel_delta_percent: float
     shap_factors: List[ShapFactor] = field(default_factory=list)
+    factor_metrics: List[FactorMetric] = field(default_factory=list)
     season: Optional[str] = None  # facts.py의 금어기 조회 키
     gear_type: Optional[str] = None
 
@@ -79,6 +100,9 @@ class ExplainInput:
         for factor in self.shap_factors:
             values.append(factor.value)
             values.append(abs(factor.value))
+        for metric in self.factor_metrics:
+            values.append(metric.self_value)
+            values.append(metric.peer_average)
         return values
 
     def top_positive(self, limit: int = 2) -> List[ShapFactor]:
@@ -124,6 +148,26 @@ class ExplainOutput:
         }
 
 
+@dataclass(frozen=True)
+class TextOutput:
+    """
+    질의응답 / 이의제기 응답 / 상세 리포트처럼 문장 하나만 생성하는 흐름의 결과.
+
+    `ExplainOutput`과 같은 `source` 규약을 쓴다 — "llm:<provider>" 또는
+    "fallback:<사유>". 화면은 이 값으로 LLM 생성인지 템플릿인지 표시한다.
+    """
+
+    text: str
+    source: str
+
+    @property
+    def is_fallback(self) -> bool:
+        return self.source.startswith("fallback")
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {"text": self.text, "source": self.source}
+
+
 # ─── LLM 응답 스키마 ─────────────────────────────────────────────────────────
 # LLM은 문장만 만든다. shapFactors는 계산 결과라 여기 없다.
 LLM_OUTPUT_SCHEMA: Dict[str, Any] = {
@@ -157,5 +201,51 @@ LLM_OUTPUT_SCHEMA: Dict[str, Any] = {
         },
     },
     "required": ["summary", "recommendations"],
+    "additionalProperties": False,
+}
+
+# 단일 문장 필드만 받는 흐름 공통 스키마 모양. 필드 이름만 다르다.
+QA_OUTPUT_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "answer": {
+            "type": "string",
+            "description": (
+                "어업인의 질문에 대한 답변. 주어진 계산 결과와 참고 사실에 있는 "
+                "내용만 근거로 삼는다. 없는 내용은 모른다고 답한다."
+            ),
+        },
+    },
+    "required": ["answer"],
+    "additionalProperties": False,
+}
+
+OBJECTION_OUTPUT_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "response": {
+            "type": "string",
+            "description": (
+                "이의제기에 대한 초안 답변. 심사역이 검토 후 수정하거나 그대로 "
+                "전달할 수 있는 초안이다. 단정적으로 결론짓지 않는다."
+            ),
+        },
+    },
+    "required": ["response"],
+    "additionalProperties": False,
+}
+
+REPORT_OUTPUT_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "report": {
+            "type": "string",
+            "description": (
+                "요인별 상세 리포트. 주어진 요인별 실측값(선박 자신 값과 유사군 "
+                "평균값)을 근거로 5~8문장 분량으로 각 요인을 풀어 설명한다."
+            ),
+        },
+    },
+    "required": ["report"],
     "additionalProperties": False,
 }

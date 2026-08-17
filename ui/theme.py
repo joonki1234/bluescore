@@ -100,6 +100,17 @@ html, body, [class*="css"] {{ font-family: {FONT_SANS}; }}
 .bs-prov .d {{ font-family: {FONT_MONO}; color: {INK}; }}
 
 div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
+
+/* 축 막대·비교 막대가 채워지는 느낌을 주는 트랜지션. Streamlit은 JS 트리거를
+   못 주므로, 요소가 렌더되며 폭이 확정되는 순간 브라우저가 자동 재생하는
+   순수 CSS 트랜지션으로 대체한다. */
+.bs-fill {{ transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1); }}
+
+@keyframes bs-fade-in {{
+  from {{ opacity: 0; transform: translateY(4px); }}
+  to {{ opacity: 1; transform: translateY(0); }}
+}}
+.bs-card, .bs-scorebar {{ animation: bs-fade-in 0.4s ease-out; }}
 </style>
 """
 

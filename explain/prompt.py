@@ -99,3 +99,103 @@ def build_user_prompt(data: ExplainInput) -> str:
         "개선 제안은 점수를 깎은 요인부터 다루되, 깎은 요인이 없으면 "
         "지금의 좋은 패턴을 유지하라는 쪽으로 씁니다."
     )
+
+
+def build_factor_metrics_block(data: ExplainInput) -> str:
+    """요인별 실측값(선박 자신 값 vs 유사군 평균)을 JSON으로 주입한다."""
+    if not data.factor_metrics:
+        return ""
+    payload = [
+        {
+            "요인": m.label,
+            "축": "자원 압력" if m.axis == "a" else "운항 효율",
+            "귀_선박_값": m.self_value,
+            "유사군_평균값": m.peer_average,
+            "단위": m.unit,
+        }
+        for m in data.factor_metrics
+    ]
+    return (
+        "요인별 실측값 (여기 있는 숫자만 쓸 수 있습니다)\n"
+        + json.dumps(payload, ensure_ascii=False, indent=2)
+    )
+
+
+# ─── 질의응답 ─────────────────────────────────────────────────────────────────
+QA_SYSTEM_PROMPT = """\
+당신은 어선의 지속가능성 점수(BlueScore) 리포트에 대한 어업인의 질문에 답하는 \
+역할입니다. 읽는 사람은 배를 모는 어업인이고, 통계나 금융 용어에 익숙하지 않습니다.
+
+지켜야 할 것
+- 주어진 계산 결과와 참고 사실에 있는 내용만 근거로 답합니다. 어떤 수치도 새로 \
+만들지 마세요.
+- 주어진 정보로 답할 수 없는 질문이면, 모른다고 솔직히 말하고 무엇을 확인하면 \
+되는지 안내하세요. 추측으로 채우지 마세요.
+- 전문용어를 쓰지 않습니다.
+- 답변은 2~4문장입니다.
+"""
+
+
+def build_qa_prompt(data: ExplainInput, question: str) -> str:
+    metrics_block = build_factor_metrics_block(data)
+    return (
+        f"{build_facts_block()}\n\n"
+        f"{build_data_block(data)}\n\n"
+        + (f"{metrics_block}\n\n" if metrics_block else "")
+        + f"어업인의 질문: {question.strip()}\n\n"
+        "위 정보만 근거로 답하세요."
+    )
+
+
+# ─── 이의제기 응답 ────────────────────────────────────────────────────────────
+OBJECTION_SYSTEM_PROMPT = """\
+당신은 여신 심사역이 검토하기 전에 이의제기에 대한 답변 초안을 작성하는 \
+역할입니다. 이 초안은 그대로 발송되지 않고, 심사역이 검토·수정한 뒤 전달합니다.
+
+지켜야 할 것
+- 주어진 계산 결과와 참고 사실에 있는 내용만 근거로 씁니다. 새 수치를 만들지 \
+마세요.
+- 이의제기 내용이 타당한지 아닌지 당신이 단정하지 마세요. "심사역이 데이터 \
+출처와 매칭 신뢰도를 확인 중"이라는 톤을 유지하세요.
+- 방어적이거나 형식적인 말투를 피하고, 무엇을 근거로 점수가 산출됐는지 \
+차분히 설명하세요.
+- 답변은 3~5문장입니다.
+"""
+
+
+def build_objection_prompt(data: ExplainInput, reason: str, detail: str) -> str:
+    metrics_block = build_factor_metrics_block(data)
+    return (
+        f"{build_facts_block()}\n\n"
+        f"{build_data_block(data)}\n\n"
+        + (f"{metrics_block}\n\n" if metrics_block else "")
+        + f"이의제기 사유: {reason}\n"
+        f"이의제기 상세 내용: {detail.strip() or '(추가 설명 없음)'}\n\n"
+        "위 계산 결과를 근거로, 심사역이 검토 후 전달할 답변 초안을 작성하세요."
+    )
+
+
+# ─── 상세 리포트 ──────────────────────────────────────────────────────────────
+REPORT_SYSTEM_PROMPT = """\
+당신은 어선의 지속가능성 점수(BlueScore) 리포트에서 요인별 상세 설명을 작성하는 \
+역할입니다. 읽는 사람은 배를 모는 어업인입니다.
+
+지켜야 할 것
+- '요인별 실측값'에 있는 귀 선박 값과 유사군 평균값만 근거로 씁니다. 새 수치를 \
+만들지 마세요.
+- 전문용어를 쓰지 않고, 각 요인이 무엇을 재는지 풀어서 설명합니다.
+- 유사군 평균과 비교했을 때 좋은 방향인지 개선이 필요한 방향인지 함께 씁니다.
+- 자원 압력(A축) 요인은 간격이 길거나 회피율이 높을수록 좋다는 방향을 지키고,
+  "같은 자리를 더 반복하라"는 식의 해석은 하지 않습니다.
+- 5~8문장으로, 요인을 하나씩 짚어가며 씁니다.
+"""
+
+
+def build_report_prompt(data: ExplainInput) -> str:
+    metrics_block = build_factor_metrics_block(data)
+    return (
+        f"{build_facts_block()}\n\n"
+        f"{build_data_block(data)}\n\n"
+        + (f"{metrics_block}\n\n" if metrics_block else "")
+        + "위 요인별 실측값을 근거로 상세 리포트를 작성하세요."
+    )

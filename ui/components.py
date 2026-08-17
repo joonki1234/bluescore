@@ -37,11 +37,12 @@ ESRI_ATTRIBUTION = "Tiles &copy; Esri — Esri, Maxar, Earthstar Geographics"
 _ASSUMED_MAP_WIDTH_PX = 560
 
 # 어두운 위성 배경 위에서 읽히도록 조정한 지도 전용 색.
-# 축 색 체계는 그대로다 — 조업 이벤트는 A축 계열(파랑), 앰버는 보호구역 표시.
+# 축 색 체계는 그대로다 — 조업 이벤트는 A축 계열(파랑), 보호구역은 방향색
+# 체계의 감점색(theme.NEGATIVE)을 그대로 써서 "감점 요인"임을 색으로도 전달한다.
 MAP_FISHING = "#60A5FA"
 MAP_SAILING = "#BBD3FA"
 MAP_GAP = "#EEF1F5"
-MAP_MPA = "#FBBF24"
+MAP_MPA = theme.NEGATIVE
 
 # 지리 기준점 — 지도가 어디를 보고 있는지 즉시 알 수 있게 한다.
 _LANDMARKS = [
@@ -49,11 +50,163 @@ _LANDMARKS = [
     {"lat": 37.5054, "lng": 130.8642, "name": "울릉도"},
 ]
 
+# ─── JS 애니메이션 위젯 공용 스타일·스크립트 ───────────────────────────────────
+# Streamlit이 재실행마다 DOM을 새로 그리는 방식이라, CSS 트랜지션은 브라우저가
+# 중간 상태를 그리지 않고 최종값을 바로 페인트해버려 재생을 보장하지 못한다.
+# 그래서 숫자 카운트업·막대 채움처럼 "임팩트가 중요한" 요소는 지도와 같은
+# components.v1.html(iframe) 안에서 진짜 JS로 애니메이션한다. iframe은 페이지의
+# 공용 CSS(theme.inject())를 못 받으므로, bs-card 스타일을 최소한으로 복제해
+# 여기 한 곳에만 정의하고 여러 컴포넌트가 재사용한다.
+_MINI_CARD_CSS = f"""
+<style>
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; padding:0; background:transparent; font-family:{theme.FONT_SANS}; }}
+  .bs-mini-card {{
+    background:{theme.SURFACE}; border:1px solid {theme.LINE}; border-radius:12px;
+    padding:14px 16px; opacity:0; transform:translateY(6px);
+    animation:bs-mini-in 0.5s ease-out forwards;
+  }}
+  @keyframes bs-mini-in {{ to {{ opacity:1; transform:translateY(0); }} }}
+  .bs-mini-label {{ font-size:12px; color:{theme.INK_SOFT}; margin-bottom:4px; }}
+  .bs-mini-value-row {{ display:flex; align-items:baseline; gap:3px; }}
+  .bs-mini-value {{ font-family:{theme.FONT_MONO}; font-weight:700; }}
+  .bs-mini-unit {{ font-size:12px; font-weight:500; color:{theme.INK_SOFT}; }}
+  .bs-mini-track {{
+    position:relative; height:8px; background:{theme.BG}; border-radius:5px; margin-top:8px;
+  }}
+  .bs-mini-fill {{
+    height:100%; border-radius:5px; width:0%;
+    transition:width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  }}
+  .bs-mini-marker {{
+    position:absolute; top:-3px; width:2px; height:14px; background:{theme.INK_SOFT};
+  }}
+</style>
+"""
 
-def _chart(fig: go.Figure, height: int) -> None:
+_COUNT_UP_JS = """
+function bsAnimateCount(el, from, target, decimals, duration, signed) {
+  var startTime = null;
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    var current = from + (target - from) * eased;
+    var text = current.toFixed(decimals);
+    if (signed && current >= 0) { text = '+' + text; }
+    el.textContent = text;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function bsAnimateAll(root) {
+  root.querySelectorAll('[data-count]').forEach(function(el) {
+    bsAnimateCount(
+      el, parseFloat(el.dataset.from || '0'), parseFloat(el.dataset.count),
+      parseInt(el.dataset.decimals || '0'), parseInt(el.dataset.duration || '900'),
+      el.dataset.signed === '1'
+    );
+  });
+  root.querySelectorAll('[data-fill]').forEach(function(el) {
+    setTimeout(function() { el.style.width = el.dataset.fill + '%'; }, 50);
+  });
+}
+window.addEventListener('DOMContentLoaded', function() { bsAnimateAll(document); });
+"""
+
+
+def _stat_card_html(s: Dict) -> str:
+    value = s["value"]
+    if isinstance(value, (int, float)):
+        number_html = (
+            f'<span class="bs-mini-value" style="font-size:{s.get("size", 20)}px; '
+            f'color:{s.get("color", theme.INK)};" data-count="{value}" '
+            f'data-decimals="{s.get("decimals", 0)}" data-signed="{1 if s.get("signed") else 0}">0</span>'
+        )
+    else:
+        # 문자열 값(등급 텍스트 등)은 셀 수 없으니 애니메이션 없이 그대로 보여준다.
+        number_html = (
+            f'<span class="bs-mini-value" style="font-size:{s.get("size", 20)}px; '
+            f'color:{s.get("color", theme.INK)};">{value}</span>'
+        )
+    unit = f'<span class="bs-mini-unit">{s.get("unit", "")}</span>' if s.get("unit") else ""
+    return (
+        f'<div class="bs-mini-card"><div class="bs-mini-label">{s["label"]}</div>'
+        f'<div class="bs-mini-value-row">{number_html}{unit}</div></div>'
+    )
+
+
+def animated_stat_cards(stats: List[Dict], height: int = 100) -> None:
+    """
+    숫자 카드 여러 개를 한 행에 0→값 카운트업 애니메이션과 함께 그린다.
+
+    `stats` 각 항목: {"label","value","unit","color","decimals","signed"}. `value`가
+    문자열이면(예: 등급 텍스트) 애니메이션 없이 그대로 표시한다.
+    기존 st.columns + bs-card 조합을 대체하는 자리에 쓴다 — 표시값은 동일하고
+    애니메이션만 더해진다.
+    """
+    cards = "".join(_stat_card_html(s) for s in stats)
+    html = (
+        f"{_MINI_CARD_CSS}"
+        f'<div style="display:grid; grid-template-columns:repeat({len(stats)}, 1fr); gap:12px;">'
+        f"{cards}</div><script>{_COUNT_UP_JS}</script>"
+    )
+    components_html(html, height=height, scrolling=False)
+
+
+def animated_transition_card(
+    label: str,
+    before,
+    after,
+    *,
+    unit: str = "",
+    decimals: int = 1,
+    color: Optional[str] = None,
+    note_html: str = "",
+    height: int = 118,
+) -> None:
+    """
+    "72.6 → 76.3" 같은 전후 비교 카드. 시뮬레이터·개선 추천 카드에서 반복되는
+    패턴이라 공용으로 뺐다. before/after가 숫자면 그 구간을 카운트업하고,
+    문자열(등급 텍스트 등)이면 애니메이션 없이 페이드인만 한다.
+    """
+    numeric = isinstance(before, (int, float)) and isinstance(after, (int, float))
+    if numeric:
+        color = color or theme.direction_color(after - before)
+        before_display = f"{before:.{decimals}f}"
+        after_html = (
+            f'<span class="bs-mini-value" style="font-size:28px; font-weight:700; '
+            f'color:{color};" data-count="{after}" data-from="{before}" '
+            f'data-decimals="{decimals}">{before_display}</span>'
+        )
+    else:
+        color = color or theme.INK
+        before_display = str(before)
+        after_html = (
+            f'<span style="font-size:21px; font-weight:800; color:{color};">{after}</span>'
+        )
+
+    html = f"""
+{_MINI_CARD_CSS}
+<div class="bs-mini-card">
+  <div class="bs-mini-label">{label}</div>
+  <div style="display:flex; align-items:baseline; gap:10px;">
+    <span style="font-size:17px; color:{theme.INK_SOFT};">{before_display}</span>
+    <span style="color:{theme.INK_SOFT};">→</span>
+    {after_html}
+    <span class="bs-mini-unit">{unit}</span>
+  </div>
+  <div style="font-size:12px; color:{theme.INK_SOFT}; line-height:1.65; margin-top:8px;">{note_html}</div>
+</div>
+<script>{_COUNT_UP_JS}</script>
+"""
+    components_html(html, height=height, scrolling=False)
+
+
+def _chart(fig: go.Figure, height: int, margin: Optional[Dict[str, int]] = None) -> None:
     fig.update_layout(
         height=height,
-        margin=dict(l=8, r=8, t=8, b=8),
+        margin=margin or dict(l=8, r=8, t=8, b=8),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=_PLOTLY_FONT,
@@ -133,43 +286,74 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
     origin_x, origin_y = track[0]
     anchor_lat, anchor_lng = vessel["anchor"]
 
+    # 동일 구역 반복조업 히트 — 격자좌표를 셀 단위로 묶어 재방문 횟수를 센다.
+    # 값이 클수록 같은 자리를 자주 긁는다는 뜻이라 A축(자원 압력) 감점 신호다.
+    # 히트맵 레이어의 가중치로 쓴다(GFW의 조업강도 히트맵과 같은 접근).
+    cell_size = 40
+    visit_counts: Dict[tuple, int] = {}
+    for gx, gy in track:
+        cell = (gx // cell_size, gy // cell_size)
+        visit_counts[cell] = visit_counts.get(cell, 0) + 1
+
+    shap_by_axis = {"a": [], "b": []}
+    for factor in vessel.get("shapFactors", []):
+        shap_by_axis.setdefault(factor["axis"], []).append(factor)
+    top_a_factor = max(shap_by_axis["a"], key=lambda f: abs(f["value"]), default=None)
+    top_b_factor = max(shap_by_axis["b"], key=lambda f: abs(f["value"]), default=None)
+
     events = []
+    heat_points = []
     for idx, (gx, gy) in enumerate(track):
         lat = anchor_lat - (gy - origin_y) * _SCALE_LAT
         lng = anchor_lng + (gx - origin_x) * _SCALE_LNG
         is_fishing = any(s <= idx <= e for s, e in vessel["fishingSegments"])
         is_gap = idx == vessel.get("gapIndex", -1)
         is_mpa = idx == vessel.get("mpaIndex", -1)
+        cell = (gx // cell_size, gy // cell_size)
+        revisits = visit_counts[cell]
 
         if is_gap:
-            kind, color, radius = "신호두절(GAP)", MAP_GAP, 6
+            kind, radius = "신호두절(GAP)", 5
         elif is_fishing:
-            kind, color, radius = "조업 이벤트", MAP_FISHING, 7
+            kind, radius = "조업 이벤트", 6
+            heat_points.append([lat, lng, min(1.0, 0.35 + 0.25 * revisits)])
         else:
-            kind, color, radius = "항해 이벤트", MAP_SAILING, 5
+            kind, radius = "항해 이벤트", 4
+
+        tip = f"#{idx + 1} {kind}"
+        if is_fishing and revisits > 1:
+            tip += f" · 이 구역 재방문 {revisits}회"
+            if top_a_factor:
+                tip += f" · 자원압력 요인: {top_a_factor['label']} ({top_a_factor['value']:+.1f})"
+        elif not is_fishing and top_b_factor:
+            tip += f" · 운항효율 요인: {top_b_factor['label']} ({top_b_factor['value']:+.1f})"
+        if is_mpa:
+            tip += " · 해양보호구역 태그"
 
         events.append(
             {
                 "lat": lat,
                 "lng": lng,
-                "color": color,
                 "radius": radius,
+                "fishing": is_fishing,
                 "dashed": is_gap,
                 "mpa": is_mpa,
                 "home": idx == 0,
-                "tip": f"#{idx + 1} {kind}"
-                + (" · 해양보호구역 태그" if is_mpa else ""),
+                "tip": tip,
             }
         )
 
     center, zoom = _fit_view(events, height)
     payload = {
         "events": events,
+        "heatPoints": heat_points,
         "landmarks": _LANDMARKS,
         "center": center,
         "zoom": zoom,
+        "fishingColor": MAP_FISHING,
         "mpaColor": MAP_MPA,
         "pathColor": MAP_SAILING,
+        "gapColor": MAP_GAP,
         "tileUrl": ESRI_WORLD_IMAGERY_URL,
         "attribution": ESRI_ATTRIBUTION,
     }
@@ -180,10 +364,13 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
         scrolling=False,
     )
     st.markdown(
-        '<div class="bs-note">파랑 = 조업 이벤트 · 연한 파랑 = 항해 이벤트 · '
-        '회색 점선 테두리 = 신호두절 · 앰버 원 = 해양보호구역 태그<br>'
-        'GFW 조업 이벤트를 이어 그린 <b>근사 경로</b>입니다. 초 단위 연속 항적이 아닙니다. '
-        '점에 마우스를 올리면 상세가 표시됩니다.</div>',
+        '<div class="bs-note">파란 히트맵 = 동일 구역 반복조업(진할수록 재방문 잦음) · '
+        '점선 = 이벤트를 이은 근사 경로 · 회색 점선 원 = 신호두절 · 빨간 원 = 해양보호구역 태그<br>'
+        'GFW는 연속 항적이 아니라 이산 이벤트만 제공해, 이벤트 지점을 점선으로 이어 '
+        '근사 경로를 표시합니다. 점에 마우스를 올리면 이 지점이 점수에 준 영향이 함께 '
+        '표시됩니다.<br>해양보호구역 최신 현황은 '
+        '<a href="https://www.meis.go.kr/mes/marineSanctuary/situation.do" target="_blank">'
+        '해양수산부 해양보호구역 통합정보시스템</a>에서 확인할 수 있습니다.</div>',
         unsafe_allow_html=True,
     )
 
@@ -230,6 +417,7 @@ def _leaflet_html(payload: Dict, height: int) -> str:
     return f"""
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <style>
   html, body {{ margin:0; padding:0; }}
   #bsmap {{ width:100%; height:{height}px; border-radius:8px; background:#0B1B2B; }}
@@ -240,6 +428,8 @@ def _leaflet_html(payload: Dict, height: int) -> str:
   .geo-label::before {{ display:none !important; }}
   .leaflet-container {{ font-family:{theme.FONT_SANS}; }}
   .leaflet-control-attribution {{ font-size:9.5px; }}
+  .bs-heat-layer {{ opacity:0; transition:opacity 1.1s ease-out; }}
+  .bs-glow-dot {{ filter:drop-shadow(0 0 4px var(--dot-color)); }}
 </style>
 <div id="bsmap"></div>
 <script>
@@ -247,6 +437,20 @@ const D = {data};
 const map = L.map('bsmap', {{ scrollWheelZoom:false, zoomControl:true }})
   .setView(D.center, D.zoom);
 L.tileLayer(D.tileUrl, {{ maxZoom:16, minZoom:6, attribution:D.attribution }}).addTo(map);
+
+// GFW의 조업강도 히트맵과 같은 접근 — 동일 구역 반복조업일수록 진하게 빛난다.
+// 색은 프로젝트의 축 색 체계(A축=파랑)를 그대로 따른다.
+if (D.heatPoints.length) {{
+  const heat = L.heatLayer(D.heatPoints, {{
+    radius: 34, blur: 26, maxZoom: 12, minOpacity: 0.25,
+    gradient: {{ 0.2: '#0B1B2B', 0.45: '#1E3A8A', 0.7: '#1E40AF', 0.85: '#3B82F6', 1.0: '#93C5FD' }}
+  }}).addTo(map);
+  const heatEl = heat.getContainer ? heat.getContainer() : heat._canvas;
+  if (heatEl) {{
+    heatEl.classList.add('bs-heat-layer');
+    setTimeout(function() {{ heatEl.style.opacity = 1; }}, 120);
+  }}
+}}
 
 D.landmarks.forEach(function(m) {{
   L.circleMarker([m.lat, m.lng], {{
@@ -258,7 +462,7 @@ D.landmarks.forEach(function(m) {{
 
 const latlngs = D.events.map(function(e) {{ return [e.lat, e.lng]; }});
 L.polyline(latlngs, {{
-  color:D.pathColor, weight:2, opacity:0.75, dashArray:'2 6', lineCap:'round'
+  color:D.pathColor, weight:2, opacity:0.7, dashArray:'2 6', lineCap:'round'
 }}).addTo(map);
 
 D.events.forEach(function(e) {{
@@ -267,14 +471,19 @@ D.events.forEach(function(e) {{
       radius:900, color:D.mpaColor, weight:2, dashArray:'3 4', fill:false, opacity:0.95
     }}).addTo(map);
   }}
-  L.circleMarker([e.lat, e.lng], {{
-    radius:e.radius,
-    color:e.dashed ? '#98A2B3' : '#FFFFFF',
-    weight:e.dashed ? 1.6 : 1.2,
-    dashArray:e.dashed ? '2 2' : null,
-    fillColor:e.color,
-    fillOpacity:e.dashed ? 0.5 : 1
-  }}).addTo(map).bindTooltip(e.tip, {{ direction:'top' }});
+  if (e.dashed) {{
+    L.circleMarker([e.lat, e.lng], {{
+      radius:e.radius, color:'#98A2B3', weight:1.6, dashArray:'2 2',
+      fillColor:D.gapColor, fillOpacity:0.5
+    }}).addTo(map).bindTooltip(e.tip, {{ direction:'top' }});
+  }} else {{
+    const color = e.fishing ? D.fishingColor : D.pathColor;
+    const marker = L.circleMarker([e.lat, e.lng], {{
+      radius:e.radius, color:'#FFFFFF', weight:1.3, fillColor:color, fillOpacity:1,
+      className:'bs-glow-dot'
+    }}).addTo(map).bindTooltip(e.tip, {{ direction:'top' }});
+    if (marker._path) {{ marker._path.style.setProperty('--dot-color', color); }}
+  }}
   if (e.home) {{
     L.circleMarker([e.lat, e.lng], {{ radius:0, opacity:0 }}).addTo(map)
       .bindTooltip('모항', {{ permanent:true, direction:'right', offset:[8,0], className:'geo-label' }});
@@ -290,20 +499,31 @@ window.addEventListener('load', function() {{ map.invalidateSize(); }});
 
 
 def axis_breakdown(vessel: Dict, simulation: Optional[adapter.Simulation] = None) -> None:
-    """A축·B축 분해. 시뮬레이션이 주어지면 변화 후 값을 함께 그린다."""
+    """
+    A축·B축 분해. 시뮬레이션이 주어지면 변화 후 값을 함께 그린다.
+
+    점수 숫자와 막대는 JS로 애니메이션한다(0→점수 카운트업, 0→길이 채움) —
+    `animated_stat_cards`와 같은 이유로 components.v1.html을 쓴다.
+    """
     dataset = adapter.load_dataset()
     weights = dataset["axisWeights"]
+    peer = vessel["peerGroup"]
+
+    def _peer_average(key: str) -> Optional[float]:
+        values = peer.get(key)
+        return sum(values) / len(values) if values else None
 
     rows = [
         ("A. 자원 압력", "a", vessel["axisA"], weights["a"],
          "자원에 회복 여지를 남겼는가 — 동일 격자 재방문 간격, 혼잡 어장 회피",
-         simulation.axis_a if simulation else None),
+         simulation.axis_a if simulation else None, _peer_average("axisAScores")),
         ("B. 운항 효율", "b", vessel["axisB"], weights["b"],
          "같은 조업을 덜 태우며 했는가 — 유사 선박군 기준선 대비 연료 소비 차이",
-         simulation.axis_b if simulation else None),
+         simulation.axis_b if simulation else None, _peer_average("axisBScores")),
     ]
 
-    for name, axis, data, weight, desc, after in rows:
+    row_blocks = []
+    for name, axis, data, weight, desc, after, peer_avg in rows:
         color = theme.axis_color(axis)
         after_html = ""
         if after is not None and abs(after - data["score"]) >= 0.05:
@@ -312,23 +532,32 @@ def axis_breakdown(vessel: Dict, simulation: Optional[adapter.Simulation] = None
                 f'<span style="font-size:14px; color:{theme.direction_color(delta)}; '
                 f'font-weight:700; margin-left:8px;">→ {after:g} ({theme.signed(delta)})</span>'
             )
-        st.markdown(
-            f"""<div class="bs-card">
+        marker_html = ""
+        if peer_avg is not None:
+            marker_html = f'<div class="bs-mini-marker" style="left:{peer_avg:.1f}%;"></div>'
+
+        row_blocks.append(
+            f"""<div class="bs-mini-card" style="margin-bottom:12px;">
   <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:8px;">
-    <span style="font-size:15px; font-weight:700;">{name}</span>
+    <span style="font-size:15px; font-weight:700; color:{theme.INK};">{name}</span>
     <span style="font-size:11px; color:{theme.INK_SOFT}; border:1px solid {theme.LINE};
       border-radius:5px; padding:2px 7px;">가중치 {int(weight * 100)}%</span>
-    <span style="margin-left:auto; font-size:20px; font-weight:800;">{data['score']:g}</span>
+    <span class="bs-mini-value" style="margin-left:auto; font-size:20px; font-weight:800;
+      color:{theme.INK};" data-count="{data['score']}" data-decimals="1">0</span>
     <span style="font-size:12px; color:{theme.INK_SOFT}; font-weight:600;">
       {theme.top_percent_text(data['topPercent'])}</span>{after_html}
   </div>
-  <div style="height:8px; background:{theme.BG}; border-radius:5px; overflow:hidden;">
-    <div style="height:100%; width:{data['score']}%; background:{color}; border-radius:5px;"></div>
+  <div class="bs-mini-track">
+    <div class="bs-mini-fill" style="background:{color};" data-fill="{data['score']}"></div>
+    {marker_html}
   </div>
-  <div class="bs-note" style="margin-top:8px;">{desc}</div>
-</div>""",
-            unsafe_allow_html=True,
+  <div style="font-size:12px; color:{theme.INK_SOFT}; line-height:1.65; margin-top:8px;">{desc}
+    {f'· 유사 선박군 평균 {peer_avg:.1f}' if peer_avg is not None else ''}</div>
+</div>"""
         )
+
+    html = f"{_MINI_CARD_CSS}{''.join(row_blocks)}<script>{_COUNT_UP_JS}</script>"
+    components_html(html, height=210 * len(rows), scrolling=False)
 
     st.markdown(
         f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
@@ -378,9 +607,16 @@ def peer_distribution(
             annotation_font=dict(color=theme.POSITIVE, size=12),
         )
 
-    fig.update_xaxes(title_text="BlueScore", gridcolor=theme.LINE, zeroline=False)
+    # 막대가 플롯 경계에서 잘려 보이지 않도록, 실제 값 범위에 5% 여백을 둔다.
+    lo, hi = min(scores + [vessel["blueScore"]]), max(scores + [vessel["blueScore"]])
+    pad = max((hi - lo) * 0.05, 1.0)
+    fig.update_xaxes(
+        title_text="BlueScore", range=[lo - pad, hi + pad], gridcolor=theme.LINE, zeroline=False
+    )
     fig.update_yaxes(title_text="척수", gridcolor=theme.LINE, zeroline=False)
-    _chart(fig, height)
+    # vline 주석("이 배 72.6" 등)은 플롯 영역 위/아래로 튀어나오는데, 기존 공용
+    # 여백(t=8, b=8)이 너무 좁아 글자가 잘렸다. 이 차트만 위아래 여백을 넉넉히 준다.
+    _chart(fig, height, margin=dict(l=8, r=8, t=34, b=30))
     st.markdown(
         f'<div class="bs-note">유사 선박군 {peer["count"]}척의 실제 점수 분포입니다. '
         f'표본이 작아 순위에는 폭이 있습니다 — {theme.interval_text(peer["topPercentInterval"])}.</div>',
@@ -442,20 +678,15 @@ def trend_chart(vessel: Dict, height: int = 200) -> None:
 
 
 def voyage_stats(vessel: Dict) -> None:
-    cols = st.columns(4)
-    stats = [
-        ("총 이동거리", f"{vessel['totalDistanceKm']:,}", "km"),
-        ("조업 시간", f"{vessel['fishingHours']}", "h"),
-        ("추정 연료", f"{vessel['estimatedFuelKl']}", "kL"),
-        ("출항", f"{vessel['sailCalls']}", "회"),
-    ]
-    for col, (label, value, unit) in zip(cols, stats):
-        with col:
-            st.markdown(
-                f'<div class="bs-card"><div class="bs-label">{label}</div>'
-                f'<div class="bs-value">{value}<span class="unit">{unit}</span></div></div>',
-                unsafe_allow_html=True,
-            )
+    animated_stat_cards(
+        [
+            {"label": "총 이동거리", "value": vessel["totalDistanceKm"], "unit": "km", "size": 20},
+            {"label": "조업 시간", "value": vessel["fishingHours"], "unit": "h", "size": 20},
+            {"label": "추정 연료", "value": vessel["estimatedFuelKl"], "unit": "kL",
+             "decimals": 1, "size": 20},
+            {"label": "출항", "value": vessel["sailCalls"], "unit": "회", "size": 20},
+        ]
+    )
 
 
 def eligibility_card(vessel: Dict, note: str = "") -> None:
@@ -585,3 +816,210 @@ def blocked_page(vessel: Dict) -> None:
     voyage_map(vessel)
     voyage_stats(vessel)
     backend_footer()
+
+
+def peer_metric_comparison(vessel: Dict, height_per_row: int = 46) -> None:
+    """
+    점수리포트 탭 — 요인별 실측값을 선박 자신 값 vs 유사군 평균으로 비교한다.
+
+    `shapFactors`(점수 기여도)와 달리 여기 쓰는 `factorMetrics`는 실제 관측값
+    (시간·km·노트·% 등 단위가 있는 값)이라, "왜 그런 기여도가 나왔는지"를
+    한 단계 더 구체적으로 보여준다.
+    """
+    metrics = vessel.get("factorMetrics", [])
+    if not metrics:
+        return
+
+    fig = go.Figure()
+    labels = [m["label"] for m in metrics]
+    fig.add_trace(
+        go.Bar(
+            name="유사 선박군 평균",
+            x=[m["peerAverage"] for m in metrics],
+            y=labels,
+            orientation="h",
+            marker=dict(color=theme.LINE),
+            hovertemplate="유사군 평균 %{x:g}<extra></extra>",
+        )
+    )
+    fig.add_trace(
+        go.Bar(
+            name="이 선박",
+            x=[m["selfValue"] for m in metrics],
+            y=labels,
+            orientation="h",
+            marker=dict(color=[theme.axis_color(m["axis"]) for m in metrics]),
+            hovertemplate="이 선박 %{x:g}<extra></extra>",
+        )
+    )
+    fig.update_layout(barmode="group", showlegend=True, legend=dict(orientation="h", y=1.12))
+    fig.update_xaxes(gridcolor=theme.LINE, zeroline=False)
+    fig.update_yaxes(gridcolor="rgba(0,0,0,0)")
+    _chart(fig, max(220, height_per_row * len(metrics)))
+    st.markdown(
+        '<div class="bs-note">막대 옆 단위는 요인마다 다릅니다(시간·km·노트·% 등). '
+        '값 자체보다 <b>유사 선박군 평균과의 위치</b>를 보는 지표입니다.</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def detailed_report(vessel: Dict) -> None:
+    """점수리포트 탭 — 요인별 실측값을 근거로 한 LLM 상세 리포트."""
+    report = adapter.detailed_report(vessel)
+    if not report.get("text"):
+        return
+    st.markdown("##### 상세 리포트")
+    st.markdown(
+        f'<div class="bs-card"><div style="font-size:13.5px; line-height:1.85;">'
+        f'{report["text"]}</div></div>',
+        unsafe_allow_html=True,
+    )
+    explanation_source(report)
+
+
+def ai_qa_widget(vessel: Dict) -> None:
+    """점수리포트 탭 하단 — 리포트에 대해 자유롭게 질문하는 위젯."""
+    st.markdown("##### AI에게 질문하기")
+    st.markdown(
+        '<div class="bs-note">용어, 리포트 내용, 리포트에 없는 궁금한 점을 물어보세요.</div>',
+        unsafe_allow_html=True,
+    )
+    key = f"qa_question_{vessel['vesselId']}"
+    question = st.text_input(
+        "질문", key=key, placeholder="예: 표류·대기 시간은 어떻게 계산되나요?",
+        label_visibility="collapsed",
+    )
+    if st.button("질문하기", key=f"qa_submit_{vessel['vesselId']}"):
+        if question.strip():
+            st.session_state[f"qa_answer_{vessel['vesselId']}"] = adapter.ask_ai(vessel, question)
+
+    answer = st.session_state.get(f"qa_answer_{vessel['vesselId']}")
+    if answer and answer.get("text"):
+        st.markdown(f'<div class="bs-card">{answer["text"]}</div>', unsafe_allow_html=True)
+        explanation_source(answer)
+
+
+def objection_form(vessel: Dict) -> None:
+    """점수리포트 탭 하단 — 점수에 대한 이의제기 제출."""
+    st.markdown("##### 이의제기")
+    existing = adapter.get_objection(vessel["vesselId"])
+    if existing:
+        st.markdown(
+            f'<div class="bs-card"><div class="bs-label">접수된 이의제기 · '
+            f'{"답변 완료" if existing["status"] == "answered" else "심사역 검토 중"}</div>'
+            f'<div class="bs-note"><b>{existing["reason"]}</b><br>{existing["detail"]}</div>'
+            + (
+                f'<div class="bs-note" style="margin-top:10px; padding-top:10px; '
+                f'border-top:1px solid {theme.LINE};"><b>심사역 답변</b><br>{existing["aiResponse"]}</div>'
+                if existing.get("aiResponse")
+                else ""
+            )
+            + "</div>",
+            unsafe_allow_html=True,
+        )
+        return
+
+    st.markdown(
+        '<div class="bs-note">데이터·산출 결과가 실제와 다르다고 생각되면 이의를 제기할 수 있습니다. '
+        '금융기관 심사역이 근거를 확인한 뒤 답변합니다.</div>',
+        unsafe_allow_html=True,
+    )
+    reason = st.selectbox(
+        "사유",
+        ["동일 해역 반복 조업 판정이 실제와 다름", "혼잡 해역 집중 판정이 실제와 다름",
+         "기대 대비 연료 초과 추정이 실제와 다름", "어업종 또는 선박제원 매칭 오류",
+         "기타"],
+        key=f"objection_reason_{vessel['vesselId']}",
+    )
+    detail = st.text_area(
+        "상세 내용", key=f"objection_detail_{vessel['vesselId']}",
+        placeholder="구체적인 상황을 적어주시면 심사역이 확인하는 데 도움이 됩니다.",
+    )
+    if st.button("이의제기 제출", key=f"objection_submit_{vessel['vesselId']}"):
+        adapter.submit_objection(vessel["vesselId"], reason, detail)
+        st.success("이의제기가 접수되었습니다. 금융기관 심사역이 검토합니다.")
+        st.rerun()
+
+
+def improvement_recommendation_cards(vessel: Dict) -> None:
+    """개선 시뮬레이터 탭 상단 — 가장 쉬운 개선 / 최고의 인센티브 두 카드."""
+    easiest = adapter.easiest_improvement(vessel)
+    best = adapter.best_incentive_improvement(vessel)
+    dataset = adapter.load_dataset()
+    before_band = theme.grade_band(vessel["blueScore"], dataset["rateGrades"])
+
+    left, right = st.columns(2, gap="medium")
+    for col, title, sim, desc in [
+        (left, "🟢 지금 할 수 있는 가장 쉬운 개선", easiest, "한 걸음만 바꿔도 되는 조합"),
+        (right, "🏆 최고의 인센티브를 위한 개선", best, "다음 우대 구간까지 필요한 조합"),
+    ]:
+        after_band = theme.grade_band(sim.score, dataset["rateGrades"])
+        with col:
+            st.markdown(
+                f'<div class="bs-label" style="margin-bottom:2px;">{title}</div>'
+                f'<div class="bs-note" style="margin-bottom:6px;">{desc}</div>',
+                unsafe_allow_html=True,
+            )
+            animated_transition_card(
+                "BlueScore", vessel["blueScore"], sim.score,
+                note_html=f'{theme.discount_text(before_band)} → <b>{theme.discount_text(after_band)}</b>',
+            )
+
+
+def objection_panel_bank(vessel: Dict) -> None:
+    """최종금리결정 탭 — 어업인 이의제기 내역과 AI 답변 초안, 가짜 발송 팝업."""
+    st.markdown("##### 이의제기 내역")
+    objection = adapter.get_objection(vessel["vesselId"])
+    if not objection:
+        st.markdown(
+            '<div class="bs-card"><div class="bs-note">제기된 이의가 없습니다.</div></div>',
+            unsafe_allow_html=True,
+        )
+        return
+
+    st.markdown(
+        f'<div class="bs-card"><div class="bs-label">사유</div>'
+        f'<div style="font-weight:700; margin-bottom:6px;">{objection["reason"]}</div>'
+        f'<div class="bs-label">상세 내용</div>'
+        f'<div class="bs-note">{objection["detail"] or "(추가 설명 없음)"}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.button("AI 답변 초안 생성", key=f"objection_ai_{vessel['vesselId']}"):
+        result = adapter.objection_ai_response(vessel, objection["reason"], objection["detail"])
+        adapter.resolve_objection(vessel["vesselId"], result["text"], result["source"])
+        st.rerun()
+
+    refreshed = adapter.get_objection(vessel["vesselId"])
+    if refreshed and refreshed.get("aiResponse"):
+        st.markdown(
+            f'<div class="bs-card"><div class="bs-label">AI 답변 초안 (검토 후 전달)</div>'
+            f'<div style="font-size:13.5px; line-height:1.8;">{refreshed["aiResponse"]}</div></div>',
+            unsafe_allow_html=True,
+        )
+        explanation_source({"source": refreshed["aiResponseSource"]})
+        if st.button("어업인에게 전달", key=f"objection_send_{vessel['vesselId']}"):
+            st.toast("어업인에게 답변을 전달했습니다.", icon="✅")
+
+
+def smart_contract_lookup_card(vessel: Dict, score: float) -> None:
+    """
+    최종금리결정 탭 — 점수→금리 조회 연출.
+
+    지금은 `adapter.rate_lookup()`이 규칙표를 감싼 mock이다. 실제 온체인
+    컨트랙트가 배포되면 이 컴포넌트는 그대로 두고 `rate_lookup()` 내부만
+    바뀐다.
+    """
+    with st.spinner("스마트컨트랙트에서 금리 구간 조회 중..."):
+        result = adapter.rate_lookup(score)
+    band = result["band"]
+    st.markdown(
+        f'<div class="bs-card"><div class="bs-label">스마트컨트랙트 조회 결과 · '
+        f'점수 {score:g} → 금리 구간</div>'
+        f'<div style="display:flex; align-items:baseline; gap:10px; margin-top:4px;">'
+        f'<span style="font-size:22px; font-weight:800;">{theme.discount_text(band)}</span></div>'
+        f'<div class="bs-note" style="margin-top:8px;">현재는 은행 사전 승인 규칙표를 조회한 '
+        f'결과입니다. 점수→금리 매핑 온체인 컨트랙트는 팀 검토 후 이 조회를 대체할 예정입니다.</div>'
+        f"</div>",
+        unsafe_allow_html=True,
+    )

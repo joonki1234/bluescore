@@ -174,3 +174,38 @@ def safe_parse(
     except RenderError as exc:
         return None, [], str(exc)
     return summary, recommendations, None
+
+
+def parse_and_validate_text(raw: str, data: ExplainInput, field: str) -> str:
+    """
+    단일 문장 필드만 있는 응답(질의응답·이의제기 응답·상세 리포트)을 검증한다.
+
+    구조 검증과 숫자 검증 둘 다 `parse_and_validate`와 같은 규칙을 쓴다 —
+    스키마만 다르고 "숫자를 창작하지 않는다"는 계약은 동일하게 강제된다.
+    """
+    parsed = parse_json(raw)
+
+    text = parsed.get(field)
+    if not isinstance(text, str) or not text.strip():
+        raise RenderError(f"{field}가 비어 있습니다.")
+    text = text.strip()
+
+    invented = find_invented_numbers(text, data)
+    if invented:
+        raise RenderError(
+            "입력에 없는 수치가 포함되어 있습니다: "
+            + ", ".join(f"{n:g}" for n in invented)
+        )
+
+    return text
+
+
+def safe_parse_text(
+    raw: str, data: ExplainInput, field: str
+) -> Tuple[Optional[str], Optional[str]]:
+    """예외를 던지지 않는 단일 문장 파싱. Returns: (text, error)."""
+    try:
+        text = parse_and_validate_text(raw, data, field)
+    except RenderError as exc:
+        return None, str(exc)
+    return text, None

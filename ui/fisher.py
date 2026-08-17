@@ -67,58 +67,41 @@ def _simulator(vessel: dict) -> None:
 
     with right:
         st.markdown("##### 예상 결과")
-        delta_color = theme.direction_color(sim.score_delta)
-        st.markdown(
-            f'<div class="bs-card">'
-            f'<div class="bs-label">예상 BlueScore</div>'
-            f'<div style="display:flex; align-items:baseline; gap:10px;">'
-            f'<span class="bs-mono" style="font-size:28px; color:{theme.INK_SOFT};">'
-            f'{vessel["blueScore"]}</span>'
-            f'<span style="color:{theme.INK_SOFT};">→</span>'
-            f'<span class="bs-mono" style="font-size:34px; font-weight:600; color:{delta_color};">'
-            f'{sim.score}</span></div>'
-            f'<div class="bs-note" style="margin-top:6px;">'
-            f'{theme.top_percent_text(vessel["peerGroup"]["topPercent"])} → '
-            f'<b>{theme.top_percent_text(sim.top_percent)}</b> · '
-            f'점수 {theme.signed(sim.score_delta)}</div></div>',
-            unsafe_allow_html=True,
+        components.animated_transition_card(
+            "예상 BlueScore", vessel["blueScore"], sim.score,
+            note_html=(
+                f'{theme.top_percent_text(vessel["peerGroup"]["topPercent"])} → '
+                f'<b>{theme.top_percent_text(sim.top_percent)}</b> · 점수 {theme.signed(sim.score_delta)}'
+            ),
         )
 
         dataset = adapter.load_dataset()
         before_band = theme.grade_band(vessel["blueScore"], dataset["rateGrades"])
         after_band = theme.grade_band(sim.score, dataset["rateGrades"])
         changed = after_band["grade"] != before_band["grade"]
-        border = theme.POSITIVE if changed else theme.LINE
 
-        st.markdown(
-            f'<div class="bs-card" style="border-color:{border};">'
-            f'<div class="bs-label">예상 우대 구간</div>'
-            f'<div style="display:flex; align-items:baseline; gap:10px;">'
-            f'<span style="font-size:17px; color:{theme.INK_SOFT};">'
-            f'{theme.discount_text(before_band)}</span>'
-            f'<span style="color:{theme.INK_SOFT};">→</span>'
-            f'<span style="font-size:21px; font-weight:800; '
-            f'color:{theme.POSITIVE if changed else theme.INK};">'
-            f'{theme.discount_text(after_band)}</span></div>'
-            f'<div class="bs-note" style="margin-top:8px;">최종 여신 승인은 은행 심사역이 '
-            f'수행합니다. 위 구간은 규칙표가 매핑한 제안값입니다.</div></div>',
-            unsafe_allow_html=True,
+        components.animated_transition_card(
+            "예상 우대 구간",
+            theme.discount_text(before_band), theme.discount_text(after_band),
+            color=theme.POSITIVE if changed else theme.INK,
+            note_html="최종 여신 승인은 은행 심사역이 수행합니다. 위 구간은 규칙표가 매핑한 제안값입니다.",
         )
 
         gained_bp = after_band["discountBp"] - before_band["discountBp"]
         yearly, total = theme.interest_saving(gained_bp, SIM_PRINCIPAL_WON, SIM_TERM_YEARS)
         st.markdown(
-            f'<div class="bs-card"><div class="bs-label">'
-            f'{SIM_PRINCIPAL_WON // 100_000_000}억 원 · {SIM_TERM_YEARS}년 만기 기준 예시</div>'
-            f'<div style="display:flex; gap:20px; margin-top:6px;">'
-            f'<div><div class="bs-label">연간 절감</div>'
-            f'<div class="bs-value">{yearly // 10_000}<span class="unit">만원</span></div></div>'
-            f'<div><div class="bs-label">만기까지</div>'
-            f'<div class="bs-value">{total // 10_000}<span class="unit">만원</span></div></div>'
-            f'<div><div class="bs-label">기대 대비 연료</div>'
-            f'<div class="bs-value">{theme.signed(sim.fuel_delta_percent, "%")}</div></div>'
-            f'</div></div>',
+            f'<div class="bs-note">{SIM_PRINCIPAL_WON // 100_000_000}억 원 · '
+            f'{SIM_TERM_YEARS}년 만기 기준 예시</div>',
             unsafe_allow_html=True,
+        )
+        components.animated_stat_cards(
+            [
+                {"label": "연간 절감", "value": yearly // 10_000, "unit": "만원", "color": theme.POSITIVE},
+                {"label": "만기까지", "value": total // 10_000, "unit": "만원", "color": theme.POSITIVE},
+                {"label": "기대 대비 연료", "value": sim.fuel_delta_percent, "unit": "%",
+                 "decimals": 1, "signed": True,
+                 "color": theme.direction_color(-sim.fuel_delta_percent)},
+            ]
         )
 
         components.peer_distribution(vessel, simulated_score=sim.score, height=200)
@@ -143,8 +126,8 @@ def render() -> None:
 
     components.score_bar(vessel, show_grade=False)
 
-    tab_voyage, tab_score, tab_why, tab_sim = st.tabs(
-        ["1 · 내 조업", "2 · 내 점수", "3 · 왜 이 점수인가", "4 · 개선 시뮬레이터"]
+    tab_voyage, tab_report, tab_sim = st.tabs(
+        ["1 · 조업 현황", "2 · 점수리포트", "3 · 개선 시뮬레이터"]
     )
 
     with tab_voyage:
@@ -162,7 +145,7 @@ def render() -> None:
             )
         components.voyage_stats(vessel)
 
-    with tab_score:
+        st.markdown("##### 내 점수")
         left, right = st.columns([1.4, 1], gap="medium")
         with left:
             components.axis_breakdown(vessel)
@@ -178,16 +161,20 @@ def render() -> None:
                 unsafe_allow_html=True,
             )
 
-    with tab_why:
+    with tab_report:
         left, right = st.columns([1.3, 1], gap="medium")
         with left:
             st.markdown("##### 어떤 것이 점수를 올리고 내렸나")
             components.shap_contributions(vessel)
             st.markdown(
                 '<div class="bs-note">막대 길이가 그 요인이 점수에 준 영향입니다. '
-                '부호가 +면 올린 것, −면 내린 것입니다.</div>',
+                '부호가 +면 올린 것, −면 내린 것입니다. 위쪽 "1 · 조업 현황" 탭 지도의 '
+                '조업 이벤트 색 진하기·재방문 표시도 같은 요인에서 나온 것입니다.</div>',
                 unsafe_allow_html=True,
             )
+            st.markdown("##### 유사 선박군과 비교한 실측값")
+            components.peer_metric_comparison(vessel)
+            components.detailed_report(vessel)
         with right:
             explanation = adapter.explanation(vessel)
             st.markdown("##### 요약")
@@ -207,8 +194,26 @@ def render() -> None:
             )
             st.markdown(f'<div class="bs-card">{items}</div>', unsafe_allow_html=True)
             components.explanation_source(explanation)
+            st.markdown(
+                '<div class="bs-note">👉 위 개선 방향을 실제로 적용하면 점수와 금리가 '
+                '어떻게 바뀌는지 <b>"3 · 개선 시뮬레이터"</b> 탭에서 미리 확인할 수 '
+                '있습니다.</div>',
+                unsafe_allow_html=True,
+            )
+            st.divider()
+            components.ai_qa_widget(vessel)
+            st.divider()
+            components.objection_form(vessel)
 
     with tab_sim:
+        components.improvement_recommendation_cards(vessel)
+        st.markdown("##### 우대 요인")
+        components.eligibility_card(
+            vessel,
+            "금어기 위반·해양보호구역 진입이 없고 관측 데이터가 충분할수록 우대 자격 "
+            "요건을 갖춘 것입니다 — 지속가능한 조업을 실천했는지 보는 항목입니다.",
+        )
+        st.divider()
         _simulator(vessel)
 
     components.backend_footer()

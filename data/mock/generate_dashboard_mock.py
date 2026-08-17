@@ -193,6 +193,16 @@ VESSEL_SEEDS = [
             {"label": "조업 시간당 연료", "value": -3.6, "axis": "b"},
             {"label": "항해 속도", "value": -5.4, "axis": "b"},
         ],
+        "factorMetrics": [
+            {"label": "동일 격자 재방문 간격", "axis": "a", "selfValue": 18.4, "peerAverage": 14.2, "unit": "시간"},
+            {"label": "혼잡 어장 회피", "axis": "a", "selfValue": 82.0, "peerAverage": 74.0, "unit": "%"},
+            {"label": "조업 시간 배분", "axis": "a", "selfValue": 61.0, "peerAverage": 58.0, "unit": "%"},
+            {"label": "어장 이동 거리", "axis": "a", "selfValue": 42.0, "peerAverage": 45.0, "unit": "km"},
+            {"label": "입출항 규칙성", "axis": "a", "selfValue": 91.0, "peerAverage": 88.0, "unit": "%"},
+            {"label": "표류·대기 시간 비중", "axis": "b", "selfValue": 14.0, "peerAverage": 10.0, "unit": "%"},
+            {"label": "조업 시간당 연료", "axis": "b", "selfValue": 9.8, "peerAverage": 8.6, "unit": "L/h"},
+            {"label": "항해 속도", "axis": "b", "selfValue": 10.4, "peerAverage": 9.1, "unit": "노트"},
+        ],
         "summary": (
             "같은 어장을 연속으로 긁지 않는 편이라 자원 압력 점수가 높습니다. "
             "다만 연료를 기대치보다 8% 더 씁니다. 항해 속도가 주된 이유이고, "
@@ -246,6 +256,16 @@ VESSEL_SEEDS = [
             {"label": "표류·대기 시간 비중", "value": -3.8, "axis": "b"},
             {"label": "동일 격자 재방문 간격", "value": -6.7, "axis": "a"},
         ],
+        "factorMetrics": [
+            {"label": "조업 시간당 연료", "axis": "b", "selfValue": 7.1, "peerAverage": 8.3, "unit": "L/h"},
+            {"label": "입출항 규칙성", "axis": "a", "selfValue": 90.0, "peerAverage": 87.0, "unit": "%"},
+            {"label": "조업 시간 배분", "axis": "a", "selfValue": 59.0, "peerAverage": 57.0, "unit": "%"},
+            {"label": "어장 이동 거리", "axis": "a", "selfValue": 38.0, "peerAverage": 39.0, "unit": "km"},
+            {"label": "혼잡 어장 회피", "axis": "a", "selfValue": 69.0, "peerAverage": 72.0, "unit": "%"},
+            {"label": "항해 속도", "axis": "b", "selfValue": 12.8, "peerAverage": 11.9, "unit": "노트"},
+            {"label": "표류·대기 시간 비중", "axis": "b", "selfValue": 16.0, "peerAverage": 11.0, "unit": "%"},
+            {"label": "동일 격자 재방문 간격", "axis": "a", "selfValue": 9.8, "peerAverage": 15.1, "unit": "시간"},
+        ],
         "summary": (
             "같은 어장을 상대적으로 자주 재방문하는 편이라 자원 압력 점수가 낮습니다. "
             "운항 효율은 양호한 편으로, 연료는 기대치보다 오히려 절감되고 있습니다."
@@ -295,6 +315,15 @@ VESSEL_SEEDS = [
             {"label": "입출항 규칙성", "value": 0.6, "axis": "a"},
             {"label": "해황 보정(유속·풍속)", "value": -1.2, "axis": "b"},
             {"label": "어장 이동 거리", "value": -1.6, "axis": "a"},
+        ],
+        "factorMetrics": [
+            {"label": "재방문 간격 확보", "axis": "a", "selfValue": 21.6, "peerAverage": 15.0, "unit": "시간"},
+            {"label": "경제속도 준수", "axis": "b", "selfValue": 9.1, "peerAverage": 10.6, "unit": "노트"},
+            {"label": "혼잡 해역 회피", "axis": "a", "selfValue": 88.0, "peerAverage": 76.0, "unit": "%"},
+            {"label": "조업 시간 배분", "axis": "a", "selfValue": 63.0, "peerAverage": 60.0, "unit": "%"},
+            {"label": "입출항 규칙성", "axis": "a", "selfValue": 93.0, "peerAverage": 89.0, "unit": "%"},
+            {"label": "해황 보정(유속·풍속)", "axis": "b", "selfValue": 6.0, "peerAverage": 4.0, "unit": "%"},
+            {"label": "어장 이동 거리", "axis": "a", "selfValue": 52.0, "peerAverage": 46.0, "unit": "km"},
         ],
         "summary": (
             "재방문 간격을 넉넉히 확보하고 경제속도를 준수해 두 축 모두 유사군 "

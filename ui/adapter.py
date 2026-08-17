@@ -338,7 +338,7 @@ def document_id(vessel: Dict, issued_date: str) -> str:
 # ─── 설명 계층 (explain/) ────────────────────────────────────────────────────
 def _build_explain_input(vessel: Dict):
     """mock 선박 레코드를 explain/의 입력 계약으로 옮긴다."""
-    from explain.contract import ExplainInput, ShapFactor
+    from explain.contract import ExplainInput, FactorMetric, ShapFactor
 
     return ExplainInput(
         vessel_id=vessel["vesselId"],
@@ -353,6 +353,16 @@ def _build_explain_input(vessel: Dict):
         shap_factors=[
             ShapFactor(label=f["label"], value=f["value"], axis=f["axis"])
             for f in vessel["shapFactors"]
+        ],
+        factor_metrics=[
+            FactorMetric(
+                label=m["label"],
+                axis=m["axis"],
+                self_value=m["selfValue"],
+                peer_average=m["peerAverage"],
+                unit=m["unit"],
+            )
+            for m in vessel.get("factorMetrics", [])
         ],
     )
 
@@ -393,3 +403,143 @@ def explanation(vessel: Dict) -> Dict:
     if not is_scored(vessel):
         return {"summary": "", "shapFactors": [], "recommendations": [], "source": ""}
     return _explain_uncached(vessel["vesselId"], MOCK_PATH.stat().st_mtime)
+
+
+def _detailed_report_uncached(vessel_id: str, _mtime: float) -> Dict:
+    from explain.explain import generate_detailed_report
+
+    vessel = get_vessel(vessel_id)
+    return generate_detailed_report(_build_explain_input(vessel)).as_dict()
+
+
+try:
+    import streamlit as st
+
+    _detailed_report_uncached = st.cache_data(show_spinner="상세 리포트를 생성하는 중...")(  # type: ignore[assignment]
+        _detailed_report_uncached
+    )
+except ImportError:  # pragma: no cover
+    pass
+
+
+def detailed_report(vessel: Dict) -> Dict:
+    """요인별 실측값을 근거로 한 상세 리포트. 선박당 한 번만 생성해 캐시한다."""
+    if not is_scored(vessel):
+        return {"text": "", "source": ""}
+    return _detailed_report_uncached(vessel["vesselId"], MOCK_PATH.stat().st_mtime)
+
+
+def ask_ai(vessel: Dict, question: str) -> Dict:
+    """어업인의 자유 질문에 답한다. 질문마다 새로 호출하며 캐시하지 않는다."""
+    from explain.explain import answer_question
+
+    if not question.strip():
+        return {"text": "", "source": ""}
+    return answer_question(_build_explain_input(vessel), question).as_dict()
+
+
+def objection_ai_response(vessel: Dict, reason: str, detail: str) -> Dict:
+    """이의제기에 대한 AI 답변 초안. 심사역이 검토 후 전달한다."""
+    from explain.explain import respond_to_objection
+
+    return respond_to_objection(_build_explain_input(vessel), reason, detail).as_dict()
+
+
+# ─── 이의제기 (세션 메모리 전용, 새로고침·서버 재시작 시 소실) ─────────────────
+def submit_objection(vessel_id: str, reason: str, detail: str) -> None:
+    """
+    이의제기를 세션에 접수한다.
+
+    어업인 화면과 금융기관 화면은 같은 Streamlit 프로세스의 같은 브라우저
+    세션(st.session_state)을 공유하므로, 페이지를 전환해도 값이 유지된다.
+    지속 저장소가 아니므로 새로고침·서버 재시작 시 사라진다 — 데모 범위에
+    맞춘 의도적인 선택이다.
+    """
+    import streamlit as st
+
+    objections = st.session_state.setdefault("objections", {})
+    objections[vessel_id] = {
+        "reason": reason,
+        "detail": detail,
+        "status": "pending",
+        "aiResponse": "",
+        "aiResponseSource": "",
+    }
+
+
+def get_objection(vessel_id: str) -> Optional[Dict]:
+    import streamlit as st
+
+    return st.session_state.get("objections", {}).get(vessel_id)
+
+
+def resolve_objection(vessel_id: str, ai_response: str, source: str) -> None:
+    """AI 답변 초안을 이의제기에 붙인다. 심사역의 발송 여부와 무관하게 기록만 한다."""
+    import streamlit as st
+
+    objections = st.session_state.setdefault("objections", {})
+    if vessel_id not in objections:
+        return
+    objections[vessel_id]["aiResponse"] = ai_response
+    objections[vessel_id]["aiResponseSource"] = source
+    objections[vessel_id]["status"] = "answered"
+
+
+# ─── 스마트컨트랙트 조회 (UI 연출) ─────────────────────────────────────────────
+def rate_lookup(score: float) -> Dict:
+    """
+    점수로 금리 구간을 조회한다.
+
+    지금은 기존 규칙표(`theme.grade_band`)를 그대로 감싸는 mock이다. 실제
+    온체인 컨트랙트(점수→금리 매핑)가 배포되면 이 함수 내부만 web3 호출로
+    바꾸면 되고, 호출부(ui/bank.py)는 손댈 필요가 없다 — `scoring_backend()`와
+    같은 스왑 지점 패턴이다.
+    TODO(chain/ 김준기·오동규): 실제 컨트랙트가 나오면 mock 대신 web3 조회로 교체.
+    """
+    from ui import theme
+
+    dataset = load_dataset()
+    band = theme.grade_band(score, dataset["rateGrades"])
+    return {"band": band, "source": "mock"}
+
+
+# ─── 개선 추천 (개선 시뮬레이터 탭) ────────────────────────────────────────────
+def easiest_improvement(vessel: Dict) -> Simulation:
+    """
+    지금 할 수 있는 가장 쉬운 개선 — 트레이드오프 대가가 더 작은 쪽 한 걸음만 옮긴다.
+    """
+    revisit_only = simulate(vessel, vessel["revisitCount"] - 1, vessel["averageSpeedKnots"])
+    speed_only = simulate(vessel, vessel["revisitCount"], vessel["averageSpeedKnots"] - 1.0)
+    return revisit_only if revisit_only.score_delta >= speed_only.score_delta else speed_only
+
+
+def best_incentive_improvement(vessel: Dict) -> Simulation:
+    """
+    최고의 인센티브(다음 등급 도달)를 위해 필요한 최소 조합.
+
+    revisit 1~5 × speed 0.5노트 단위로 간단히 그리드 탐색해, 다음 등급에
+    도달하면서 두 축 하락(트레이드오프 대가)이 가장 작은 조합을 고른다.
+    다음 등급에 못 미치면 그중 점수가 가장 높은 조합을 돌려준다.
+    """
+    from ui import theme
+
+    dataset = load_dataset()
+    current_band = theme.grade_band(vessel["blueScore"], dataset["rateGrades"])
+
+    base_speed = vessel["averageSpeedKnots"]
+    candidates: List[Simulation] = []
+    for revisit in range(1, 6):
+        for step in range(0, 21):
+            speed = round(base_speed - 3.0 + step * 0.25, 2)
+            candidates.append(simulate(vessel, revisit, speed))
+
+    upgraded = [
+        c for c in candidates
+        if theme.grade_band(c.score, dataset["rateGrades"])["grade"] != current_band["grade"]
+        and c.score > vessel["blueScore"]
+    ]
+    if upgraded:
+        # 다음 등급을 막 넘기는 조합 — 필요 이상으로 많이 바꾸지 않는 최소 조합.
+        return min(upgraded, key=lambda c: c.score)
+    # 어떤 조합도 다음 등급에 못 미치면, 그중 가장 점수가 높은 조합을 보여준다.
+    return max(candidates, key=lambda c: c.score)
