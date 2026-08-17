@@ -99,49 +99,52 @@
 
 - [ ] 어업인 화면 정보구조 재설계: 점수 → 이유 → 개선팁 → 시뮬레이터 → 이의제기.
 - [ ] 금융기관 화면 정보구조 재설계: 이의제기 목록 → 상세 근거 → 승인/보류 → 온체인 기록.
-- [ ] 페르소나 1(B→A)·페르소나 2(C→이의제기)의 화면별 스토리보드 확정.
+- [x] 페르소나 1(B→A)·페르소나 2(C→이의제기)의 화면별 스토리보드 확정.
+      (`ui/REQUIREMENTS_FROZEN.md`, `fixtures/personas.json`)
 - [ ] 모바일 어업인 화면과 데스크톱 심사역 화면의 반응형 기준 확정.
-- [ ] "신용등급" 대신 "BlueScore 우대구간" 용어 사용.
-- [ ] 실산출·추정·시연용 데이터 배지를 화면 공통 규칙으로 정의.
+- [x] "신용등급" 대신 "BlueScore 우대구간" 용어 사용.
+- [x] 실산출·추정·시연용 데이터 배지를 화면 공통 규칙으로 정의.
+      (`sourceType=real|estimated|demo`, 화면 반영은 6단계)
 
 ### 2단계 — 화면 데이터 계약과 시연 데이터 고정
 
-- [ ] `ScoreResponse`, `SimulationResponse`, `ExplanationResponse` 스키마 확정.
-- [ ] `AppealCreate`, `AppealDetail`, `ReviewDecision` 스키마 확정.
-- [ ] `ChainCommitResponse`, `ChainRecordResponse` 스키마 확정.
-- [ ] 모든 결과에 `dataSnapshotId`, `modelVersion`, `scoringRuleVersion`,
+- [x] `ScoreResponse`, `SimulationResponse`, `ExplanationResponse` 스키마 확정.
+- [x] `AppealCreate`, `AppealDetail`, `ReviewDecision` 스키마 확정.
+- [x] `ChainCommitResponse`, `ChainRecordResponse` 스키마 확정.
+- [x] 모든 결과에 `dataSnapshotId`, `modelVersion`, `scoringRuleVersion`,
       `rateTableVersion`, `sourceType`을 포함.
-- [ ] 페르소나 1·2 입력을 별도 fixture로 만들고 화면 결과를 하드코딩하지 않는다.
-- [ ] 같은 입력이면 항상 B→A, C구간, 승인/보류 흐름이 재현되는 회귀 테스트 작성.
+- [x] 페르소나 1·2 입력을 별도 fixture로 만들고 화면 결과를 하드코딩하지 않는다.
+- [x] 같은 입력이면 항상 B→A, C구간, 승인/보류 흐름이 재현되는 회귀 테스트 작성.
 
 ### 3단계 — SQLite와 서비스 계층
 
-- [ ] SQLite 초기 스키마 작성: `score_runs`, `appeals`, `reviews`, `chain_commits`.
-- [ ] 원본 GFW 이벤트는 JSONL.gz/Parquet에 두고 DB에는 경로·스냅샷 메타데이터만 저장.
-- [ ] 점수 산출 결과와 당시의 리포트 JSON·SHA-256 해시 저장.
-- [ ] 어업인 이의제기 제출 → 금융기관 목록 조회 → 승인/보류 상태 전이 구현.
-- [ ] 앱 재시작 후에도 이의제기·심사·온체인 기록이 복원되는지 검증.
-- [ ] 시연 초기 상태를 반복 생성하는 seed/reset 스크립트 마련.
+- [x] SQLite 초기 스키마 작성: `score_runs`, `appeals`, `reviews`, `chain_commits`.
+- [x] 원본 GFW 이벤트는 JSONL.gz/Parquet에 두고 DB에는 경로·스냅샷 메타데이터만 저장.
+- [x] 점수 산출 결과와 당시의 리포트 JSON·SHA-256 해시 저장.
+- [x] 어업인 이의제기 제출 → 금융기관 목록 조회 → 승인/보류 상태 전이 구현.
+- [x] 앱 재시작 후에도 이의제기·심사·온체인 기록이 복원되는지 검증.
+- [x] 시연 초기 상태를 반복 생성하는 seed/reset 스크립트 마련.
 
 ### 4단계 — 실데이터·모델 어댑터 연결
 
-- [ ] `ui/adapter.scoring_backend()`의 오래된 "조업 이벤트 데이터 미확보" 분기 제거.
-- [ ] 실제 GFW 스냅샷 → A축 → 유사군 → `raw_to_score()` 연결.
-- [ ] `score/score_assembly.py`와 `score/rate_mapping.py`를 정식 계산 경로로 사용.
-- [ ] B축은 실산출/추정/시연값 상태를 명시하고 검증되지 않은 부분을 숨기지 않는다.
-- [ ] 시뮬레이터의 UI 고정상수를 `score/tradeoff_coefficients.py` 결과로 교체하거나,
+- [x] `ui/adapter.scoring_backend()`의 오래된 "조업 이벤트 데이터 미확보" 분기 제거.
+- [x] 실제 GFW 스냅샷 → A축 → 유사군 → `raw_to_score()` 연결.
+- [x] `score/score_assembly.py`와 `score/rate_mapping.py`를 정식 계산 경로로 사용.
+- [x] B축은 실산출/추정/시연값 상태를 명시하고 검증되지 않은 부분을 숨기지 않는다.
+- [x] 시뮬레이터의 UI 고정상수를 `score/tradeoff_coefficients.py` 결과로 교체하거나,
       미연결 시 정책 시뮬레이션 예시임을 명시.
-- [ ] 매칭 신뢰도·실측/추정·결측 사유를 응답에 포함.
+- [x] 매칭 신뢰도·실측/추정·결측 사유를 응답에 포함.
 
 ### 5단계 — FastAPI 구현
 
-- [ ] `GET /vessels`, `GET /vessels/{id}/score`.
-- [ ] `POST /vessels/{id}/simulate`, `GET /vessels/{id}/explanation`.
-- [ ] `POST /appeals`, `GET /appeals`, `GET /appeals/{id}`.
-- [ ] `POST /appeals/{id}/review`.
-- [ ] `POST /reports/{id}/commit`, `GET /chain/records/{recordId}`.
-- [ ] 데이터·모델·LLM·체인 오류를 화면용 상태코드로 변환.
-- [ ] 데이터 수집 API 키는 FastAPI/프론트에 두지 않고 수집 환경에서만 관리.
+- [x] `GET /vessels`, `GET /vessels/{id}/score`.
+- [x] `POST /vessels/{id}/simulate`, `GET /vessels/{id}/explanation`.
+- [x] `POST /appeals`, `GET /appeals`, `GET /appeals/{id}`.
+- [x] `POST /appeals/{id}/review`.
+- [x] `POST /reports/{id}/commit`, `GET /chain/records/{recordId}`.
+      (현재 `ledgerMode=local`; 실제 온체인 전환은 8단계)
+- [x] 데이터·모델·LLM·체인 오류를 화면용 상태코드로 변환.
+- [x] 데이터 수집 API 키는 FastAPI/프론트에 두지 않고 수집 환경에서만 관리.
 
 ### 6단계 — 프론트엔드 연결
 
@@ -165,8 +168,8 @@
 
 ### 8단계 — 온체인 커밋·조회 연결
 
-- [ ] UI 해시 중복 구현을 `chain.hashing.compute_result_hash()` 호출로 교체.
-- [ ] 최종 심사 리포트 payload에 점수·결정·스냅샷·모델·산식·규칙표 버전 포함.
+- [x] UI 해시 중복 구현을 `chain.hashing.compute_result_hash()` 호출로 교체.
+- [x] 최종 심사 리포트 payload에 점수·결정·스냅샷·모델·산식·규칙표 버전 포함.
 - [ ] 승인/보류 후 `HashRegistry.commit()` 호출.
 - [ ] 트랜잭션 해시·블록번호·기록시각·컨트랙트 주소를 `chain_commits`에 저장.
 - [ ] 심사역 화면에서 Record ID로 `HashRegistry.get()` 결과 조회.
@@ -176,7 +179,7 @@
 
 - [ ] 페르소나 1 전체 흐름을 네트워크 없이 반복 실행.
 - [ ] 페르소나 2의 어업인→금융기관 상태 전달을 별도 화면/세션에서 확인.
-- [ ] 앱·API 재시작 후 SQLite 기록 복원 확인.
+- [x] 앱·API 재시작 후 SQLite 기록 복원 확인.
 - [ ] LLM 호출 실패 시 폴백으로 발표가 계속되는지 확인.
 - [ ] 로컬 Hardhat 노드·컨트랙트 사전 배포 및 연결 상태 확인.
 - [ ] 발표용 seed 상태 복원 절차와 실패 시 대체 화면 준비.

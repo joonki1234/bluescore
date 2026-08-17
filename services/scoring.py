@@ -1,0 +1,341 @@
+"""담당: 최지희
+
+시연 fixture와 실제 A축 스냅샷을 동일한 API 계약으로 변환한다.
+
+시연 모드의 축 간 상충계수는 아직 정책 예시다. 실제 score 계수로 오인되지 않도록
+SimulationResponse.assumptions에 항상 명시한다.
+"""
+
+from __future__ import annotations
+
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, List
+
+from api.schemas import (
+    AxisScore,
+    DetailedReportItem,
+    EligibilityItem,
+    ExplanationResponse,
+    FactorMetricSchema,
+    PeerContext,
+    RateBand,
+    RecommendationSchema,
+    ScoreResponse,
+    ShapFactorSchema,
+    SimulationRequest,
+    SimulationResponse,
+    VesselListResponse,
+    VesselSummary,
+)
+from explain import fallback
+from explain.contract import ExplainInput, FactorMetric, ShapFactor
+from explain.explain import explain as run_explain
+from score.rate_mapping import RateGrade, grade_for_score
+from services.exceptions import BackendUnavailableError, InvalidStateError, NotFoundError
+from services.metadata import response_metadata
+from services.real_scoring import RealAxisAAdapter
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEMO_DATA_PATH = PROJECT_ROOT / "data" / "mock" / "dashboard_mock.json"
+PERSONA_PATH = PROJECT_ROOT / "fixtures" / "personas.json"
+
+AXIS_A_WEIGHT = 0.65
+AXIS_B_WEIGHT = 0.35
+AXIS_A_GAIN_PER_REVISIT_STEP = 7.0
+AXIS_B_COST_PER_REVISIT_STEP = 2.4
+AXIS_B_GAIN_PER_KNOT = 3.2
+AXIS_A_COST_PER_KNOT = 0.8
+FUEL_PERCENT_PER_AXIS_B_POINT = 0.55
+AXIS_SCORE_FLOOR = 4.0
+AXIS_SCORE_CEIL = 97.0
+
+
+def _rate_band(grade: RateGrade) -> RateBand:
+    return RateBand(
+        grade=grade.grade,
+        min_score=grade.min_score,
+        discount_bp=grade.discount_bp,
+        label=grade.label,
+    )
+
+
+def _top_percent(value: float, population: List[float]) -> int:
+    if not population:
+        return 1
+    return max(1, round(sum(1 for score in population if score > value) / len(population) * 100))
+
+
+class ScoringService:
+    def __init__(
+        self,
+        demo_data_path: Path = DEMO_DATA_PATH,
+        persona_path: Path = PERSONA_PATH,
+        real_adapter: RealAxisAAdapter = None,
+    ) -> None:
+        self.demo_data_path = Path(demo_data_path)
+        self.persona_path = Path(persona_path)
+        self.real_adapter = real_adapter or RealAxisAAdapter()
+
+    def _demo_data(self) -> dict:
+        return json.loads(self.demo_data_path.read_text(encoding="utf-8"))
+
+    def _personas(self) -> List[dict]:
+        return json.loads(self.persona_path.read_text(encoding="utf-8"))["personas"]
+
+    def _demo_vessel(self, vessel_id: str) -> dict:
+        for vessel in self._demo_data()["vessels"]:
+            if vessel["vesselId"] == vessel_id:
+                return vessel
+        raise NotFoundError(f"선박을 찾을 수 없습니다: {vessel_id}")
+
+    def score_run_id(self, vessel_id: str, source_type: str = "demo") -> str:
+        if source_type == "demo":
+            for persona in self._personas():
+                if persona["vesselId"] == vessel_id:
+                    return persona["scoreRunId"]
+            return f"demo-score-{vessel_id.lower()}-v1"
+        return f"real-axis-a-{vessel_id}-20260813"
+
+    def list_vessels(self, source_type: str = "demo", limit: int = 50) -> VesselListResponse:
+        metadata = response_metadata(source_type)
+        if source_type == "real":
+            if not self.real_adapter.available:
+                raise BackendUnavailableError("실데이터 스냅샷을 찾을 수 없습니다.")
+            records = self.real_adapter.list_vessels()[:limit]
+            vessels = [
+                VesselSummary(
+                    vessel_id=v["vesselId"],
+                    name=v.get("name") or "가명 선박",
+                    meta=f"{v.get('fishingType') or '어업종 미상'} · {v.get('tonnage') or '톤수 미상'}",
+                    fleet_label="실데이터 A축 산출 후보",
+                    status="partial",
+                )
+                for v in records
+            ]
+            return VesselListResponse(vessels=vessels, **metadata)
+
+        vessels = [
+            VesselSummary(
+                vessel_id=v["vesselId"],
+                name=v["name"],
+                meta=v["meta"],
+                fleet_label=v["fleetLabel"],
+                status=v["status"],
+            )
+            for v in self._demo_data()["vessels"]
+        ]
+        return VesselListResponse(vessels=vessels, **metadata)
+
+    def build_score(self, vessel_id: str, source_type: str = "demo") -> ScoreResponse:
+        if source_type == "real":
+            return self._build_real_score(vessel_id)
+        if source_type != "demo":
+            raise InvalidStateError(f"지원하지 않는 sourceType입니다: {source_type}")
+        return self._build_demo_score(vessel_id)
+
+    def _build_demo_score(self, vessel_id: str) -> ScoreResponse:
+        vessel = self._demo_vessel(vessel_id)
+        status = vessel["status"]
+        scored = status == "success"
+        band = _rate_band(grade_for_score(vessel["blueScore"])) if scored else None
+        peer = vessel.get("peerGroup", {})
+        message = vessel.get("reason") if not scored else None
+        return ScoreResponse(
+            score_run_id=self.score_run_id(vessel_id),
+            vessel=VesselSummary(
+                vessel_id=vessel_id,
+                name=vessel["name"],
+                meta=vessel["meta"],
+                fleet_label=vessel["fleetLabel"],
+                status=status,
+            ),
+            status=status,
+            blue_score=vessel.get("blueScore"),
+            axis_a=AxisScore(
+                score=vessel.get("axisA", {}).get("score"),
+                state="demo" if scored else "unavailable",
+                missing_reason=message,
+            ),
+            axis_b=AxisScore(
+                score=vessel.get("axisB", {}).get("score"),
+                state="demo" if scored else "unavailable",
+                missing_reason=message,
+            ),
+            rate_band=band,
+            peer_group=PeerContext(
+                count=peer.get("count", 0),
+                top_percent=peer.get("topPercent"),
+                top_percent_interval=peer.get("topPercentInterval"),
+            ),
+            matching_confidence=None,
+            matching_method="demoFixture",
+            matching_reason="가명 시연 선박이며 실선박 식별자 매칭값이 아닙니다.",
+            fuel_delta_percent=vessel.get("fuelDeltaPercent"),
+            coverage_percent=vessel.get("coveragePercent"),
+            shap_factors=[ShapFactorSchema(**item) for item in vessel.get("shapFactors", [])],
+            factor_metrics=[FactorMetricSchema(**item) for item in vessel.get("factorMetrics", [])],
+            eligibility=[EligibilityItem(**item) for item in vessel.get("eligibility", [])],
+            recommendations=[
+                RecommendationSchema(**item) for item in vessel.get("recommendations", [])
+            ],
+            trend=vessel.get("trend", []),
+            track=vessel.get("track", []),
+            fishing_segments=vessel.get("fishingSegments", []),
+            revisit_count=vessel.get("revisitCount"),
+            average_speed_knots=vessel.get("averageSpeedKnots"),
+            message=message,
+            created_at=datetime.now(timezone.utc),
+            **response_metadata("demo"),
+        )
+
+    def _build_real_score(self, vessel_id: str) -> ScoreResponse:
+        if not self.real_adapter.available:
+            raise BackendUnavailableError("실데이터 스냅샷을 찾을 수 없습니다.")
+        try:
+            result = self.real_adapter.score(vessel_id)
+        except KeyError as exc:
+            raise NotFoundError(f"실데이터 선박을 찾을 수 없습니다: {vessel_id}") from exc
+        vessel = result.vessel
+        status = result.status
+        return ScoreResponse(
+            score_run_id=self.score_run_id(vessel_id, "real"),
+            vessel=VesselSummary(
+                vessel_id=vessel_id,
+                name=vessel.get("name") or "가명 선박",
+                meta=f"{vessel.get('fishingType') or '어업종 미상'} · {vessel.get('tonnage') or '톤수 미상'}",
+                fleet_label="GFW 고정 스냅샷 유사군",
+                status=status,
+            ),
+            status=status,
+            blue_score=None,
+            axis_a=AxisScore(
+                score=result.axis_a_score,
+                state="real" if result.axis_a_score is not None else "unavailable",
+                raw_value=result.axis_a_raw,
+                used_event_count=result.used_event_count,
+                skipped_event_count=result.skipped_event_count,
+                missing_reason=None if result.axis_a_score is not None else "유사군 표본이 부족합니다.",
+            ),
+            axis_b=AxisScore(
+                state="unavailable",
+                missing_reason="B축 LightGBM 실데이터 검증이 완료되지 않았습니다.",
+            ),
+            rate_band=None,
+            peer_group=PeerContext(count=result.peer_count),
+            matching_confidence=None,
+            matching_method=result.matching_method,
+            matching_reason=result.matching_reason,
+            message="A축만 실산출되었습니다. B축·BlueScore·금리구간은 산출하지 않습니다.",
+            created_at=datetime.now(timezone.utc),
+            **response_metadata("real"),
+        )
+
+    def simulate(self, vessel_id: str, request: SimulationRequest) -> SimulationResponse:
+        vessel = self._demo_vessel(vessel_id)
+        if vessel["status"] != "success":
+            raise InvalidStateError("점수가 산출되지 않은 선박은 시뮬레이션할 수 없습니다.")
+
+        base_a = vessel["axisA"]["score"]
+        base_b = vessel["axisB"]["score"]
+        revisit_steps = vessel["revisitCount"] - request.revisit_count
+        speed_steps = vessel["averageSpeedKnots"] - request.speed_knots
+        axis_a = base_a + revisit_steps * AXIS_A_GAIN_PER_REVISIT_STEP
+        axis_b = base_b + speed_steps * AXIS_B_GAIN_PER_KNOT
+        axis_a -= speed_steps * AXIS_A_COST_PER_KNOT
+        axis_b -= revisit_steps * AXIS_B_COST_PER_REVISIT_STEP
+        axis_a = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_a)), 1)
+        axis_b = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_b)), 1)
+        score = round(AXIS_A_WEIGHT * axis_a + AXIS_B_WEIGHT * axis_b, 1)
+        peers = list(vessel["peerGroup"]["scores"])
+        peers[vessel["peerGroup"]["selfIndex"]] = score
+        before = _rate_band(grade_for_score(vessel["blueScore"]))
+        after = _rate_band(grade_for_score(score))
+
+        notes = []
+        if revisit_steps > 0:
+            notes.append(
+                f"어장을 더 자주 옮기면 이동거리가 늘어 운항 효율이 "
+                f"{revisit_steps * AXIS_B_COST_PER_REVISIT_STEP:.1f}점 깎입니다."
+            )
+        if speed_steps > 0:
+            notes.append(
+                f"속도를 낮추면 해상 체류가 길어져 자원 압력이 "
+                f"{speed_steps * AXIS_A_COST_PER_KNOT:.1f}점 깎입니다."
+            )
+        fuel_delta = vessel["fuelDeltaPercent"] - (axis_b - base_b) * FUEL_PERCENT_PER_AXIS_B_POINT
+
+        return SimulationResponse(
+            score_run_id=self.score_run_id(vessel_id),
+            vessel_id=vessel_id,
+            base_score=vessel["blueScore"],
+            simulated_score=score,
+            score_delta=round(score - vessel["blueScore"], 1),
+            axis_a=axis_a,
+            axis_b=axis_b,
+            axis_a_delta=round(axis_a - base_a, 1),
+            axis_b_delta=round(axis_b - base_b, 1),
+            top_percent=_top_percent(score, peers),
+            fuel_delta_percent=round(fuel_delta, 1),
+            before_band=before,
+            after_band=after,
+            band_changed=before.grade != after.grade,
+            tradeoff_notes=notes,
+            assumptions=[
+                "가명 시연 선박용 정책 시뮬레이션입니다.",
+                "축 간 상충계수는 실데이터 검증 전 잠정값입니다.",
+            ],
+            **response_metadata("demo"),
+        )
+
+    def explain(self, score: ScoreResponse) -> ExplanationResponse:
+        if score.status != "success" or score.blue_score is None:
+            raise InvalidStateError("완전한 점수가 없는 산출 건은 설명을 만들 수 없습니다.")
+        vessel = self._demo_vessel(score.vessel.vessel_id)
+        explain_input = ExplainInput(
+            vessel_id=vessel["vesselId"],
+            vessel_label=vessel["meta"],
+            fleet_label=vessel["fleetLabel"],
+            blue_score=vessel["blueScore"],
+            axis_a_score=vessel["axisA"]["score"],
+            axis_b_score=vessel["axisB"]["score"],
+            peer_count=vessel["peerGroup"]["count"],
+            top_percent=vessel["peerGroup"]["topPercent"],
+            fuel_delta_percent=vessel["fuelDeltaPercent"],
+            shap_factors=[ShapFactor(**item) for item in vessel.get("shapFactors", [])],
+            factor_metrics=[
+                FactorMetric(
+                    label=item["label"],
+                    axis=item["axis"],
+                    self_value=item["selfValue"],
+                    peer_average=item["peerAverage"],
+                    unit=item["unit"],
+                )
+                for item in vessel.get("factorMetrics", [])
+            ],
+        )
+        generated = run_explain(explain_input, use_llm=False)
+        report_sentences = fallback.build_report_fallback(explain_input)
+        contributions = {item["label"]: item["value"] for item in vessel.get("shapFactors", [])}
+        report = [
+            DetailedReportItem(
+                **metric,
+                contribution=contributions.get(metric["label"]),
+                sentence=report_sentences.get(metric["label"], ""),
+            )
+            for metric in vessel.get("factorMetrics", [])
+        ]
+        return ExplanationResponse(
+            score_run_id=score.score_run_id,
+            vessel_id=vessel["vesselId"],
+            summary=generated.summary,
+            shap_factors=[ShapFactorSchema(**item.as_dict()) for item in generated.shap_factors],
+            recommendations=[
+                RecommendationSchema(**item.as_dict()) for item in generated.recommendations
+            ],
+            detailed_report=report,
+            explanation_source=generated.source,
+            **response_metadata("demo"),
+        )

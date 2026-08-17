@@ -9,6 +9,7 @@ BlueScore 폴더/영역별 담당자 매핑.
 | `chain/` | 김준기, 오동규 |
 | `explain/` | 최지희 |
 | `app.py`, `ui/` | 최지희 |
+| `api/`, `services/`, `storage/`, `fixtures/` | 최지희 |
 
 새 파일을 만들 때는 이 표를 기준으로 파일 상단 주석에 `담당: {이름}`을 표기한다.
 

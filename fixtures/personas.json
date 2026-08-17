@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "owner": "최지희",
+    "version": "2026-08-17-v1",
+    "purpose": "네트워크 없이 두 시연 흐름을 결정론적으로 재현하기 위한 입력 fixture"
+  },
+  "personas": [
+    {
+      "personaId": "improvement-b-to-a",
+      "vesselId": "VESSEL_A",
+      "scoreRunId": "demo-score-persona-1-v1",
+      "initialBand": "B",
+      "simulationInput": {
+        "revisitCount": 2,
+        "speedKnots": 7.6
+      },
+      "expectedBand": "A"
+    },
+    {
+      "personaId": "appeal-c-band",
+      "vesselId": "VESSEL_B",
+      "scoreRunId": "demo-score-persona-2-v1",
+      "initialBand": "C",
+      "appealInput": {
+        "reason": "동일 해역 반복 조업 판정이 실제와 다름",
+        "detail": "기상 악화로 대기한 시간을 반복 조업으로 본 것인지 확인을 요청합니다."
+      },
+      "allowedDecisions": ["approve", "hold"]
+    }
+  ]
+}

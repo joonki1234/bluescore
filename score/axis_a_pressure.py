@@ -255,10 +255,23 @@ def compute_axis_a_pressure(
         Counter(zip(gdf["vesselId"], gdf["gridCell"])) if not gdf.empty else Counter()
     )
 
+    # 선박마다 `gdf[gdf["vesselId"] == vessel_id]`로 전체 이벤트를 다시 훑으면
+    # 실제 스냅샷(약 91만 건 × 약 1만 선박)에서 요청 시간이 수 분 이상으로
+    # 늘어난다. groupby 인덱스를 한 번 만든 뒤 동일한 행 묶음을 재사용한다.
+    # 계산식과 행 내용은 기존과 같고, 선박별 조회 비용만 O(전체 이벤트)에서
+    # O(해당 선박 이벤트)로 줄인다.
+    grouped_by_vessel = gdf.groupby("vesselId", sort=False) if not gdf.empty else None
+    grouped_vessel_ids = set(grouped_by_vessel.groups) if grouped_by_vessel is not None else set()
+    empty_gdf = gdf.iloc[0:0]
+
     results: Dict[str, VesselAxisAResult] = {}
 
     for vessel_id in vessel_ids:
-        vessel_gdf = gdf[gdf["vesselId"] == vessel_id] if not gdf.empty else gdf
+        vessel_gdf = (
+            grouped_by_vessel.get_group(vessel_id)
+            if grouped_by_vessel is not None and vessel_id in grouped_vessel_ids
+            else empty_gdf
+        )
         vessel_events_sorted = sorted(
             (
                 {"startDatetime": row.startDatetime, "gridCell": row.gridCell}

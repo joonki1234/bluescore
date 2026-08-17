@@ -1,4 +1,5 @@
 fastapi
+uvicorn
 streamlit
 lightgbm
 shap

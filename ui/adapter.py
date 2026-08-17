@@ -23,7 +23,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -63,11 +62,11 @@ class Backend:
 
     @property
     def label(self) -> str:
-        return "score/ 실산출" if self.live else f"mock 임시값 ({self.reason})"
+        return "score/ 실산출" if self.live else f"시연용 데이터 ({self.reason})"
 
 
 def scoring_backend() -> Backend:
-    """score/ 실산출 가용 여부를 확인한다."""
+    """현재 화면의 산출 경로와 실제 A축 어댑터 준비 상태를 알린다."""
     try:
         import geopandas  # noqa: F401
         import lightgbm  # noqa: F401
@@ -81,9 +80,15 @@ def scoring_backend() -> Backend:
     except ImportError as exc:
         return Backend(live=False, reason=f"score/ 임포트 실패: {exc}")
 
-    # 모듈은 있으나 실제 이벤트 데이터가 아직 없다. 데이터가 붙으면 이 분기를 제거한다.
-    # TODO(data/ 김태윤): 조업 이벤트 데이터셋이 확보되면 실산출 경로로 전환.
-    return Backend(live=False, reason="조업 이벤트 데이터 미확보")
+    from services.real_scoring import RealAxisAAdapter
+
+    if not RealAxisAAdapter().available:
+        return Backend(live=False, reason="실데이터 스냅샷 없음")
+
+    # 두 페르소나 화면은 결정론적 fixture를 쓰고, REST API의 sourceType=real 경로가
+    # 실제 GFW 스냅샷→A축→유사군→백분위를 제공한다. B축이 검증되기 전에는
+    # 실데이터 총점을 억지로 만들지 않는다.
+    return Backend(live=False, reason="fixture 고정 · 실제 A축 연결됨 · B축 검증 대기")
 
 
 def _raw_to_score(raw: float, peer_raws: List[float]) -> float:
@@ -93,12 +98,9 @@ def _raw_to_score(raw: float, peer_raws: List[float]) -> float:
     A축 압력과 B축 잔차는 둘 다 '클수록 나쁨'이므로 부호를 뒤집는다.
     score/의 실산출을 붙일 때 이 함수를 쓴다.
     """
-    if not peer_raws:
-        raise ValueError("peer_raws가 비어 있습니다.")
-    worse_or_equal = sum(1 for v in peer_raws if v >= raw)
-    return round(
-        min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, worse_or_equal / len(peer_raws) * 100)), 1
-    )
+    from score.score_assembly import raw_to_score
+
+    return raw_to_score(raw, peer_raws, floor=AXIS_SCORE_FLOOR, ceil=AXIS_SCORE_CEIL)
 
 
 def _read_dataset(_mtime: float) -> Dict:
@@ -426,10 +428,9 @@ def score_hash(payload: Dict) -> str:
     TODO(chain/ 김준기·오동규): chain/의 해시 함수가 나오면 이 구현을 그쪽 호출로
     교체하고, 두 결과가 일치하는지 검증할 것.
     """
-    canonical = json.dumps(
-        _canonicalize(payload), sort_keys=True, ensure_ascii=False, separators=(",", ":")
-    )
-    return "0x" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    from chain.hashing import compute_result_hash
+
+    return "0x" + compute_result_hash(payload)
 
 
 def hash_payload(vessel: Dict, simulation: Optional[Simulation] = None) -> Dict:
@@ -633,17 +634,22 @@ def rate_lookup(score: float) -> Dict:
     """
     점수로 금리 구간을 조회한다.
 
-    지금은 기존 규칙표(`theme.grade_band`)를 그대로 감싸는 mock이다. 실제
+    현재는 `score.rate_mapping`의 은행 사전 승인 규칙표를 사용한다. 실제
     온체인 컨트랙트(점수→금리 매핑)가 배포되면 이 함수 내부만 web3 호출로
     바꾸면 되고, 호출부(ui/bank.py)는 손댈 필요가 없다 — `scoring_backend()`와
     같은 스왑 지점 패턴이다.
     TODO(chain/ 김준기·오동규): 실제 컨트랙트가 나오면 mock 대신 web3 조회로 교체.
     """
-    from ui import theme
+    from score.rate_mapping import grade_for_score
 
-    dataset = load_dataset()
-    band = theme.grade_band(score, dataset["rateGrades"])
-    return {"band": band, "source": "mock"}
+    grade = grade_for_score(score)
+    band = {
+        "grade": grade.grade,
+        "minScore": grade.min_score,
+        "discountBp": grade.discount_bp,
+        "label": grade.label,
+    }
+    return {"band": band, "source": "rules:score.rate_mapping"}
 
 
 # ─── 개선 추천 (개선 시뮬레이터 탭) ────────────────────────────────────────────

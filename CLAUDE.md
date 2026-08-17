@@ -21,13 +21,20 @@ BlueScore는 어선의 조업 데이터를 기반으로 두 축(A축: 자원 압
 - `score/axis_b_baseline.py` — B축(운항 효율) raw 값 산출: LightGBM 기준선 대비 잔차.
   파이프라인 코드는 구현 완료했으나, 해양기상 미부착·어업종 매핑표 부재로 아직 실데이터로
   돌리지는 못하는 상태.
-- `chain/` — 아직 코드 없이 `TODO.md`만 있는 상태 (온체인 증적, `score/` 결과물 대기 중).
+- `chain/` — SHA-256, 로컬 원장, Hardhat 컨트랙트, web3 연동 구현 완료. REST API는
+  현재 `ledgerMode=local`로 연결돼 있고 실제 RPC 전환은 후속 단계다.
 - `explain/` — SHAP 기여도 연계, LLM 프롬프트/strict JSON 파싱/폴백 문구, 프로바이더 중립
   구조, `ui/adapter.py` 연결까지 대부분 구현 완료(최지희 담당, 테스트 27개). 남은 일은
   `explain/TODO.md` 참고(실제 LLM 키 검증, SHAP 라벨 정합 등).
 - `app.py` — Streamlit 앱 진입점(어업인/금융기관 화면 분리, `ui/` 모듈 사용). 지금은
   `ui/adapter.py`가 `data/mock/dashboard_mock.json`을 읽어 화면을 채우고, `score/`가
   실산출 가능해지면 그쪽으로 자동 전환되는 구조다(최지희 담당).
+- `api/` — Pydantic 공개 계약과 FastAPI 엔드포인트. 모든 결과가 데이터·모델·산식·
+  금리표 버전과 `sourceType`을 포함한다.
+- `services/` — 결정론적 시연 점수, 실제 GFW A축 어댑터, 이의제기→심사→해시 기록
+  업무 흐름. 실데이터 B축은 검증 대기라 총점을 추정하지 않고 `partial`로 반환한다.
+- `storage/` — SQLite 스키마·저장소·seed/reset. 원천 이벤트는 저장하지 않고 점수·
+  리포트·이의제기·심사·체인 메타데이터만 저장한다.
 - `conftest.py`(루트)는 내용 없이, pytest가 리포지토리 루트를 `sys.path`에 넣어
   `score/`, `data/` 등에 `__init__.py` 없이도 `from score.xxx import ...` 절대 임포트가
   테스트에서 동작하도록 하기 위한 용도다.
@@ -38,8 +45,14 @@ BlueScore는 어선의 조업 데이터를 기반으로 두 축(A축: 자원 압
 아니라, 점수조립 단계에서 유사 선박군 내 상대값(백분위 등)으로 다시 정규화되어야 하는
 중간 산출값이다.
 
-When substantial code is added to this repo, this file should be updated with real
-build/lint/test commands and an accurate architecture overview.
+주요 실행/검증 명령:
+
+```bash
+streamlit run app.py
+uvicorn api.main:app --reload
+python -m storage.seed_demo
+pytest -q
+```
 
 ## File ownership convention
 
