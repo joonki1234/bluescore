@@ -73,11 +73,43 @@ class WorkflowService:
     def rate_lookup(self, score: float) -> RateLookupResponse:
         return self.scoring.rate_lookup(score)
 
+    @staticmethod
+    def _is_current_demo_score(score: ScoreResponse) -> bool:
+        """현재 UI가 요구하는 데모 점수 필드가 캐시에 모두 있는지 확인한다.
+
+        이전 버전의 SQLite ``result_json``도 Pydantic 검증은 통과하지만, 새로
+        추가된 화면 필드는 ``None``일 수 있다. 성공 점수에 한해 지도·비교 차트
+        필드가 빠졌다면 같은 결정론적 데모 점수를 다시 만들어 캐시를 승격한다.
+        """
+        if score.status != "success":
+            return True
+
+        display_values = (
+            score.anchor,
+            score.total_distance_km,
+            score.fishing_hours,
+            score.estimated_fuel_kl,
+            score.sail_calls,
+            score.fishing_days,
+            score.gap_index,
+            score.mpa_index,
+            score.axis_a.top_percent,
+            score.axis_b.top_percent,
+            score.peer_group.self_index,
+        )
+        return (
+            all(value is not None for value in display_values)
+            and bool(score.track)
+            and bool(score.peer_group.scores)
+        )
+
     def get_score(self, vessel_id: str, source_type: str = "demo") -> ScoreResponse:
         score_run_id = self.scoring.score_run_id(vessel_id, source_type)
         stored = self.repository.get_score_run(score_run_id)
         if stored:
-            return ScoreResponse.model_validate(stored["result"])
+            cached = ScoreResponse.model_validate(stored["result"])
+            if source_type != "demo" or self._is_current_demo_score(cached):
+                return cached
         score = self.scoring.build_score(vessel_id, source_type)
         self.repository.save_score_run(score.model_dump(mode="json", by_alias=True))
         return score
@@ -86,7 +118,10 @@ class WorkflowService:
         stored = self.repository.get_score_run(score_run_id)
         if stored is None:
             raise NotFoundError(f"점수 산출 건을 찾을 수 없습니다: {score_run_id}")
-        return ScoreResponse.model_validate(stored["result"])
+        cached = ScoreResponse.model_validate(stored["result"])
+        if cached.source_type == "demo" and not self._is_current_demo_score(cached):
+            return self.get_score(cached.vessel.vessel_id, "demo")
+        return cached
 
     def simulate(self, vessel_id: str, request: SimulationRequest) -> SimulationResponse:
         self.get_score(vessel_id, "demo")
@@ -168,21 +203,71 @@ class WorkflowService:
         appeal = self.repository.get_appeal(appeal_id)
         if appeal is None:
             raise NotFoundError(f"이의제기를 찾을 수 없습니다: {appeal_id}")
+        self._save_review(
+            score_run_id=appeal["score_run_id"], request=request, appeal_id=appeal_id
+        )
+        return self.get_appeal(appeal_id)
+
+    def review_score_run(self, score_run_id: str, request: ReviewDecision) -> ReviewDetail:
+        """
+        점수 산출 건에 대한 심사 결정을 저장한다.
+
+        이의제기가 접수돼 있으면 그 건에 함께 매달아 상태를 전이시키고, 없으면
+        심사 결정만 남긴다 — 여신 심사는 차주가 이의를 제기해야만 이루어지는
+        절차가 아니다. 이의제기는 심사의 입력 중 하나일 뿐이다.
+        """
+        score = self.get_score_run(score_run_id)
+        appeal = next(
+            (
+                item
+                for item in self.repository.list_appeals()
+                if item["score_run_id"] == score.score_run_id and not item.get("review")
+            ),
+            None,
+        )
+        return self._save_review(
+            score_run_id=score.score_run_id,
+            request=request,
+            appeal_id=appeal["appeal_id"] if appeal else None,
+        )
+
+    def get_review(self, score_run_id: str) -> Optional[ReviewDetail]:
+        row = self.repository.get_review_for_score_run(score_run_id)
+        return self._review_detail(row) if row else None
+
+    def _save_review(
+        self, *, score_run_id: str, request: ReviewDecision, appeal_id: Optional[str]
+    ) -> ReviewDetail:
         now = _utc_now()
         review = {
             "review_id": f"review-{uuid.uuid4().hex}",
+            "score_run_id": score_run_id,
             "appeal_id": appeal_id,
             "decision": request.decision,
             "reason": request.reason,
             "reviewer": request.reviewer,
+            "final_discount_bp": request.final_discount_bp,
             "decided_at": now.isoformat(),
         }
         status = "approved" if request.decision == "approve" else "held"
         try:
-            self.repository.save_review(review, status)
+            self.repository.save_review(review, status if appeal_id else None)
         except ValueError as exc:
             raise ConflictError(str(exc)) from exc
-        return self.get_appeal(appeal_id)
+        return self._review_detail(review)
+
+    @staticmethod
+    def _review_detail(row: dict) -> ReviewDetail:
+        return ReviewDetail(
+            review_id=row["review_id"],
+            score_run_id=row["score_run_id"],
+            appeal_id=row.get("appeal_id"),
+            decision=row["decision"],
+            reason=row["reason"],
+            reviewer=row["reviewer"],
+            final_discount_bp=row.get("final_discount_bp"),
+            decided_at=row["decided_at"],
+        )
 
     def commit_report(self, score_run_id: str) -> ChainCommitResponse:
         existing = self.repository.get_chain_commit_for_score_run(score_run_id)
@@ -190,18 +275,10 @@ class WorkflowService:
             return self._chain_response(existing, record_model=ChainCommitResponse)
 
         score = self.get_score_run(score_run_id)
-        reviewed = next(
-            (
-                appeal
-                for appeal in self.repository.list_appeals()
-                if appeal["score_run_id"] == score_run_id and appeal.get("review")
-            ),
-            None,
-        )
-        if reviewed is None:
+        review = self.repository.get_review_for_score_run(score_run_id)
+        if review is None:
             raise InvalidStateError("승인 또는 보류 결정이 저장된 뒤에만 커밋할 수 있습니다.")
 
-        review = reviewed["review"]
         payload = {
             "scoreRunId": score.score_run_id,
             "vesselId": score.vessel.vessel_id,
@@ -209,6 +286,7 @@ class WorkflowService:
             "axisA": score.axis_a.score,
             "axisB": score.axis_b.score,
             "decision": review["decision"],
+            "finalDiscountBp": review.get("final_discount_bp"),
             "dataSnapshotId": score.data_snapshot_id,
             "modelVersion": score.model_version,
             "scoringRuleVersion": score.scoring_rule_version,
@@ -219,7 +297,15 @@ class WorkflowService:
         try:
             committed = self.ledger.commit(record_id, result_hash)
         except ValueError as exc:
-            raise ConflictError(str(exc)) from exc
+            # 원장에는 있는데 DB에는 없는 상태가 될 수 있다 — 시연 중 DB만
+            # 리셋하고 API 프로세스(인메모리 원장)는 계속 살아 있는 경우다.
+            # 같은 내용의 해시가 이미 올라가 있다면 커밋은 이미 사실이므로
+            # 원장 기록을 그대로 받아 DB만 맞춘다. 해시가 다르면 진짜 충돌이라
+            # 그대로 막는다 — 기록을 덮어쓰지 않는 것이 이 기능의 존재 이유다.
+            existing_record = self.ledger.get(record_id)
+            if existing_record is None or existing_record.result_hash != result_hash:
+                raise ConflictError(str(exc)) from exc
+            committed = existing_record
 
         record = {
             "record_id": record_id,
@@ -260,16 +346,7 @@ class WorkflowService:
     def _appeal_detail(self, row: dict) -> AppealDetail:
         score = self.get_score_run(row["score_run_id"])
         review = row.get("review")
-        review_detail = None
-        if review:
-            review_detail = ReviewDetail(
-                review_id=review["review_id"],
-                appeal_id=review["appeal_id"],
-                decision=review["decision"],
-                reason=review["reason"],
-                reviewer=review["reviewer"],
-                decided_at=review["decided_at"],
-            )
+        review_detail = self._review_detail(review) if review else None
         return AppealDetail(
             appeal_id=row["appeal_id"],
             score_run_id=row["score_run_id"],

@@ -160,34 +160,62 @@ class Repository:
             rows = connection.execute(sql, params).fetchall()
         return [self.get_appeal(row["appeal_id"]) for row in rows]  # type: ignore[list-item]
 
-    def save_review(self, review: Dict[str, Any], appeal_status: str) -> None:
+    def save_review(self, review: Dict[str, Any], appeal_status: Optional[str] = None) -> None:
+        """
+        심사 결정을 저장한다.
+
+        `review["appeal_id"]`가 있으면 그 이의제기의 상태도 함께 넘긴다
+        (`appeal_status`). 이의제기 없이 진행한 심사는 `appeal_id`가 None이며,
+        여신 심사 자체는 이의제기 유무와 무관하게 성립한다.
+        """
+        appeal_id = review.get("appeal_id")
         with self.database.transaction() as connection:
-            current = connection.execute(
-                "SELECT status FROM appeals WHERE appeal_id = ?", (review["appeal_id"],)
+            existing = connection.execute(
+                "SELECT review_id FROM reviews WHERE score_run_id = ?",
+                (review["score_run_id"],),
             ).fetchone()
-            if current is None:
-                raise KeyError(review["appeal_id"])
-            if current["status"] != "submitted":
-                raise ValueError(f"이미 심사된 이의제기입니다: {review['appeal_id']}")
+            if existing is not None:
+                raise ValueError(f"이미 심사된 산출 건입니다: {review['score_run_id']}")
+
+            if appeal_id:
+                current = connection.execute(
+                    "SELECT status FROM appeals WHERE appeal_id = ?", (appeal_id,)
+                ).fetchone()
+                if current is None:
+                    raise KeyError(appeal_id)
+                if current["status"] != "submitted":
+                    raise ValueError(f"이미 심사된 이의제기입니다: {appeal_id}")
+
             connection.execute(
                 """
                 INSERT INTO reviews (
-                    review_id, appeal_id, decision, reason, reviewer, decided_at
-                ) VALUES (?, ?, ?, ?, ?, ?)
+                    review_id, score_run_id, appeal_id, decision, reason, reviewer,
+                    final_discount_bp, decided_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     review["review_id"],
-                    review["appeal_id"],
+                    review["score_run_id"],
+                    appeal_id,
                     review["decision"],
                     review["reason"],
                     review["reviewer"],
+                    review.get("final_discount_bp"),
                     review["decided_at"],
                 ),
             )
-            connection.execute(
-                "UPDATE appeals SET status = ?, updated_at = ? WHERE appeal_id = ?",
-                (appeal_status, review["decided_at"], review["appeal_id"]),
-            )
+            if appeal_id and appeal_status:
+                connection.execute(
+                    "UPDATE appeals SET status = ?, updated_at = ? WHERE appeal_id = ?",
+                    (appeal_status, review["decided_at"], appeal_id),
+                )
+
+    def get_review_for_score_run(self, score_run_id: str) -> Optional[Dict[str, Any]]:
+        with self.database.connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM reviews WHERE score_run_id = ?", (score_run_id,)
+            ).fetchone()
+        return _row_dict(row)
 
     def save_appeal_response(self, appeal_id: str, text: str, source: str) -> None:
         with self.database.transaction() as connection:

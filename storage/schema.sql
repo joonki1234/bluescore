@@ -46,14 +46,21 @@ CREATE TABLE IF NOT EXISTS appeals (
 CREATE INDEX IF NOT EXISTS idx_appeals_status_submitted
     ON appeals(status, submitted_at DESC);
 
+-- 심사 결정은 이의제기가 아니라 **점수 산출 건**에 매단다.
+-- 여신 심사는 이의제기가 없어도 이루어지며, 이의제기는 심사의 입력 중 하나일 뿐이다.
+-- appeal_id는 "이 심사가 어떤 이의제기에 대한 답이기도 한가"를 표시하는 선택 항목이다.
 CREATE TABLE IF NOT EXISTS reviews (
     review_id TEXT PRIMARY KEY,
-    appeal_id TEXT NOT NULL UNIQUE REFERENCES appeals(appeal_id),
+    score_run_id TEXT NOT NULL REFERENCES score_runs(score_run_id),
+    appeal_id TEXT UNIQUE REFERENCES appeals(appeal_id),
     decision TEXT NOT NULL CHECK(decision IN ('approve', 'hold')),
     reason TEXT NOT NULL,
     reviewer TEXT NOT NULL,
+    final_discount_bp INTEGER,
     decided_at TEXT NOT NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_score_run ON reviews(score_run_id);
 
 CREATE TABLE IF NOT EXISTS chain_commits (
     record_id TEXT PRIMARY KEY,

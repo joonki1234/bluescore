@@ -101,6 +101,59 @@ html, body, [class*="css"] {{ font-family: {FONT_SANS}; }}
 
 div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
 
+/* ─── 금융기관(PC웹) 화면 ─────────────────────────────────────────────────
+   심사 화면은 항목이 많아 섹션 경계가 없으면 카드가 흩어져 보인다. 아래
+   클래스는 "제목 → 내용" 한 덩어리를 만들어 화면 전체에 같은 리듬을 준다. */
+.bs-sec {{
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  color: {INK_SOFT}; text-transform: uppercase;
+  padding-bottom: 6px; margin: 18px 0 10px;
+  border-bottom: 1px solid {LINE};
+  display: flex; align-items: baseline; gap: 8px;
+}}
+.bs-sec .n {{ font-weight: 400; letter-spacing: 0; text-transform: none; font-size: 11.5px; }}
+
+/* 심사 요약 밴드 — 판단에 바로 쓰는 값만 한 줄에 모은다. */
+.bs-band {{
+  display: grid; gap: 0; background: {SURFACE};
+  border: 1px solid {LINE}; border-radius: 12px; overflow: hidden;
+}}
+.bs-band .cell {{ padding: 13px 16px; border-left: 1px solid {LINE}; }}
+.bs-band .cell:first-child {{ border-left: none; }}
+.bs-band .k {{ font-size: 11.5px; color: {INK_SOFT}; margin-bottom: 3px; }}
+.bs-band .v {{ font-family: {FONT_MONO}; font-size: 19px; font-weight: 700; color: {INK}; }}
+.bs-band .s {{ font-size: 11px; color: {INK_SOFT}; margin-top: 2px; }}
+
+/* 요인 원장 — 금리를 내릴 근거 / 올릴 근거를 한 행씩 대조한다. */
+.bs-led {{ display: flex; flex-direction: column; gap: 7px; }}
+.bs-led .row {{
+  background: {SURFACE}; border: 1px solid {LINE}; border-radius: 9px;
+  padding: 9px 11px;
+}}
+.bs-led .top {{ display: flex; align-items: baseline; gap: 7px; }}
+.bs-led .lab {{ font-size: 12.5px; font-weight: 600; }}
+.bs-led .amt {{ margin-left: auto; font-family: {FONT_MONO}; font-weight: 700; font-size: 13px; }}
+.bs-led .bar {{ height: 5px; border-radius: 3px; background: {BG}; margin: 6px 0 5px; }}
+.bs-led .bar > i {{ display: block; height: 5px; border-radius: 3px; }}
+.bs-led .met {{ font-size: 11px; color: {INK_SOFT}; font-family: {FONT_MONO}; }}
+.bs-led .say {{ font-size: 12px; line-height: 1.6; margin-top: 4px; }}
+
+/* 금리 게이지 — 현재 점수가 구간 경계에서 얼마나 떨어져 있는지. */
+.bs-gauge {{ position: relative; height: 34px; margin: 14px 0 6px; }}
+.bs-gauge .track {{
+  position: absolute; top: 13px; left: 0; right: 0; height: 8px;
+  border-radius: 5px; overflow: hidden; display: flex;
+}}
+.bs-gauge .track > span {{ display: block; height: 8px; }}
+.bs-gauge .pin {{
+  position: absolute; top: 4px; width: 3px; height: 26px;
+  background: {INK}; border-radius: 2px;
+}}
+.bs-gauge .tick {{
+  position: absolute; top: 24px; font-size: 10px; color: {INK_SOFT};
+  font-family: {FONT_MONO}; transform: translateX(-50%);
+}}
+
 /* 축 막대·비교 막대가 채워지는 느낌을 주는 트랜지션. Streamlit은 JS 트리거를
    못 주므로, 요소가 렌더되며 폭이 확정되는 순간 브라우저가 자동 재생하는
    순수 CSS 트랜지션으로 대체한다. */
