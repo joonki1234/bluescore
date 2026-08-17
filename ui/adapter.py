@@ -276,11 +276,28 @@ def objection_ai_response(vessel: Dict, reason: str = "", detail: str = "") -> D
     return {"text": item.get("aiResponse", ""), "source": item.get("aiResponseSource", "")}
 
 
-def review_objection(vessel_id: str, decision: str, reason: str, reviewer: str = "심사역 A") -> Dict:
-    appeal = get_objection(vessel_id)
-    if not appeal:
-        raise ApiClientError("심사할 이의제기가 없습니다.")
-    return _legacy_appeal(_api.review_appeal(appeal["appealId"], decision, reason, reviewer))
+# `review_objection()`(이의제기가 있어야만 심사할 수 있던 경로)은 제거했다.
+# 심사는 이의제기 유무와 무관하게 성립하므로 화면은 `review_score_run()`만 쓴다.
+# 이의제기가 접수돼 있으면 서비스 계층이 알아서 같은 심사에 매달아 준다.
+def review_score_run(
+    score_run_id: str,
+    decision: str,
+    reason: str,
+    reviewer: str = "심사역 A",
+    final_discount_bp: Optional[int] = None,
+) -> Dict:
+    """
+    여신 심사 결정을 저장한다.
+
+    이의제기가 있으면 그 건에 함께 매달리고, 없어도 저장된다 — 심사는 차주가
+    이의를 제기해야만 열리는 절차가 아니다.
+    """
+    return _api.review_score_run(score_run_id, decision, reason, reviewer, final_discount_bp)
+
+
+def get_review(score_run_id: str) -> Optional[Dict]:
+    """산출 건에 저장된 심사 결정. 아직 없으면 None."""
+    return _api.review_for_score_run(score_run_id)
 
 
 def rate_lookup(score: float) -> Dict:

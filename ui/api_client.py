@@ -97,6 +97,29 @@ class BlueScoreApiClient:
             json={"decision": decision, "reason": reason, "reviewer": reviewer},
         )
 
+    def review_score_run(
+        self,
+        score_run_id: str,
+        decision: str,
+        reason: str,
+        reviewer: str,
+        final_discount_bp: Optional[int] = None,
+    ) -> Dict:
+        """이의제기 유무와 무관하게 산출 건에 심사 결정을 남긴다."""
+        return self._request(
+            "POST", f"/score-runs/{score_run_id}/review",
+            json={
+                "decision": decision,
+                "reason": reason,
+                "reviewer": reviewer,
+                "finalDiscountBp": final_discount_bp,
+            },
+        )
+
+    def review_for_score_run(self, score_run_id: str) -> Optional[Dict]:
+        result = self._request("GET", f"/score-runs/{score_run_id}/review")
+        return result or None
+
     def rate_lookup(self, score: float) -> Dict:
         return self._request("GET", f"/rates/lookup?score={score}")
 

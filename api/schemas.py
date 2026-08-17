@@ -270,14 +270,20 @@ class ReviewDecision(ApiModel):
     decision: DecisionType
     reason: str = Field(min_length=1, max_length=4000)
     reviewer: str = Field(default="demo-reviewer", min_length=1, max_length=200)
+    # 심사역이 최종 확정한 우대금리(bp). 규칙표가 제안한 값을 그대로 쓰면 같은
+    # 값이 들어오고, 심사역이 조정하면 조정값이 들어온다. 규칙표 제안과 최종
+    # 결정을 구분해 남겨야 "자동화한 것은 결정이 아니라 계산과 기록"이 성립한다.
+    final_discount_bp: Optional[int] = Field(default=None, ge=0, le=500)
 
 
 class ReviewDetail(ApiModel):
     review_id: str
-    appeal_id: str
+    score_run_id: str
+    appeal_id: Optional[str] = None
     decision: DecisionType
     reason: str
     reviewer: str
+    final_discount_bp: Optional[int] = None
     decided_at: datetime
 
 

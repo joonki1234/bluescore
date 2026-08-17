@@ -284,7 +284,11 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
         return
 
     origin_x, origin_y = track[0]
-    anchor_lat, anchor_lng = vessel["anchor"]
+    anchor = vessel.get("anchor")
+    if not anchor or len(anchor) != 2:
+        st.warning("지도 기준 좌표가 없어 조업 이벤트 지도를 표시할 수 없습니다.")
+        return
+    anchor_lat, anchor_lng = anchor
 
     def _to_latlng(gx: float, gy: float) -> tuple:
         return (anchor_lat - (gy - origin_y) * _SCALE_LAT,
@@ -1541,6 +1545,209 @@ def explanation_source(explanation: Dict) -> None:
     )
 
 
+# ─── 금융기관(심사역) 화면 전용 ──────────────────────────────────────────────
+def section(title: str, note: str = "") -> None:
+    """
+    섹션 제목. 심사 화면 전체에서 같은 리듬을 만들기 위한 것이다.
+
+    `st.markdown("##### ...")`를 섞어 쓰면 카드마다 제목 크기·여백이 달라져
+    항목이 많은 심사 화면이 흩어져 보인다. 제목은 전부 이 함수로 낸다.
+    """
+    note_html = f'<span class="n">{note}</span>' if note else ""
+    st.markdown(f'<div class="bs-sec">{title}{note_html}</div>', unsafe_allow_html=True)
+
+
+def review_summary_band(vessel: Dict, band: Dict, review: Optional[Dict] = None) -> None:
+    """심사 판단에 바로 쓰는 값만 한 줄로 모은 요약 밴드."""
+    peer = vessel["peerGroup"]
+    passed = sum(1 for item in vessel.get("eligibility", []) if item["passed"])
+    total = len(vessel.get("eligibility", []))
+
+    cells = [
+        ("BlueScore", f'{vessel["blueScore"]:g}', f'유사군 {peer["count"]}척 중 상위 {peer["topPercent"]}%'),
+        ("규칙표 제안 구간", band["grade"], theme.discount_text(band).split("·")[-1].strip()),
+        ("A축 자원 압력", f'{vessel["axisA"]["score"]:g}', f'상위 {vessel["axisA"]["topPercent"]}%'),
+        ("B축 운항 효율", f'{vessel["axisB"]["score"]:g}', f'상위 {vessel["axisB"]["topPercent"]}%'),
+        ("우대 자격 요건", f"{passed}/{total}", "충족" if passed == total else "미충족 항목 있음"),
+    ]
+    if review:
+        decided = "승인" if review["decision"] == "approve" else "보류"
+        bp = review.get("finalDiscountBp")
+        cells.append(("심사 결정", decided, f"최종 −{bp}bp" if bp is not None else "금리 미확정"))
+
+    html = "".join(
+        f'<div class="cell"><div class="k">{k}</div>'
+        f'<div class="v">{v}</div><div class="s">{s}</div></div>'
+        for k, v, s in cells
+    )
+    st.markdown(
+        f'<div class="bs-band" style="grid-template-columns:repeat({len(cells)}, 1fr);">'
+        f'{html}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def rate_gauge(vessel: Dict) -> None:
+    """
+    현재 점수가 금리 구간 경계에서 얼마나 떨어져 있는지.
+
+    심사역이 실제로 판단하는 것은 "이 배가 몇 점인가"가 아니라 "구간을 넘기는가,
+    넘긴다면 얼마나 여유 있게 넘기는가"다. 경계까지의 거리를 점수와 bp로 함께
+    보여줘 금리 인하·인상 판단에 바로 쓰이게 한다.
+    """
+    grades = adapter.load_dataset()["rateGrades"]
+    score = vessel["blueScore"]
+    ordered = sorted(grades, key=lambda g: g["minScore"])
+    current = theme.grade_band(score, grades)
+
+    lo, hi = 40.0, 100.0
+    pos = max(0.0, min(1.0, (score - lo) / (hi - lo))) * 100
+
+    segs, ticks = [], []
+    for i, g in enumerate(ordered):
+        start = max(g["minScore"], lo)
+        end = ordered[i + 1]["minScore"] if i + 1 < len(ordered) else hi
+        width = max(0.0, (min(end, hi) - start) / (hi - lo) * 100)
+        shade = theme.POSITIVE if g["discountBp"] >= 20 else (
+            theme.AXIS_A if g["discountBp"] >= 12 else (
+                theme.AXIS_B if g["discountBp"] > 0 else theme.LINE))
+        segs.append(f'<span style="width:{width}%; background:{shade}; opacity:.75;"></span>')
+        if g["minScore"] > lo:
+            left = (g["minScore"] - lo) / (hi - lo) * 100
+            ticks.append(
+                f'<div class="tick" style="left:{left}%;">{g["grade"]} {g["minScore"]:g}</div>'
+            )
+
+    upper = [g for g in ordered if g["minScore"] > score]
+    if upper:
+        nxt = min(upper, key=lambda g: g["minScore"])
+        gap = round(nxt["minScore"] - score, 1)
+        extra = nxt["discountBp"] - current["discountBp"]
+        headroom = (
+            f'<b>{nxt["grade"]}구간</b>까지 <b>{gap:g}점</b> 남았습니다 '
+            f'(도달 시 추가 <b>−{extra}bp</b>).'
+        )
+    else:
+        headroom = "최상위 구간입니다. 위쪽 경계가 없습니다."
+
+    lower = [g for g in ordered if g["minScore"] <= score]
+    floor = max(lower, key=lambda g: g["minScore"])
+    cushion = round(score - floor["minScore"], 1)
+    drop = current["discountBp"] - (
+        max([g for g in ordered if g["minScore"] < floor["minScore"]],
+            key=lambda g: g["minScore"])["discountBp"]
+        if [g for g in ordered if g["minScore"] < floor["minScore"]] else 0
+    )
+
+    st.markdown(
+        f'<div class="bs-card">'
+        f'  <div class="bs-gauge">'
+        f'    <div class="track">{"".join(segs)}</div>'
+        f'    <div class="pin" style="left:calc({pos}% - 1px);"></div>'
+        f'    {"".join(ticks)}'
+        f'  </div>'
+        f'  <div class="bs-note" style="margin-top:16px;">{headroom}<br>'
+        f'  현재 구간 하단 경계까지 여유 <b>{cushion:g}점</b> — 이 아래로 내려가면 '
+        f'  우대가 <b>{drop}bp</b> 줄어듭니다.</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def factor_ledger(vessel: Dict) -> None:
+    """
+    금리를 내릴 근거 / 올릴 근거를 좌우로 대조한 요인 원장.
+
+    심사역이 알아야 하는 것은 요인 목록이 아니라 **각 요인이 금리 방향에
+    어떻게 작용하는가**다. 기여도 부호로 두 열로 갈라 놓으면, 줄글을 읽지 않고도
+    "무엇 때문에 깎아줄 수 있고, 무엇 때문에 못 깎아주는가"가 한눈에 잡힌다.
+    """
+    rows = adapter.detailed_report(vessel).get("rows", [])
+    if not rows:
+        return
+
+    scored = [r for r in rows if r.get("contribution") is not None]
+    ups = sorted([r for r in scored if r["contribution"] > 0],
+                 key=lambda r: -r["contribution"])
+    downs = sorted([r for r in scored if r["contribution"] < 0],
+                   key=lambda r: r["contribution"])
+    widest = max([abs(r["contribution"]) for r in scored], default=1.0) or 1.0
+
+    def _rows_html(items: List[Dict], color: str) -> str:
+        if not items:
+            return '<div class="bs-note">해당 요인이 없습니다.</div>'
+        out = []
+        for r in items:
+            width = min(100.0, abs(r["contribution"]) / widest * 100)
+            out.append(
+                f'<div class="row">'
+                f'  <div class="top">'
+                f'    <span class="lab">{r["label"]}</span>'
+                f'    <span class="bs-pill info" style="padding:1px 6px; font-size:10px;">'
+                f'{r["axis"].upper()}축</span>'
+                f'    <span class="amt" style="color:{color};">{theme.signed(r["contribution"], "")}</span>'
+                f'  </div>'
+                f'  <div class="bar"><i style="width:{width}%; background:{color};"></i></div>'
+                f'  <div class="met">내 값 {r["selfValue"]:g}{r["unit"]} · '
+                f'유사군 평균 {r["peerAverage"]:g}{r["unit"]}</div>'
+                f'  <div class="say">{r["sentence"]}</div>'
+                f'</div>'
+            )
+        return "".join(out)
+
+    up_total = sum(r["contribution"] for r in ups)
+    down_total = sum(r["contribution"] for r in downs)
+
+    left, right = st.columns(2, gap="medium")
+    with left:
+        st.markdown(
+            f'<div class="bs-note" style="margin-bottom:7px;">'
+            f'<b style="color:{theme.POSITIVE};">금리 인하 근거</b> · 합계 '
+            f'<span class="bs-mono">{theme.signed(up_total, "")}</span></div>'
+            f'<div class="bs-led">{_rows_html(ups, theme.POSITIVE)}</div>',
+            unsafe_allow_html=True,
+        )
+    with right:
+        st.markdown(
+            f'<div class="bs-note" style="margin-bottom:7px;">'
+            f'<b style="color:{theme.NEGATIVE};">금리 인하 제약 요인</b> · 합계 '
+            f'<span class="bs-mono">{theme.signed(down_total, "")}</span></div>'
+            f'<div class="bs-led">{_rows_html(downs, theme.NEGATIVE)}</div>',
+            unsafe_allow_html=True,
+        )
+
+
+def reproducibility_panel(vessel: Dict) -> None:
+    """산출 조건·버전·매칭 신뢰도 — 같은 결과를 다시 만들 수 있는지에 필요한 값."""
+    dataset = adapter.load_dataset()
+    items = [
+        ("점수 산출 건", vessel["scoreRunId"]),
+        ("데이터 스냅샷", vessel["dataSnapshotId"]),
+        ("모델 버전", vessel["modelVersion"]),
+        ("산식 버전", vessel["scoringRuleVersion"]),
+        ("금리표 버전", vessel["rateTableVersion"]),
+        ("산출 경로", vessel["sourceType"]),
+    ]
+    rows = "".join(
+        f'<div style="display:grid; grid-template-columns:110px 1fr; gap:10px; padding:3px 0;">'
+        f'<span class="bs-note">{k}</span>'
+        f'<span class="bs-mono" style="font-size:11.5px; word-break:break-all;">{v}</span></div>'
+        for k, v in items
+    )
+    freshness = "".join(
+        f'<div style="display:grid; grid-template-columns:110px 1fr; gap:10px; padding:3px 0;">'
+        f'<span class="bs-note">{name}</span>'
+        f'<span class="bs-mono" style="font-size:11.5px;">{day}</span></div>'
+        for name, day in dataset["dataFreshness"].items()
+    )
+    st.markdown(
+        f'<div class="bs-card">{rows}'
+        f'<div style="border-top:1px solid {theme.LINE}; margin:9px 0 7px;"></div>'
+        f'{freshness}</div>',
+        unsafe_allow_html=True,
+    )
+
+
 def backend_footer() -> None:
     """
     지금 보고 있는 숫자가 실산출인지 임시값인지 항상 표시한다.
@@ -1757,38 +1964,218 @@ def objection_form(vessel: Dict) -> None:
 
 
 def objection_panel_bank(vessel: Dict) -> None:
-    """최종금리결정 탭 — 어업인 이의제기 내역과 AI 답변 초안, 가짜 발송 팝업."""
-    st.markdown("##### 이의제기 내역")
+    """
+    이의제기 내역과 AI 답변 초안, 전달(시연용 팝업).
+
+    이의제기가 없어도 이 패널은 화면을 막지 않는다 — 심사는 차주의 이의제기와
+    무관하게 진행되며, 이의제기는 심사의 입력 중 하나일 뿐이다.
+    """
     objection = adapter.get_objection(vessel["vesselId"])
     if not objection:
         st.markdown(
-            '<div class="bs-card"><div class="bs-note">제기된 이의가 없습니다.</div></div>',
+            '<div class="bs-card"><div class="bs-note">접수된 이의제기가 없습니다. '
+            '이의제기 없이도 아래에서 심사 의견을 작성하고 최종 금리를 결정할 수 '
+            '있습니다.</div></div>',
             unsafe_allow_html=True,
         )
         return
 
+    status_label = {"submitted": "접수", "approved": "승인", "held": "보류"}.get(
+        objection.get("status", ""), objection.get("status", "")
+    )
     st.markdown(
-        f'<div class="bs-card"><div class="bs-label">사유</div>'
-        f'<div style="font-weight:700; margin-bottom:6px;">{objection["reason"]}</div>'
+        f'<div class="bs-card">'
+        f'<div style="display:flex; align-items:baseline; gap:8px;">'
+        f'<span class="bs-label" style="margin:0;">사유</span>'
+        f'<span class="bs-pill info" style="margin-left:auto;">{status_label}</span></div>'
+        f'<div style="font-weight:700; margin:2px 0 8px;">{objection["reason"]}</div>'
         f'<div class="bs-label">상세 내용</div>'
         f'<div class="bs-note">{objection["detail"] or "(추가 설명 없음)"}</div></div>',
         unsafe_allow_html=True,
     )
 
-    if st.button("AI 답변 초안 생성", key=f"objection_ai_{vessel['vesselId']}"):
-        adapter.objection_ai_response(vessel, objection["reason"], objection["detail"])
+    if st.button("AI 답변 초안 생성", key=f"objection_ai_{vessel['vesselId']}",
+                 width="stretch"):
+        with st.spinner("답변 초안을 생성하는 중..."):
+            adapter.objection_ai_response(vessel, objection["reason"], objection["detail"])
         st.rerun()
 
     refreshed = adapter.get_objection(vessel["vesselId"])
     if refreshed and refreshed.get("aiResponse"):
         st.markdown(
-            f'<div class="bs-card"><div class="bs-label">AI 답변 초안 (검토 후 전달)</div>'
+            f'<div class="bs-card"><div class="bs-label">AI 답변 초안 · 검토 후 전달</div>'
             f'<div style="font-size:13.5px; line-height:1.8;">{refreshed["aiResponse"]}</div></div>',
             unsafe_allow_html=True,
         )
         explanation_source({"source": refreshed["aiResponseSource"]})
-        if st.button("어업인에게 전달", key=f"objection_send_{vessel['vesselId']}"):
+        sent_key = f"objection_sent_{vessel['vesselId']}"
+        if st.button("어업인에게 전달", key=f"objection_send_{vessel['vesselId']}",
+                     width="stretch"):
+            st.session_state[sent_key] = True
             st.toast("어업인에게 답변을 전달했습니다.", icon="✅")
+        if st.session_state.get(sent_key):
+            st.success(
+                f'{vessel["name"]} 차주에게 답변을 전달했습니다. '
+                "(시연용 표시이며 실제 발송은 이루어지지 않습니다.)"
+            )
+
+
+_INTEREST_PANEL_HTML = """
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:transparent; font-family:__FONT_SANS__; color:__INK__; }
+  .wrap { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .card {
+    background:__SURFACE__; border:1px solid __LINE__; border-radius:12px; padding:14px 16px;
+    opacity:0; transform:translateY(6px); animation:in .45s ease-out forwards;
+  }
+  .card.b { animation-delay:.08s; }
+  @keyframes in { to { opacity:1; transform:none; } }
+  .k { font-size:11.5px; color:__INK_SOFT__; margin-bottom:5px; }
+  .rate { font-family:__FONT_MONO__; font-weight:700; font-size:26px; }
+  .sub { font-size:11.5px; color:__INK_SOFT__; margin-top:3px; }
+  .bars { margin-top:12px; }
+  .barrow { display:flex; align-items:center; gap:9px; margin-bottom:7px; font-size:11.5px; }
+  .barrow .tag { width:52px; color:__INK_SOFT__; }
+  .track { flex:1; height:11px; background:__BG__; border-radius:6px; overflow:hidden; }
+  .track > i { display:block; height:11px; border-radius:6px; width:0; transition:width 1s cubic-bezier(.22,1,.36,1); }
+  .barrow .num { width:96px; text-align:right; font-family:__FONT_MONO__; font-weight:600; }
+  .save { margin-top:12px; padding-top:11px; border-top:1px solid __LINE__; }
+  .big { font-family:__FONT_MONO__; font-weight:700; font-size:24px; color:__POSITIVE__; }
+</style>
+<div class="wrap">
+  <div class="card">
+    <div class="k">적용 금리</div>
+    <div style="display:flex; align-items:baseline; gap:9px;">
+      <span class="rate" style="color:__INK_SOFT__; font-size:19px;"><span id="r0">0</span>%</span>
+      <span style="color:__INK_SOFT__;">→</span>
+      <span class="rate" style="color:__AXIS_A__;"><span id="r1">0</span>%</span>
+    </div>
+    <div class="sub">기준금리 <span id="base">0</span>% · 우대 <span id="bp">0</span>bp 적용</div>
+    <div class="save">
+      <div class="k">만기까지 이자 절감</div>
+      <div class="big"><span id="tot">0</span> 만원</div>
+      <div class="sub">연간 <span id="yr">0</span>만원 · <span id="pri">0</span>억 원 · <span id="trm">0</span>년 만기</div>
+    </div>
+  </div>
+  <div class="card b">
+    <div class="k">총 이자 부담 비교</div>
+    <div class="bars">
+      <div class="barrow">
+        <span class="tag">우대 전</span>
+        <span class="track"><i id="bar0" style="background:__INK_SOFT__;"></i></span>
+        <span class="num"><span id="i0">0</span>만원</span>
+      </div>
+      <div class="barrow">
+        <span class="tag">우대 후</span>
+        <span class="track"><i id="bar1" style="background:__AXIS_A__;"></i></span>
+        <span class="num"><span id="i1">0</span>만원</span>
+      </div>
+    </div>
+    <div class="sub" id="note"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var D = __DATA__;
+  function tween(id, target, decimals, dur) {
+    var el = document.getElementById(id), t0 = null;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / (dur || 850), 1);
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = (target * e).toFixed(decimals);
+      if (p < 1) requestAnimationFrame(step); else el.textContent = target.toFixed(decimals);
+    }
+    requestAnimationFrame(step);
+  }
+  document.getElementById('base').textContent = D.baseRate.toFixed(2);
+  document.getElementById('bp').textContent = D.finalBp;
+  document.getElementById('pri').textContent = D.principalEok;
+  document.getElementById('trm').textContent = D.termYears;
+  tween('r0', D.baseRate, 2);
+  tween('r1', D.finalRate, 2);
+  tween('i0', D.interestBefore, 0);
+  tween('i1', D.interestAfter, 0);
+  tween('yr', D.savingYearly, 0);
+  tween('tot', D.savingTotal, 0);
+  var most = Math.max(D.interestBefore, 1);
+  setTimeout(function () {
+    document.getElementById('bar0').style.width = '100%';
+    document.getElementById('bar1').style.width = (D.interestAfter / most * 100) + '%';
+  }, 60);
+  document.getElementById('note').textContent = D.finalBp > 0
+    ? '우대 ' + D.finalBp + 'bp 적용으로 만기까지 이자 부담이 ' + D.savingTotal + '만원 줄어듭니다.'
+    : '우대 없음으로 적용하면 이자 부담은 그대로입니다.';
+})();
+</script>
+"""
+
+
+def interest_impact(
+    *, base_rate_percent: float, final_bp: int, principal_won: int, term_years: int,
+    height: int = 210,
+) -> None:
+    """
+    확정 금리가 실제 이자 부담을 얼마나 바꾸는지.
+
+    심사역이 bp 하나를 조정할 때 그것이 차주에게 얼마인지 바로 보이지 않으면
+    금리 결정이 숫자 놀음이 된다. 단리 근사이며 화면에도 그렇게 표기한다.
+    """
+    final_rate = round(base_rate_percent - final_bp / 100, 4)
+    interest_before = int(principal_won * base_rate_percent / 100) * term_years
+    interest_after = int(principal_won * final_rate / 100) * term_years
+    yearly = int(principal_won * final_bp / 10000)
+
+    data = {
+        "baseRate": base_rate_percent,
+        "finalRate": final_rate,
+        "finalBp": final_bp,
+        "principalEok": round(principal_won / 100_000_000, 2),
+        "termYears": term_years,
+        "interestBefore": interest_before // 10_000,
+        "interestAfter": interest_after // 10_000,
+        "savingYearly": yearly // 10_000,
+        "savingTotal": (yearly * term_years) // 10_000,
+    }
+    html = (
+        _INTEREST_PANEL_HTML
+        .replace("__DATA__", json.dumps(data, ensure_ascii=False))
+        .replace("__FONT_SANS__", theme.FONT_SANS)
+        .replace("__FONT_MONO__", theme.FONT_MONO)
+        .replace("__INK_SOFT__", theme.INK_SOFT)
+        .replace("__INK__", theme.INK)
+        .replace("__SURFACE__", theme.SURFACE)
+        .replace("__LINE__", theme.LINE)
+        .replace("__BG__", theme.BG)
+        .replace("__AXIS_A__", theme.AXIS_A)
+        .replace("__POSITIVE__", theme.POSITIVE)
+    )
+    components_html(html, height=height, scrolling=False)
+    st.markdown(
+        '<div class="bs-note">단리 근사이며 예시 표기입니다. 실제 상환 방식·수수료는 '
+        '여신 약정에 따릅니다.</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def onchain_receipt(commit: Dict) -> None:
+    """온체인 커밋 영수증 — 기록된 해시와 블록 정보."""
+    st.markdown(
+        f'<div class="bs-card" style="border-left:3px solid {theme.POSITIVE};">'
+        f'<div style="display:flex; align-items:baseline; gap:8px; margin-bottom:8px;">'
+        f'<span style="font-weight:700; color:{theme.POSITIVE};">온체인 기록 완료</span>'
+        f'<span class="bs-note">{commit["committedAt"]}</span></div>'
+        f'<div class="bs-label">Record ID</div>'
+        f'<div class="bs-hash">{commit["recordId"]}</div>'
+        f'<div class="bs-label" style="margin-top:9px;">Result hash (SHA-256)</div>'
+        f'<div class="bs-hash">{commit["resultHash"]}</div>'
+        f'<div class="bs-note" style="margin-top:9px;">'
+        f'원장 {commit["ledgerMode"]} · 블록 {commit.get("blockNumber") or "-"}<br>'
+        f'트랜잭션 {commit.get("transactionHash") or "로컬 모드"}<br>'
+        f'컨트랙트 {commit.get("contractAddress") or "-"}</div></div>',
+        unsafe_allow_html=True,
+    )
 
 
 def smart_contract_lookup_card(vessel: Dict, score: float) -> None:

@@ -29,6 +29,7 @@ from api.schemas import (
     QuestionRequest,
     RateLookupResponse,
     ReviewDecision,
+    ReviewDetail,
     ScoreResponse,
     SimulationRequest,
     SimulationResponse,
@@ -181,6 +182,20 @@ def create_app(
     @api.post("/appeals/{appeal_id}/review", response_model=AppealDetail)
     def review_appeal(appeal_id: str, request: ReviewDecision) -> AppealDetail:
         return workflow.review_appeal(appeal_id, request)
+
+    @api.post("/score-runs/{score_run_id}/review", response_model=ReviewDetail)
+    def review_score_run(score_run_id: str, request: ReviewDecision) -> ReviewDetail:
+        """
+        여신 심사 결정을 저장한다.
+
+        이의제기가 접수돼 있으면 그 건에 함께 매달리고, 없어도 결정을 남길 수
+        있다 — 심사는 차주의 이의제기와 무관하게 이루어지는 절차다.
+        """
+        return workflow.review_score_run(score_run_id, request)
+
+    @api.get("/score-runs/{score_run_id}/review", response_model=Optional[ReviewDetail])
+    def get_review(score_run_id: str) -> Optional[ReviewDetail]:
+        return workflow.get_review(score_run_id)
 
     @api.post("/reports/{score_run_id}/commit", response_model=ChainCommitResponse)
     def commit_report(score_run_id: str) -> ChainCommitResponse:
