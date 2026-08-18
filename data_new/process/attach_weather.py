@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import gzip
 import json
 import math
 from datetime import datetime, timedelta
@@ -29,7 +30,7 @@ from pathlib import Path
 
 RAW_WEATHER_DIR = Path(__file__).resolve().parent.parent / "raw" / "marine_weather"
 EVENTS_PATH = Path(__file__).resolve().parent.parent / "processed" / "gfw_events_normalized.jsonl"
-OUT_PATH = Path(__file__).resolve().parent.parent / "processed" / "events_with_weather.jsonl"
+OUT_PATH = Path(__file__).resolve().parent.parent / "processed" / "events_with_weather.jsonl.gz"
 
 WEATHER_FIELDS = [
     "WIND_DIRECT", "WIND_SPEED", "SURFACE_CURR_DRC", "SURFACE_CURR_SPEED",
@@ -111,7 +112,7 @@ def run(dates: list) -> None:
     n_matched = 0
     n_total = 0
     n_no_weather = 0
-    with OUT_PATH.open("w", encoding="utf-8") as out:
+    with gzip.open(OUT_PATH, "wt", encoding="utf-8") as out:
         for date_str in dates:
             iso_date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
             events = events_by_date.get(iso_date, [])

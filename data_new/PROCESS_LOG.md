@@ -1257,3 +1257,18 @@ MOF 경유 저정밀도), 라이브 파이프라인 어디서도 더 이상 안 
 1,430→1,249척, unmatched 1,847→2,056척. `final_vessel_matches.jsonl`
 재생성 완료. 파이프라인이 GFW 이벤트/선박 수집 → TAC 정규화 → 한글
 직접비교 매칭으로 단순해짐(`data_new/README.md` 실행 순서 갱신).
+
+## 53. 추적 스냅샷의 서비스·후처리 경로 통합(2026-08-19)
+
+production 실산출은 `final_vessel_matches.jsonl`,
+`gfw_vessels_normalized.jsonl`, `events_with_weather.jsonl.gz` 3개를 직접
+읽도록 통합됐다. A축과 B축은 공용 선박 변환을 사용하며 무시된 파생 파일
+`vessels_for_score.jsonl.gz`와 `axis_b_input.jsonl`은 API 실행에 필요하지 않다.
+두 파일의 exporter는 레거시 분석 호환용으로만 남겼다.
+
+현재 입력 건수는 선박 5,323척, 톤수 1,234척, 구체적인 GFW fishingType
+2,682척, 둘 다 665척이다. B축 이벤트는 총 275,782건이며 tonnageGt
+85,985건, gearType 147,441건, 둘 다 45,305건이다. 최종 서비스 상태는
+success 289척, partial 3,395척, insufficientSample 1,630척,
+matchingFailed 9척이다. 모델 계수·날씨 단위·가중치·금리 정책의 타당성은
+별도 검증 대상으로 남겼다.
