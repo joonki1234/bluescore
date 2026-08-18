@@ -3,6 +3,8 @@
 score/scripts/convert_data_new_vessels.py 단위 테스트.
 """
 
+import pytest
+
 from score.scripts.convert_data_new_vessels import convert_row, load_gear_types
 
 
@@ -48,8 +50,9 @@ class TestConvertRow:
 
 
 class TestLoadGearTypes:
-    def test_missing_file_returns_empty_dict(self, tmp_path):
-        assert load_gear_types(tmp_path / "does-not-exist.jsonl") == {}
+    def test_missing_file_raises(self, tmp_path):
+        with pytest.raises(FileNotFoundError):
+            load_gear_types(tmp_path / "does-not-exist.jsonl")
 
     def test_loads_combined_gear_types_by_vessel_id(self, tmp_path):
         path = tmp_path / "gfw_vessels_normalized.jsonl"

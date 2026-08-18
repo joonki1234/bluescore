@@ -23,17 +23,17 @@ from score.axis_a_pressure import compute_axis_a_pressure
 from score.axis_b_baseline import VesselAxisBResult
 from score.peer_grouping import MIN_PEER_GROUP_SAMPLE_SIZE, build_peer_groups, peer_group_for_vessel
 from score.real_axis_b_scoring import compute_axis_b_results
+from score.real_vessel_input import (
+    DEFAULT_GFW_VESSELS_PATH,
+    DEFAULT_MATCHES_PATH,
+    load_real_vessel_records,
+)
 from score.score_assembly import raw_to_score, score_status_for_group
 from score.shap_factors import axis_a_factor_shares
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-# data_new/ 스냅샷을 쓴다 — 구 data/보다 매칭 정밀도가 높다(data_new/README.md
-# 참고). 선박은 score/scripts/convert_data_new_vessels.py로 이 모듈이 기대하는
-# 평평한 스키마(vesselId/tonnage/fishingType)로 미리 변환해둔 파생 파일이다 —
-# 원본 final_vessel_matches.jsonl은 톤수가 중첩·문자열이라 그대로 못 쓴다.
 DEFAULT_EVENTS_PATH = PROJECT_ROOT / "data_new" / "processed" / "events_with_weather.jsonl.gz"
-DEFAULT_VESSELS_PATH = PROJECT_ROOT / "data_new" / "processed" / "vessels_for_score.jsonl.gz"
 
 
 @dataclass(frozen=True)
@@ -219,20 +219,23 @@ class RealAxisAAdapter:
     def __init__(
         self,
         events_path: Path = DEFAULT_EVENTS_PATH,
-        vessels_path: Path = DEFAULT_VESSELS_PATH,
+        matches_path: Path = DEFAULT_MATCHES_PATH,
+        gfw_vessels_path: Path = DEFAULT_GFW_VESSELS_PATH,
     ) -> None:
         self.events_path = Path(events_path)
-        self.vessels_path = Path(vessels_path)
+        self.matches_path = Path(matches_path)
+        self.gfw_vessels_path = Path(gfw_vessels_path)
 
     @property
     def available(self) -> bool:
-        return self.events_path.exists() and self.vessels_path.exists()
+        return all(
+            path.exists()
+            for path in (self.events_path, self.matches_path, self.gfw_vessels_path)
+        )
 
     @lru_cache(maxsize=1)
     def _vessel_records(self) -> List[dict]:
-        if not self.vessels_path.exists():
-            raise FileNotFoundError(str(self.vessels_path))
-        return _load_jsonl_gz(self.vessels_path)
+        return load_real_vessel_records(self.matches_path, self.gfw_vessels_path)
 
     @lru_cache(maxsize=1)
     def _event_records(self) -> List[dict]:
