@@ -105,3 +105,21 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       담당 — 여기서는 "된다"만 증명, 배선은 안 건드림.**
       주의: 대부분 선박의 톤수 매칭이 아직 안 끝나서(tonnage_band=None인 채로
       그룹핑됨) 정식 실행 전 매칭 완료를 기다리는 게 맞다.
+- [x] **(2026-08-18) `services/real_scoring.py`의 A축 실산출을 `data_new/`로
+      전환** — 구 `data/`(31,605척, 확정매칭 순도 9.5%) 대신 `data_new/`
+      (EEZ 제한 5,323척, 사람 라벨링 실측 정밀도 약 75%)를 쓰도록
+      `DEFAULT_EVENTS_PATH`/`DEFAULT_VESSELS_PATH`를 교체(최지희님 파일이라
+      확인 후 진행). 이벤트는 `data_new/processed/events_with_weather.jsonl.gz`
+      필드가 그대로 맞아서 변환 없이 바로 씀. 선박은
+      `scripts/convert_data_new_vessels.py`로 `final_vessel_matches.jsonl`의
+      중첩·문자열 톤수(`tac.tonnageGtTac`/`mof.tonnageGtMof`)를 평판화(테스트
+      6개). `services/metadata.py`의 `REAL_DATA_SNAPSHOT_ID`도 실제 데이터
+      출처와 맞게 갱신(최지희님 파일, 라벨이 실제와 안 맞으면 재현성 계약이
+      깨져서 같이 고침).
+      **결과**: 5,323척 중 `partial`(A축 실산출됨) 3,887척(73%),
+      `insufficientSample` 1,427척(27%), `matchingFailed` 9척.
+      **알려진 한계**: `fishingType`을 아직 못 채움 — data_new의 공개분에
+      GFW 자체 gear 정보(`gfw_vessels_normalized.jsonl` 등)가 없어서
+      전부 빈 리스트. 유사군이 톤수·해역·계절만으로 묶여서 `insufficientSample`
+      비율이 실제보다 다소 높게 나올 수 있음 — GFW gear 정보가 추가
+      공개되면 `convert_data_new_vessels.py`만 보강하면 됨.

@@ -22,8 +22,15 @@ from score.score_assembly import raw_to_score, score_status_for_group
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_EVENTS_PATH = PROJECT_ROOT / "data" / "raw" / "gfw_events_2026-01-01_2026-08-13.jsonl.gz"
-DEFAULT_VESSELS_PATH = PROJECT_ROOT / "data" / "raw" / "gfw_vessels_enriched.jsonl.gz"
+# 2026-08-18: data_new/(김태윤) 스냅샷으로 전환 — 구 data/의 31,605척(확정매칭
+# 순도 9.5%) 대신 EEZ 제한 모집단 5,323척(사람 라벨링 실측 정밀도 약 75%,
+# data_new/README.md 참고)을 쓴다. 이벤트는 data_new/processed/의 산출물을
+# 그대로 쓰고, 선박은 score/scripts/convert_data_new_vessels.py로 미리 평판화
+# 해둔 파생 파일을 쓴다(vesselId/tonnage/fishingType 등 이 모듈이 기대하는
+# 평평한 스키마로 변환 — 원본 final_vessel_matches.jsonl은 톤수가
+# tac.tonnageGtTac처럼 중첩·문자열이라 그대로 못 씀).
+DEFAULT_EVENTS_PATH = PROJECT_ROOT / "data_new" / "processed" / "events_with_weather.jsonl.gz"
+DEFAULT_VESSELS_PATH = PROJECT_ROOT / "data_new" / "processed" / "vessels_for_score.jsonl.gz"
 
 
 @dataclass(frozen=True)
