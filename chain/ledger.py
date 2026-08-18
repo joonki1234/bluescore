@@ -1,20 +1,15 @@
 """
 담당: 김준기, 오동규
 
-해시 커밋/조회 — 최소 스코프(minimal scope)의 원장(ledger).
+해시 원장(ledger) — commit/get/verify, 최소 스코프.
 
-참고: BlueScore 프로젝트 기획서 - 온체인 증적(해시값 기록 및 검증 기능, 최소 스코프로
-한정).
+record_id는 한 번 커밋하면 덮어쓰기 불가 (증적 목적).
 
-한 번 커밋된 record_id는 덮어쓸 수 없다 — 증적(evidence)이라는 목적상 같은 산출
-결과에 대해 나중에 값이 바뀌어 보이면 안 되기 때문이다.
+구현 2종, LedgerLike로 선택:
+- HashLedger: 인메모리, Hardhat 없이도 동작 (기본 pytest는 이거)
+- OnChainHashLedger: chain/hardhat/HashRegistry.sol 실호출 (web3.py)
 
-같은 commit/get/verify 인터페이스를 가진 구현이 두 개 있다: `HashLedger`(인메모리,
-Node/Hardhat 없이 어디서나 동작하며 기본 pytest 스위트가 이걸로 돈다)와
-`OnChainHashLedger`(`chain/hardhat/`에 배포된 `HashRegistry.sol`을 web3.py로 실제
-호출). 후자가 전자를 대체하는 게 아니라 나란히 두는 것 — Hardhat 노드가 없는
-컴퓨터에서도 기존 테스트가 통과해야 하기 때문이다. 호출부는 `LedgerLike` 인터페이스로
-둘 중 하나를 선택해 쓴다(`chain/commit_score_result.py` 참고).
+호출부는 chain/commit_score_result.py 참고.
 """
 
 import json
@@ -94,16 +89,9 @@ def _error_selector(signature: str) -> bytes:
 
 
 class OnChainHashLedger:
-    """`HashLedger`와 같은 commit/get/verify 인터페이스를 갖는, 실제 배포된
-    `HashRegistry` 스마트컨트랙트(web3.py) 기반 구현.
+    """`HashRegistry` 스마트컨트랙트 기반 원장.
 
-    로컬 Hardhat 노드(`npx hardhat node` + `chain/hardhat/ignition/modules/
-    HashRegistry.js` 배포)가 떠 있어야 동작한다. 생성자는 네트워크에 바로
-    접속하지 않는다 — 실제 RPC 호출은 commit/get/verify를 부를 때 처음 일어난다.
-
-    서명 방식 두 가지를 지원: private_key(또는 BLUESCORE_CHAIN_PRIVATE_KEY)를
-    주면 그 키로 직접 서명하고(공개 테스트넷 등 어디서나 동작), 안 주면
-    `w3.eth.accounts[0]`을 보내는 사람으로 쓴다(로컬 Hardhat 노드 전용 지름길).
+    RPC는 첫 원장 호출에서 연결한다. 개인 키가 없으면 노드의 첫 계정을 사용한다.
     """
 
     def __init__(

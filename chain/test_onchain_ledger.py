@@ -1,14 +1,12 @@
 """
 
-chain/ledger.py의 OnChainHashLedger 단위 테스트.
+OnChainHashLedger 단위 테스트.
 
-이 컴퓨터엔 Node.js가 없어 로컬 Hardhat 노드를 띄울 수 없다 — 그래서 아래 테스트는
-크게 두 그룹으로 나뉜다:
-    - 네트워크 없이 검증 가능한 순수 로직(hex<->bytes32 변환, revert 셀렉터 판별,
-      생성자 검증, mock으로 대체한 컨트랙트 호출) — 기본 `pytest -q`에서 항상 돈다.
-    - 실제 로컬 Hardhat 노드가 떠 있을 때만 도는 end-to-end 테스트 — RPC 연결이
-      안 되면 스스로 skip한다. 실제로 이 경로가 도는지는 Node가 있는 컴퓨터에서
-      별도로 확인해야 한다.
+이 컴퓨터엔 Node.js가 없어 로컬 Hardhat 노드 실행 불가. 두 그룹으로 분리:
+    - 순수 로직(hex<->bytes32, revert 셀렉터, 생성자 검증, mock 컨트랙트 호출)
+      — 기본 `pytest -q`에서 항상 실행
+    - 로컬 Hardhat 노드 필요한 e2e 테스트 — RPC 연결 안 되면 자동 skip
+      (Node 있는 환경에서 별도 확인 필요)
 """
 
 from unittest.mock import MagicMock
