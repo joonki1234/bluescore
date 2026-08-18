@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from score.axis_a_pressure import compute_axis_a_pressure
-from score.peer_grouping import build_peer_groups, peer_group_for_vessel
+from score.peer_grouping import MIN_PEER_GROUP_SAMPLE_SIZE, build_peer_groups, peer_group_for_vessel
 from score.score_assembly import raw_to_score, score_status_for_group
 
 
@@ -52,7 +52,7 @@ def compute_axis_a_for_vessel(
     vessels: List[dict],
     events: List[dict],
     *,
-    min_peer_size: int = 20,
+    min_peer_size: int = MIN_PEER_GROUP_SAMPLE_SIZE,
 ) -> RealAxisAResult:
     """메모리의 스냅샷 레코드를 A축→유사군→백분위 점수까지 연결한다."""
     vessel_by_id = {v.get("vesselId"): v for v in vessels if v.get("vesselId")}
@@ -177,7 +177,7 @@ class RealAxisAAdapter:
             axis_results,
             groups,
             vessel_to_key,
-            min_peer_size=20,
+            min_peer_size=MIN_PEER_GROUP_SAMPLE_SIZE,
         )
 
     @lru_cache(maxsize=1)
