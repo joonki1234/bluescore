@@ -239,3 +239,6 @@ data_new/processed/*
 # 보고 추가(2026-08-18). gearType이 final_vessel_matches.jsonl의 축약된
 # tac 딕셔너리엔 안 담겨있어 vesselNoTac으로 원본을 다시 조회해야 함.
 !data_new/processed/tac_vessels_normalized.jsonl
+# 카카오 지오코딩 캐시(process/geocode_kakao.py) — 재실행할 때마다 API를
+# 또 부르는 낭비를 막음, 588개 고유 지명이라 작음(~40KB) — 2026-08-18
+!data_new/processed/kakao_geocode_cache.json

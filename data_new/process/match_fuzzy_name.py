@@ -1,21 +1,30 @@
-"""매칭 3단계 — 이름(+톤수 있으면 보너스) 다중신호 fuzzy 매칭.
+"""매칭 3단계 — GFW 선박과 TAC/어선원부를 한글 직접비교로 매칭한다.
 
-조인키 설계(PROCESS_LOG.md 12번) 3단계. 1·2단계(정확일치)로 못 붙은
-GFW 선박에 대해, TAC/어선원부/MOF의 한글 이름을 로마자로 변환한 뒤 GFW
-자기신고 로마자명과 유사도를 비교한다. MOF는 이미 그 GFW 선박 이름으로
-검색해서 나온 결과라(collect/mof.py) 전역 후보 풀이 아니라 해당 선박
-전용 후보로만 추가한다.
+기존엔 GFW 자기신고 로마자명을 로마자로 변환한 TAC/어선원부 이름과
+유사도(SequenceMatcher)로 비교했다. 사람이 GFW 영문명 4,662척 전체를
+직접 한글로 재변환한 데이터(`gfw_korean_name_candidates.csv`)가 생기면서
+로마자 대신 한글 원문끼리 직접 비교할 수 있게 됐고, 검증 결과(사람
+스팟체크로 발견한 여러 버그 수정 포함) 로마자 유사도의 구조적 오탐
+("-성호"류, 서로 다른 이름인데 로마자로 바꾸면 끝부분이 겹쳐서 점수가
+높게 나옴)을 없앨 수 있다고 확인돼 이 방식으로 교체함(2026-08-18,
+`data_new/matching_redesign_proposal/README.md`에 검증 과정 전체 기록).
 
-**표준 로마자 변환 규칙을 안 따를 수 있다는 점 감안**(사용자 지적,
-2026-08-17) — 자기신고자가 발음나는 대로 대충 썼을 수 있어, 변환 결과와
-정확히 같아야 인정하지 않고 편집거리 기반 유사도 점수로 순위만 매긴다.
-자동으로 accept/reject하지 않음 — 옛날 TAC 이름매칭이 정밀도 7.5~13.2%
-한계에 부딪혔던 사례(PROCESS_LOG.md 1번)를 반복하지 않기 위해, 후보와
-점수만 산출하고 임계값·최종 판정은 이후 결정으로 미룬다.
+매칭 규칙 4단계:
+1. 한글 직접비교(exact match만, fuzzy 유사도는 안 씀)
+2. 숫자 하드필터 — 자릿수 상관없이 GFW·후보 양쪽에 다 숫자가 보이는데
+   값이 다르면 배제
+3. "제N호" 정규화 — TAC/어선원부 원문은 "제707태근호"처럼 선단
+   일련번호를 이름에 그대로 갖고 있는데 GFW 쪽 한글변환은 숫자를
+   분리해서 뺐으므로, 비교 시 pool 쪽에서도 이 접두어를 한 번 더 뗀다
+4. 카카오 지오코딩 거리 확인 — 이름이 동률(후보 2개+)이면 GFW
+   조업위치와 후보 항구 거리로 판단. 후보 전원의 위치를 확인할 수
+   있고 유일하게 ≤150km면 verified(근해어업은 등록항에서 150km까지도
+   나가 조업). 후보 중 하나라도 위치를 확인 못 하면 "모른다"를
+   "가깝다"로 오판하지 않도록 확정하지 않는다.
 
-**한계**: GFW 쪽 톤수는 `registryInfo`가 있는 소수(우리 모집단 대부분
-없음, PROCESS_LOG.md 9번)에만 있어, 톤수 교차확인은 "있으면 보너스" 수준
-— 이름이 사실상 유일하게 항상 쓸 수 있는 신호다.
+한글 후보가 없는 GFW 벡터(범용 영문명 등, ~17%)는 비교 대상 자체가
+없어 바로 매칭실패로 낸다 — 로마자 유사도 fallback은 검증 결과
+오탐이 많아 안 쓴다.
 
 사용법:
     python match_fuzzy_name.py
@@ -23,27 +32,24 @@ GFW 선박에 대해, TAC/어선원부/MOF의 한글 이름을 로마자로 변�
 
 from __future__ import annotations
 
+import csv
 import json
 import math
 import re
 from collections import defaultdict
-from difflib import SequenceMatcher
 from pathlib import Path
 
-from korean_romanizer.romanizer import Romanizer
+from geocode_kakao import geocode_kakao
 
 PROCESSED = Path(__file__).resolve().parent.parent / "processed"
 GFW_VESSELS_PATH = PROCESSED / "gfw_vessels_normalized.jsonl"
 TAC_PATH = PROCESSED / "tac_vessels_normalized.jsonl"
 REGISTRY_PATH = PROCESSED / "vessel_registry_normalized.jsonl"
-MOF_PATH = PROCESSED / "mof_candidates_normalized.jsonl"
-PORTS_PATH = PROCESSED / "ports_normalized.jsonl"
 EVENTS_PATH = PROCESSED / "gfw_events_normalized.jsonl"
+KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "gfw_korean_name_candidates.csv"
 OUT_PATH = PROCESSED / "fuzzy_name_candidates.jsonl"
 
-TOP_N = 3  # GFW 선박 1척당 남길 후보 수
-# 항구까지 이 거리(km) 이내면 만점 보너스, 멀수록 선형으로 줄어듦. 잠정값.
-LOCATION_BONUS_MAX_KM = 100.0
+LOC_VERIFIED_KM = 150.0  # 근해어업은 등록항에서 150km까지도 나가 조업(사용자 확인, 2026-08-18)
 
 
 def _haversine_km(lat1, lon1, lat2, lon2) -> float:
@@ -75,132 +81,157 @@ def _normalize(s: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", (s or "").upper())
 
 
-def _romanize(korean_name: str) -> str:
-    try:
-        return Romanizer(korean_name).romanize()
-    except Exception:
-        return ""
+def _any_digit(s: str) -> str:
+    """이름에 보이는 숫자 하나(자릿수 제한 없음). 불일치하면 다른 배라는
+    신호는 자릿수와 무관하게 신뢰할 수 있다(사람 스팟체크로 검증)."""
+    m = re.search(r"(\d+)", s)
+    return m.group(1) if m else ""
 
 
-def _similarity(a: str, b: str) -> float:
-    return SequenceMatcher(None, a, b).ratio()
+def _strip_ho(name: str) -> str:
+    name = (name or "").strip()
+    return name[:-1] if name.endswith("호") else name
+
+
+def _strip_je_number(base: str) -> str:
+    """"제707태근" -> "태근". GFW 쪽 한글변환은 숫자를 통째로 분리해서
+    뺐는데(letterPart_호제외 컬럼), TAC/어선원부 원문은 "제N호" 선단
+    일련번호를 이름에 그대로 갖고 있어 exact match가 실패한다. 숫자
+    일치는 별도 하드필터(_any_digit)로 이미 확인하니 여기서 또 떼도
+    변별력 손실 없음 — 비교 전용 정규화일 뿐 표시용 원본 이름은
+    그대로 둔다."""
+    return re.sub(r"^제\d+", "", base)
+
+
+def _load_korean_candidates() -> dict:
+    out = {}
+    with KOREAN_CSV_PATH.open(encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            cands = [c.strip() for c in row["koreanNameCandidates"].split("|") if c.strip()]
+            out[row["vesselId"]] = cands
+    return out
+
+
+def _build_pool() -> list:
+    pool = []
+    for t in _load_jsonl(TAC_PATH):
+        pool.append({"source": "tac", "name": t["nameTac"], "key": t["vesselNoTac"], "tonnage": t["tonnageGtTac"], "ports": t.get("portNamesTac") or []})
+    for r in _load_jsonl(REGISTRY_PATH):
+        pool.append({"source": "vessel_registry", "name": r["nameRegistry"], "key": r["vesselNoRegistry"], "tonnage": r["tonnageGtRegistry"], "ports": [r["portNameRegistry"]] if r.get("portNameRegistry") else []})
+    for p in pool:
+        p["base"] = _strip_ho(p["name"])
+        p["compareBase"] = _strip_je_number(p["base"])
+        # 숫자는 ASCII라 _normalize(한글 다 지움) 없이 base 원문에 바로 찾는다.
+        # compareBase("제N호" 뗀 것)에서 찾으면 그 숫자 자체가 지워져 있어 안 됨.
+        p["anyDigit"] = _any_digit(p["base"])
+    return pool
+
+
+def _nearest_port_km(centroid, port_names) -> float | None:
+    if not centroid:
+        return None
+    best = None
+    for port_name in port_names:
+        coord = geocode_kakao(port_name)
+        if not coord:
+            continue
+        d = _haversine_km(centroid[0], centroid[1], coord[0], coord[1])
+        if best is None or d < best:
+            best = d
+    return best
+
+
+def _try_resolve_by_nearest(passing: list):
+    """동률 후보 중 유일하게 최근접인 게 있으면 그 후보, 없으면 None.
+    후보 중 하나라도 지오코딩 실패로 거리를 못 구했으면 확정하지 않는다
+    — "거리 모름"을 "후보 아님"으로 취급하면 지오코딩 안 된 후보가
+    조용히 비교에서 빠지고 지오코딩된 후보 1개만 "유일한 최근접"으로
+    둔갑하는 문제가 있었다(사람 스팟체크로 발견)."""
+    if any(p["distKm"] is None for p in passing):
+        return None
+    nearest = min(passing, key=lambda x: x["distKm"])
+    others = [p["distKm"] for p in passing if p is not nearest]
+    if others and min(others) - nearest["distKm"] <= 0.05:
+        return None  # 동률(공동 최근접) — 못 정함
+    if nearest["distKm"] <= LOC_VERIFIED_KM:
+        return nearest
+    return None
 
 
 def run() -> None:
     gfw_vessels = _load_jsonl(GFW_VESSELS_PATH)
-    tac_vessels = _load_jsonl(TAC_PATH)
-    registry_rows = _load_jsonl(REGISTRY_PATH)
-    mof_queries = _load_jsonl(MOF_PATH) if MOF_PATH.exists() else []
-    mof_by_gfw_id = {m["gfwVesselId"]: m["candidates"] for m in mof_queries}
+    pool = _build_pool()
+    centroids = _vessel_centroids(_load_jsonl(EVENTS_PATH))
+    gfw_korean = _load_korean_candidates()
 
-    ports = {p["portName"]: (p["latitude"], p["longitude"]) for p in _load_jsonl(PORTS_PATH)} if PORTS_PATH.exists() else {}
-    centroids = _vessel_centroids(_load_jsonl(EVENTS_PATH)) if EVENTS_PATH.exists() else {}
-
-    # 매칭 후보 풀(전체 GFW 선박 공통): (출처, 이름, 톤수, 항구명들, 부가정보) 하나로 합침.
-    # MOF는 풀에 안 넣는다 — 이미 특정 GFW 선박 이름으로 검색해서 나온
-    # 결과라 그 배 전용 후보이지, 다른 GFW 선박과 비교할 대상이 아님.
-    pool = []
-    for t in tac_vessels:
-        pool.append(
-            {"source": "tac", "name": t["nameTac"], "tonnage": t["tonnageGtTac"], "key": t["vesselNoTac"], "ports": t.get("portNamesTac") or []}
-        )
-    for r in registry_rows:
-        pool.append(
-            {
-                "source": "vessel_registry",
-                "name": r["nameRegistry"],
-                "tonnage": r["tonnageGtRegistry"],
-                "key": r["vesselNoRegistry"],
-                "ports": [r["portNameRegistry"]] if r.get("portNameRegistry") else [],
-            }
-        )
-    for p in pool:
-        p["romanized"] = _normalize(_romanize(p["name"]))
-
+    counts = {"verified": 0, "held_multi": 0, "no_korean": 0, "unmatched": 0}
     results = []
+
     for gfw in gfw_vessels:
-        gfw_name = gfw["selfReportedName"] or gfw["registryName"]
-        if not gfw_name:
+        vessel_id = gfw["vesselId"]
+        name = gfw["selfReportedName"] or gfw["registryName"]
+        result = {"gfwVesselId": vessel_id, "gfwName": name, "category": None, "candidate": None, "distKm": None}
+
+        if not name:
+            result["category"] = "unmatched"
+            counts["unmatched"] += 1
+            results.append(result)
             continue
-        gfw_norm = _normalize(gfw_name)
-        gfw_tonnage = gfw["registryTonnageGt"]  # 대부분 None(위 한계 참고)
-        gfw_centroid = centroids.get(gfw["vesselId"])  # 이벤트 있으면 항상 있음
 
-        vessel_pool = list(pool)
-        for mof_cand in mof_by_gfw_id.get(gfw["vesselId"], []):
-            if not mof_cand.get("vsslKorNm"):
+        norm = _normalize(name)
+        gfw_any_digit = _any_digit(norm)
+        centroid = centroids.get(vessel_id)
+        korean_cands = gfw_korean.get(vessel_id, [])
+
+        if not korean_cands:
+            result["category"] = "no_korean"
+            counts["no_korean"] += 1
+            results.append(result)
+            continue
+
+        passing = []
+        for p in pool:
+            if gfw_any_digit and p["anyDigit"] and gfw_any_digit != p["anyDigit"]:
                 continue
-            # MOF Info3는 어선 전용이 아니라 국내 등록 선박 전체 대상 검색이라,
-            # 어선(vsslKnd 91=연근해어선/92=원양어선)이 아닌 배(상선 등)가
-            # 이름만 우연히 겹쳐 후보로 들어오는 오염이 실측으로 확인됨
-            # (외국적 대형 컨테이너선·벌크선이 톤수 이상치로 매칭된 사례,
-            # PROCESS_LOG.md 39번) — 어선 코드만 후보로 남긴다.
-            vssl_knd = mof_cand.get("vsslKnd") or ""
-            if not (vssl_knd.startswith("91") or vssl_knd.startswith("92")):
-                continue
-            vessel_pool.append(
-                {
-                    "source": "mof",
-                    "name": mof_cand["vsslKorNm"],
-                    "tonnage": mof_cand.get("grtg"),
-                    "key": mof_cand.get("vsslNo") or mof_cand.get("clsgn"),
-                    "ports": [],  # MOF 응답엔 항구 정보 없음
-                    "romanized": _normalize(_romanize(mof_cand["vsslKorNm"])),
-                }
-            )
+            if p["base"] in korean_cands or p["compareBase"] in korean_cands:
+                dist = _nearest_port_km(centroid, p["ports"])
+                passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "tonnage": p["tonnage"], "distKm": dist})
 
-        scored = []
-        for p in vessel_pool:
-            if not p["romanized"]:
-                continue
-            name_score = _similarity(gfw_norm, p["romanized"])
-            tonnage_bonus = 0.0
-            if gfw_tonnage and p["tonnage"]:
-                try:
-                    diff_ratio = abs(float(gfw_tonnage) - float(p["tonnage"])) / float(gfw_tonnage)
-                    tonnage_bonus = max(0.0, 0.1 * (1 - diff_ratio))
-                except (ValueError, ZeroDivisionError):
-                    pass
+        if not passing:
+            result["category"] = "unmatched"
+            counts["unmatched"] += 1
+            results.append(result)
+            continue
 
-            location_bonus = 0.0
-            nearest_port_km = None
-            if gfw_centroid:
-                for port_name in p.get("ports", []):
-                    coord = ports.get(port_name)
-                    if not coord:
-                        continue
-                    dist = _haversine_km(gfw_centroid[0], gfw_centroid[1], coord[0], coord[1])
-                    if nearest_port_km is None or dist < nearest_port_km:
-                        nearest_port_km = dist
-                if nearest_port_km is not None:
-                    location_bonus = max(0.0, 0.1 * (1 - nearest_port_km / LOCATION_BONUS_MAX_KM))
+        distinct = {(c["source"], c["key"]) for c in passing}
+        winner = None
+        if len(distinct) == 1:
+            p = passing[0]
+            if p["distKm"] is None or p["distKm"] <= LOC_VERIFIED_KM:
+                winner = p
+        else:
+            winner = _try_resolve_by_nearest(passing)
 
-            scored.append(
-                {
-                    **p,
-                    "nameScore": round(name_score, 3),
-                    "tonnageBonus": round(tonnage_bonus, 3),
-                    "locationBonus": round(location_bonus, 3),
-                    "nearestPortKm": round(nearest_port_km, 1) if nearest_port_km is not None else None,
-                }
-            )
+        if winner is not None:
+            result["category"] = "verified"
+            result["candidate"] = {"source": winner["source"], "key": winner["key"], "name": winner["name"], "tonnage": winner["tonnage"]}
+            result["distKm"] = winner["distKm"]
+            counts["verified"] += 1
+        else:
+            result["category"] = "held_multi"
+            counts["held_multi"] += 1
 
-        scored.sort(key=lambda x: x["nameScore"] + x["tonnageBonus"] + x["locationBonus"], reverse=True)
-        top = scored[:TOP_N]
-        results.append({"gfwVesselId": gfw["vesselId"], "gfwName": gfw_name, "candidates": top})
+        results.append(result)
 
     with OUT_PATH.open("w", encoding="utf-8") as out:
         for r in results:
             out.write(json.dumps(r, ensure_ascii=False) + "\n")
 
-    print(f"GFW {len(gfw_vessels)}척 중 이름 있는 {len(results)}척에 대해 후보 산출 -> {OUT_PATH}")
-    for r in results:
-        print(f"\nGFW {r['gfwName']!r} ({r['gfwVesselId']}):")
-        for c in r["candidates"]:
-            print(
-                f"  {c['source']} {c['name']!r}({c['romanized']}) nameScore={c['nameScore']} "
-                f"tonnageBonus={c['tonnageBonus']} locationBonus={c['locationBonus']}(nearestPort={c['nearestPortKm']}km)"
-            )
+    total = len(results)
+    print(f"GFW {total}척 한글 직접비교 매칭 결과:")
+    for k, v in counts.items():
+        print(f"  {k}: {v}척 ({v / total * 100:.1f}%)")
+    print(f"-> {OUT_PATH}")
 
 
 if __name__ == "__main__":

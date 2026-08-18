@@ -1,13 +1,15 @@
 # GFW↔국내등록 선박 매칭 재설계 검토 (2026-08-18, 김태윤)
 
-상태: **팀 결정 대기**. 로마자 유사도 매칭을 한글 직접비교로 바꾸면 정밀도가
-얼마나 오르고 대신 뭘 잃는지 정리한 자료. 반영 여부는 팀 결정 필요.
+상태: **채택됨(2026-08-18)** — 라이브 파이프라인(`data_new/process/
+match_fuzzy_name.py`, `assemble_matches.py`)에 이미 반영·재실행 완료.
+아래는 이 결정에 이른 검증 과정 기록.
 
 ## 배경
 
-현재 라이브에 커밋된 매칭(`data_new/process/assemble_matches.py`,
-`FUZZY_NAME_THRESHOLD=0.8`)은 GFW 자기신고 영문명을 로마자로 변환해 국내
-등록명(TAC·어선원부)과 문자열 유사도로 비교한다. 사람 라벨링 80쌍 검증에서
+기존 라이브 매칭(`data_new/process/assemble_matches.py`,
+`FUZZY_NAME_THRESHOLD=0.8`, 이번에 교체됨)은 GFW 자기신고 영문명을
+로마자로 변환해 국내 등록명(TAC·어선원부)과 문자열 유사도로 비교했다.
+사람 라벨링 80쌍 검증에서
 **정밀도 약 75%**로 이미 팀 결정에 반영돼 있다(CLAUDE.md 10번) — 매칭
 2,881척(54.1%) 중 약 720척은 오탐으로 추정된다.
 
@@ -65,42 +67,33 @@ GFW 영문명 4,662척 전체를 사람이 직접 한글로 재변환한 데이�
 | unmatched | 1,905 | 35.8% | 변환추측 실패 또는 실제 미등록 |
 | no_name | 661 | 12.4% | GFW 이름 자체 없음, 기존과 동일 |
 
-## 선택지
+## 검토했던 선택지와 결정
 
-**A. 현행 유지** (작업량 없음) — 커버리지 54.1% / 정밀도 ~75%.
+A(현행 유지)·B(숫자필터만 추가)·C(한글비교로 전체 교체) 세 안을
+검토했고 **C를 채택**했다 — verified 1,262척(23.7%)로 커버리지는
+줄지만(기존 54.1%) 오탐이 사실상 0에 가까워진다(기존 추정 오탐
+~720척). 스키마 호환이라 B축 소비 코드(`score/real_axis_b_input.py`)는
+안 건드려도 됐다(`tac`/`mof` 객체 존재 여부만 읽지 `matchTier` 값은
+안 봄, 실측 확인함). 카카오맵 API 키 필요(`.env`의 `KAKAO_API_KEY`,
+개발자 콘솔에서 "카카오맵" 제품 활성화 필요).
 
-**B. 숫자필터만 추가** (작음) — 이미 팀이 인용한 근거(PROCESS_LOG 49번)를
-기존 로마자매칭 코드에 실제로 반영. 위험 적음, 즉시 가능.
-
-**C. 한글비교로 전체 교체** (중간 — 시뮬레이션 코드 포팅) — verified
-1,262척 = 23.7% 커버리지. 스키마 호환이라 B축 소비 코드
-(`score/real_axis_b_input.py`)는 안 건드려도 됨(`tac`/`mof` 객체 존재
-여부만 읽지 `matchTier` 값은 안 봄, 실측 확인함). 단 "0.8 임계값 재론
-불필요"로 못박은 팀 결정을 사실상 뒤집는 변경. 카카오맵 API 키가
-필요함(`.env`의 `KAKAO_API_KEY`, 개발자 콘솔에서 "카카오맵" 제품
-활성화 필요).
-
-## 팀 결정 필요
-
-1. **A/B/C 중 방향** — 마감 압박 감안해서 지금 시점에 반영할지, 이번
-   제출은 현행 유지하고 다음으로 미룰지
-2. **(C 선택 시) held_multi(1,402척) 처리** — unmatched처럼 블록
-   (`ui/adapter.py`의 `matchingFailed` 게이팅) 권장. 다시 좁히려면
-   TAC/어선원부 위치정보 커버리지를 더 확충하는 게 다음 라운드 후보.
+held_multi(1,402척)는 unmatched처럼 블록 처리한다(`ui/adapter.py`의
+`matchingFailed` 게이팅) — 이름 같은 배가 실제로 여러 척이거나 위치
+확인이 안 돼 어느 후보인지 근거가 없는 상태라 억지로 안 붙인다. 다시
+좁히려면 TAC/어선원부 위치정보 커버리지를 더 확충하는 게 다음
+라운드 후보.
 
 ## 재현/참고
 
-- 이 폴더(`data_new/matching_redesign_proposal/`)가 이 제안 전체의 위치다
-  — 입력 데이터(`gfw_korean_name_candidates.csv`), 위치신호 의존성
-  (`geocode_kakao.py`, 카카오맵 API), 시뮬레이션 스크립트, 결과물(`output/`)이
-  전부 여기 모여있다. 라이브 파이프라인(`data_new/process/`)과는 완전히
-  분리돼있어 채택 안 해도 그쪽엔 아무 영향 없다.
+- **채택 후 실제 코드는 `data_new/process/match_fuzzy_name.py`·
+  `assemble_matches.py`에 있다** — 입력 데이터(`data_new/
+  gfw_korean_name_candidates.csv`), 지오코더(`data_new/process/
+  geocode_kakao.py`)도 다 그쪽으로 옮겨졌다. 이 폴더는 검증 과정
+  기록(시뮬레이션 스크립트, 웹 탐색기용 데이터)만 남아있다.
 - 웹 탐색기(실제 데이터 검색·필터링): 별도 공유된 링크 참고 — 매칭 규칙
   설명 + 5,323척 전체를 카테고리/이름으로 검색해서 기존판정과 나란히
-  비교 가능.
-- 재현: `python data_new/matching_redesign_proposal/simulate_korean_name_matching.py`
-  — 요약 통계 출력 + `output/korean_matching_comparison.jsonl` 생성
-  (GFW 5,323척 전부, 척당 기존 판정과 이번 판정을 나란히 기록).
-- 아직 실제 파이프라인(`data_new/process/match_fuzzy_name.py`·
-  `assemble_matches.py`)에는 미반영 — 채택 결정 후 포팅 필요.
-- 관련 근거: CLAUDE.md 10번(매칭 임계값 확정), PROCESS_LOG.md 49번(숫자신호 검증)
+  비교 가능(채택 전 검증 시점 스냅샷).
+- 재현(라이브): `python data_new/process/match_fuzzy_name.py &&
+  python data_new/process/assemble_matches.py`
+- 관련 근거: CLAUDE.md 10번(매칭 임계값 확정, 이번에 재론됨), PROCESS_LOG.md
+  49번(숫자신호 검증)

@@ -1,11 +1,10 @@
 """한글 직접비교 매칭 재설계 시뮬레이션 (이 폴더의 README.md 근거).
 
-로마자 유사도 대신, 사람이 GFW 영문명을 직접 한글로 변환한 후보
-(`gfw_korean_name_candidates.csv`)를 TAC/어선원부 원문 한글과 직접
-비교하면 정밀도가 얼마나 오르는지(대신 커버리지를 얼마나 잃는지)
-확인한다. **아직 실제 파이프라인(data_new/process/match_fuzzy_name.py,
-assemble_matches.py)에 반영 안 됨** — 팀 결정(README.md 참고) 전까지는
-이 스크립트가 유일한 산출 경로다.
+**2026-08-18 채택됨 — 라이브 파이프라인(`data_new/process/match_fuzzy_name.py`,
+`assemble_matches.py`)에 이미 반영됨.** 이 스크립트는 그 검증 과정의
+기록으로 남겨둔다(로직은 라이브 버전과 동일, 카테고리 세분화·old/new
+비교 파일 출력 등 탐색용 기능만 더 있음) — 실제 매칭 산출은 이제
+`process/match_fuzzy_name.py`가 담당한다.
 
 핵심 설계(자세한 배경은 README.md 참고):
 - 이름비교는 exact match만 쓴다(로마자 유사도 fuzzy는 구조적 오탐이 있어 안 씀)
@@ -40,7 +39,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "process"))
 
-from geocode_kakao import geocode_kakao  # noqa: E402
+from geocode_kakao import geocode_kakao  # noqa: E402 — data_new/process/에서 옮겨옴, sys.path로 찾음
 from match_fuzzy_name import (  # noqa: E402
     EVENTS_PATH,
     GFW_VESSELS_PATH,
@@ -71,7 +70,7 @@ def _any_digit(normalized: str) -> str:
     return m.group(1) if m else ""
 
 
-KOREAN_CSV_PATH = Path(__file__).resolve().parent / "gfw_korean_name_candidates.csv"
+KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "gfw_korean_name_candidates.csv"  # data_new/ 최상위로 이동됨(채택 후)
 OLD_MATCHES_PATH = Path(__file__).resolve().parent.parent / "processed" / "final_vessel_matches.jsonl"
 COMPARISON_OUT_PATH = Path(__file__).resolve().parent / "output" / "korean_matching_comparison.jsonl"
 ROMAN_FALLBACK_THRESHOLD = 0.85  # 한글후보 자체가 없는 벡터에만 씀

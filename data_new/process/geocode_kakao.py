@@ -1,12 +1,13 @@
-"""카카오 로컬 API(키워드 장소검색) 지오코딩 — 유일한 지오코딩 경로.
+"""카카오 로컬 API(키워드 장소검색) 지오코딩 — TAC/어선원부 항구명의
+유일한 지오코딩 경로(match_fuzzy_name.py에서 씀).
 
-원래 어항113개 큐레이션 목록 + 시군구centroid 폴백 2단계를 썼는데,
+어항113개 큐레이션 목록 + 시군구centroid 폴백 2단계로 먼저 시도했는데,
 "대천항"처럼 시군구명 토큰이 아예 없는 항구 고유명사는 구조적으로 못
-찾는 한계가 있었다(322/588개 지명, README.md 발견 6). 카카오는 일반
-장소검색이라 이런 이름도 찾을 확률이 높아 — 여러 방법 섞지 말고 이거
-하나로 통일한다(어항목록·geocode_kr.py는 더 이상 안 씀). 단 "부산직"
-처럼 원본 데이터 자체가 잘린 문자열은 카카오로도 못 찾는다(지오코딩
-문제가 아니라 데이터 정제 문제).
+찾는 한계가 컸다(고유 지명 588개 중 322개 실패). 카카오는 일반 장소검색
+이라 이런 이름도 대부분 찾음 — TAC 위치확인율 66.2%→96.4%, 어선원부
+18.7%→94.7%로 개선 확인(data_new/matching_redesign_proposal/README.md
+참고). 단 "부산직"처럼 원본 데이터 자체가 잘린 문자열은 카카오로도
+못 찾는다(지오코딩 문제가 아니라 데이터 정제 문제).
 
 결과를 로컬 JSON에 캐싱한다 — 같은 지명이 TAC/어선원부 여러 행에서
 반복 등장하고(588개 고유 지명뿐), 재실행할 때마다 API를 또 부르는 건
@@ -28,7 +29,7 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 KAKAO_URL = "https://dapi.kakao.com/v2/local/search/keyword.json"
-CACHE_PATH = Path(__file__).resolve().parent / "output" / "kakao_geocode_cache.json"
+CACHE_PATH = Path(__file__).resolve().parent.parent / "processed" / "kakao_geocode_cache.json"
 
 
 def _load_cache() -> dict:
@@ -80,9 +81,6 @@ def geocode_kakao(query: str) -> tuple | None:
 
 
 if __name__ == "__main__":
-    import sys
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "process"))
     from match_fuzzy_name import _load_jsonl, TAC_PATH, REGISTRY_PATH  # noqa: E402
 
     names = set()
