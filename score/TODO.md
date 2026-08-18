@@ -225,10 +225,15 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       6개). `services/metadata.py`의 `REAL_DATA_SNAPSHOT_ID`도 실제 데이터
       출처와 맞게 갱신(최지희님 파일, 라벨이 실제와 안 맞으면 재현성 계약이
       깨져서 같이 고침).
-      **결과**: 5,323척 중 `partial`(A축 실산출됨) 3,887척(73%),
-      `insufficientSample` 1,427척(27%), `matchingFailed` 9척.
-      **알려진 한계**: `fishingType`을 아직 못 채움 — data_new의 공개분에
-      GFW 자체 gear 정보(`gfw_vessels_normalized.jsonl` 등)가 없어서
-      전부 빈 리스트. 유사군이 톤수·해역·계절만으로 묶여서 `insufficientSample`
-      비율이 실제보다 다소 높게 나올 수 있음 — GFW gear 정보가 추가
-      공개되면 `convert_data_new_vessels.py`만 보강하면 됨.
+      **결과(gearType 미반영 시점)**: 5,323척 중 `partial`(A축 실산출됨)
+      3,887척(73%), `insufficientSample` 1,427척(27%), `matchingFailed` 9척.
+      **(2026-08-18 후속) `gfw_vessels_normalized.jsonl` 공개돼 fishingType
+      반영함** — `load_gear_types()`가 GFW `combinedGearTypes`를 읽어 채움.
+      단, **실측으로 큰 트레이드오프를 발견**: 뭉뚱그려진 라벨(FISHING/NA 등,
+      전체 44%)까지 그대로 그룹 키로 쓰면 유사군이 과도하게 쪼개져서 A축
+      실산출이 73%→32%로 급락함. 자기모순 라벨(CARGO 등)과 함께 뭉뚱그려진
+      라벨도 제외(=None 취급, 구체적 gear만 그룹핑에 씀)하도록 수정해서
+      42.6%(2,269척)까지 회복. **여전히 gearType 미사용(73%)보다는 낮음** —
+      팀 논의 결과 현재 버전(구체적 gear만)으로 일단 유지, 태윤님이 국내
+      어업종↔GFW 영문 통합 작업을 별도로 진행 중이라 그 결과 나오면
+      재검토 예정. 테스트 7개 추가(자기모순/뭉뚱그림 라벨 제외 검증 포함).
