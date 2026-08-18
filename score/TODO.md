@@ -7,8 +7,9 @@
 - A축과 B축은 같은 추적 선박 입력을 사용하며 서비스는 파생
   `vessels_for_score.jsonl.gz`/`axis_b_input.jsonl`을 요구하지 않는다.
 - 구체적인 GFW fishingType을 B축 `gearType`에 연결했다. 현재 서비스 입력은
-  선박 5,323척, 톤수 1,234척, fishingType 2,682척, 둘 다 665척이다.
-- 실산출 상태는 success 289척, partial 3,395척, insufficientSample 1,630척,
+  선박 5,323척, 톤수 712척(13.4%, TAC 유일성 강제 + 원양선 제외 반영 후
+  최종값), fishingType 2,682척, 둘 다 368척이다.
+- 실산출 상태는 success 73척, partial 3,909척, insufficientSample 1,332척,
   matchingFailed 9척이다. 아래 864척·807척 등의 값은 중간 스냅샷 결과다.
 - 날씨 단위, 모델 계수, 가중치와 금리 정책은 아직 검증 전이며 완료로 보지 않는다.
 

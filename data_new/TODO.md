@@ -13,7 +13,9 @@
   `gearType`은 구체적인 GFW fishingType을 결정론적 대표값으로 연결하며 147,441개
   이벤트에 존재한다. 제외 규칙은 CARGO/PASSENGER/CARRIER와 FISHING/OTHER/NA/
   INCONCLUSIVE/GEAR/FIXED_GEAR/TROLLERS/OTHER_PURSE_SEINES/OTHER_SEINES다.
-- 현재 건수는 선박 5,323척, 톤수 1,234척, fishingType 2,682척, 둘 다 665척이다.
+- 현재 건수는 선박 5,323척, 톤수 712척(13.4%, TAC 유일성 강제 + 원양선
+  registryInfo 제외 반영 후 최종값 — `README.md`·`matching_redesign_proposal/
+  README.md` 참고), fishingType 2,682척, 둘 다 368척이다.
   아래의 다른 건수와 파일 부재 설명은 당시 조사 기록으로 보존한다.
 
 ## 완료 — 1~6번(계획·설계 단계)
