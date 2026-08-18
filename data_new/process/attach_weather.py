@@ -139,8 +139,8 @@ def run(dates: list) -> None:
                 out.write(json.dumps(enriched, ensure_ascii=False) + "\n")
                 n_matched += 1
 
-    print(f"이벤트 {n_total}건 중 {n_matched}건에 해양기상 부착, "
-          f"해당 날짜 기상 없음(부착 불가) {n_no_weather}건 -> {OUT_PATH}")
+    print(f"기상 있는 날짜의 이벤트 {n_total}건 중 {n_matched}건에 해양기상 부착, "
+          f"기상 없는 날짜라 부착 불가 {n_no_weather}건(위 {n_total}건에는 미포함) -> {OUT_PATH}")
 
 
 if __name__ == "__main__":

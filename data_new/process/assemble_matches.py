@@ -1,8 +1,8 @@
-"""매칭 4단계 — 3단계(GFW<->TAC 한글 직접비교, match_fuzzy_name.py) 결과를
-최종 판정으로 정리한다.
+"""선박 매칭 후처리 — GFW<->TAC 한글 직접비교(`match_fuzzy_name.py`)
+결과를 최종 서비스 계약으로 정리한다.
 
-3단계가 이미 verified/held_multi/no_korean/unmatched로 판정을 끝내놓기
-때문에 여기서 별도 임계값 판단은 안 한다 — verified만 최종 매칭으로
+앞 단계가 이미 verified/held_multi/no_korean/unmatched로 판정을 끝내므로
+여기서 별도 임계값 판단은 안 한다 — verified만 최종 매칭으로
 쓰고 나머지(held_multi도 포함, "이름 같은 배가 여러 척이라 어느 쪽
 톤수를 써야 할지 근거가 없음")는 전부 매칭실패로 취급한다.
 

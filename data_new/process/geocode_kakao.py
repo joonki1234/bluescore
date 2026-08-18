@@ -76,15 +76,11 @@ def geocode_kakao(query: str) -> tuple | None:
 
 
 if __name__ == "__main__":
-    from match_fuzzy_name import _load_jsonl, TAC_PATH, REGISTRY_PATH  # noqa: E402
+    from match_fuzzy_name import _load_jsonl, TAC_PATH  # noqa: E402
 
     names = set()
     for t in _load_jsonl(TAC_PATH):
         for p in t.get("portNamesTac") or []:
-            names.add(p)
-    for r in _load_jsonl(REGISTRY_PATH):
-        p = r.get("portNameRegistry")
-        if p:
             names.add(p)
 
     names = sorted(names)
