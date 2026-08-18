@@ -36,7 +36,7 @@ def render() -> None:
         unsafe_allow_html=True,
     )
     st.caption(
-        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(data_new/, 2026-04~08월)로 "
+        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(2026-04~08월)로 "
         "계산한 결과입니다. 실제 5,323척 규모 데이터 중 807척에 대해 BlueScore가 "
         "완전 산출됩니다."
     )
