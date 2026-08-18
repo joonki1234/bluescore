@@ -55,6 +55,44 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
 
 ---
 
+- [x] **요인 기여도(SHAP) 실제 계산 구현** — **완료(2026-08-18, 오동규)**:
+      `score/shap_factors.py` 신설. 그동안 `requirements.txt`에 `shap`
+      패키지만 있고 실제로 쓰는 코드는 없어서, 화면의 `shapFactors`는 전부
+      `data/mock/generate_dashboard_mock.py`가 손으로 써넣은 예시 숫자였다 —
+      이걸 실제 계산으로 채웠다.
+      - **A축** `axis_a_factor_contributions()`: `axis_a_pressure_raw`가
+        가중합+상호작용항 수식이라 `shap` 라이브러리 없이 세 항(재방문압력/
+        혼잡압력/상호작용)으로 정확히 분해. 합이 `axis_a_pressure_raw`와
+        정확히 일치함을 실측(91.4만 건 스냅샷)으로도 확인
+        (328.5901 = 328.5901).
+      - **B축** `axis_b_baseline_factor_contributions()`: `shap.TreeExplainer`로
+        LightGBM 기준선(`expected_fuel_kg`) 예측의 피처별 기여도(kg)를
+        분해. **중요한 제약 — 이건 "기준선이 왜 이 값인지"(조건 설명)이지
+        "왜 이 선박의 B축 효율이 좋다/나쁘다"가 아니다.** 효율(잔차)은
+        `estimated_fuel_kg - expected_fuel_kg`라는 단순 뺄셈으로 이미
+        설명이 끝나 있음 — 함수 docstring에 명시해서 나중에 오용 안 되게
+        해둠. SHAP 가법성(모든 피처 기여도 합 + 기준값 = 모델 예측값)도
+        실측으로 확인.
+      - **실행 중 실제 버그 발견·수정**: `axis_b_baseline._rows_to_feature_dataframe()`가
+        행이 1개뿐이고 그 값이 None인 수치형 컬럼을 pandas가 object dtype으로
+        추론해버리는 함정이 있었음(단일행 시 다른 float 값과 섞어볼 게 없어서).
+        `model.predict()`는 이 상태로도 통과하지만, `shap.TreeExplainer`가
+        쓰는 LightGBM의 `pred_contrib=True` 경로는 object dtype을 거부해서
+        `ValueError: pandas dtypes must be int, float or bool`로 실데이터
+        검증 중 실제로 죽었음 — `pd.to_numeric(..., errors="coerce")`로
+        수치형 컬럼을 행 개수와 무관하게 항상 float dtype으로 강제해서 해결.
+        `axis_b_baseline.py`의 다른 소비처(`predict_expected_fuel_kg`,
+        `compute_axis_b_efficiency`)에도 잠재돼 있던 취약점이라 이번 수정으로
+        같이 해소됨. 회귀 테스트 추가(`test_axis_b_baseline.py::TestRowsToFeatureDataframe`).
+      - 테스트 6개(`score/test_shap_factors.py`) + 회귀 테스트 1개, 검증
+        스크립트 `score/scripts/run_shap_factors.py`로 실데이터 확인,
+        `pytest -q` 328 passed(SHAP 관련 전부 통과 — 별개로 실패하는 1개는
+        `api/test_api.py`의 env 서브프로세스 테스트로 Windows 소켓 프로바이더
+        OS 이슈이며 이번 작업과 무관).
+      - **다음 단계(범위 밖, 팀 논의 필요)**: raw 값을 화면 "점수(포인트)"
+        단위로 바꾸는 환산 정책, `explain/contract.ShapFactor`로의 배선,
+        `services/`(최지희) 연결.
+
 - [x] **A축 격자 크기·재방문 스케일 확정** — **완료(2026-08-18, 오동규, 최지희 요청
       회의)**: `GRID_CELL_SIZE_DEG` 0.05→**0.1도**, `REVISIT_PRESSURE_SCALE_HOURS`
       24→**60시간**으로 확정. CLAUDE.md 확정된 규칙 8번에 근거 전문 기록함
