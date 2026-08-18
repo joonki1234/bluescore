@@ -25,9 +25,8 @@ A축(자원 압력) 지표 산출 — 동일·인접 격자 내 조업 이벤트
          axis_a_pressure_raw = revisit_weight * revisit_raw
                               + congestion_weight * congestion_raw
                               + interaction_weight * revisit_raw * congestion_raw
-       (2026-08-13, 오동규·김준기 논의로 결정 — 혼잡한 해역을 반복 착취하는
-       것이 한산한 해역을 반복 방문하는 것보다 자원에 더 큰 압력을 준다는
-       판단에 따름.)
+       (혼잡한 해역을 반복 착취하는 것이 한산한 해역을 반복 방문하는 것보다
+       자원에 더 큰 압력을 준다는 판단에 따라 상호작용항을 추가했다.)
     5. 두 raw 값과 결합값을 선박 단위로 집계해 반환한다.
 
 주의:
@@ -35,7 +34,7 @@ A축(자원 압력) 지표 산출 — 동일·인접 격자 내 조업 이벤트
       담당한다. 절대 점수가 아니며, 점수조립 단계에서 유사 선박군 내 상대값으로
       다시 정규화되어야 한다.
     - 격자 크기(GRID_CELL_SIZE_DEG=0.1도)와 재방문압력 변환 스케일
-      (REVISIT_PRESSURE_SCALE_HOURS=60시간)은 2026-08-18 확정됐다(CLAUDE.md
+      (REVISIT_PRESSURE_SCALE_HOURS=60시간)은 확정값이다(CLAUDE.md
       "확정된 규칙" 8번 참고 — data_new/ 실측 275,782건으로 격자 후보
       0.02~1.0도를 비교해 근거를 마련함). 결합 가중치 3개(AXIS_A_REVISIT_WEIGHT,
       AXIS_A_CONGESTION_WEIGHT, AXIS_A_INTERACTION_WEIGHT)는 여전히 팀에서
@@ -57,7 +56,7 @@ from typing import Dict, List, Optional, Tuple
 import geopandas as gpd
 from shapely.geometry import Point
 
-# 격자 한 변의 크기 (도 단위, 위경도 기준) — 확정값(2026-08-18, CLAUDE.md
+# 격자 한 변의 크기 (도 단위, 위경도 기준) — 확정값(CLAUDE.md
 # 확정된 규칙 8번). data_new/ 실측 275,782건으로 0.02~1.0도 후보를 비교해
 # 재방문 검출률·격자당 평균 이벤트 수를 근거로 정함(0.25도부터 검출률이
 # 91%대로 포화되며 격자당 이벤트가 급증해 "재방문"의 의미가 흐려짐).
@@ -70,7 +69,7 @@ ADJACENT_GRID_CHEBYSHEV_DISTANCE = 1
 #   revisit_pressure = REVISIT_PRESSURE_SCALE_HOURS / (interval_hours + REVISIT_INTERVAL_EPSILON_HOURS)
 # interval이 REVISIT_PRESSURE_SCALE_HOURS(시간)일 때 압력이 대략 1.0이 되도록
 # 스케일링한다. 0시간 나눗셈 방지를 위해 EPSILON을 더한다.
-# 확정값(2026-08-18, CLAUDE.md 확정된 규칙 8번) — GRID_CELL_SIZE_DEG=0.1도
+# 확정값(CLAUDE.md 확정된 규칙 8번) — GRID_CELL_SIZE_DEG=0.1도
 # 기준 실측 재방문 간격 중앙값(59.1시간)에 맞춤. 기존 잠정값 24시간은 실측
 # 중앙값의 1/3도 안 돼 대부분의 선박이 압력 0.1~0.3대에 몰려 변별력이 거의
 # 없었다.

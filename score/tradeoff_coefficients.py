@@ -6,8 +6,7 @@ ui/adapter.py의 "개선 시뮬레이터" 트레이드오프 계수를, 추측�
 
 배경: `ui/adapter.py`에 있던 4개 계수(AXIS_A_GAIN_PER_REVISIT_STEP,
 AXIS_B_COST_PER_REVISIT_STEP, AXIS_B_GAIN_PER_KNOT, AXIS_A_COST_PER_KNOT)는
-전부 "근거 없는 잠정값"이라고 표시돼 있었다(2026-08-14, `TODO(score/ 김준기·
-오동규)` 주석). 이 중 B축 관련 두 개는 `axis_b_physics.py`의 Coello et al.
+전부 "근거 없는 잠정값"이라고 표시돼 있었다. 이 중 B축 관련 두 개는 `axis_b_physics.py`의 Coello et al.
 (2015) 연료식이 연속함수(속도의 3제곱 법칙)이므로 차분으로 실제 값을 구할 수
 있다 — 아래 `axis_b_points_per_knot`, `axis_b_points_per_revisit_step`.
 

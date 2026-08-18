@@ -17,13 +17,13 @@
 그대로 읽어서 score/가 원하는 이름으로 새로 변환만 한다
 (`data/vessel_spec_client.py`가 MOF 원본 필드를 그대로 받아 자체 정규화하는
 것, `services/real_scoring.py`가 GFW 원본 필드를 그대로 읽어 A축을 계산하는
-것과 같은 패턴 — 2026-08-18 오동규·김태윤 논의 결론).
+것과 같은 패턴).
 
-필드별 처리 방침 (전부 2026-08-18 오동규·김태윤 논의로 확정 — `score/TODO.md`
-"B축 입력 병합 스크립트" 항목에 논의 경과 전체 기록):
+필드별 처리 방침(`score/TODO.md`의 "B축 입력 병합 스크립트" 항목에 논의
+경과 전체 기록):
     - `tonnageGt`: `final_vessel_matches.jsonl`의 `tac.tonnageGtTac` 또는
       `mof.tonnageGtMof`(둘 다 문자열, 중첩) 중 있는 쪽을 float로 변환해서 쓴다.
-      **실측 확인함(2026-08-18): `tac`와 `mof`가 동시에 채워진 행은 0건**이라
+      **실측 확인 결과 `tac`와 `mof`가 동시에 채워진 행은 0건**이라
       우선순위/충돌 로직은 필요 없다 — 있는 쪽 하나만 쓰면 된다.
     - `windSpeedMs`(`weather_WIND_SPEED`에서 변환): **m/s로 추정**한다. 이 API
       문서를 직접 확인한 근거는 아니고, (1) 한국 기상청·해양수산부가 풍속
@@ -35,16 +35,16 @@
       타당하다는 정황(위와 동일 근거)만 있고 마찬가지로 공식 확인은 아니다.
     - `currentSpeedMs`(`weather_SURFACE_CURR_SPEED`에서 변환): **단위 추정
       근거조차 없다. 완전 미확인 상태다.**
-    - `seaArea`/`season`: 데이터팀 태그(`population_tags.jsonl`, 2026-08-18
-      기준 아직 생성 안 됨)를 기다리지 않고, `score/peer_grouping.py`의
+    - `seaArea`/`season`: 데이터팀 태그(`population_tags.jsonl`, 아직 생성
+      안 됨)를 기다리지 않고, `score/peer_grouping.py`의
       `region_key()`/`season_key()`를 그대로 재사용한다 — 이벤트 자체의
       위경도·시작시각만 있으면 계산되고 이미 `events_with_weather.jsonl.gz`에
       들어있어서 즉시 채울 수 있다. **단, `region_key()`가 주는 `(row, col)`
       튜플은 `"{row}_{col}"` 문자열로 바꿔서 쓴다** — 튜플을 그대로 LightGBM
       범주형 피처에 넣으면 학습↔예측 사이 카테고리 왕복 과정에서 numpy가
       같은 길이의 튜플들을 2차원 배열로 오인해 리스트로 망가뜨리는 바람에
-      예측 단계에서 `TypeError: unhashable type: 'list'`가 난다(2026-08-18
-      실행 중 실제로 발견, `_sea_area_label()` 참고).
+      예측 단계에서 `TypeError: unhashable type: 'list'`가 난다
+      (`_sea_area_label()` 참고).
     - `gearType`: 이번 배치에서는 `None`으로 둔다(옵션 c로 확정, 나중에 별도
       논의 — 후보는 `population_tags.jsonl`의 뭉뚱그린 태그를 쓰거나
       `data/gear_type_mapping_draft.py`의 TAC 19종 매핑까지 동원하는 것).
@@ -124,13 +124,12 @@ def _load_events(events_path: Path) -> List[dict]:
 def _sea_area_label(latitude, longitude) -> Optional[str]:
     """region_key()의 (row, col) 튜플을 문자열로 바꾼다.
 
-    2026-08-18 실행 중 발견: 튜플을 LightGBM 범주형 피처 값으로 그대로 쓰면
-    안 된다 — 학습 시 LightGBM이 카테고리 목록을 내부적으로 numpy 배열을
-    거쳐 저장하는데, 길이가 같은 튜플들(예: 전부 2튜플)은 numpy가 2차원
-    배열로 해석해버려서 `.tolist()`를 거치면 튜플이 아니라 **리스트**가
-    되고, 리스트는 해시가 안 돼서 예측 단계에서
-    `TypeError: unhashable type: 'list'`로 죽는다(실제로 겪음). 문자열로
-    바꾸면 이 문제가 없다.
+    튜플을 LightGBM 범주형 피처 값으로 그대로 쓰면 안 된다 — 학습 시
+    LightGBM이 카테고리 목록을 내부적으로 numpy 배열을 거쳐 저장하는데,
+    길이가 같은 튜플들(예: 전부 2튜플)은 numpy가 2차원 배열로 해석해버려서
+    `.tolist()`를 거치면 튜플이 아니라 **리스트**가 되고, 리스트는 해시가
+    안 돼서 예측 단계에서 `TypeError: unhashable type: 'list'`로 죽는다.
+    문자열로 바꾸면 이 문제가 없다.
     """
     key = region_key(latitude, longitude)
     if key is None:
