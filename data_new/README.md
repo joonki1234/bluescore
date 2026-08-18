@@ -57,28 +57,22 @@ data_new/
 ```bash
 pip install -r requirements.txt -r ../requirements.txt
 
-# 1. 수집 (collect/) — .env에 GFW_API_KEY/VESSEL_SPEC_API_KEY/MARINE_WEATHER_API_KEY 필요
+# 1. 수집 (collect/) — .env에 GFW_API_KEY/MARINE_WEATHER_API_KEY/KAKAO_API_KEY 필요
 cd collect
 python gfw_events.py --start 2026-04-01 --end 2026-08-15     # 이벤트 먼저(모집단이 여기서 나옴)
 python gfw_vessels.py                                         # 이벤트에서 나온 vesselId 상세조회(건당 1요청)
-python mof.py                                                  # GFW 선박명으로 MOF 검색(15동시 병렬)
 python marine_weather_range.py --start 20260401 --end 20260814 # 이벤트 기간 전체 재수집(날짜별 재개 지원)
-python static_files_check.py                                   # 정적 파일(TAC 등) 구조 검증
 
 # 2. 가공 (process/)
 cd ../process
 python normalize_gfw_events.py
 python normalize_gfw_vessels.py
 python normalize_tac.py
-python normalize_vessel_registry.py
-python normalize_mof.py
 python normalize_ports.py
 
-# 3. 매칭 (1~4단계 순서대로)
-python match_tac_vessel_registry.py     # 1단계: TAC<->어선원부 어선번호 정확일치
-python match_gfw_vessel_registry.py     # 2단계: GFW<->어선원부 콜사인 정확일치
-python match_fuzzy_name.py              # 3단계: 이름+톤수+해역 다중신호 fuzzy
-python assemble_matches.py              # 4단계: 1~3단계 종합 최종 판정
+# 3. 매칭 (GFW<->TAC 한글 직접비교, matching_redesign_proposal/README.md 참고)
+python match_fuzzy_name.py              # 3단계: 한글 직접비교 + 카카오 지오코딩 거리확인
+python assemble_matches.py              # 4단계: 최종 판정 정리
 
 # 4. 부가 가공
 python tag_population.py                                 # 근해/연안·양식업 태그

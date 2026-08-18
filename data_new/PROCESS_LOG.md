@@ -1176,3 +1176,84 @@ explore_match_precision_groundtruth.py`, 읽기전용): tier3(TAC/어선원부
 합리적. 이제 실행 가능한 구체안: **번호일치 신호로 unmatched 134척
 타겟 구제 + 기존 매칭 중 번호불일치 78척 재검토·제외**(44번) —
 정밀도 개선과 구제 둘 다 되는 안.
+
+## 50. 매칭을 로마자 유사도에서 한글 직접비교로 교체(채택) — 44번 이후 상황이 바뀜
+
+44번(숫자신호로 78척 제외+134척 구제) 검토 도중, GFW 영문명 4,662척
+전체를 사람이 직접 한글로 재변환한 데이터(`gfw_korean_name_candidates.csv`)
+가 새로 생겼다 — 이러면 44번처럼 로마자 유사도를 패치하는 것보다,
+애초에 로마자 변환 자체를 건너뛰고 한글 원문끼리 직접 비교하는 게
+근본적으로 나을 수 있어 그 방향으로 전면 재검토했다.
+
+**발견**: 로마자 유사도는 서로 다른 실제 이름인데 로마자로 바꾸면
+끝부분이 겹쳐서 점수가 높게 나오는 구조적 오탐이 있었다(예:
+EUNSEONGHO(은성호)가 금성호로, DEOG YANG HO(덕양호)가 동양호로
+오매칭). 한글 직접비교(exact match만)로 바꾸면 이 문제가 원천적으로
+없어진다. 검증 과정에서 여러 버그를 사람이 직접 웹 탐색기를 훑어보며
+찾아냄(자동 검증만으론 놓쳤을 패턴들) — "제N호" 내부번호 소실,
+지오코딩 실패를 "후보 아님"으로 오판, 숫자 하드필터의 자릿수 사각지대
+등. 전체 검증 기록은 `data_new/matching_redesign_proposal/README.md`.
+
+**최종 설계**: (1) 한글 exact match만 사용(fuzzy 폐기), (2) 숫자
+하드필터를 자릿수 제한 없이 통일(양쪽 다 숫자 보이는데 다르면 배제),
+(3) "제N호" 선단번호 정규화, (4) 카카오 지오코딩(로컬 API)으로 동률
+후보를 거리(≤150km, 근해어업 조업범위 감안)로 판단 — 후보 전원의
+위치를 모르면 확정하지 않음. gearType 보조필터와 헝가리안 전역할당도
+시도했으나 실익이 작거나(gearType) 오탐률이 높아서(헝가리안 19%)
+최종안에서는 뺐다.
+
+**결과**: matched 2,881척(54.1%, 추정 오탐 ~720척) → verified
+1,290척(24.2%, 추정 오탐 거의 0). 커버리지는 줄고 정밀도는 크게
+오름 — 오탐 하나가 B축 점수를 그 배 단위로 완전히 틀어지게 만들 수
+있어 커버리지보다 정밀도를 우선하기로 결정(CLAUDE.md 12번). MOF 경유
+매칭(45·48·49번에서 특히 위험하다고 지적된 부분집합)은 이번 설계에서
+아예 후보풀에서 뺐다 — 이름 검색 자체가 어선보다 상선 위주로 편향돼
+있어 얻는 것보다 오염 위험이 컸다.
+
+`data_new/process/match_fuzzy_name.py`·`assemble_matches.py`에 반영,
+`final_vessel_matches.jsonl` 재생성 완료(2026-08-18). `korean-romanizer`
+의존성 제거, 카카오맵 API(`KAKAO_API_KEY`) 의존성 추가.
+
+## 51. verified 기준에서 "이름만으로 확정"(거리 미확인 28척) 제외 — 예외 없이 단일화(2026-08-18)
+
+50번 verified 1,290척 중 28척은 후보가 이름만으로 유일했지만 거리를
+확인 못 한 채(distKm=None) 통과된 것이었다 — 코드가 `distKm is None
+or distKm <= 150` 조건이라, 진짜 150km 이내인지 검증 안 된 케이스가
+verified에 섞여 있었다. 사용자 확인 결과 기준이 예외 없이 확실한 게
+낫다고 판단, `distKm is not None and distKm <= 150`으로 단일화 —
+후보 개수와 무관하게 거리를 모르면 무조건 held_multi로 보류한다.
+
+**결과**: verified 1,290척 → **1,262척**(28척은 held_multi로 이동,
+1,402→1,430척). `final_vessel_matches.jsonl` 재생성 완료.
+
+## 52. 어선원부를 후보풀에서 완전히 제외 — GFW-TAC 매칭만 사용(2026-08-18)
+
+51번까지도 `match_fuzzy_name.py`의 후보풀은 TAC와 어선원부를 같이 썼다.
+어선원부는 전체 등록대장이 아니라 2006년 처리배치 일부(1,379행, 전부
+현행여부='N')라 TAC보다 신뢰도가 떨어지고, 별도 경로였던 2단계
+(GFW<->어선원부 콜사인 정확일치)도 기여분이 0.1%(3척)뿐이라 사실상
+의미가 없었다. 정리 겸 사용자 결정으로 어선원부를 완전히 빼고
+GFW-TAC 매칭만 쓰기로 확정했다.
+
+**삭제한 것**: `process/match_tac_vessel_registry.py`(1단계),
+`process/match_gfw_vessel_registry.py`(2단계), `process/
+normalize_vessel_registry.py`, 그 산출물(`vessel_registry_normalized.
+jsonl` 등 3개, 원래도 git 비추적). `assemble_matches.py`는 1·2단계
+분기를 걷어내고 verified/unmatched 두 카테고리만 남기게 단순화(필드는
+그대로 `matchTier`/`tac`/`mof` 유지, `mof`는 여전히 None — B축 소비
+코드는 값 안 봐서 영향 없음, 50번에서 확인함).
+
+같은 정리 과정에서 MOF 수집·정규화 스크립트(`collect/mof.py`·
+`mof_korean_retry.py`·`hangul_reverse.py`·`process/normalize_mof.py`)도
+삭제했다 — 매칭 후보풀에서는 이미 50번에서 빠졌고(오탐 위험,
+MOF 경유 저정밀도), 라이브 파이프라인 어디서도 더 이상 안 읽었다
+(`assemble_matches.py`가 `mof`를 항상 None으로 채움). 유일한
+소비처였던 `analysis/explore_match_precision_groundtruth.py`(48번
+분석, 49번에서 이미 결론이 뒤집힘)도 같이 삭제. 미사용 1회성
+스크립트 `collect/static_files_check.py`, 미커밋 실험
+`collect/mof_from_tac.py`도 정리.
+
+**결과**: verified 1,262척(23.7%) → **1,234척(23.2%)**, held_multi
+1,430→1,249척, unmatched 1,847→2,056척. `final_vessel_matches.jsonl`
+재생성 완료. 파이프라인이 GFW 이벤트/선박 수집 → TAC 정규화 → 한글
+직접비교 매칭으로 단순해짐(`data_new/README.md` 실행 순서 갱신).

@@ -216,18 +216,19 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
-def page_title(title: str, subtitle: str, *, badge_html: str = "") -> None:
-    """어업인/금융기관/실산출 화면 최상단 제목 — 담백한 사각 박스 하나로 표시한다.
-    Streamlit 기본 헤딩은 다른 카드들과 존재감이 비슷해 화면 최상단이라는 게
-    눈에 잘 안 들어온다. 좌측 축색 강조 바 + 더 크고 굵은 제목으로 구분한다.
+def page_title(title: str, subtitle: str = "", *, badge_html: str = "") -> None:
+    """어업인/금융기관/실산출 화면 최상단 제목.
+
+    박스·틴트 배경까지 시도했다가 "원래대로, 그냥 텍스트로 하고 옆에 세로
+    네모 포인트만 달라"는 요청으로 되돌렸다 — 일반 텍스트 한 줄("선박 A ·
+    내 조업 성적")에 왼쪽에 작은 남색 세로 막대 하나만 붙인다. subtitle이
+    없으면(예: 실산출 페이지 제목) title만 표시한다.
     """
+    label = f"{title} · {subtitle}" if subtitle else title
     st.markdown(
-        f"""<div class="bs-card" style="padding:16px 18px; margin-bottom:16px;">
-  <div style="display:flex; align-items:baseline; gap:10px;">
-    <span style="font-size:20px; font-weight:700; color:{theme.INK};">{title}</span>
-    {badge_html}
-  </div>
-  <div class="bs-label" style="margin-top:2px;">{subtitle}</div>
+        f"""<div style="display:flex; align-items:center; gap:10px; margin:4px 0 14px;">
+  <div style="width:5px; height:22px; border-radius:2px; background:#1E3A5F; flex-shrink:0;"></div>
+  <div style="font-size:22px; font-weight:700; color:{theme.INK};">{label}{badge_html}</div>
 </div>""",
         unsafe_allow_html=True,
     )

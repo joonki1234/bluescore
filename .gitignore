@@ -229,8 +229,16 @@ data/raw/event_weather/
 data_new/raw/
 
 # processed/도 대부분 재생성 가능한 중간산출물(357MB)이라 안 올림.
-# 팀원 확인용으로 최종 산출물 2개만 예외(1.4MB + gzip 31MB) — 2026-08-18
+# 팀원 확인용으로 최종 산출물만 예외 — 2026-08-18
 data_new/processed/*
 !data_new/processed/final_vessel_matches.jsonl
 !data_new/processed/events_with_weather.jsonl.gz
 !data_new/processed/gfw_vessels_normalized.jsonl
+# tac_vessels_normalized.jsonl(528KB) — score/TODO.md에 팀원이 B축
+# gearType 작업하려다 이 파일 없어서 FileNotFoundError로 막혔다고 기록한 걸
+# 보고 추가(2026-08-18). gearType이 final_vessel_matches.jsonl의 축약된
+# tac 딕셔너리엔 안 담겨있어 vesselNoTac으로 원본을 다시 조회해야 함.
+!data_new/processed/tac_vessels_normalized.jsonl
+# 카카오 지오코딩 캐시(process/geocode_kakao.py) — 재실행할 때마다 API를
+# 또 부르는 낭비를 막음, 588개 고유 지명이라 작음(~40KB) — 2026-08-18
+!data_new/processed/kakao_geocode_cache.json
