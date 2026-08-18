@@ -4,8 +4,8 @@ GFW 자기신고 영문명을 사람이 미리 한글로 변환해둔 후보
 (`gfw_korean_name_candidates.csv`)와 TAC 한글 원문을 대조한다. 로마자
 유사도 대신 한글 원문끼리 비교하는 이유: 로마자로 바꾸면 서로 다른
 실제 이름인데 끝부분이 겹쳐 점수가 높게 나오는 구조적 오탐이 있다
-(예: EUNSEONGHO가 은성호 대신 금성호로 매칭되는 식). 검증 과정 전체
-기록은 `data_new/matching_redesign_proposal/README.md`.
+(예: EUNSEONGHO가 은성호 대신 금성호로 매칭되는 식). 전체 설계·근거는
+`data_new/README.md`.
 
 어선원부·MOF는 후보풀에 안 쓴다 — 어선원부는 전체 등록대장이 아니라
 2006년 처리배치 일부(1,379행, 전부 현행여부='N')라 TAC 대비 신뢰도가
@@ -58,7 +58,7 @@ EVENTS_PATH = PROCESSED / "gfw_events_normalized.jsonl"
 KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "reference" / "gfw_korean_name_candidates.csv"
 OUT_PATH = PROCESSED / "fuzzy_name_candidates.jsonl"
 
-LOC_VERIFIED_KM = 150.0  # 근해어업 조업범위 감안한 보수적 값 — 법·데이터 근거 없음, matching_redesign_proposal/README.md "왜 150km인가" 참고
+LOC_VERIFIED_KM = 150.0  # 근해어업 조업범위 감안한 보수적 값 — 법·데이터 근거 없음, data_new/README.md "알려진 한계" 참고
 
 
 def _haversine_km(lat1, lon1, lat2, lon2) -> float:
