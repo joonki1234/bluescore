@@ -30,7 +30,11 @@ def _discount_text(band: dict) -> str:
 
 
 def render() -> None:
-    st.markdown("### 실산출 미리보기")
+    st.markdown(
+        '### 실산출 미리보기'
+        '<span class="bs-live-badge"><span class="dot"></span>LIVE DATA</span>',
+        unsafe_allow_html=True,
+    )
     st.caption(
         "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(data_new/, 2026-04~08월)로 "
         "계산한 결과입니다. 표본 5,323척 중 A축 실산출 61.0%, BlueScore까지 완전 "

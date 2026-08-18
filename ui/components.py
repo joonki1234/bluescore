@@ -578,7 +578,10 @@ def _leaflet_html(payload: Dict, height: int) -> str:
   .leaflet-container {{ font-family:{theme.FONT_SANS}; }}
   .leaflet-control-attribution {{ font-size:9.5px; }}
   .bs-heat-layer {{ opacity:0; transition:opacity 1.1s ease-out; }}
-  .bs-glow-dot {{ filter:drop-shadow(0 0 4px var(--dot-color)); }}
+  .bs-glow-dot {{
+    filter:drop-shadow(0 0 4px var(--dot-color)); transition:filter 0.15s ease-out;
+  }}
+  .bs-glow-dot-hover {{ filter:drop-shadow(0 0 9px var(--dot-color)) drop-shadow(0 0 3px var(--dot-color)); }}
 
   /* 점수를 내린 지점은 계속 맥동시켜 지도에서 먼저 눈에 띄게 한다. */
   @keyframes bs-pulse {{
@@ -744,9 +747,16 @@ D.events.forEach(function(e, i) {{
     marker._path.style.animationDelay = delay + 'ms';
   }}
 
-  // 마우스를 올리면 그 지점만 커져서, 어느 점을 읽고 있는지 헷갈리지 않는다.
-  marker.on('mouseover', function() {{ marker.setRadius(e.radius + 3); }});
-  marker.on('mouseout',  function() {{ marker.setRadius(e.radius); }});
+  // 마우스를 올리면 그 지점만 커지고 발광이 강해져서, 어느 점을 읽고 있는지
+  // 헷갈리지 않는다.
+  marker.on('mouseover', function() {{
+    marker.setRadius(e.radius + 3);
+    if (marker._path) marker._path.classList.add('bs-glow-dot-hover');
+  }});
+  marker.on('mouseout', function() {{
+    marker.setRadius(e.radius);
+    if (marker._path) marker._path.classList.remove('bs-glow-dot-hover');
+  }});
 
   if (e.home) {{
     L.circleMarker([e.lat, e.lng], {{ radius:0, opacity:0 }}).addTo(map)
@@ -1690,11 +1700,18 @@ def rate_gauge(vessel: Dict) -> None:
         if [g for g in ordered if g["minScore"] < floor["minScore"]] else 0
     )
 
+    # 핀이 정적으로 뜨면 "경계까지 여유가 있다"는 게 숫자를 읽어야만 전달된다.
+    # @keyframes로 왼쪽 끝에서 실제 위치까지 슬라이드시켜 여유를 체감하게 한다.
+    # bs-fill과 같은 이유로 CSS transition이 아니라 정적 keyframe을 쓴다 —
+    # transition은 초기 렌더에서 중간 상태 없이 최종값을 바로 페인트해버린다.
     st.markdown(
         f'<div class="bs-card">'
+        f'  <style>@keyframes bs-gauge-pin-slide {{ from {{ left:-1px; }} '
+        f'  to {{ left:calc({pos}% - 1px); }} }}</style>'
         f'  <div class="bs-gauge">'
         f'    <div class="track">{"".join(segs)}</div>'
-        f'    <div class="pin" style="left:calc({pos}% - 1px);"></div>'
+        f'    <div class="pin" style="animation:bs-gauge-pin-slide 0.9s '
+        f'    cubic-bezier(0.22, 1, 0.36, 1) forwards;"></div>'
         f'    {"".join(ticks)}'
         f'  </div>'
         f'  <div class="bs-note" style="margin-top:16px;">{headroom}<br>'
@@ -2210,11 +2227,20 @@ def interest_impact(
     )
 
 
+_ONCHAIN_CHECK_SVG = """
+<svg width="22" height="22" viewBox="0 0 24 24" style="flex-shrink:0;">
+  <circle class="bs-check-circle" cx="12" cy="12" r="10" />
+  <polyline class="bs-check-mark" points="7,12.5 10.5,16 17,8" />
+</svg>
+"""
+
+
 def onchain_receipt(commit: Dict) -> None:
     """온체인 커밋 영수증 — 기록된 해시와 블록 정보."""
     st.markdown(
         f'<div class="bs-card" style="border-left:3px solid {theme.POSITIVE};">'
-        f'<div style="display:flex; align-items:baseline; gap:8px; margin-bottom:8px;">'
+        f'<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">'
+        f'{_ONCHAIN_CHECK_SVG}'
         f'<span style="font-weight:700; color:{theme.POSITIVE};">온체인 기록 완료</span>'
         f'<span class="bs-note">{commit["committedAt"]}</span></div>'
         f'<div class="bs-label">Record ID</div>'
