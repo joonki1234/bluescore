@@ -1,19 +1,7 @@
-"""
-담당: 오동규, 김준기 (최지희 확인 필요)
+"""실산출(sourceType=real) 미리보기 화면.
 
-실산출(sourceType=real) 미리보기 화면.
-
-배경: A/B축 실산출 파이프라인(score/real_axis_b_scoring.py 등)은 API까지
-연결됐지만, Streamlit 화면은 sourceType을 "demo"로 고정 호출해서 실산출이
-화면 어디서도 보이지 않았다. 데모 화면(fisher.py/bank.py)을 그대로 실산출에
-재사용하지 않은 이유: 그 화면들은 시뮬레이터·설명(explain)·이의제기까지
-쓰는데, services/scoring.py._build_real_score()는 점수 산출만 지원한다
-(데모 fixture 전용 기능들). 그래서 이 화면은 "점수가 실제로 계산됐다"를
-보여주는 최소 기능만 담당하는 별도 페이지로 뺐다.
-
-커버리지가 낮다(A축 61.4%, BlueScore까지 나오는 건 15.2%뿐)는 것과, 해양기상
-단위 등 미검증 가정이 있다는 걸 화면에 항상 같이 보여준다 — "모르면 모른다"
-원칙.
+시뮬레이터·설명·이의제기를 포함한 데모 화면과 분리해 실산출 결과만 보여준다.
+낮은 커버리지와 미검증 가정도 함께 표시한다.
 """
 
 from __future__ import annotations
@@ -21,6 +9,11 @@ from __future__ import annotations
 import streamlit as st
 
 from ui import adapter, components, theme
+
+# services/scoring.py의 AXIS_A_WEIGHT/AXIS_B_WEIGHT와 동일 — 실산출 결과
+# 계산식을 화면에 보여줄 때 쓴다. 그쪽 값이 바뀌면 여기도 같이 바꿔야 한다.
+_AXIS_A_WEIGHT = 0.65
+_AXIS_B_WEIGHT = 0.35
 
 
 def _discount_text(band: dict) -> str:
@@ -106,6 +99,35 @@ def render() -> None:
         ],
         height=108,
     )
+
+    # services/scoring.py의 AXIS_A_WEIGHT/AXIS_B_WEIGHT와 동일한 값을 여기 직접
+    # 쓴다 — adapter.formula_text()는 데모 fixture 설정(data/mock/dashboard_mock.json의
+    # axisWeights)에서 가중치를 읽어오는 함수라, 지금은 값이 우연히 같아도(둘 다
+    # 0.65/0.35) 실산출 화면에 데모 설정을 끌어다 쓰는 건 개념적으로 맞지 않다.
+    #
+    # BlueScore가 없는 경우(현재 94.6%, B축 미산출)에도 섹션 자체를 숨기지 않고
+    # 왜 계산이 안 됐는지 보여준다 — 조용히 사라지면 "원래 계산식이 없다"로
+    # 오해할 수 있다("모르면 모른다" 원칙).
+    blue_score = score.get("blueScore")
+    st.markdown("###### BlueScore 계산")
+    if blue_score is not None and axis_a_score is not None and axis_b_score is not None:
+        st.markdown(
+            f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
+            f'color:{theme.INK_SOFT};">{_AXIS_A_WEIGHT:g} × {axis_a_score:g} + '
+            f'{_AXIS_B_WEIGHT:g} × {axis_b_score:g} = {blue_score:g}</span>'
+            f'<div class="bs-note" style="margin-top:8px;">축 간 비중(자원 압력 '
+            f'{_AXIS_A_WEIGHT:g} · 운항 효율 {_AXIS_B_WEIGHT:g})은 검증 전 잠정치입니다.</div></div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        missing_reason = score["axisB"].get("missingReason") or score["axisA"].get("missingReason")
+        st.markdown(
+            f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
+            f'color:{theme.INK_SOFT};">{_AXIS_A_WEIGHT:g} × A + {_AXIS_B_WEIGHT:g} × B = BlueScore</span>'
+            f'<div class="bs-note" style="margin-top:8px;">B축이 산출되지 않아 BlueScore는 '
+            f'계산하지 않습니다{f" — {missing_reason}" if missing_reason else ""}.</div></div>',
+            unsafe_allow_html=True,
+        )
 
     if score.get("rateBand"):
         st.info(f"제안 금리 등급 · {_discount_text(score['rateBand'])}")

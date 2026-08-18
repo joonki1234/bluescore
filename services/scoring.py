@@ -45,7 +45,7 @@ from explain.explain import (
 from score.rate_mapping import RATE_GRADES, RateGrade, grade_for_score
 from score.tradeoff_coefficients import axis_b_points_per_knot, axis_b_points_per_revisit_step
 from services.exceptions import BackendUnavailableError, InvalidStateError, NotFoundError
-from services.metadata import response_metadata
+from services.metadata import real_score_run_id, response_metadata
 from services.real_scoring import RealAxisAAdapter
 
 
@@ -149,7 +149,7 @@ class ScoringService:
                 if persona["vesselId"] == vessel_id:
                     return persona["scoreRunId"]
             return f"demo-score-{vessel_id.lower()}-v1"
-        return f"real-axis-a-{vessel_id}-20260813"
+        return real_score_run_id(vessel_id)
 
     def list_vessels(self, source_type: str = "demo", limit: int = 50) -> VesselListResponse:
         metadata = response_metadata(source_type)
@@ -269,7 +269,7 @@ class ScoringService:
         vessel = result.vessel
 
         # A축만 되는 대다수 선박은 그대로 "partial"이고(톤수 매칭 커버리지
-        # 43.4%뿐), A축+B축이 둘 다 유사군 백분위까지 나온 선박만 "success"로
+        # 23.2%뿐), A축+B축이 둘 다 유사군 백분위까지 나온 선박만 "success"로
         # 승격해 BlueScore·금리구간을 낸다.
         has_axis_b = result.axis_b_score is not None
         status = "success" if result.status == "partial" and has_axis_b else result.status

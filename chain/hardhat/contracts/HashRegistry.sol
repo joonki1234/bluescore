@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-// 담당: 김준기, 오동규
 pragma solidity ^0.8.28;
 
 /// @title HashRegistry

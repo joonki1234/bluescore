@@ -34,12 +34,7 @@ from api.schemas import (
 from chain.hashing import compute_result_hash
 from chain.ledger import HashLedger, LedgerLike
 from services.exceptions import ConflictError, InvalidStateError, NotFoundError
-from services.metadata import (
-    REAL_DATA_SNAPSHOT_ID,
-    REAL_MODEL_VERSION_WITH_B,
-    REAL_PARTIAL_MODEL_VERSION,
-    response_metadata,
-)
+from services.metadata import response_metadata
 from services.scoring import ScoringService
 from storage.repository import Repository
 
@@ -79,12 +74,22 @@ class WorkflowService:
         return self.scoring.rate_lookup(score)
 
     @staticmethod
+    def _has_current_metadata(score: ScoreResponse, source_type: str) -> bool:
+        expected = response_metadata(
+            source_type,
+            axis_b_included=source_type == "real" and score.axis_b.score is not None,
+        )
+        return _metadata_from_score(score) == expected
+
+    @staticmethod
     def _is_current_demo_score(score: ScoreResponse) -> bool:
         """캐시된 데모 점수에 현재 UI가 요구하는 화면 필드가 모두 있는지 확인한다.
 
         옛 SQLite 캐시는 Pydantic 검증은 통과해도 새로 추가된 필드가 ``None``일
         수 있어, 성공 점수인데 지도·비교 차트 필드가 비어 있으면 다시 만든다.
         """
+        if not WorkflowService._has_current_metadata(score, "demo"):
+            return False
         if score.status != "success":
             return True
 
@@ -109,17 +114,8 @@ class WorkflowService:
 
     @staticmethod
     def _is_current_real_score(score: ScoreResponse) -> bool:
-        """실데이터 점수 캐시가 지금 코드/데이터 버전과 맞는지 확인한다.
-
-        `sourceType=real`의 score_run_id는 고정 문자열이라 캐시된 뒤에는 코드를
-        고쳐도 그대로 반환된다. `data_snapshot_id`/`model_version`이 지금 코드가
-        낼 수 있는 값과 다르면 캐시를 버리고 다시 계산한다.
-        """
-        if score.status not in ("success", "partial"):
-            return True
-        if score.data_snapshot_id != REAL_DATA_SNAPSHOT_ID:
-            return False
-        return score.model_version in (REAL_PARTIAL_MODEL_VERSION, REAL_MODEL_VERSION_WITH_B)
+        """실데이터 캐시의 데이터·모델·규칙·금리표 버전을 확인한다."""
+        return WorkflowService._has_current_metadata(score, "real")
 
     def get_score(self, vessel_id: str, source_type: str = "demo") -> ScoreResponse:
         score_run_id = self.scoring.score_run_id(vessel_id, source_type)
@@ -134,19 +130,17 @@ class WorkflowService:
             if is_current:
                 return cached
         score = self.scoring.build_score(vessel_id, source_type)
-        self.repository.save_score_run(score.model_dump(mode="json", by_alias=True))
+        try:
+            self.repository.save_score_run(score.model_dump(mode="json", by_alias=True))
+        except ValueError as exc:
+            raise ConflictError(str(exc)) from exc
         return score
 
     def get_score_run(self, score_run_id: str) -> ScoreResponse:
         stored = self.repository.get_score_run(score_run_id)
         if stored is None:
             raise NotFoundError(f"점수 산출 건을 찾을 수 없습니다: {score_run_id}")
-        cached = ScoreResponse.model_validate(stored["result"])
-        if cached.source_type == "demo" and not self._is_current_demo_score(cached):
-            return self.get_score(cached.vessel.vessel_id, "demo")
-        if cached.source_type == "real" and not self._is_current_real_score(cached):
-            return self.get_score(cached.vessel.vessel_id, "real")
-        return cached
+        return ScoreResponse.model_validate(stored["result"])
 
     def simulate(self, vessel_id: str, request: SimulationRequest) -> SimulationResponse:
         self.get_score(vessel_id, "demo")

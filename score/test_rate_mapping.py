@@ -1,5 +1,4 @@
 """
-담당: 김준기, 오동규
 
 score/rate_mapping.py 단위 테스트.
 """

@@ -5,8 +5,8 @@
 B축은 `score/real_axis_b_scoring.py`가 B축 raw(잔차)를 내고, 여기서 A축과 같은
 유사 선박군으로 백분위 변환한다. **알려진 한계(화면에 정직하게 표기할 것)**:
 해양기상 단위(풍속 m/s)는 공식 확인이 아니라 정황 추정, 유속 단위는 추정
-근거조차 없음, gearType은 TAC 매칭된 선박만 채워짐, 톤수 매칭 커버리지
-43.4%뿐이라 B축 자체가 대부분 선박에서 계산되지 않음(그 경우 A축만 `partial`
+근거조차 없음, gearType은 GFW 스냅샷에서 일부만 확보됨, 톤수 매칭 커버리지
+23.2%뿐이라 B축 자체가 대부분 선박에서 계산되지 않음(그 경우 A축만 `partial`
 로 유지되고 이전과 동일하게 동작 — B축 연결이 A축 단독 경로를 깨지 않는다).
 """
 
@@ -23,17 +23,17 @@ from score.axis_a_pressure import compute_axis_a_pressure
 from score.axis_b_baseline import VesselAxisBResult
 from score.peer_grouping import MIN_PEER_GROUP_SAMPLE_SIZE, build_peer_groups, peer_group_for_vessel
 from score.real_axis_b_scoring import compute_axis_b_results
+from score.real_vessel_input import (
+    DEFAULT_GFW_VESSELS_PATH,
+    DEFAULT_MATCHES_PATH,
+    load_real_vessel_records,
+)
 from score.score_assembly import raw_to_score, score_status_for_group
 from score.shap_factors import axis_a_factor_shares
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-# data_new/ 스냅샷을 쓴다 — 구 data/보다 매칭 정밀도가 높다(data_new/README.md
-# 참고). 선박은 score/scripts/convert_data_new_vessels.py로 이 모듈이 기대하는
-# 평평한 스키마(vesselId/tonnage/fishingType)로 미리 변환해둔 파생 파일이다 —
-# 원본 final_vessel_matches.jsonl은 톤수가 중첩·문자열이라 그대로 못 쓴다.
 DEFAULT_EVENTS_PATH = PROJECT_ROOT / "data_new" / "processed" / "events_with_weather.jsonl.gz"
-DEFAULT_VESSELS_PATH = PROJECT_ROOT / "data_new" / "processed" / "vessels_for_score.jsonl.gz"
 
 
 @dataclass(frozen=True)
@@ -73,7 +73,7 @@ def _axis_b_score_for_vessel(
 
     A축 상태(group)는 이미 확정된 뒤 호출되므로, 여기서는 "B축 표본이 그
     그룹 안에서 따로 충분한가"만 별도로 판단한다 — 톤수 매칭 커버리지가
-    43.4%뿐이라 A축 표본은 충분해도 B축 표본은 부족한 그룹이 많다.
+    23.2%뿐이라 A축 표본은 충분해도 B축 표본은 부족한 그룹이 많다.
 
     estimated_fuel_kg/expected_fuel_kg는 peer 표본 부족·group=None이어도
     이 선박 하나의 물리식/LightGBM 계산 결과라 항상 낼 수 있다 — B축 SHAP을
@@ -219,20 +219,23 @@ class RealAxisAAdapter:
     def __init__(
         self,
         events_path: Path = DEFAULT_EVENTS_PATH,
-        vessels_path: Path = DEFAULT_VESSELS_PATH,
+        matches_path: Path = DEFAULT_MATCHES_PATH,
+        gfw_vessels_path: Path = DEFAULT_GFW_VESSELS_PATH,
     ) -> None:
         self.events_path = Path(events_path)
-        self.vessels_path = Path(vessels_path)
+        self.matches_path = Path(matches_path)
+        self.gfw_vessels_path = Path(gfw_vessels_path)
 
     @property
     def available(self) -> bool:
-        return self.events_path.exists() and self.vessels_path.exists()
+        return all(
+            path.exists()
+            for path in (self.events_path, self.matches_path, self.gfw_vessels_path)
+        )
 
     @lru_cache(maxsize=1)
     def _vessel_records(self) -> List[dict]:
-        if not self.vessels_path.exists():
-            raise FileNotFoundError(str(self.vessels_path))
-        return _load_jsonl_gz(self.vessels_path)
+        return load_real_vessel_records(self.matches_path, self.gfw_vessels_path)
 
     @lru_cache(maxsize=1)
     def _event_records(self) -> List[dict]:
@@ -251,7 +254,7 @@ class RealAxisAAdapter:
     @lru_cache(maxsize=1)
     def status_ranked_vessels(self) -> List[Tuple[bool, dict, str]]:
         """전체 스냅샷의 산출 상태를 선박별로 한 번만 계산해, BlueScore까지
-        완전 산출되는 선박(전체의 15.2%)이 앞쪽에 오도록 정렬해 둔다.
+        완전 산출되는 선박(전체의 5.4%)이 앞쪽에 오도록 정렬해 둔다.
         선박당 계산은 가벼워도 5,000여 척 전체를 매 API 호출마다 다시 돌리면
         수십 초가 걸려(측정: 약 21초) 목록 화면이 매번 멈춘 것처럼 보인다.
         """

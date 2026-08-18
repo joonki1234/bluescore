@@ -1,38 +1,10 @@
-"""
-담당: 김준기, 오동규
+"""A축 raw 값을 재방문·혼잡·상호작용 기여도로 분해한다.
 
-A축 raw 값을 요인별로 분해한다 — "요인 기여도(SHAP)" 계산의 실제 구현.
+A축은 명시적 가중합이므로 Shapley 근사 없이 세 항으로 정확히 분해할 수 있다.
+`axis_a_factor_shares()`는 각 기여도를 절댓값 합 대비 비중으로 변환한다.
 
-배경: `explain/TODO.md`의 설계 원칙("기여도 계산은 score/가, 문장화만
-explain/이 한다")에 따라, LLM이 숫자를 만들 여지를 없애려면 계산은 여기
-score/에 있어야 한다. 화면의 `shapFactors`는 원래
-`data/mock/generate_dashboard_mock.py`가 손으로 써넣은 예시 숫자였다 — 이
-모듈이 그 자리를 실제 계산으로 채운다.
-
-`axis_a_pressure_raw`는 트리 모델이 아니라 명시적 가중합+상호작용항 수식
-(`revisit_weight*revisit_zscore + congestion_weight*crowding_zscore +
-interaction_weight*(revisit_zscore*crowding_zscore)` — `axis_a_pressure.py`
-참고, raw 값이 아니라 population 기준 z-score로 정규화된 값을 결합한다)
-이라, 근사 없이 세 항으로 정확히 분해된다 — 진짜 Shapley value 계산
-(`shap` 라이브러리)이 필요 없다.
-
-`axis_a_factor_shares()`는 `services/real_scoring.py`(A축 실산출 경로)에
-실제로 연결돼 있다 — `axis_a_factor_contributions()`의 raw 기여도를 "전체
-A축 raw 압력에서 이 요인이 차지하는 상대적 비중(%)"으로 바꿔서, 유사군
-분포 없이도 정직하게 `api/schemas.ShapFactorSchema.value`에 넣을 수 있게
-한 것이다(개별 요인의 절대 "점수"는 유사군 백분위 특성상 유사군 분포 없이
-못 구한다).
-
-**B축은 이 모듈에서 다루지 않는다.** B축 효율(잔차 = estimated_fuel_kg -
-expected_fuel_kg)은 LightGBM 기준선 모델(`expected_fuel_kg`)에
-`shap.TreeExplainer`를 붙여도, "기대 연료소비량이 왜 이렇게 예측됐는지"
-(조건 설명)만 알려줄 뿐 "왜 이 선박의 효율이 좋다/나쁘다"는 설명하지
-못한다 — 잔차를 만드는 진짜 원인(속도)이 순환성 방지를 위해 애초에 모델
-입력에서 빠져있기 때문에, SHAP이 그 원인을 찾아낼 방법이 구조적으로 없다.
-이 결과를 B축 점수의 설명으로 오인하면 사실과 다른 이유를 보여주게 된다.
-B축은 대신 "자기 속도 vs 유사군 평균 속도" 같은 단순 비교로 설명하는
-쪽이 유사군 분포도 필요 없고 실제 원인(속도)을 직접 보여줘서 더
-낫다(구현은 별도 작업).
+B축은 효율 잔차의 원인인 속도가 순환성 방지를 위해 기준선 입력에서 빠져 있어
+SHAP으로 설명할 수 없으므로 이 모듈에서 다루지 않는다.
 """
 
 from typing import List

@@ -97,10 +97,11 @@ def _configured_ledger() -> LedgerLike:
 def create_app(
     db_path: Optional[Path] = None, *, seed_if_empty: bool = True,
     ledger: Optional[LedgerLike] = None,
+    scoring: Optional[ScoringService] = None,
 ) -> FastAPI:
     database = Database(db_path)
     repository = Repository(database)
-    scoring = ScoringService()
+    scoring = scoring or ScoringService()
     workflow = WorkflowService(repository=repository, scoring=scoring, ledger=ledger or _configured_ledger())
 
     if seed_if_empty:

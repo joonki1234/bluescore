@@ -1,9 +1,12 @@
-"""담당: 최지희
+"""
 
 실데이터 A축 어댑터의 작은 결정론적 회귀 테스트.
 """
 
-from services.real_scoring import compute_axis_a_for_vessel
+import gzip
+import json
+
+from services.real_scoring import RealAxisAAdapter, compute_axis_a_for_vessel
 
 
 def _vessels():
@@ -70,4 +73,56 @@ def test_shap_factors_populated_for_axis_a_only():
 def test_shap_factors_empty_when_matching_failed():
     result = compute_axis_a_for_vessel("R1", _vessels(), [], min_peer_size=1)
     assert result.shap_factors == []
+
+
+def test_adapter_uses_tracked_sources_without_derived_vessel_file(tmp_path, monkeypatch):
+    matches_path = tmp_path / "final_vessel_matches.jsonl"
+    gfw_path = tmp_path / "gfw_vessels_normalized.jsonl"
+    events_path = tmp_path / "events_with_weather.jsonl.gz"
+    matches_path.write_text(
+        json.dumps(
+            {
+                "gfwVesselId": "R1",
+                "gfwName": "REAL ONE",
+                "matchTier": "verified",
+                "matchConfidence": "high",
+                "tac": {"tonnageGtTac": "25"},
+                "mof": None,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    gfw_path.write_text(
+        json.dumps({"vesselId": "R1", "combinedGearTypes": ["POTS_AND_TRAPS"]}) + "\n",
+        encoding="utf-8",
+    )
+    with gzip.open(events_path, "wt", encoding="utf-8") as stream:
+        stream.write(json.dumps(_event("R1", "1", "2026-05-01T00:00:00Z")) + "\n")
+
+    monkeypatch.setattr("services.real_scoring.compute_axis_b_results", lambda: {})
+    adapter = RealAxisAAdapter(
+        events_path=events_path,
+        matches_path=matches_path,
+        gfw_vessels_path=gfw_path,
+    )
+
+    assert adapter.available is True
+    assert adapter.list_vessels()[0]["matchConfidence"] == "high"
+    assert adapter.score("R1").vessel["name"] == "REAL ONE"
+
+
+def test_adapter_availability_requires_both_tracked_vessel_sources(tmp_path):
+    events_path = tmp_path / "events.jsonl.gz"
+    matches_path = tmp_path / "matches.jsonl"
+    events_path.touch()
+    matches_path.touch()
+
+    adapter = RealAxisAAdapter(
+        events_path=events_path,
+        matches_path=matches_path,
+        gfw_vessels_path=tmp_path / "missing-gfw.jsonl",
+    )
+
+    assert adapter.available is False
 
