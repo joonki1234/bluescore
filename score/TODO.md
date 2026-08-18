@@ -122,7 +122,18 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         `season_key(start)`를 그대로 재사용하기로 함. 이벤트 자체의
         위경도·시작시각만 있으면 계산되고 `events_with_weather.jsonl.gz`에
         이미 다 있어서 즉시 채울 수 있음.
-      - `gearType`: **보류 — 다음 논의 때 결정** (2026-08-18). 후보 3가지만
+      - `gearType`: **(2026-08-18 결정) 영문(GFW) 표기로 통일** — 태윤님이
+        국내 어업종↔GFW 영문 체계 통합 작업을 진행 중. 완료되면 A축(`score/
+        scripts/convert_data_new_vessels.py`)과 B축이 같은 영문 taxonomy를
+        쓰게 된다 — 지금 `build_axis_b_input.py`가 쓰는 TAC 한글 원본
+        (`gearTypeNamesTac`)은 이 통합 결과로 교체 예정. A축 쪽에서 이미
+        확인한 참고사항(아래): GFW 영문 gear 값의 44%가 FISHING/NA 같은
+        뭉뚱그려진 라벨이라 그대로 그룹핑에 쓰면 유사군이 과도하게 쪼개짐
+        (A축 실산출 73%→32%로 급락 실측) — B축은 카테고리 피처로만 쓰여
+        같은 문제(표본 부족)는 없지만, 뭉뚱그려진 라벨 자체의 정보량이
+        적다는 점은 동일하게 감안할 것.
+        (아래는 이 결정 이전의 검토 기록 — 보존)
+        후보 3가지만
         기록해둠: (a) `population_tags.jsonl`의 `licenseTag`/`locationTag`
         (근해/연안/원양/양식 등, 뭉뚱그려진 수준)를 그대로 쓰기,
         (b) `data/gear_type_mapping_draft.py`(TAC 19종 매핑 초안)까지 동원해
