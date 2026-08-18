@@ -28,9 +28,8 @@ OUT_PATH = Path(__file__).resolve().parent.parent / "processed" / "gfw_events_no
 
 
 def _duration_hours(start: str, end: str) -> float:
-    """GFW `fishing.averageDurationHours`는 실측 결과 100% null이었다
-    (processed/gfw_events_normalized.jsonl 19,613건 전수 확인, 2026-08-17).
-    대신 매 이벤트에 항상 있는 start/end(전수 확인, null 0건)로 직접 계산한다."""
+    """GFW `fishing.averageDurationHours`는 100% null이다(19,613건 확인).
+    대신 매 이벤트에 항상 있는 start/end(null 0건)로 직접 계산한다."""
     s = datetime.fromisoformat(start.replace("Z", "+00:00"))
     e = datetime.fromisoformat(end.replace("Z", "+00:00"))
     return (e - s).total_seconds() / 3600.0

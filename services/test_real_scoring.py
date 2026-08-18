@@ -50,7 +50,7 @@ def test_real_axis_a_does_not_invent_score_without_events():
 
 
 def test_shap_factors_populated_for_axis_a_only():
-    """2026-08-18: A축 요인 기여도(SHAP) 실연결 — B축은 연결 안 하므로
+    """A축 요인 기여도(SHAP) 실연결 테스트 — B축은 연결 안 하므로
     axis="b"가 섞이면 안 된다."""
     events = [
         _event("R1", "1", "2026-05-01T00:00:00Z"),

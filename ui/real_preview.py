@@ -3,13 +3,13 @@
 
 실산출(sourceType=real) 미리보기 화면.
 
-배경: A/B축 실산출 파이프라인(score/real_axis_b_scoring.py 등)이 API까지는
-연결됐는데(2026-08-18), Streamlit 화면은 sourceType을 "demo"로 고정 호출해서
-실산출이 화면 어디서도 안 보였다. 데모 화면(fisher.py/bank.py)을 그대로
-실산출에 재사용하지 않은 이유: 그 화면들은 시뮬레이터·설명(explain)·
-이의제기까지 쓰는데, services/scoring.py._build_real_score()는 점수 산출만
-지원한다(데모 fixture 전용 기능들). 그래서 이 화면은 "점수가 실제로
-계산됐다"를 보여주는 최소 기능만 담당하는 별도 페이지로 뺐다.
+배경: A/B축 실산출 파이프라인(score/real_axis_b_scoring.py 등)은 API까지
+연결됐지만, Streamlit 화면은 sourceType을 "demo"로 고정 호출해서 실산출이
+화면 어디서도 보이지 않았다. 데모 화면(fisher.py/bank.py)을 그대로 실산출에
+재사용하지 않은 이유: 그 화면들은 시뮬레이터·설명(explain)·이의제기까지
+쓰는데, services/scoring.py._build_real_score()는 점수 산출만 지원한다
+(데모 fixture 전용 기능들). 그래서 이 화면은 "점수가 실제로 계산됐다"를
+보여주는 최소 기능만 담당하는 별도 페이지로 뺐다.
 
 커버리지가 낮다(A축 61.0%, BlueScore까지 나오는 건 16.2%뿐)는 것과, 해양기상
 단위 등 미검증 가정이 있다는 걸 화면에 항상 같이 보여준다 — "모르면 모른다"

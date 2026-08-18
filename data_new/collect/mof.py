@@ -25,9 +25,9 @@ from xml.etree import ElementTree
 
 from http_common import request_with_retry, save_snapshot
 
-# 실측 확인(2026-08-17): 이 API(data.go.kr)는 동시요청 15개로 60건을 4초에
-# 처리해도 에러 0건(resultCode 전부 00) — 순차 대비 대폭 단축. PROCESS_LOG.md
-# 33번 참고. 네트워크 요청만 병렬화하고, 파일 저장(save_snapshot)은 타임스탬프
+# 이 API(data.go.kr)는 동시요청 15개로 60건을 4초에 처리해도 에러 0건
+# (resultCode 전부 00) — 순차 대비 대폭 단축. PROCESS_LOG.md 33번 참고.
+# 네트워크 요청만 병렬화하고, 파일 저장(save_snapshot)은 타임스탬프
 # 충돌(TOCTOU) 방지를 위해 메인 스레드에서 순차로 한다.
 MAX_WORKERS = 15
 

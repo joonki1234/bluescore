@@ -5,12 +5,11 @@
 검증하는 스크립트. 여기서는 raw 단위 기여도가 실제로 계산되고,
 axis_a_pressure_raw와 정확히 합이 맞는지만 증명한다.
 
-B축은 다루지 않는다 — LightGBM 기준선에 shap.TreeExplainer를 붙여
-시도했었지만, 그건 "기대 연료소비량이 왜 이렇게 예측됐는지"(조건 설명)만
-알려줄 뿐 "왜 이 선박의 B축 효율이 좋다/나쁘다"는 설명하지 못한다는 게
-드러나(잔차를 만드는 진짜 원인인 속도가 순환성 방지를 위해 모델 입력에서
-빠져있어서 SHAP이 찾아낼 수 없음) 2026-08-18 팀 결정으로 들어냈다
-(`score/shap_factors.py` 모듈 docstring 참고).
+B축은 다루지 않는다 — LightGBM 기준선에 shap.TreeExplainer를 붙이면
+"기대 연료소비량이 왜 이렇게 예측됐는지"(조건 설명)만 알려줄 뿐 "왜 이
+선박의 B축 효율이 좋다/나쁘다"는 설명하지 못한다(잔차를 만드는 진짜
+원인인 속도가 순환성 방지를 위해 모델 입력에서 빠져있어서 SHAP이 찾아낼
+수 없음). 자세한 내용은 `score/shap_factors.py` 모듈 docstring 참고.
 
 실행:
     python -m score.scripts.run_shap_factors

@@ -2,8 +2,7 @@
 
 버전 고정 GFW 스냅샷을 실제 A축·B축 산출 파이프라인에 연결한다.
 
-2026-08-18(해커톤 제출): B축도 연결했다(오동규, 최지희 확인 후 진행) —
-`score/real_axis_b_scoring.py`가 B축 raw(잔차)를 내고, 여기서 A축과 같은
+B축은 `score/real_axis_b_scoring.py`가 B축 raw(잔차)를 내고, 여기서 A축과 같은
 유사 선박군으로 백분위 변환한다. **알려진 한계(화면에 정직하게 표기할 것)**:
 해양기상 단위(풍속 m/s)는 공식 확인이 아니라 정황 추정, 유속 단위는 추정
 근거조차 없음, gearType은 TAC 매칭된 선박만 채워짐, 톤수 매칭 커버리지
@@ -29,13 +28,13 @@ from score.shap_factors import axis_a_factor_shares
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-# 2026-08-18: data_new/(김태윤) 스냅샷으로 전환 — 구 data/의 31,605척(확정매칭
-# 순도 9.5%) 대신 EEZ 제한 모집단 5,323척(사람 라벨링 실측 정밀도 약 75%,
-# data_new/README.md 참고)을 쓴다. 이벤트는 data_new/processed/의 산출물을
-# 그대로 쓰고, 선박은 score/scripts/convert_data_new_vessels.py로 미리 평판화
-# 해둔 파생 파일을 쓴다(vesselId/tonnage/fishingType 등 이 모듈이 기대하는
-# 평평한 스키마로 변환 — 원본 final_vessel_matches.jsonl은 톤수가
-# tac.tonnageGtTac처럼 중첩·문자열이라 그대로 못 씀).
+# data_new/ 스냅샷을 쓴다 — 구 data/의 31,605척(확정매칭 순도 9.5%) 대신 EEZ 제한
+# 모집단 5,323척(사람 라벨링 실측 정밀도 약 75%, data_new/README.md 참고)을 쓴다.
+# 이벤트는 data_new/processed/의 산출물을 그대로 쓰고, 선박은
+# score/scripts/convert_data_new_vessels.py로 미리 평판화해둔 파생 파일을 쓴다
+# (vesselId/tonnage/fishingType 등 이 모듈이 기대하는 평평한 스키마로 변환 — 원본
+# final_vessel_matches.jsonl은 톤수가 tac.tonnageGtTac처럼 중첩·문자열이라 그대로
+# 못 씀).
 DEFAULT_EVENTS_PATH = PROJECT_ROOT / "data_new" / "processed" / "events_with_weather.jsonl.gz"
 DEFAULT_VESSELS_PATH = PROJECT_ROOT / "data_new" / "processed" / "vessels_for_score.jsonl.gz"
 
@@ -52,14 +51,13 @@ class RealAxisAResult:
     vessel: dict
     matching_method: str
     matching_reason: Optional[str]
-    # 2026-08-18 B축 연결 추가분 — 전부 기본값 있음, 기존 호출부는 안 건드려도 됨.
+    # B축 연결 추가 필드 — 전부 기본값 있음, 기존 호출부는 안 건드려도 됨.
     axis_b_score: Optional[float] = None
     axis_b_raw: Optional[float] = None
     axis_b_used_row_count: Optional[int] = None
-    # 2026-08-18 A축 요인 기여도(SHAP) 연결 추가분. B축은 연결 안 함 —
-    # score/shap_factors.py 모듈 docstring 참고("점수"가 아니라 "기준선
-    # 조건"만 설명 가능하다는 의미론적 제약으로, B축 SHAP 코드 자체를
-    # 팀 결정으로 들어냄).
+    # A축 요인 기여도(SHAP) 연결 필드. B축은 연결 안 함 — score/shap_factors.py
+    # 모듈 docstring 참고("점수"가 아니라 "기준선 조건"만 설명 가능하다는
+    # 의미론적 제약으로 B축 SHAP 코드 자체를 들어냄).
     shap_factors: List[dict] = field(default_factory=list)
 
 
@@ -266,9 +264,8 @@ class RealAxisAAdapter:
         vessel_by_id = {v.get("vesselId"): v for v in vessels if v.get("vesselId")}
         axis_results = compute_axis_a_pressure(events)
         groups, vessel_to_key = build_peer_groups(vessels, events)
-        # 2026-08-18: B축은 실패해도(입력 파일 없음 등) A축 단독 경로가 죽지
-        # 않게 예외를 흡수한다 — B축 연결은 "있으면 더 좋은 것"이지 A축의
-        # 전제조건이 아니다.
+        # B축은 실패해도(입력 파일 없음 등) A축 단독 경로가 죽지 않게 예외를
+        # 흡수한다 — B축 연결은 "있으면 더 좋은 것"이지 A축의 전제조건이 아니다.
         try:
             axis_b_results = compute_axis_b_results()
         except (FileNotFoundError, ValueError):

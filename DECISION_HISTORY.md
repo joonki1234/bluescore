@@ -149,3 +149,30 @@
 > # 2026-08-18 B축 연결(score/real_axis_b_scoring.py) — 선박별로 B축 실산출
 > # 여부가 갈려서(톤수 매칭 커버리지 43.4%뿐) model_version도 응답마다 달라야
 > # 한다.
+
+## api/test_api.py
+
+> # 2026-08-18: score/tradeoff_coefficients.py 실제 계수로 교체되며 78.0->89.7로
+> # 바뀜(밴드 B->A 전환은 그대로 유지) — services/scoring.py 커밋 메시지 참고.
+
+## chain/hashing.py
+
+> 2026-08-17: 화면의 중복 해시 구현은 제거했다. 이제 WorkflowService가 이 함수만
+> 호출하고 UI는 커밋·조회 API의 결과 해시를 표시한다.
+
+## chain/ledger.py
+
+> `OnChainHashLedger` (2026-08-14 추가): `chain/hardhat/`에 배포된
+
+> 없는 컴퓨터도 있을 수 있어(2026-08-14 기준 이 코드를 작성한 컴퓨터가 그렇다),
+> 생성자에서 네트워크에 바로 접속하지는 않는다
+
+## chain/test_onchain_ledger.py
+
+>       안 되면 스스로 skip한다. 실제로 이 경로가 도는지는 Node가 있는 컴퓨터
+>       (예: 김준기님)에서 확인이 필요하다.
+
+## storage/test_workflow.py
+
+> # 2026-08-18: score/tradeoff_coefficients.py 실제 계수로 교체되며 78.0->89.7로
+> # 바뀜(밴드 B->A 전환은 그대로 유지) — services/scoring.py 커밋 메시지 참고.

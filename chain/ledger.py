@@ -12,7 +12,7 @@
 이 파일엔 같은 commit/get/verify 인터페이스를 가진 구현이 두 개 있다:
     - `HashLedger`: 인메모리. Node/Hardhat 없이 어디서나 동작하고, 이 프로젝트의
       기본 pytest 스위트가 이걸로 돈다.
-    - `OnChainHashLedger` (2026-08-14 추가): `chain/hardhat/`에 배포된
+    - `OnChainHashLedger`: `chain/hardhat/`에 배포된
       `HashRegistry.sol`을 web3.py로 실제 호출한다. `HashLedger`를 대체하는 게
       아니라 나란히 두는 것 — 로컬에 Hardhat 노드를 안 띄운 컴퓨터에서도 기존
       테스트가 그대로 통과해야 하기 때문이다. 실제 사용은 호출부가 어느 클래스를
@@ -103,9 +103,8 @@ class OnChainHashLedger:
 
     로컬 Hardhat 노드(`npx hardhat node` + `chain/hardhat/ignition/modules/
     HashRegistry.js` 배포)가 떠 있어야 실제로 동작한다. 이 프로젝트엔 Node가
-    없는 컴퓨터도 있을 수 있어(2026-08-14 기준 이 코드를 작성한 컴퓨터가 그렇다),
-    생성자에서 네트워크에 바로 접속하지는 않는다 — 실제 RPC 호출은 commit/get/
-    verify를 부를 때 처음 일어난다.
+    없는 컴퓨터도 있을 수 있어, 생성자에서 네트워크에 바로 접속하지는 않는다 —
+    실제 RPC 호출은 commit/get/verify를 부를 때 처음 일어난다.
 
     서명 방식은 두 가지를 지원한다:
         - private_key(또는 BLUESCORE_CHAIN_PRIVATE_KEY)를 주면 그 키로 직접

@@ -2,8 +2,8 @@
 
 ⚠ 시간 정합성 주의: `collect/marine_weather.py`를 `--date` 없이 돌리면
 "최신"(수집 시점) 값만 나와서, 몇 주 전 이벤트에 붙이면 시간이 안 맞는
-값을 붙이는 꼴이 된다(실제로 이번에 발견함, 2026-08-17). 이벤트가 걸친
-날짜들로 `--date YYYYMMDD`를 따로 수집해야 한다.
+값을 붙이는 꼴이 된다. 이벤트가 걸친 날짜들로 `--date YYYYMMDD`를 따로
+수집해야 한다.
 
 날짜별 조회(`openWeatherDate`)는 최신조회와 응답 구조가 다르다 — 지점당
 값 1개가 아니라 **그 날 하루 전체의 10분 단위 시계열**이 옴(실측 확인:
@@ -79,7 +79,7 @@ def _nearest_reading(event_lat, event_lon, event_dt, by_station: dict):
     중 이벤트 시각에 가장 가까운 레코드를 반환한다. by_station은 하루치
     관측소 시계열을 미리 묶어둔 것 — 이벤트마다 다시 묶으면(실측, 하루
     ~1,700건 x 이벤트 수만큼) 실규모에서 너무 느려 호출부에서 날짜당
-    한 번만 묶어 넘긴다(2026-08-17 성능 문제로 발견·수정)."""
+    한 번만 묶어 넘긴다."""
     best_station, best_dist = None, None
     for mmsi, recs in by_station.items():
         r0 = recs[0]
@@ -101,9 +101,8 @@ def _nearest_reading(event_lat, event_lon, event_dt, by_station: dict):
 def run(dates: list) -> None:
     """실규모(여러 날짜) 대응 — 원래 단일 --date만 받던 버전은 OUT_PATH를
     "w"로 매번 덮어써서 날짜별로 반복 호출하면 마지막 날짜 결과만 남는
-    버그가 있었다(2026-08-17 실규모 재실행 중 발견). 이벤트를 한 번만
-    읽어 날짜별로 묶고, 날짜마다 그날 관측소만 로드해 매칭한 뒤 한 파일에
-    누적한다."""
+    버그가 있었다. 이벤트를 한 번만 읽어 날짜별로 묶고, 날짜마다 그날
+    관측소만 로드해 매칭한 뒤 한 파일에 누적한다."""
     events_by_date = {}
     with EVENTS_PATH.open(encoding="utf-8") as f:
         for line in f:

@@ -8,8 +8,8 @@ chain/ledger.py의 OnChainHashLedger 단위 테스트.
     - 네트워크 없이 검증 가능한 순수 로직(hex<->bytes32 변환, revert 셀렉터 판별,
       생성자 검증, mock으로 대체한 컨트랙트 호출) — 기본 `pytest -q`에서 항상 돈다.
     - 실제 로컬 Hardhat 노드가 떠 있을 때만 도는 end-to-end 테스트 — RPC 연결이
-      안 되면 스스로 skip한다. 실제로 이 경로가 도는지는 Node가 있는 컴퓨터
-      (예: 김준기님)에서 확인이 필요하다.
+      안 되면 스스로 skip한다. 실제로 이 경로가 도는지는 Node가 있는 컴퓨터에서
+      별도로 확인해야 한다.
 """
 
 from unittest.mock import MagicMock

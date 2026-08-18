@@ -29,8 +29,8 @@ for _stream in (sys.stdout, sys.stderr):
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 RETRYABLE_STATUS = {429, 500, 502, 503, 524}
-# 원래 2s->4s->8s(3회)였으나, 실규모 본수집 중(2026-08-17) 네트워크가
-# 반복적으로 30초 타임아웃 나는 게 실측돼 재시도 강도를 올림(원칙 재조정,
+# 원래 2s->4s->8s(3회)였으나, 실규모 본수집 중 네트워크가 반복적으로
+# 30초 타임아웃 나는 것이 확인되어 재시도 강도를 올림(원칙 재조정,
 # PROCESS_LOG.md 27번 기록).
 RETRY_DELAYS_SEC = [2, 4, 8, 16, 30]
 USER_AGENT = "Mozilla/5.0 (bluescore-data-collector)"

@@ -8,11 +8,10 @@
 peer_grouping.py, score_assembly.py)을 실제 수집 데이터에 붙여서 확인한다.
 API 서버 없이 CLI에서 바로 돌려볼 수 있는 진단용 스크립트라 계속 남겨둔다.
 
-(2026-08-18) 데이터 소스를 구 `data/raw/`에서 `data_new/`로 전환했다 —
-`services/real_scoring.py`와 동일한 스냅샷(EEZ 제한 5,323척, 실측 정밀도 약
-75%)을 쓴다. 선박 목록은 `convert_data_new_vessels.py`가 만드는 파생 파일을
-그대로 읽는다(먼저 `python -m score.scripts.convert_data_new_vessels`로
-생성해둘 것).
+데이터 소스는 `data_new/`를 쓴다 — `services/real_scoring.py`와 동일한
+스냅샷(EEZ 제한 5,323척, 실측 정밀도 약 75%)이다. 선박 목록은
+`convert_data_new_vessels.py`가 만드는 파생 파일을 그대로 읽는다(먼저
+`python -m score.scripts.convert_data_new_vessels`로 생성해둘 것).
 
 실행:
     python -m score.scripts.convert_data_new_vessels  # 선박 파일 먼저 생성

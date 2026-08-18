@@ -35,10 +35,9 @@ from http_common import (
 EVENTS_URL = "https://gateway.api.globalfishingwatch.org/v3/events"
 RAW_DIR = Path(__file__).resolve().parent.parent / "raw" / "gfw" / "events"
 PROGRESS_PATH = RAW_DIR / "_progress.json"
-# 실측 확인(2026-08-17): limit=50000도 API가 그대로 받아주고, 요청 하나당
-# 걸리는 시간이 건수와 거의 무관(고정 오버헤드가 대부분) — 1000짜리
-# 277번보다 50000짜리 6번이 압도적으로 빠름(28초 vs 20초x277). PROCESS_LOG.md
-# 28번 참고.
+# limit=50000도 API가 그대로 받아주고, 요청 하나당 걸리는 시간이 건수와
+# 거의 무관(고정 오버헤드가 대부분) — 1000짜리 277번보다 50000짜리 6번이
+# 압도적으로 빠름(28초 vs 20초x277). PROCESS_LOG.md 28번 참고.
 PAGE_LIMIT = 50000
 
 

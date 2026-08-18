@@ -48,8 +48,9 @@ class TestLoadVesselTonnageIndex:
             assert value is None or isinstance(value, float)
 
     def test_tac_and_mof_are_never_both_present(self):
-        """2026-08-18 실측 확인 사실을 회귀로 지켜본다 — 이게 깨지면
-        score/TODO.md의 '우선순위/충돌 로직 불필요' 전제가 무효화된다."""
+        """tac와 mof가 동시에 채워지지 않는다는 전제를 회귀로 지켜본다 —
+        이게 깨지면 score/TODO.md의 '우선순위/충돌 로직 불필요' 전제가
+        무효화된다."""
         import json
 
         from score.real_axis_b_input import DEFAULT_MATCHES_PATH
@@ -92,8 +93,8 @@ class TestBuildAxisBRows:
         assert set(rows[0].keys()) == expected_keys
 
     def test_gear_type_is_always_none_for_now(self, rows):
-        """2026-08-18 결정(옵션 c) 회귀 확인 — gearType을 채우기 시작하면
-        이 테스트를 의도적으로 고쳐야 한다."""
+        """gearType이 아직 채워지지 않는다는 전제의 회귀 확인 —
+        gearType을 채우기 시작하면 이 테스트를 의도적으로 고쳐야 한다."""
         assert all(row["gearType"] is None for row in rows)
 
     def test_sea_area_is_string_not_tuple(self, rows):

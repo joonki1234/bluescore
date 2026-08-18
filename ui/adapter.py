@@ -41,12 +41,10 @@ def _score(vessel_id: str) -> Dict:
 
 
 # ─── 실산출(sourceType=real) 미리보기 ────────────────────────────────────────
-# 2026-08-18(오동규, 최지희 확인 필요): A/B축 실산출이 API까지는 연결됐는데
-# 화면 어디서도 안 보이길래 추가함. 데모(fisher.py/bank.py)와 달리 시뮬레이터·
-# 설명(explain)·이의제기는 없다 — services/scoring.py._build_real_score()가
-# 그 기능들을 아직 지원하지 않는다(데모 fixture 전용). API 응답을 화면 키로
-# 변환하지 않고 그대로 쓴다 — 실산출은 아직 "다듬어진 데모 스키마"가 아니라
-# API 원본 그대로 정직하게 보여주는 쪽이 맞다고 판단.
+# 데모(fisher.py/bank.py)와 달리 시뮬레이터·설명(explain)·이의제기는 없다 —
+# services/scoring.py._build_real_score()가 그 기능들을 아직 지원하지 않는다
+# (데모 fixture 전용). API 응답을 화면 키로 변환하지 않고 그대로 쓴다 — 실산출은
+# 아직 "다듬어진 데모 스키마"가 아니라 API 원본 그대로 보여주는 쪽이 맞다.
 @lru_cache(maxsize=1)
 def real_vessel_options(limit: int = 50) -> List[Dict]:
     """실산출 선박 목록(최대 limit척). 5,323척 전체를 드롭다운에 넣는 건

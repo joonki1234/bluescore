@@ -57,12 +57,10 @@ AXIS_A_WEIGHT = 0.65
 AXIS_B_WEIGHT = 0.35
 AXIS_A_GAIN_PER_REVISIT_STEP = 7.0
 AXIS_A_COST_PER_KNOT = 0.8
-# B축 관련 트레이드오프 계수(속도↔B축, 재방문↔B축)는 2026-08-18에
-# score/tradeoff_coefficients.py의 실제 물리식 기반 함수로 교체했다 — 원래 여기
-# 있던 고정 상수(AXIS_B_GAIN_PER_KNOT=3.2, AXIS_B_COST_PER_REVISIT_STEP=2.4)는
-# 근거 없는 정책 예시였다. 이 파일은 services/ 소유자(최지희)의 파일이라 배선을
-# 바꾸는 것 자체가 조율 대상이었음 — 오동규가 작업, 최지희 확인 완료(2026-08-18,
-# 같은 날짜에 추가된 A축 격자 크기·재방문 스케일 확정값 변경분 포함).
+# B축 관련 트레이드오프 계수(속도↔B축, 재방문↔B축)는 score/tradeoff_coefficients.py의
+# 실제 물리식 기반 함수로 교체했다 — 원래 여기 있던 고정 상수
+# (AXIS_B_GAIN_PER_KNOT=3.2, AXIS_B_COST_PER_REVISIT_STEP=2.4)는 근거 없는 정책
+# 예시였다.
 FUEL_PERCENT_PER_AXIS_B_POINT = 0.55
 AXIS_SCORE_FLOOR = 4.0
 AXIS_SCORE_CEIL = 97.0
@@ -266,10 +264,10 @@ class ScoringService:
             raise NotFoundError(f"실데이터 선박을 찾을 수 없습니다: {vessel_id}") from exc
         vessel = result.vessel
 
-        # 2026-08-18: B축 연결(오동규, 최지희 확인 후 진행). A축만 되던 대다수
-        # 선박은 그대로 "partial"이고(톤수 매칭 커버리지 43.4%뿐이라 B축 자체가
-        # 안 나오는 경우가 흔함), A축+B축이 둘 다 유사군 백분위까지 나온 선박만
-        # "success"로 승격해 BlueScore·금리구간을 낸다.
+        # B축 연결 이후: A축만 되던 대다수 선박은 그대로 "partial"이고(톤수
+        # 매칭 커버리지 43.4%뿐이라 B축 자체가 안 나오는 경우가 흔함), A축+B축이
+        # 둘 다 유사군 백분위까지 나온 선박만 "success"로 승격해 BlueScore·
+        # 금리구간을 낸다.
         has_axis_b = result.axis_b_score is not None
         status = "success" if result.status == "partial" and has_axis_b else result.status
 
@@ -321,10 +319,9 @@ class ScoringService:
             matching_confidence=None,
             matching_method=result.matching_method,
             matching_reason=result.matching_reason,
-            # 2026-08-18: A축 요인 기여도(SHAP) 실연결(오동규, 최지희 확인 필요).
-            # B축은 연결 안 함 — score/shap_factors.py 모듈 docstring 참고
-            # ("점수"가 아니라 "기준선 조건"만 설명 가능하다는 의미론적
-            # 제약으로, B축 SHAP 코드 자체를 팀 결정으로 들어냄).
+            # A축 요인 기여도(SHAP) 실연결. B축은 연결 안 함 — score/shap_factors.py
+            # 모듈 docstring 참고("점수"가 아니라 "기준선 조건"만 설명 가능하다는
+            # 의미론적 제약으로 B축 SHAP 코드 자체를 들어냄).
             shap_factors=[ShapFactorSchema(**item) for item in result.shap_factors],
             message=message,
             created_at=datetime.now(timezone.utc),

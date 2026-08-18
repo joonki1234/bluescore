@@ -57,8 +57,7 @@ def make_dummy_dataset():
 class TestRowsToFeatureDataframe:
     def test_single_row_with_missing_numeric_feature_is_float_dtype(self):
         """단일 행 + 수치형 컬럼이 None이면 pandas가 dtype을 object로
-        추론해버리는 함정(2026-08-18, score/shap_factors.py 실데이터
-        검증 중 실제로 겪음) 회귀 확인. object dtype은 LightGBM의
+        추론해버리는 함정에 대한 회귀 확인. object dtype은 LightGBM의
         pred_contrib=True(SHAP) 경로에서 ValueError를 낸다."""
         from score.axis_b_baseline import NUMERIC_FEATURE_COLUMNS, _rows_to_feature_dataframe
 
@@ -115,9 +114,8 @@ class TestFitBaselineModel:
 
 class TestResidualCapturesSpeedSignal:
     """averageSpeedKnots/totalDistanceKm을 LightGBM 입력에서 뺀 뒤, 잔차가
-    실제로 "속도 선택"을 반영하는지 확인한다 (2026-08-18, axis_b_baseline.py
-    docstring [해결됨] 항목 대응). 2026-08-13 데모에서는 속도를 피처에 남겨둬서
-    잔차가 -21.8%~+8.2%로 무질서하게 흩어졌었다."""
+    실제로 "속도 선택"을 반영하는지 확인한다. 속도를 피처에 남겨두면 잔차가
+    무질서하게 흩어져 신호로 쓸 수 없다."""
 
     def test_residual_increases_with_speed_when_other_conditions_are_equal(self):
         # 톤수 여러 단계 × 속도 여러 단계 조합으로 기준선을 학습시킨다 —
@@ -142,7 +140,7 @@ class TestResidualCapturesSpeedSignal:
         # "기대보다 더 썼다"는 신호가 커진다는 뜻.
         assert residuals == sorted(residuals)
         # 잡음이 아니라 뚜렷한 신호여야 한다 — 가장 빠른 배와 가장 느린 배의
-        # 잔차 차이가 커야 한다(2026-08-13 데모의 흩어진 잔차와 대비).
+        # 잔차 차이가 커야 한다.
         assert residuals[-1] - residuals[0] > 0
 
     def test_averageSpeedKnots_and_totalDistanceKm_are_not_lightgbm_features(self):

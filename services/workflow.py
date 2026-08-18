@@ -112,13 +112,11 @@ class WorkflowService:
     def _is_current_real_score(score: ScoreResponse) -> bool:
         """실데이터 점수 캐시가 지금 코드/데이터 기준으로 유효한지 확인한다.
 
-        2026-08-18에 실제로 겪은 버그: `sourceType=real`의 score_run_id가
-        `f"real-axis-a-{vesselId}-20260813"`처럼 고정 문자열이라, 예전
-        코드(데이터 소스 전환 전, B축 연결 전)로 SQLite에 한 번 캐싱된 뒤로는
-        코드를 아무리 고쳐도 그 캐시가 영원히 반환됐다 — 데모 캐시와 달리
-        신선도 체크가 아예 없었다. `data_snapshot_id`/`model_version`이 지금
-        코드가 낼 수 있는 값과 다르면(예: data_new 전환, B축 연결처럼 버전을
-        올리는 변경이 있었으면) 캐시를 버리고 다시 계산한다.
+        `sourceType=real`의 score_run_id는 `f"real-axis-a-{vesselId}-20260813"`처럼
+        고정 문자열이라, 한 번 SQLite에 캐싱되면 코드를 고쳐도 그 캐시가 그대로
+        반환된다 — 데모 캐시와 달리 신선도 체크가 아예 없다. `data_snapshot_id`/
+        `model_version`이 지금 코드가 낼 수 있는 값과 다르면(예: data_new 전환,
+        B축 연결처럼 버전을 올리는 변경이 있었으면) 캐시를 버리고 다시 계산한다.
         """
         if score.status not in ("success", "partial"):
             return True
