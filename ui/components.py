@@ -81,6 +81,12 @@ _MINI_CARD_CSS = f"""
   .bs-mini-marker {{
     position:absolute; top:-3px; width:2px; height:14px; background:{theme.INK_SOFT};
   }}
+  .bs-mini-pill {{
+    display:inline-block; border-radius:999px; padding:3px 10px;
+    font-size:11px; font-weight:700; margin-top:8px;
+  }}
+  .bs-mini-pill.pass {{ background:{theme.POSITIVE_SOFT}; color:{theme.POSITIVE}; }}
+  .bs-mini-pill.fail {{ background:{theme.NEGATIVE_SOFT}; color:{theme.NEGATIVE}; }}
 </style>
 """
 
@@ -248,10 +254,10 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
     factors는 score/shap_factors.axis_a_factor_shares()가 낸 {"label","value","axis"} 리스트 —
     value는 세 항 절댓값 합 대비 부호 있는 비중(%)이다. value는 axis_a_pressure_raw에
     더해지는 방향이고, score/score_assembly.raw_to_score()는 raw가 낮을수록(=압력이
-    적을수록) A축 점수를 높게 준다 — 그래서 value가 음수(압력을 깎는 방향)일수록
-    이 선박에는 좋은 신호라 direction_color(-value)로 부호를 뒤집어 칠한다(양수=압력
-    증가=나쁨=빨강, 음수=압력 감소=좋음=초록). 그냥 direction_color(value)를 쓰면
-    "압력이 적어서 좋은 상황"이 빨간색으로 표시돼 정반대로 오해를 준다.
+    적을수록) A축 점수를 높게 준다 — 즉 value의 +/- 부호만 보고는 좋은 건지 나쁜
+    건지 바로 알기 어렵다(부호를 뒤집어야 함). 그래서 숫자·막대는 축 중립색으로
+    두고, "압력 감소/증가(좋음/나쁨)" 판정은 부호와 분리해 아래 pill로 따로
+    보여준다 — 숫자의 +/-가 곧 좋고 나쁨이라고 오해하지 않도록.
     """
     if not factors:
         return
@@ -259,24 +265,30 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
     rows = []
     for f in factors:
         value = f["value"]
-        color = theme.direction_color(-value) if value != 0 else theme.INK_SOFT
         width = min(abs(value), 100.0)
+        if value < 0:
+            pill = '<span class="bs-mini-pill pass">압력 감소 · 이 선박에 유리</span>'
+        elif value > 0:
+            pill = '<span class="bs-mini-pill fail">압력 증가 · 이 선박에 불리</span>'
+        else:
+            pill = ""
         rows.append(
             f"""<div class="bs-mini-card" style="margin-bottom:10px;">
   <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:6px;">
     <span style="font-size:13.5px; font-weight:700; color:{theme.INK};">{f['label']}</span>
     <span class="bs-mini-value" style="margin-left:auto; font-size:16px; font-weight:800;
-      color:{color};" data-count="{value}" data-decimals="1" data-signed="1">0</span>
+      color:{theme.AXIS_A};" data-count="{value}" data-decimals="1" data-signed="1">0</span>
     <span class="bs-mini-unit">%</span>
   </div>
   <div class="bs-mini-track">
-    <div class="bs-mini-fill" style="background:{color};" data-fill="{width}"></div>
+    <div class="bs-mini-fill" style="background:{theme.AXIS_A};" data-fill="{width}"></div>
   </div>
+  {pill}
 </div>"""
         )
 
     html = f"{_MINI_CARD_CSS}{''.join(rows)}<script>{_COUNT_UP_JS}</script>"
-    components_html(html, height=92 * len(factors), scrolling=False)
+    components_html(html, height=118 * len(factors), scrolling=False)
 
 
 def skeleton_score_card(label: str = "불러오는 중…") -> None:
