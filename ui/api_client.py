@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 from typing import Any, Dict, Optional
+from urllib.parse import urlencode
 
 import requests
 
@@ -55,8 +56,21 @@ class BlueScoreApiClient:
     def config(self) -> Dict:
         return self._request("GET", "/config")
 
-    def list_vessels(self, source_type: str = "demo") -> Dict:
-        return self._request("GET", f"/vessels?sourceType={source_type}")
+    def list_vessels(
+        self,
+        source_type: str = "demo",
+        *,
+        status: Optional[str] = None,
+        query: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> Dict:
+        params = {"sourceType": source_type, "limit": limit, "offset": offset}
+        if status:
+            params["status"] = status
+        if query:
+            params["query"] = query
+        return self._request("GET", f"/vessels?{urlencode(params)}")
 
     def score(self, vessel_id: str, source_type: str = "demo") -> Dict:
         return self._request("GET", f"/vessels/{vessel_id}/score?sourceType={source_type}")
@@ -70,12 +84,16 @@ class BlueScoreApiClient:
     def simulation_surface(self, vessel_id: str) -> Dict:
         return self._request("GET", f"/vessels/{vessel_id}/simulation-surface")
 
-    def explanation(self, vessel_id: str) -> Dict:
-        return self._request("GET", f"/vessels/{vessel_id}/explanation")
-
-    def ask(self, vessel_id: str, question: str) -> Dict:
+    def explanation(self, vessel_id: str, source_type: str = "demo") -> Dict:
         return self._request(
-            "POST", f"/vessels/{vessel_id}/questions", json={"question": question}
+            "GET", f"/vessels/{vessel_id}/explanation?sourceType={source_type}"
+        )
+
+    def ask(self, vessel_id: str, question: str, source_type: str = "demo") -> Dict:
+        return self._request(
+            "POST",
+            f"/vessels/{vessel_id}/questions?sourceType={source_type}",
+            json={"question": question},
         )
 
     def create_appeal(self, score_run_id: str, reason: str, detail: str) -> Dict:

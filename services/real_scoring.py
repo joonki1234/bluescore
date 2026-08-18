@@ -187,7 +187,6 @@ def _result_from_context(
             vessel_id, group if status == "success" else None, axis_b_results, min_peer_size
         )
     )
-    has_specs = vessel.get("tonnage") is not None and bool(vessel.get("fishingType"))
     return RealAxisAResult(
         vessel_id=vessel_id,
         status="partial" if status == "success" else status,
@@ -198,7 +197,7 @@ def _result_from_context(
         skipped_event_count=len(axis_result.skipped_events),
         vessel=vessel,
         matching_method="snapshotVesselId",
-        matching_reason=None if has_specs else "톤수 또는 어업종 메타데이터가 비어 있습니다.",
+        matching_reason=None,
         axis_b_score=axis_b_score,
         axis_b_raw=axis_b_raw,
         axis_b_used_row_count=axis_b_used_row_count,

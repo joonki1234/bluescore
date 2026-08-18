@@ -163,8 +163,20 @@ def create_app(
     def list_vessels(
         source_type: str = Query(default="demo", alias="sourceType", pattern="^(demo|real)$"),
         limit: int = Query(default=50, ge=1, le=200),
+        status: Optional[str] = Query(
+            default=None,
+            pattern="^(success|partial|insufficientSample|matchingFailed)$",
+        ),
+        query: Optional[str] = Query(default=None, max_length=200),
+        offset: int = Query(default=0, ge=0),
     ) -> VesselListResponse:
-        return workflow.list_vessels(source_type, limit)
+        return workflow.list_vessels(
+            source_type,
+            limit,
+            status=status,
+            query=query,
+            offset=offset,
+        )
 
     @api.get("/vessels/{vessel_id}/score", response_model=ScoreResponse)
     def get_score(

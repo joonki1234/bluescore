@@ -35,34 +35,69 @@ def _vessel_summaries(source_type: str = "demo") -> Dict:
     return _api.list_vessels(source_type)
 
 
-@lru_cache(maxsize=32)
-def _score(vessel_id: str) -> Dict:
-    return _api.score(vessel_id)
+@lru_cache(maxsize=96)
+def _score(vessel_id: str, source_type: str = "demo") -> Dict:
+    return _api.score(vessel_id, source_type)
 
 
 # ─── 실산출(sourceType=real) 미리보기 ────────────────────────────────────────
-# 데모(fisher.py/bank.py)와 달리 시뮬레이터·설명(explain)·이의제기는 아직
-# services/scoring.py._build_real_score()가 지원하지 않는다. API 응답을 화면
-# 키로 변환하지 않고 원본(camelCase) 그대로 쓴다.
-@lru_cache(maxsize=1)
-def real_vessel_options(limit: int = 50) -> List[Dict]:
-    """실산출 선박 목록(최대 limit척). 5,323척 전체를 드롭다운에 넣는 건
-    비현실적이라 API의 기본 limit(50)을 그대로 쓴다.
+# 실산출 응답은 화면용 키로 바꾸지 않고 API 원본(camelCase) 그대로 쓴다.
+@lru_cache(maxsize=64)
+def _real_vessel_page(
+    status: Optional[str], query: str, limit: int, offset: int
+) -> Dict:
+    return _api.list_vessels(
+        "real",
+        status=status,
+        query=query or None,
+        limit=limit,
+        offset=offset,
+    )
 
-    ApiClientError를 여기서 삼키지 않는다 — 예전엔 삼키고 빈 리스트를
-    반환했는데, 이 함수가 @lru_cache라 그 빈 리스트가 프로세스 수명 내내
-    캐싱돼서 첫 요청이 한 번만 타임아웃 나도(실산출 첫 요청은 최대 20여
-    초 걸림) 이후 백엔드가 정상화돼도 계속 빈 화면만 떴다(실측으로 확인한
-    버그). lru_cache는 예외를 캐싱하지 않으므로, 예외를 그대로 올려서
-    app.py의 except adapter.ApiClientError가 처리하게 하면 다음 재시도가
-    실제로 다시 API를 부른다."""
-    return _vessel_summaries("real")["vessels"][:limit]
+
+def real_vessel_page(
+    *,
+    status: Optional[str] = None,
+    query: str = "",
+    limit: int = 100,
+    offset: int = 0,
+) -> Dict:
+    """상태·ID·이름으로 좁힌 실산출 선박 목록 한 페이지."""
+    return _real_vessel_page(status, query.strip(), limit, offset)
+
+
+def real_vessel_options(
+    limit: int = 50,
+    *,
+    status: Optional[str] = None,
+    query: str = "",
+    offset: int = 0,
+) -> List[Dict]:
+    return real_vessel_page(
+        status=status,
+        query=query,
+        limit=limit,
+        offset=offset,
+    )["vessels"]
 
 
 @lru_cache(maxsize=64)
 def get_real_score(vessel_id: str) -> Dict:
     """실산출 선박 하나의 점수 응답 — API 원본 그대로(camelCase) 반환."""
-    return _api.score(vessel_id, "real")
+    return _score(vessel_id, "real")
+
+
+def get_real_explanation(score: Dict) -> Optional[Dict]:
+    """완전 산출된 실데이터 점수의 설명만 지연 조회한다."""
+    if score.get("status") != "success":
+        return None
+    return _report(score["vessel"]["vesselId"], "real")
+
+
+def ask_real(score: Dict, question: str) -> Optional[Dict]:
+    if score.get("status") != "success":
+        return None
+    return _api.ask(score["vessel"]["vesselId"], question, "real")
 
 
 @lru_cache(maxsize=8)
@@ -70,13 +105,20 @@ def _surface(vessel_id: str) -> Dict:
     return _api.simulation_surface(vessel_id)
 
 
-@lru_cache(maxsize=8)
-def _report(vessel_id: str) -> Dict:
-    return _api.explanation(vessel_id)
+@lru_cache(maxsize=16)
+def _report(vessel_id: str, source_type: str = "demo") -> Dict:
+    return _api.explanation(vessel_id, source_type)
 
 
 def clear_cache() -> None:
-    for cached in (_config, _vessel_summaries, _score, _surface, _report):
+    for cached in (
+        _config,
+        _vessel_summaries,
+        _score,
+        _real_vessel_page,
+        _surface,
+        _report,
+    ):
         cached.cache_clear()
 
 
@@ -261,7 +303,7 @@ def simulate_speed_axis(vessel: Dict) -> List[float]:
 def explanation(vessel: Dict) -> Dict:
     if not is_scored(vessel):
         return {"summary": "", "shapFactors": [], "recommendations": [], "source": ""}
-    item = _report(vessel["vesselId"])
+    item = _report(vessel["vesselId"], "demo")
     return {
         "summary": item["summary"], "shapFactors": item["shapFactors"],
         "recommendations": item["recommendations"], "source": item["explanationSource"],
@@ -271,16 +313,16 @@ def explanation(vessel: Dict) -> Dict:
 
 
 def detailed_report(vessel: Dict) -> Dict:
-    item = _report(vessel["vesselId"])
+    item = _report(vessel["vesselId"], "demo")
     return {"rows": item["detailedReport"], "source": item["reportSource"]}
 
 
 def improvement_plans(vessel: Dict) -> List[Dict]:
-    return _report(vessel["vesselId"]).get("improvementPlans", [])
+    return _report(vessel["vesselId"], "demo").get("improvementPlans", [])
 
 
 def ask_ai(vessel: Dict, question: str) -> Dict:
-    return _api.ask(vessel["vesselId"], question)
+    return _api.ask(vessel["vesselId"], question, "demo")
 
 
 def _legacy_appeal(item: Dict) -> Dict:

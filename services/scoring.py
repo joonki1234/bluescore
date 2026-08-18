@@ -21,6 +21,7 @@ from api.schemas import (
     ExplanationResponse,
     FactorMetricSchema,
     ImprovementPlan,
+    MatchingEvidence,
     PeerContext,
     RateBand,
     RateLookupResponse,
@@ -161,7 +162,15 @@ class ScoringService:
             return f"demo-score-{vessel_id.lower()}-v1"
         return real_score_run_id(vessel_id)
 
-    def list_vessels(self, source_type: str = "demo", limit: int = 50) -> VesselListResponse:
+    def list_vessels(
+        self,
+        source_type: str = "demo",
+        limit: int = 50,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        offset: int = 0,
+    ) -> VesselListResponse:
         metadata = response_metadata(source_type)
         if source_type == "real":
             if not self.real_adapter.available:
@@ -169,17 +178,38 @@ class ScoringService:
             # BlueScore까지 완전 산출되는 선박이 목록 앞쪽에 오도록 정렬한다 —
             # A축만 나온 사례부터 보이면 "B축은 안 되나?"로 오해를 살 수 있다.
             ranked = self.real_adapter.status_ranked_vessels()
+            status_counts: Dict[str, int] = {}
+            for _, _, item_status in ranked:
+                status_counts[item_status] = status_counts.get(item_status, 0) + 1
+            if status:
+                ranked = [item for item in ranked if item[2] == status]
+            normalized_query = (query or "").strip().casefold()
+            if normalized_query:
+                ranked = [
+                    item
+                    for item in ranked
+                    if normalized_query in str(item[1].get("vesselId") or "").casefold()
+                    or normalized_query in str(item[1].get("name") or "").casefold()
+                ]
+            total = len(ranked)
             vessels = [
                 VesselSummary(
                     vessel_id=v["vesselId"],
                     name=v.get("name") or "가명 선박",
                     meta=f"{_fishing_type_text(v.get('fishingType'))} · {v.get('tonnage') or '톤수 미상'}",
                     fleet_label="실데이터 A축 산출 후보",
-                    status=status,
+                    status=item_status,
+                    match_tier=v.get("matchTier"),
+                    confidence_label=v.get("matchConfidence"),
                 )
-                for _, v, status in ranked[:limit]
+                for _, v, item_status in ranked[offset : offset + limit]
             ]
-            return VesselListResponse(vessels=vessels, **metadata)
+            return VesselListResponse(
+                vessels=vessels,
+                total=total,
+                status_counts=status_counts,
+                **metadata,
+            )
 
         vessels = [
             VesselSummary(
@@ -191,7 +221,7 @@ class ScoringService:
             )
             for v in self._demo_data()["vessels"]
         ]
-        return VesselListResponse(vessels=vessels, **metadata)
+        return VesselListResponse(vessels=vessels, total=len(vessels), **metadata)
 
     def build_score(self, vessel_id: str, source_type: str = "demo") -> ScoreResponse:
         if source_type == "real":
@@ -277,6 +307,7 @@ class ScoringService:
         except KeyError as exc:
             raise NotFoundError(f"실데이터 선박을 찾을 수 없습니다: {vessel_id}") from exc
         vessel = result.vessel
+        evidence = vessel.get("matchingEvidence") or {}
 
         # A축만 되는 대다수 선박은 그대로 "partial"이고(톤수 매칭 커버리지
         # 23.2%뿐), A축+B축이 둘 다 유사군 백분위까지 나온 선박만 "success"로
@@ -290,16 +321,29 @@ class ScoringService:
             blue_score = round(AXIS_A_WEIGHT * result.axis_a_score + AXIS_B_WEIGHT * result.axis_b_score, 1)
             band = _rate_band(grade_for_score(blue_score))
 
+        if result.axis_b_score is not None:
+            axis_b_missing_reason = None
+        elif vessel.get("tonnage") is None:
+            axis_b_missing_reason = "TAC 매칭 톤수가 없어 B축을 산출할 수 없습니다."
+        elif not vessel.get("fishingType"):
+            axis_b_missing_reason = "구체적인 GFW 어업종이 없어 B축 유사군을 구성할 수 없습니다."
+        elif not result.axis_b_used_row_count:
+            axis_b_missing_reason = "유효한 B축 이벤트가 없어 운항 효율을 산출할 수 없습니다."
+        else:
+            axis_b_missing_reason = "유사군 내 B축 표본이 부족합니다."
+
         if status == "success":
             message = (
                 "A축·B축 모두 실산출되었습니다. 해양기상 단위(풍속 m/s)는 공식 확인이 "
                 "아니라 정황 추정이며, 유속·어업종 일부 필드는 아직 미확인·미보강 "
                 "상태입니다 — data_new/README.md 한계 목록 참고."
             )
-        elif result.axis_a_score is not None:
-            message = "A축만 실산출되었습니다. 이 선박은 유사군 내 B축 표본이 부족해 BlueScore·금리구간은 산출하지 않습니다."
+        elif status == "partial":
+            message = f"A축만 실산출되었습니다. {axis_b_missing_reason} BlueScore·금리구간은 산출하지 않습니다."
+        elif status == "insufficientSample":
+            message = "유효 이벤트의 원시값은 계산됐지만 A축 유사군 표본이 부족해 점수로 변환하지 않습니다."
         else:
-            message = "A축만 실산출되었습니다. B축·BlueScore·금리구간은 산출하지 않습니다."
+            message = "스냅샷에 유효한 조업 이벤트가 없어 점수를 산출하지 않습니다."
 
         return ScoreResponse(
             score_run_id=self.score_run_id(vessel_id, "real"),
@@ -309,6 +353,8 @@ class ScoringService:
                 meta=f"{_fishing_type_text(vessel.get('fishingType'))} · {vessel.get('tonnage') or '톤수 미상'}",
                 fleet_label="GFW 고정 스냅샷 유사군",
                 status=status,
+                match_tier=vessel.get("matchTier"),
+                confidence_label=vessel.get("matchConfidence"),
             ),
             status=status,
             blue_score=blue_score,
@@ -318,14 +364,20 @@ class ScoringService:
                 raw_value=result.axis_a_raw,
                 used_event_count=result.used_event_count,
                 skipped_event_count=result.skipped_event_count,
-                missing_reason=None if result.axis_a_score is not None else "유사군 표본이 부족합니다.",
+                missing_reason=(
+                    None
+                    if result.axis_a_score is not None
+                    else "유효한 조업 이벤트가 없습니다."
+                    if status == "matchingFailed"
+                    else "A축 유사군 표본이 부족합니다."
+                ),
             ),
             axis_b=AxisScore(
                 score=result.axis_b_score,
                 state="real" if has_axis_b else "unavailable",
                 raw_value=result.axis_b_raw,
                 used_event_count=result.axis_b_used_row_count,
-                missing_reason=None if has_axis_b else "톤수 미매칭이거나 유사군 내 B축 표본이 부족합니다.",
+                missing_reason=axis_b_missing_reason,
                 estimated_fuel_kg=result.axis_b_estimated_fuel_kg,
                 expected_fuel_kg=result.axis_b_expected_fuel_kg,
             ),
@@ -334,6 +386,7 @@ class ScoringService:
             matching_confidence=None,
             matching_method=result.matching_method,
             matching_reason=result.matching_reason,
+            matching_evidence=MatchingEvidence(**evidence),
             # A축 요인 기여도(SHAP)만 연결한다. B축은 score/shap_factors.py 모듈
             # docstring 참고("점수"가 아니라 "기준선 조건"만 설명 가능한 제약).
             shap_factors=[ShapFactorSchema(**item) for item in result.shap_factors],

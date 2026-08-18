@@ -64,8 +64,22 @@ class WorkflowService:
         self.scoring = scoring or ScoringService()
         self.ledger = ledger or HashLedger()
 
-    def list_vessels(self, source_type: str = "demo", limit: int = 50) -> VesselListResponse:
-        return self.scoring.list_vessels(source_type, limit)
+    def list_vessels(
+        self,
+        source_type: str = "demo",
+        limit: int = 50,
+        *,
+        status: str | None = None,
+        query: str | None = None,
+        offset: int = 0,
+    ) -> VesselListResponse:
+        return self.scoring.list_vessels(
+            source_type,
+            limit,
+            status=status,
+            query=query,
+            offset=offset,
+        )
 
     def config(self) -> ConfigResponse:
         return self.scoring.config()

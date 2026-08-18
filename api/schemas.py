@@ -79,10 +79,14 @@ class VesselSummary(ApiModel):
     meta: str
     fleet_label: str
     status: ScoreStatus
+    match_tier: Optional[str] = None
+    confidence_label: Optional[str] = None
 
 
 class VesselListResponse(VersionedResponse):
     vessels: List[VesselSummary]
+    total: Optional[int] = None
+    status_counts: Dict[str, int] = Field(default_factory=dict)
 
 
 class AxisScore(ApiModel):
@@ -141,6 +145,20 @@ class EligibilityItem(ApiModel):
     passed: bool
 
 
+class MatchingEvidence(ApiModel):
+    match_tier: Optional[str] = None
+    confidence_label: Optional[str] = None
+    source: Optional[str] = None
+    gfw_name: Optional[str] = None
+    matched_name: Optional[str] = None
+    distance_km: Optional[float] = None
+    tonnage_gt: Optional[float] = None
+    tonnage_source: Optional[str] = None
+    fishing_types: List[str] = Field(default_factory=list)
+    fishing_type_source: Optional[str] = None
+    unmatched_reason: Optional[str] = None
+
+
 class ScoreResponse(VersionedResponse):
     score_run_id: str
     vessel: VesselSummary
@@ -153,6 +171,7 @@ class ScoreResponse(VersionedResponse):
     matching_confidence: Optional[float] = Field(default=None, ge=0, le=1)
     matching_method: str
     matching_reason: Optional[str] = None
+    matching_evidence: Optional[MatchingEvidence] = None
     fuel_delta_percent: Optional[float] = None
     coverage_percent: Optional[float] = None
     shap_factors: List[ShapFactorSchema] = Field(default_factory=list)
