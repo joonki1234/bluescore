@@ -49,12 +49,19 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         (아직 미정 — 김태윤님과 확인).
       - 날씨: `weather_WATER_TEMPER`/`weather_WIND_SPEED`/`weather_SURFACE_CURR_SPEED`
         (문자열, "미제공" 결측 표기) -> `seaSurfaceTempC`/`windSpeedMs`/
-        `currentSpeedMs`(float). **단위는 미검증으로 그대로 진행하기로 함**
-        (2026-08-18 결정) — `data/marine_weather_client.py`가 같은 이름으로
-        이미 정규화해뒀지만 이름만 맞춘 것이지 단위를 실측 검증한 근거는
-        없고, 확보했었다는 정식 API 매뉴얼도 리포에 안 남아있어 재확인 불가,
-        `.env`의 `MARINE_WEATHER_API_KEY`도 비어있어 라이브 재확인도 지금은
-        불가. 나중에 매뉴얼 재확보나 키 발급 후 확정.
+        `currentSpeedMs`(float). **단위는 여전히 공식 확인은 안 됐지만, 풍속만
+        정황 근거로 m/s로 가정하고 진행하기로 함**(2026-08-18 갱신) — 근거:
+        (1) 한국 기상청·해양수산부가 풍속 단위로 m/s를 공식 표준으로 쓰는 게
+        잘 알려진 관행, (2) 실제 샘플값과 대조도 됨(`AIR_PRESSURE: "1012"`가
+        표준대기압 1013hPa 근처, `AIR_TEMPERATURE: "14.5"`가 4월 초 한국
+        연안 기온으로 섭씨 기준 타당 — 화씨였다면 영하 9.7도라 말이 안 됨).
+        다만 이건 이 API 문서를 직접 확인한 게 아니라 일반 관행으로 추론한
+        것이라 "확인"이 아니라 "추정"으로 코드에 명시할 것.
+        **`currentSpeedMs`(유속, `SURFACE_CURR_SPEED`)는 단위 추정 근거조차
+        없음 — 완전 미확인 상태로 별도 표시.** 확보했었다는 정식 API
+        매뉴얼도 리포에 안 남아있어 재확인 불가, `.env`의
+        `MARINE_WEATHER_API_KEY`도 비어있어 라이브 재확인도 지금은 불가.
+        나중에 매뉴얼 재확보나 키 발급 후 확정.
       - `seaArea`/`season`: **해결됨(2026-08-18)** — 데이터팀 태그를 안 기다리고
         `score/peer_grouping.py`의 `region_key(latitude, longitude)`/
         `season_key(start)`를 그대로 재사용하기로 함. 이벤트 자체의
