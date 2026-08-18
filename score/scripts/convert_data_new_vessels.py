@@ -1,4 +1,8 @@
-"""Export the tracked vessel snapshots to the legacy gzip format."""
+"""추적 선박 스냅샷을 레거시 gzip 형식으로 선택적으로 내보낸다.
+
+API와 production 점수 계산은 이 파일을 읽지 않는다. 이전 분석 도구와의 호환이
+필요할 때만 실행하며, 변환 규칙은 `score.real_vessel_input`을 그대로 재사용한다.
+"""
 
 import gzip
 import json

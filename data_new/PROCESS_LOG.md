@@ -1330,3 +1330,20 @@ FFA/IMO/IOTC/WCPFC/OPRT 등 원양 참치연승선 국제기구에 등록된 **�
 **결과**: verified 713척(13.4%) → **712척(13.4%)**, 확실한 오탐 1건
 제거. 커버리지 손해는 이 1건뿐(나머지 20척은 애초에 no_korean·
 unmatched였음). `final_vessel_matches.jsonl` 재생성 완료.
+
+## 55. 추적 스냅샷의 서비스·후처리 경로 통합(2026-08-19, 오동규)
+
+production 실산출은 `final_vessel_matches.jsonl`,
+`gfw_vessels_normalized.jsonl`, `events_with_weather.jsonl.gz` 3개를 직접
+읽도록 통합됐다. A축과 B축은 공용 선박 변환을 사용하며 무시된 파생 파일
+`vessels_for_score.jsonl.gz`와 `axis_b_input.jsonl`은 API 실행에 필요하지 않다.
+두 파일의 exporter는 레거시 분석 호환용으로만 남겼다.
+
+작성 당시 입력 건수는 선박 5,323척, 톤수 1,234척, 구체적인 GFW
+fishingType 2,682척, 둘 다 665척이었다(53·54번 매칭 수정 전 스냅샷 —
+현재는 톤수 712척, 13.4%로 대체됨). B축 이벤트는 총 275,782건이며
+tonnageGt 85,985건, gearType 147,441건, 둘 다 45,305건이다. 최종
+서비스 상태는 success 289척, partial 3,395척, insufficientSample
+1,630척, matchingFailed 9척이다(이 역시 53·54번 반영 전 수치 — 매칭이
+줄어든 만큼 success/partial 비중도 다시 계산해야 함). 모델 계수·날씨
+단위·가중치·금리 정책의 타당성은 별도 검증 대상으로 남겼다.

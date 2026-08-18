@@ -62,17 +62,35 @@ def convert_row(row: dict, gear_by_vessel: Optional[Dict[str, List[str]]] = None
     mof = row.get("mof") or {}
 
     tonnage = _to_float(tac.get("tonnageGtTac"))
+    tonnage_source = "TAC" if tonnage is not None else None
     if tonnage is None:
         tonnage = _to_float(mof.get("tonnageGtMof"))
+        tonnage_source = "MOF" if tonnage is not None else None
 
     vessel_id = row["gfwVesselId"]
+    fishing_types = gear_by_vessel.get(vessel_id, [])
+    verified = row.get("matchTier") == "verified"
+    matched_name = tac.get("nameTac") or mof.get("nameMof") if verified else None
     return {
         "vesselId": vessel_id,
         "name": row.get("gfwName"),
         "tonnage": tonnage,
-        "fishingType": gear_by_vessel.get(vessel_id, []),
+        "fishingType": fishing_types,
         "matchTier": row.get("matchTier"),
         "matchConfidence": row.get("matchConfidence"),
+        "matchingEvidence": {
+            "matchTier": row.get("matchTier"),
+            "confidenceLabel": row.get("matchConfidence") if verified else None,
+            "source": tonnage_source if verified else None,
+            "gfwName": row.get("gfwName"),
+            "matchedName": matched_name,
+            "distanceKm": _to_float(row.get("distKm")) if verified else None,
+            "tonnageGt": tonnage if verified else None,
+            "tonnageSource": tonnage_source if verified else None,
+            "fishingTypes": fishing_types,
+            "fishingTypeSource": "GFW" if fishing_types else None,
+            "unmatchedReason": None if verified else row.get("unmatchedReason"),
+        },
     }
 
 

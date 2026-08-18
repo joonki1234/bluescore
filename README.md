@@ -42,6 +42,7 @@ Streamlit은 점수나 상태를 직접 만들지 않고 FastAPI REST 응답만 
 | --- | --- | --- |
 | 어업인 | `/` | 내 점수, 왜 이 점수인지, 무엇을 바꾸면 되는지 |
 | 금융기관 | `/bank` | 산출 근거, 자격 요건, 데이터 출처, 해시, 승인·보류 |
+| 실산출 미리보기 | `/real` | 실제 스냅샷 점수 상태, 매칭 근거, 설명 |
 
 두 화면은 SQLite의 같은 `scoreRunId`와 설명 캐시를 본다. 계산과 업무 상태는
 FastAPI 뒤 서비스가 담당하고 `ui/adapter.py`는 API 클라이언트 역할만 한다.
@@ -54,6 +55,7 @@ ui/api_client.py        HTTP 전송·오류 변환
 ui/adapter.py           API 응답을 기존 화면 키로 변환
 ui/fisher.py            어업인 화면
 ui/bank.py              금융기관 화면
+ui/real_preview.py      실데이터 검색·상태·매칭 근거 화면
 ui/components.py        두 화면이 공유하는 컴포넌트
 ui/theme.py             색 토큰 · CSS · 포맷 헬퍼
 score/                  A축·B축 raw 값 산출
@@ -70,9 +72,22 @@ storage/                SQLite 스키마·저장소·시연 seed/reset
 ## 현재 상태
 
 Streamlit 대시보드는 FastAPI 응답만 읽으며, 이의제기·심사·설명 캐시·체인 메타데이터는
-SQLite에 저장한다. FastAPI의 `sourceType=real` 경로는 버전 고정 GFW
-스냅샷으로 A축까지 실산출합니다. B축 실데이터 검증 전에는 BlueScore를 추정하지 않고
-`partial` 상태로 반환합니다. 시연 화면은 결정론적 `demo` fixture를 사용합니다.
+SQLite에 저장한다. `sourceType=real`은 버전 고정 GFW·TAC 스냅샷으로 A축과
+B축을 계산하며, 두 축의 유사군 표본이 모두 충분한 선박만 BlueScore와 금리구간을
+산출한다. 현재 5,323척의 상태는 `success` 289척, `partial` 3,395척,
+`insufficientSample` 1,630척, `matchingFailed` 9척이다. 실데이터 시뮬레이션은
+모델·정책 파라미터 검증 전이라 지원하지 않는다. 시연 화면은 결정론적 `demo`
+fixture를 사용한다.
+
+실산출 런타임은 Git에서 추적하는 다음 파일을 직접 읽는다.
+
+- `data_new/processed/final_vessel_matches.jsonl`
+- `data_new/processed/gfw_vessels_normalized.jsonl`
+- `data_new/processed/events_with_weather.jsonl.gz`
+
+`vessels_for_score.jsonl.gz`와 `axis_b_input.jsonl`은 레거시 분석 도구를 위한
+선택적 exporter 결과이며 API 실행에는 필요하지 않다. 데이터 재구축 절차와 각
+파일의 역할은 `data_new/README.md`에 정리돼 있다.
 
 ## LLM 설명 사전 생성
 
@@ -80,11 +95,15 @@ SQLite에 저장한다. FastAPI의 `sourceType=real` 경로는 버전 고정 GFW
 
 ```bash
 python -m storage.precompute_explanations
+python -m storage.precompute_explanations --source-type real --limit 1 --fallback-only
+# 또는 특정 실선박: --source-type real --vessel-id <GFW_VESSEL_ID> --fallback-only
 ```
 
 요약·요인 상세·개선 팁은 허용 행동과 숫자 검증을 통과한 뒤 `score_runs.report_json`에
 저장된다. 발표 화면은 이 캐시를 읽으며 런타임 LLM 호출은 기본적으로 꺼져 있다.
 외부 호출 없이 템플릿 캐시만 만들려면 `--fallback-only`를 붙인다.
+실산출은 의도하지 않은 대량 LLM 호출을 막기 위해 `--vessel-id` 또는 `--limit`가
+필수이며, 완전 산출(`success`) 선박만 설명을 생성한다.
 
 ## 로컬 온체인 모드
 

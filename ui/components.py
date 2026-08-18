@@ -236,8 +236,14 @@ def page_title(title: str, subtitle: str = "", *, badge_html: str = "") -> None:
 
 
 # ─── 실산출 미리보기 전용 시각화 ────────────────────────────────────────────
-def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer_count: int,
-                           axis_a_event_count: Optional[int], axis_b_event_count: Optional[int]) -> None:
+def real_vessel_meta_card(
+    vessel_meta: str,
+    matching_reason: Optional[str],
+    peer_count: int,
+    axis_a_event_count: Optional[int],
+    axis_b_event_count: Optional[int],
+    matching_method: Optional[str] = None,
+) -> None:
     """선택한 선박의 어업종·톤수·A/B축 각각의 이벤트 건수를 pill 형태로 보여준다.
 
     A/B축 건수는 같은 개념이 아니다 — A축은 GFW 원본 이벤트 전체, B축은
@@ -245,17 +251,82 @@ def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer
     (score/real_axis_b_input.py 참고). 그래서 각각 표시한다 — 하나로 합치면
     "B축이 왜 이 값 미만인지"를 설명할 근거가 사라진다.
     """
-    pills = [f'<span class="bs-pill info">{vessel_meta}</span>']
+    pills = [f'<span class="bs-pill info">{escape_html(str(vessel_meta))}</span>']
     if axis_a_event_count is not None:
         pills.append(f'<span class="bs-pill info">A축 이벤트 {axis_a_event_count:,}건</span>')
     if axis_b_event_count is not None:
         pills.append(f'<span class="bs-pill info">B축 이벤트 {axis_b_event_count:,}건</span>')
     pills.append(f'<span class="bs-pill info">유사 선박군 {peer_count}척</span>')
-    note = f'<div class="bs-note" style="margin-top:8px;">{matching_reason}</div>' if matching_reason else ""
+    if matching_method:
+        pills.append(
+            '<span class="bs-pill info">이벤트 연결 '
+            f'{escape_html(str(matching_method))}</span>'
+        )
+    note = (
+        '<div class="bs-note" style="margin-top:8px;">'
+        f'{escape_html(str(matching_reason))}</div>'
+        if matching_reason
+        else ""
+    )
     st.markdown(
         f'<div class="bs-card">{"".join(pills)}{note}</div>',
         unsafe_allow_html=True,
     )
+
+
+def real_matching_evidence_card(
+    evidence: Dict,
+    fishing_type_text: str,
+    unmatched_reason_text: Optional[str] = None,
+) -> None:
+    """GFW 선박과 TAC 등록정보의 매칭 근거를 식별번호 없이 보여준다."""
+    esc = lambda value: escape_html(str(value))
+    verified = evidence.get("matchTier") == "verified"
+    rows = [
+        ("GFW 선박명", evidence.get("gfwName") or "미상"),
+        ("GFW 어업종", fishing_type_text or "구체 어업종 없음"),
+        ("어업종 출처", evidence.get("fishingTypeSource") or "확보 안 됨"),
+    ]
+    if verified:
+        confidence = evidence.get("confidenceLabel") or "미상"
+        rows.extend(
+            [
+                ("TAC 매칭", f"검증됨 · {confidence}(범주형)"),
+                ("TAC 선박명", evidence.get("matchedName") or "미상"),
+                (
+                    "활동 위치–등록 항구 거리",
+                    f"{evidence['distanceKm']:.1f} km"
+                    if evidence.get("distanceKm") is not None
+                    else "미상",
+                ),
+                (
+                    "톤수",
+                    f"{evidence['tonnageGt']:g} GT"
+                    if evidence.get("tonnageGt") is not None
+                    else "미상",
+                ),
+                ("톤수 출처", evidence.get("tonnageSource") or "확보 안 됨"),
+            ]
+        )
+    else:
+        raw_reason = evidence.get("unmatchedReason") or "unknown"
+        reason = unmatched_reason_text or raw_reason
+        rows.extend(
+            [
+                ("TAC 매칭", "검증 안 됨"),
+                ("미매칭 사유", f"{reason} ({raw_reason})"),
+            ]
+        )
+
+    body = "".join(
+        '<div style="display:flex; justify-content:space-between; gap:16px; '
+        'padding:5px 0;">'
+        f'<span class="bs-note">{esc(label)}</span>'
+        f'<span style="font-weight:650; color:{theme.INK}; text-align:right;">'
+        f'{esc(value)}</span></div>'
+        for label, value in rows
+    )
+    st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
 def real_shap_factor_bars(factors: List[Dict]) -> None:
@@ -272,6 +343,7 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
     rows = []
     for f in factors:
         value = f["value"]
+        label = escape_html(str(f["label"]))
         width = min(abs(value), 100.0)
         if value < 0:
             color = theme.POSITIVE
@@ -285,7 +357,7 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
         rows.append(
             f"""<div class="bs-mini-card" style="margin-bottom:10px;">
   <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:6px;">
-    <span style="font-size:13.5px; font-weight:700; color:{theme.INK};">{f['label']}</span>
+    <span style="font-size:13.5px; font-weight:700; color:{theme.INK};">{label}</span>
     <span class="bs-mini-value" style="margin-left:auto; font-size:16px; font-weight:800;
       color:{color};" data-count="{width}" data-decimals="1">0</span>
     <span class="bs-mini-unit">%</span>

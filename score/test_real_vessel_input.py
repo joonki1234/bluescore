@@ -15,8 +15,9 @@ def test_convert_row_builds_only_the_service_schema():
         "gfwName": "TEST",
         "matchTier": "verified",
         "matchConfidence": "high",
-        "tac": {"tonnageGtTac": "32"},
+        "tac": {"tonnageGtTac": "32", "nameTac": "테스트호", "vesselNoTac": "SECRET"},
         "mof": {"tonnageGtMof": "99"},
+        "distKm": 12.5,
     }
 
     record = convert_row(row, {"V1": ["SET_GILLNETS"]})
@@ -28,7 +29,44 @@ def test_convert_row_builds_only_the_service_schema():
         "fishingType": ["SET_GILLNETS"],
         "matchTier": "verified",
         "matchConfidence": "high",
+        "matchingEvidence": {
+            "matchTier": "verified",
+            "confidenceLabel": "high",
+            "source": "TAC",
+            "gfwName": "TEST",
+            "matchedName": "테스트호",
+            "distanceKm": 12.5,
+            "tonnageGt": 32.0,
+            "tonnageSource": "TAC",
+            "fishingTypes": ["SET_GILLNETS"],
+            "fishingTypeSource": "GFW",
+            "unmatchedReason": None,
+        },
     }
+    assert "vesselNoTac" not in str(record)
+
+
+def test_convert_row_keeps_unmatched_reason_without_tac_details():
+    record = convert_row(
+        {
+            "gfwVesselId": "V2",
+            "gfwName": "UNKNOWN",
+            "matchTier": "unmatched",
+            "matchConfidence": None,
+            "unmatchedReason": "held_multi",
+            "tac": None,
+            "mof": None,
+        },
+        {"V2": ["DRIFTING_LONGLINES"]},
+    )
+
+    evidence = record["matchingEvidence"]
+    assert evidence["unmatchedReason"] == "held_multi"
+    assert evidence["matchedName"] is None
+    assert evidence["distanceKm"] is None
+    assert evidence["tonnageGt"] is None
+    assert evidence["confidenceLabel"] is None
+    assert evidence["fishingTypeSource"] == "GFW"
 
 
 def test_load_gear_types_excludes_non_specific_labels(tmp_path):
@@ -95,3 +133,15 @@ def test_tracked_snapshot_service_record_counts():
         record["tonnage"] is not None and bool(record["fishingType"])
         for record in records
     ) == 665
+
+    evidence = [record["matchingEvidence"] for record in records]
+    verified = [item for item in evidence if item["matchTier"] == "verified"]
+    unmatched = [item for item in evidence if item["matchTier"] == "unmatched"]
+    assert len(verified) == 1_234
+    assert len(unmatched) == 4_089
+    assert all(item["confidenceLabel"] == "high" for item in verified)
+    assert all(not isinstance(item["confidenceLabel"], float) for item in evidence)
+    assert all(item["source"] == "TAC" for item in verified)
+    assert all(item["tonnageSource"] == "TAC" for item in verified)
+    assert all(item["matchedName"] is None for item in unmatched)
+    assert all(item["distanceKm"] is None for item in unmatched)

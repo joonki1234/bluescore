@@ -1,4 +1,7 @@
-"""공용 B축 입력을 선택적으로 JSONL 파일로 내보낸다.
+"""공용 B축 입력을 분석용 JSONL 파일로 선택적으로 내보낸다.
+
+API와 production B축 계산은 `score.real_axis_b_input.build_axis_b_rows()`를
+메모리에서 직접 호출하므로 `axis_b_input.jsonl`은 런타임 필수 파일이 아니다.
 
 실행:
     python -m data_new.process.build_axis_b_input

@@ -63,6 +63,17 @@ def real_snapshot_e2e(tmp_path_factory):
     )
 
     vessels = scoring.real_adapter.list_vessels()
+    vessel_by_tier = {
+        tier: next(v for v in vessels if v["matchTier"] == tier)
+        for tier in ("verified", "unmatched")
+    }
+    matching_responses = {
+        tier: client.get(
+            f"/vessels/{vessel['vesselId']}/score",
+            params={"sourceType": "real"},
+        )
+        for tier, vessel in vessel_by_tier.items()
+    }
     rows = build_axis_b_rows()
     row_counts = {
         "total": len(rows),
@@ -85,6 +96,8 @@ def real_snapshot_e2e(tmp_path_factory):
         "score_responses": score_responses,
         "unknown_response": unknown_response,
         "vessels": vessels,
+        "vessel_by_tier": vessel_by_tier,
+        "matching_responses": matching_responses,
         "status_counts": Counter(status for _, _, status in ranked),
         "row_counts": row_counts,
         "gear_types": gear_types,
@@ -116,6 +129,21 @@ def test_tracked_snapshot_counts_and_real_availability(real_snapshot_e2e):
     assert real_snapshot_e2e["gear_types"].isdisjoint(EXCLUDED_GEAR_LABELS)
     assert real_snapshot_e2e["status_counts"] == EXPECTED_STATUSES
 
+    evidence = [vessel["matchingEvidence"] for vessel in vessels]
+    verified = [item for item in evidence if item["matchTier"] == "verified"]
+    unmatched = [item for item in evidence if item["matchTier"] == "unmatched"]
+    assert len(verified) == 1_234
+    assert len(unmatched) == 4_089
+    assert Counter(item["unmatchedReason"] for item in unmatched) == {
+        "held_multi": 1_249,
+        "no_korean": 784,
+        "unmatched": 2_056,
+    }
+    distances = [item["distanceKm"] for item in verified]
+    assert min(distances) == pytest.approx(0.2206538985869675)
+    assert max(distances) == pytest.approx(149.825752928251)
+    assert sum(distances) / len(distances) == pytest.approx(64.66532020255381)
+
 
 def test_real_vessel_list_contract_and_order(real_snapshot_e2e):
     response = real_snapshot_e2e["list_response"]
@@ -123,6 +151,9 @@ def test_real_vessel_list_contract_and_order(real_snapshot_e2e):
     body = response.json()
     assert body["sourceType"] == "real"
     assert body["vessels"][0]["status"] == "success"
+    assert len(body["vessels"]) == 50
+    assert body["total"] == 5_323
+    assert body["statusCounts"] == EXPECTED_STATUSES
     expected_metadata = response_metadata("real")
     assert {
         "dataSnapshotId": body["dataSnapshotId"],
@@ -137,6 +168,75 @@ def test_real_vessel_list_contract_and_order(real_snapshot_e2e):
         "rateTableVersion": expected_metadata["rate_table_version"],
         "sourceType": expected_metadata["source_type"],
     }
+
+
+def test_real_vessel_list_filters_search_and_pagination(real_snapshot_e2e):
+    client = real_snapshot_e2e["client"]
+    filtered = client.get(
+        "/vessels",
+        params={"sourceType": "real", "status": "partial", "limit": 7},
+    ).json()
+    assert filtered["total"] == EXPECTED_STATUSES["partial"]
+    assert len(filtered["vessels"]) == 7
+    assert {item["status"] for item in filtered["vessels"]} == {"partial"}
+
+    first = client.get(
+        "/vessels",
+        params={"sourceType": "real", "status": "success", "limit": 5},
+    ).json()["vessels"]
+    second = client.get(
+        "/vessels",
+        params={
+            "sourceType": "real",
+            "status": "success",
+            "limit": 5,
+            "offset": 5,
+        },
+    ).json()["vessels"]
+    assert {item["vesselId"] for item in first}.isdisjoint(
+        item["vesselId"] for item in second
+    )
+
+    target = real_snapshot_e2e["vessels"][0]
+    by_id = client.get(
+        "/vessels",
+        params={"sourceType": "real", "query": target["vesselId"].lower()},
+    ).json()
+    assert any(item["vesselId"] == target["vesselId"] for item in by_id["vessels"])
+    if target.get("name"):
+        by_name = client.get(
+            "/vessels",
+            params={"sourceType": "real", "query": target["name"].swapcase()},
+        ).json()
+        assert any(item["vesselId"] == target["vesselId"] for item in by_name["vessels"])
+
+
+def test_real_matching_evidence_contract(real_snapshot_e2e):
+    verified = real_snapshot_e2e["matching_responses"]["verified"]
+    unmatched = real_snapshot_e2e["matching_responses"]["unmatched"]
+    assert verified.status_code == 200
+    assert unmatched.status_code == 200
+
+    verified_body = verified.json()
+    verified_source = real_snapshot_e2e["vessel_by_tier"]["verified"]
+    evidence = verified_body["matchingEvidence"]
+    assert verified_body["matchingConfidence"] is None
+    assert evidence == verified_source["matchingEvidence"]
+    assert evidence["confidenceLabel"] == "high"
+    assert not isinstance(evidence["confidenceLabel"], (int, float))
+    assert evidence["source"] == "TAC"
+    assert "vesselNo" not in str(evidence)
+
+    unmatched_evidence = unmatched.json()["matchingEvidence"]
+    assert unmatched_evidence["matchTier"] == "unmatched"
+    assert unmatched_evidence["unmatchedReason"] in {
+        "held_multi",
+        "no_korean",
+        "unmatched",
+    }
+    assert unmatched_evidence["matchedName"] is None
+    assert unmatched_evidence["distanceKm"] is None
+    assert unmatched_evidence["tonnageGt"] is None
 
 
 def test_representative_statuses_use_current_camel_case_contract(real_snapshot_e2e):
