@@ -97,7 +97,7 @@
 {"gfwVesselId": "04735f4f6-6fee-307e-e97d-71ca09912e5e", "gfwName": "TAE YANG HO", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "05120026281708", "nameTac": "제88태양호", "tonnageGtTac": "29"}, "mof": null, "distKm": 56.70767557378273}
 {"gfwVesselId": "0473ada70-0858-ed5b-3c9d-0181aa3c1910", "gfwName": "301 MAN GANG HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "0478eef18-8285-cbad-35a8-883317fa288d", "gfwName": "SIN HEUNG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
-{"gfwVesselId": "047a41ea8-85f2-b742-b819-30513d72a4ce", "gfwName": "SAWASDEE BALTIC", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
+{"gfwVesselId": "047a41ea8-85f2-b742-b819-30513d72a4ce", "gfwName": "SAWASDEE BALTIC", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "04803d728-8a10-2f4a-b6f4-451185205331", "gfwName": "501 TAE GWANG HO", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "98090026461104", "nameTac": "제501태광호", "tonnageGtTac": "39"}, "mof": null, "distKm": 92.8235769795274}
 {"gfwVesselId": "0483e4a25-5366-99b0-998b-595d00e8a0ca", "gfwName": "SUPER STAR", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
 {"gfwVesselId": "048f47206-6fba-17bf-adfa-9d4a05e69ad0", "gfwName": "JE2KWANG YANG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
@@ -597,14 +597,14 @@
 {"gfwVesselId": "1c5482cc8-8efa-8a8a-640e-1b8359dd4101", "gfwName": "101NAMYANG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "1c5b2ae03-36e5-de25-8ac1-cc88fd64fafb", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "1c8b80a92-2c3e-4131-fc2c-ca1901137b92", "gfwName": "103 GYEONG HAE", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
-{"gfwVesselId": "1ca7d5873-31b3-26a6-7cbb-1def79c9fe0e", "gfwName": "NO.6 KYUNG YANG", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "19110126461309", "nameTac": "경양호", "tonnageGtTac": "8.55"}, "mof": null, "distKm": 123.07401544157489}
+{"gfwVesselId": "1ca7d5873-31b3-26a6-7cbb-1def79c9fe0e", "gfwName": "NO.6 KYUNG YANG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "1cac75d59-9f61-dbc7-565e-5cb5027f3d24", "gfwName": "ONNURI", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "1cc0a3709-98e1-3b86-73ff-fbb8cbd40e02", "gfwName": "153 GYOUNG MIN", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "1cc6b0ebb-b033-ca58-32bb-19dd9bb09294", "gfwName": "JAEGYEONG", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "23049016448253", "nameTac": "제203재경호", "tonnageGtTac": "24"}, "mof": null, "distKm": 19.398280990612278}
 {"gfwVesselId": "1ccdd17cc-ce7d-945b-8386-8ec257043cb8", "gfwName": "BUM JU HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "1ccef1302-2ca0-300e-4738-dfa99d7e12ec", "gfwName": "BLUEBIRD", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
 {"gfwVesselId": "1cecad545-5b13-6beb-52d7-53ac4c79a4e3", "gfwName": "73JEONGSUN", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
-{"gfwVesselId": "1cf01945d-d0ed-9e09-dd3e-f6a7b7f904c2", "gfwName": "PRINCESS CRYSTAL", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
+{"gfwVesselId": "1cf01945d-d0ed-9e09-dd3e-f6a7b7f904c2", "gfwName": "PRINCESS CRYSTAL", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "1cf044d66-6432-50dd-c642-0655ce625175", "gfwName": "GANGDONG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "1d0a0fa79-919f-a525-3c16-a09dab4eedb1", "gfwName": "POONG EO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "1d1e5b667-75e6-2bf8-f2f2-d1e61215b31c", "gfwName": "TONG YEONG 11 HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
@@ -1442,7 +1442,7 @@
 {"gfwVesselId": "44902d839-98ca-560e-f981-756b7311e7aa", "gfwName": "311GYEONGWON", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "4490c726d-d338-d264-69f8-fbd9e0eb1f60", "gfwName": "NAMHAE HO", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "95060346481373", "nameTac": "남해호", "tonnageGtTac": "22"}, "mof": null, "distKm": 40.352362547186075}
 {"gfwVesselId": "449f01aac-c9f1-5490-bcd0-ed4c1bf2b8e1", "gfwName": "7YU GEUM", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
-{"gfwVesselId": "44a773354-4f0b-a701-756a-b1ac61b1293d", "gfwName": "SHILLA HARVESTER", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
+{"gfwVesselId": "44a773354-4f0b-a701-756a-b1ac61b1293d", "gfwName": "SHILLA HARVESTER", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "44b1a8928-84c7-2307-f5ed-fef398c2440f", "gfwName": "DONG BACK HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
 {"gfwVesselId": "44b1f606f-f43b-ea36-f958-67b5bceea4ec", "gfwName": "GYEONGNAM HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "44b7d65d2-2b32-c491-6183-312fbb9c9595", "gfwName": "HOMERUN HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
@@ -2509,7 +2509,7 @@
 {"gfwVesselId": "773631ee3-3cc4-4cba-1d3e-a787954020b7", "gfwName": "MARUHO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "773df415d-d467-b029-c633-8f8484d975a2", "gfwName": "SU JIN", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "7742e1088-84db-461a-b26d-5c225b5b00d8", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
-{"gfwVesselId": "7744f7df3-3f16-66b6-f1e6-0adee9b58097", "gfwName": "OCEAN ACE", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
+{"gfwVesselId": "7744f7df3-3f16-66b6-f1e6-0adee9b58097", "gfwName": "OCEAN ACE", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "774ca560a-a5f8-757a-f95a-b08790675dce", "gfwName": "TAE GWANG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "774e00112-25e1-3322-6778-b907647884c6", "gfwName": "GEUM SEONG HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "774e2d0e9-9b93-a8f1-829b-7dbecd88dedc", "gfwName": "2010GWANGMYENG", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "10080026501307", "nameTac": "제2010광명호", "tonnageGtTac": "54"}, "mof": null, "distKm": 50.3990693501585}
@@ -2605,7 +2605,7 @@
 {"gfwVesselId": "7b61d4de0-0b57-3230-907e-c726bdbfea39", "gfwName": "LEERANG HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "7b743463c-c67e-5e8f-58b9-64d62f026ee9", "gfwName": "HAEKYOUNG HO", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "16070016482400", "nameTac": "제2016해경호", "tonnageGtTac": "24"}, "mof": null, "distKm": 89.49117650938133}
 {"gfwVesselId": "7b753d565-59cb-f039-2c01-d356b4dfc7e9", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
-{"gfwVesselId": "7b82c7ef8-8ee8-8e8d-23a2-93344dc46a2b", "gfwName": "NO56 SHIN YUNG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
+{"gfwVesselId": "7b82c7ef8-8ee8-8e8d-23a2-93344dc46a2b", "gfwName": "NO56 SHIN YUNG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "7b8986793-3a7f-3046-4378-1255970ee6c9", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "7b9d46c0d-d9d8-c4d2-f897-4f297c8c1a7a", "gfwName": "DAE IL HO", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "95090566260001", "nameTac": "제17대일호", "tonnageGtTac": "139"}, "mof": null, "distKm": 142.40643152971643}
 {"gfwVesselId": "7bb40e5af-faa9-9b51-a77f-46dbac398c2d", "gfwName": "HAN IL HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
@@ -3721,7 +3721,7 @@
 {"gfwVesselId": "b3ba40444-4911-4daa-a76c-b2605d8ae849", "gfwName": "GO GO HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "b3bd1661b-b6c3-9aa0-7fff-19d39ecdfb5d", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "b3be89b69-90eb-8f14-7615-0d3e08fc4a45", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
-{"gfwVesselId": "b3c07c1b2-2cf8-4d69-2dea-6a434f4d0309", "gfwName": "AGNES 90 HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
+{"gfwVesselId": "b3c07c1b2-2cf8-4d69-2dea-6a434f4d0309", "gfwName": "AGNES 90 HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "b3e36f303-3437-587b-b9ab-ad4e8fb96304", "gfwName": "JO YANG HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "b3e745a23-3b40-4bc7-1586-c438b22b8894", "gfwName": "2014CHOEGANGLIDEU", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "b3e984c9a-add7-1d6e-1d6f-e263184b7726", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
@@ -4098,7 +4098,7 @@
 {"gfwVesselId": "c686780f9-907b-cf6d-8413-4a6785ab7ab8", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "c68fa8585-5e8a-5038-6eb0-35f78aa1bd16", "gfwName": "YEONG DONG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "c69124f9a-affc-0c6d-4467-9609c6031c12", "gfwName": "301 SEO JIN", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
-{"gfwVesselId": "c6971a4b9-9e10-6eea-106d-afd823af152d", "gfwName": "SAJO THETISIA", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
+{"gfwVesselId": "c6971a4b9-9e10-6eea-106d-afd823af152d", "gfwName": "SAJO THETISIA", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "c698344b4-4722-4817-4aee-866d13b1c107", "gfwName": "HAE SEONG HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "c6db52ad7-7beb-6d96-4495-53e5de2fb640", "gfwName": "SEJONG", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "09080146469101", "nameTac": "제5세종호", "tonnageGtTac": "19"}, "mof": null, "distKm": 134.83098938563063}
 {"gfwVesselId": "c6e35e4bd-dcd5-2424-0298-e18e291b6a6a", "gfwName": "TAE YEONG 2HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
@@ -5145,7 +5145,7 @@
 {"gfwVesselId": "f789a0811-1594-de02-4a4e-006a8bdc8195", "gfwName": "JANG AN HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "f78e9e5f3-326a-1445-1fac-6f68ea9d9195", "gfwName": null, "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "f7969a815-59a9-7fd0-5ada-4c764683386a", "gfwName": "YOUNG SEON HO", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
-{"gfwVesselId": "f7a719863-3d61-1562-c8a0-f34c9fd5d122", "gfwName": "MS ZINNIA", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "no_korean"}
+{"gfwVesselId": "f7a719863-3d61-1562-c8a0-f34c9fd5d122", "gfwName": "MS ZINNIA", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "unmatched"}
 {"gfwVesselId": "f7c6ae3d4-4511-b542-dde8-1bff18a457ee", "gfwName": "2021YEONGPUNG", "matchTier": "verified", "matchConfidence": "high", "tac": {"vesselNoTac": "21089026501305", "nameTac": "제2021영풍호", "tonnageGtTac": "44"}, "mof": null, "distKm": 47.88659819587736}
 {"gfwVesselId": "f7c739b3b-b5cb-6a88-24dd-1dcbe4076717", "gfwName": "YU SUNG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}
 {"gfwVesselId": "f7d7abe32-2c1a-1a31-77e6-4edd7cab6c8b", "gfwName": "5SINYANG", "matchTier": "unmatched", "matchConfidence": null, "tac": null, "mof": null, "unmatchedReason": "held_multi"}

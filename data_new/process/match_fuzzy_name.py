@@ -187,6 +187,17 @@ def run() -> None:
             results.append(result)
             continue
 
+        if gfw.get("hasRegistryMatch"):
+            # GFW 공식 registryInfo가 있는 21척(0.4%)은 대부분 원양 대형선단
+            # 소속(사람 스팟체크로 발견 — "NO.6 KYUNG YANG"이 IMO번호·601GT·
+            # 56.5m 원양 참치연승선인데 TAC의 8.55톤 근해소형선과 오매칭됐음,
+            # 2026-08-18). 우리 모집단은 근해/연안 어선이라 후보풀에서 아예
+            # 제외한다 — registryInfo 없는 selfReportedInfo 기반 매칭만 신뢰.
+            result["category"] = "unmatched"
+            counts["unmatched"] += 1
+            results.append(result)
+            continue
+
         norm = _normalize(name)
         gfw_any_digit = _any_digit(norm)
         centroid = centroids.get(vessel_id)
