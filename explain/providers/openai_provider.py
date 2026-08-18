@@ -1,12 +1,11 @@
 """
 담당: 최지희
 
-OpenAI 프로바이더 — 현재 기본값.
+OpenAI 프로바이더 — 기본값이자 앨런의 강등 대상.
 
-앨런 API는 셀프서비스로 공개돼 있지 않고 이스트소프트 B2B 문의를 거쳐야 해서,
-운영진 회신 전까지 OpenAI로 먼저 붙였다. 앨런 접근이 열리면
-`alan_provider.py`를 채우고 `BLUESCORE_LLM_PROVIDER=alan`으로 바꾸면 되며,
-이 파일을 포함해 다른 코드는 손대지 않는다.
+앨런은 URL 길이 한도와 호출 쿼터가 있어 흐름 전체를 맡기지 않고, 흐름별로
+`alan+openai` 체인을 걸어 앨런이 답하지 못할 때 이 프로바이더가 이어받는다
+(`provider.py`의 `ChainProvider` 참고).
 
 환경변수
 --------
@@ -30,7 +29,7 @@ from __future__ import annotations
 import os
 from typing import Any, Dict
 
-from explain.provider import LLMProvider, ProviderError, ProviderUnavailable
+from explain.provider import LLMProvider, Prompts, ProviderError, ProviderUnavailable
 
 # 기본 모델. 짧은 한국어 문장 생성이라 소형 모델로 충분하다.
 # 바꾸려면 코드가 아니라 BLUESCORE_LLM_MODEL 환경변수로 바꾼다.
@@ -82,12 +81,16 @@ class OpenAIProvider(LLMProvider):
 
     def generate_json(
         self,
-        system_prompt: str,
-        user_prompt: str,
+        prompts: Prompts,
         schema: Dict[str, Any],
         schema_name: str,
     ) -> str:
         client = self._client()
+
+        # 압축본은 앨런의 URL 한도 때문에 있는 것이고, OpenAI는 그 제약이 없다.
+        # 체인에서 앨런이 죽어 여기로 넘어와도 참고 사실 블록이 살아 있는 원본을
+        # 쓴다 — 강등됐다고 근거까지 줄어들면 안 된다.
+        system_prompt, user_prompt = prompts.resolve(compact=False)
 
         try:
             response = client.chat.completions.create(

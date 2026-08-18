@@ -14,11 +14,16 @@ mock이 같은 키를 보고 있어야 프론트가 실제 LLM 연결 전에도 
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 # LLM 응답에 허용되는 축 코드
 AXIS_CODES = ("a", "b")
+
+# 라벨 문자열에 박혀 있는 숫자를 뽑는 패턴. "근해통발 · 29톤 · 남해"의 29,
+# "20–30톤"의 20과 30처럼 화면에도 그대로 보이는 값들이다.
+_LABEL_NUMBER_PATTERN = re.compile(r"\d+(?:\.\d+)?")
 
 
 @dataclass(frozen=True)
@@ -87,7 +92,16 @@ class ExplainInput:
     gear_type: Optional[str] = None
 
     def numeric_values(self) -> List[float]:
-        """응답에 등장해도 되는 숫자들. 숫자 검증의 허용 집합이 된다."""
+        """
+        응답에 등장해도 되는 숫자들. 숫자 검증의 허용 집합이 된다.
+
+        점수·기여도 같은 계산값뿐 아니라 **라벨 안에 박힌 숫자도 넣는다.**
+        선박 라벨이 "근해통발 · 29톤 · 남해"인데 29가 허용 집합에 없으면,
+        모델이 자기 배 톤수를 그대로 옮겨 적었을 뿐인데 `render.py`가
+        수치 창작으로 보고 폴백시킨다. 실제로 앨런 프로바이더를 붙이며
+        이 경우가 드러났다 — 화면에 이미 보이는 숫자를 문장에서 금지할
+        이유가 없다.
+        """
         values: List[float] = [
             self.blue_score,
             self.axis_a_score,
@@ -103,6 +117,9 @@ class ExplainInput:
         for metric in self.factor_metrics:
             values.append(metric.self_value)
             values.append(metric.peer_average)
+        for label in (self.vessel_label, self.fleet_label):
+            for match in _LABEL_NUMBER_PATTERN.findall(label or ""):
+                values.append(float(match))
         return values
 
     def top_positive(self, limit: int = 2) -> List[ShapFactor]:

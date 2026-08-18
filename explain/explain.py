@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
-from explain import fallback, prompt, render
+from explain import fallback, prompt, render, tip_cache
 from explain.contract import (
     LLM_OUTPUT_SCHEMA,
     OBJECTION_OUTPUT_SCHEMA,
@@ -35,12 +35,21 @@ from explain.contract import (
 )
 from explain.provider import (
     LLMProvider,
+    Prompts,
     ProviderError,
     ProviderUnavailable,
     get_provider,
 )
 
 logger = logging.getLogger(__name__)
+
+# 흐름 이름. `BLUESCORE_LLM_PROVIDER__<이름>` 환경변수로 흐름마다 다른
+# 프로바이더를 걸 때의 키가 된다 (`provider.resolve_provider_name` 참고).
+FLOW_EXPLAIN = "explain"
+FLOW_QA = "qa"
+FLOW_OBJECTION = "objection"
+FLOW_REPORT = "report"
+FLOW_TIP = "tip"
 
 SCHEMA_NAME = "bluescore_explanation"
 QA_SCHEMA_NAME = "bluescore_qa"
@@ -69,7 +78,7 @@ def explain(
         return fallback.build(data, "llm_disabled")
 
     try:
-        llm = provider or get_provider()
+        llm = provider or get_provider(flow=FLOW_EXPLAIN)
     except ProviderUnavailable as exc:
         logger.info("프로바이더를 만들 수 없어 폴백합니다: %s", exc)
         return fallback.build(data, "provider_unavailable")
@@ -80,8 +89,7 @@ def explain(
 
     try:
         raw = llm.generate_json(
-            system_prompt=prompt.SYSTEM_PROMPT,
-            user_prompt=prompt.build_user_prompt(data),
+            prompts=prompt.explain_prompts(data),
             schema=LLM_OUTPUT_SCHEMA,
             schema_name=SCHEMA_NAME,
         )
@@ -110,14 +118,15 @@ def explain(
 def _generate_text(
     data: ExplainInput,
     *,
-    system_prompt: str,
-    user_prompt: str,
+    flow: str,
+    prompts: Prompts,
     schema: dict,
     schema_name: str,
     field: str,
     fallback_text: str,
     provider: Optional[LLMProvider] = None,
     use_llm: bool = True,
+    check_forbidden_advice: bool = False,
 ) -> TextOutput:
     """
     문장 하나만 생성하는 흐름(질의응답·이의제기 응답·상세 리포트)의 공통 뼈대.
@@ -129,7 +138,7 @@ def _generate_text(
         return TextOutput(text=fallback_text, source="fallback:llm_disabled")
 
     try:
-        llm = provider or get_provider()
+        llm = provider or get_provider(flow=flow)
     except ProviderUnavailable as exc:
         logger.info("프로바이더를 만들 수 없어 폴백합니다: %s", exc)
         return TextOutput(text=fallback_text, source="fallback:provider_unavailable")
@@ -140,8 +149,7 @@ def _generate_text(
 
     try:
         raw = llm.generate_json(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
+            prompts=prompts,
             schema=schema,
             schema_name=schema_name,
         )
@@ -152,7 +160,9 @@ def _generate_text(
         logger.warning("프로바이더 %s 호출 실패: %s", llm.name, exc)
         return TextOutput(text=fallback_text, source=f"fallback:{llm.name}_error")
 
-    text, error = render.safe_parse_text(raw, data, field)
+    text, error = render.safe_parse_text(
+        raw, data, field, check_forbidden_advice=check_forbidden_advice
+    )
     if error is not None:
         logger.warning("응답 검증 실패, 폴백합니다: %s", error)
         return TextOutput(text=fallback_text, source="fallback:validation_failed")
@@ -167,8 +177,8 @@ def answer_question(
     """어업인의 자유 질문에 답한다. `explain()`과 같은 LLM 프로바이더를 재사용한다."""
     return _generate_text(
         data,
-        system_prompt=prompt.QA_SYSTEM_PROMPT,
-        user_prompt=prompt.build_qa_prompt(data, question),
+        flow=FLOW_QA,
+        prompts=prompt.qa_prompts(data, question),
         schema=QA_OUTPUT_SCHEMA,
         schema_name=QA_SCHEMA_NAME,
         field="answer",
@@ -185,8 +195,8 @@ def respond_to_objection(
     """이의제기에 대한 답변 초안을 만든다. 심사역이 검토 후 전달한다."""
     return _generate_text(
         data,
-        system_prompt=prompt.OBJECTION_SYSTEM_PROMPT,
-        user_prompt=prompt.build_objection_prompt(data, reason, detail),
+        flow=FLOW_OBJECTION,
+        prompts=prompt.objection_prompts(data, reason, detail),
         schema=OBJECTION_OUTPUT_SCHEMA,
         schema_name=OBJECTION_SCHEMA_NAME,
         field="response",
@@ -211,7 +221,7 @@ def generate_detailed_report(
         return ReportOutput(items=fallback_items, source="fallback:llm_disabled")
 
     try:
-        llm = provider or get_provider()
+        llm = provider or get_provider(flow=FLOW_REPORT)
     except ProviderUnavailable as exc:
         logger.info("프로바이더를 만들 수 없어 폴백합니다: %s", exc)
         return ReportOutput(items=fallback_items, source="fallback:provider_unavailable")
@@ -222,8 +232,7 @@ def generate_detailed_report(
 
     try:
         raw = llm.generate_json(
-            system_prompt=prompt.REPORT_SYSTEM_PROMPT,
-            user_prompt=prompt.build_report_prompt(data),
+            prompts=prompt.report_prompts(data),
             schema=REPORT_OUTPUT_SCHEMA,
             schema_name=REPORT_SCHEMA_NAME,
         )
@@ -251,6 +260,7 @@ def generate_improvement_tip(
     actions: List[str],
     provider: Optional[LLMProvider] = None,
     use_llm: bool = True,
+    use_cache: bool = True,
 ) -> TextOutput:
     """
     개선 조합 하나를 실제 조업에서 어떻게 실천하는지 알려주는 팁.
@@ -259,15 +269,32 @@ def generate_improvement_tip(
     계산해 카드에 이미 표시된다. 여기서 만드는 것은 **행동 설명뿐**이며,
     프롬프트가 숫자 사용을 금지하고 `render.safe_parse_text`의 숫자 검증이
     그물 역할을 한다.
+
+    사전 생성 캐시를 먼저 본다. 카드가 두 장이라 화면 한 번에 호출이 두 번
+    나가는데 앨런은 호출당 6초쯤 걸려서, 캐시가 없으면 시뮬레이터 탭이 14초
+    멈춘다. 캐시는 `use_llm`과 무관하게 쓴다 — 이미 만들어 둔 문장을 읽는
+    것은 LLM 호출이 아니고, LLM을 꺼둔 환경에서도 템플릿보다 나은 문장을
+    보여주는 편이 낫기 때문이다. 템플릿만 보고 싶으면 `use_cache=False`.
+
+    Args:
+        use_cache: False면 사전 생성 캐시를 무시하고 매번 생성한다.
     """
+    if use_cache:
+        cached = tip_cache.lookup(plan_label, actions)
+        if cached is not None:
+            return cached
+
     return _generate_text(
         data,
-        system_prompt=prompt.TIP_SYSTEM_PROMPT,
-        user_prompt=prompt.build_improvement_tip_prompt(data, plan_label, actions),
+        flow=FLOW_TIP,
+        prompts=prompt.improvement_tip_prompts(data, plan_label, actions),
         schema=TIP_OUTPUT_SCHEMA,
         schema_name=TIP_SCHEMA_NAME,
         field="tip",
         fallback_text=fallback.build_improvement_tip_fallback(actions),
         provider=provider,
         use_llm=use_llm,
+        # 팁만 조언 내용을 검사한다. "다른 어장으로 옮기라"는 말이 섞이면
+        # 연료를 더 태워 B축이 깎여서, 점수를 올리려는 사람에게 정반대다.
+        check_forbidden_advice=True,
     )

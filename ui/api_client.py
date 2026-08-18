@@ -21,9 +21,16 @@ class ApiClientError(RuntimeError):
 
 
 class BlueScoreApiClient:
-    def __init__(self, base_url: Optional[str] = None, timeout: float = 8.0) -> None:
+    #: 요약+요인별 상세 리포트를 처음 만들 때 LLM 호출이 두 번 나가고 실측
+    #: 7.7~8.0초가 걸린다. 기존 기본값 8.0초는 그 경계에 정확히 걸려서,
+    #: 저장된 리포트가 없는 선박을 처음 누르면 타임아웃으로 떨어졌다.
+    #: 시연 전 워밍업(`?refresh=true`)을 하면 0.01초로 끝나지만, 워밍업을
+    #: 빠뜨렸을 때 화면이 에러로 죽지 않도록 여유를 준다.
+    DEFAULT_TIMEOUT_SECONDS = 30.0
+
+    def __init__(self, base_url: Optional[str] = None, timeout: Optional[float] = None) -> None:
         self.base_url = (base_url or os.getenv("BLUESCORE_API_URL") or "http://127.0.0.1:8000").rstrip("/")
-        self.timeout = timeout
+        self.timeout = timeout if timeout is not None else self.DEFAULT_TIMEOUT_SECONDS
 
     def _request(self, method: str, path: str, *, json: Optional[Dict[str, Any]] = None) -> Dict:
         try:
