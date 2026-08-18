@@ -306,8 +306,19 @@ def _resolve_pending(pending: list, ports: dict, rows: list) -> None:
     for item in pending:
         distinct = {(p["source"], p["key"]) for p in item["passing"]}
         if len(distinct) == 1:
+            # 버그 수정(2026-08-18): gearType으로 후보가 1개로 좁혀졌다고 거리
+            # 체크 없이 무조건 verified로 처리하면 안 됨 — 241.9km짜리도
+            # verified로 새는 사례를 스팟체크로 발견함. gearType은 후보를
+            # 거르는 용도일 뿐 거리 신뢰도 기준을 대체하지 않는다. 위치정보
+            # 자체가 없는 경우(d is None)는 후보 1개까지 좁힌 근거는 있으니
+            # held_multi보다 held_위치애매(낮은신뢰도로 계산 가능)로 둔다.
             p = item["passing"][0]
-            rows.append({**item["row"], "category": "verified", "matchedName": p["name"], "distKm": p["distKm"], "candidateCount": 1, "resolvedBy": "gearType"})
+            d = p["distKm"]
+            if d is not None and d > LOC_HELD_CAP_KM:
+                rows.append({**item["row"], "category": "held_multi_동명이선", "matchedName": None, "distKm": None, "candidateCount": 1, "candidateNames": [p["name"]]})
+            else:
+                category = "verified" if (d is not None and d <= LOC_VERIFIED_KM) else "held_위치애매"
+                rows.append({**item["row"], "category": category, "matchedName": p["name"], "distKm": d, "candidateCount": 1, "resolvedBy": "gearType"})
         else:
             still_ambiguous.append(item)
 
