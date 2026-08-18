@@ -85,7 +85,7 @@ _MINI_CARD_CSS = f"""
     display:inline-block; border-radius:999px; padding:3px 10px;
     font-size:11px; font-weight:700; margin-top:8px;
   }}
-  .bs-mini-pill.favorable {{ background:{theme.AXIS_A_SOFT}; color:{theme.AXIS_A}; }}
+  .bs-mini-pill.favorable {{ background:{theme.POSITIVE_SOFT}; color:{theme.POSITIVE}; }}
   .bs-mini-pill.unfavorable {{ background:{theme.NEGATIVE_SOFT}; color:{theme.NEGATIVE}; }}
 </style>
 """
@@ -225,6 +225,29 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
+def page_title(vessel_name: str, subtitle: str) -> None:
+    """어업인/금융기관 화면 최상단 제목 — 선박명 + 화면 종류.
+
+    기존엔 st.markdown("### 선박 A · 내 조업 성적")처럼 Streamlit 기본 헤딩을
+    썼는데, 바로 아래 score_bar 등 다른 카드들과 존재감이 비슷해서 화면
+    최상단이라는 게 눈에 잘 안 들어온다는 지적(사용자, 2026-08-18)이 있었다.
+    좌측 축색 강조 바 + 더 크고 굵은 제목으로 확실히 구분되게 한다.
+    """
+    st.markdown(
+        f"""<div style="display:flex; align-items:center; gap:14px; margin:2px 0 16px;">
+  <div style="width:6px; height:40px; border-radius:3px; background:{theme.AXIS_A};
+    flex-shrink:0;"></div>
+  <div>
+    <div style="font-size:29px; font-weight:800; color:{theme.INK}; line-height:1.25;">
+      {vessel_name}</div>
+    <div style="font-size:13px; font-weight:700; color:{theme.AXIS_A}; letter-spacing:.02em;
+      margin-top:1px;">{subtitle}</div>
+  </div>
+</div>""",
+        unsafe_allow_html=True,
+    )
+
+
 # ─── 실산출 미리보기 전용 시각화 ────────────────────────────────────────────
 def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer_count: int,
                            axis_a_event_count: Optional[int], axis_b_event_count: Optional[int]) -> None:
@@ -256,7 +279,8 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
     더해지는 방향이고, score/score_assembly.raw_to_score()는 raw가 낮을수록(=압력이
     적을수록) A축 점수를 높게 준다 — 즉 value의 +/- 부호는 좋고 나쁨과 반대로
     읽혀서 오독하기 쉽다. +/- 부호는 아예 빼고 절댓값만 보여주며, 유리(압력 감소,
-    value<0)는 파란색, 불리(압력 증가, value>0)는 빨간색으로 직접 칠한다.
+    value<0)는 초록색(B축 산출 근거 카드와 같은 POSITIVE 색), 불리(압력 증가,
+    value>0)는 빨간색으로 직접 칠한다 — 두 축 다 "좋다=초록"으로 통일.
     """
     if not factors:
         return
@@ -266,7 +290,7 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
         value = f["value"]
         width = min(abs(value), 100.0)
         if value < 0:
-            color = theme.AXIS_A
+            color = theme.POSITIVE
             pill = f'<span class="bs-mini-pill favorable">압력 감소 · 이 선박에 유리</span>'
         elif value > 0:
             color = theme.NEGATIVE
