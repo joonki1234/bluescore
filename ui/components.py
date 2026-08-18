@@ -220,10 +220,6 @@ def card(body: str) -> None:
 
 
 # ─── 실산출 미리보기 전용 시각화 ────────────────────────────────────────────
-# 2026-08-18(김준기, 최지희 확인 필요): 실산출 화면이 "숫자만 던지는" 느낌이라
-# 요인 기여도(SHAP)처럼 이미 API 응답에 있지만 화면에 안 쓰이던 값을
-# 시각화로 추가함. axis_breakdown()과 같은 components.v1.html 카운트업+채움
-# 패턴을 그대로 재사용해 톤을 맞췄다.
 def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer_count: int,
                            axis_a_event_count: Optional[int], axis_b_event_count: Optional[int]) -> None:
     """선택한 선박의 어업종·톤수·A/B축 각각의 이벤트 건수를 pill 형태로 보여준다.

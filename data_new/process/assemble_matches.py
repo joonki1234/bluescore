@@ -43,15 +43,6 @@ def _total_score(candidate: dict) -> float:
     return candidate["nameScore"] + candidate["tonnageBonus"] + candidate.get("locationBonus", 0.0)
 
 
-# 2026-08-18(김준기, 태윤님 확인 필요): PROCESS_LOG.md 49번 검증("번호 일치 시
-# 정밀도 95~100%, 불일치 시 0%")이 CLAUDE.md 10번의 근거로 이미 인용됐는데
-# _total_score에는 실제로 반영돼 있지 않았다. 이미 커밋된 final_vessel_matches.jsonl
-# (2,878 tier3_fuzzy_name 중 이름 텍스트 확인 가능한 2,311척)로 시뮬레이션한
-# 결과, "26 NAM GANG HO" ↔ "203남광호"처럼 fuzzyScore 0.8~0.92로 높게 나왔는데도
-# 선단 번호가 명백히 다른 오매칭 77건(3.3%)을 확인했다. 원본 raw 입력
-# (fuzzy_name_candidates.jsonl 등)이 로컬에 없어 이 필터를 넣은 채로 파이프라인을
-# 처음부터 재실행해 전체 재검증은 못 했다 — 태윤님이 다음에 재실행할 때 카운트가
-# 이 설명과 크게 어긋나면 알려주시길.
 def _digit_prefix(name: str) -> str:
     normalized = re.sub(r"[^A-Z0-9]", "", (name or "").upper())
     m = re.match(r"^\D*?(\d{2,4})", normalized)

@@ -11,19 +11,12 @@ DEMO_DATA_SNAPSHOT_ID = "dashboard-demo-seed-20260814-v1"
 # DEFAULT_EVENTS_PATH/DEFAULT_VESSELS_PATH 참고. 이 상수가 실제 데이터 출처와
 # 안 맞으면 응답 재현성 계약이 깨지므로, 데이터 출처를 바꿀 때는 항상 같이
 # 갱신해야 한다.
-# (2026-08-18 -v2) 매칭 오탐 필터(숫자접두어 불일치, 78척 unmatched 강등) +
-# A축 SHAP 요인 기여도 연결로 같은 vesselId라도 응답이 바뀌는 변경이 있었는데
-# 처음엔 이 상수를 안 올려서 SQLite 캐시가 옛 결과(빈 shapFactors 등)를 계속
-# 돌려줬다 — 이 파일 docstring이 경고한 바로 그 실수를 실제로 반복함. 데이터
-# 소스 자체(경로)는 안 바뀌었지만 그 안의 내용이 바뀌면 반드시 버전을 올려야
-# 한다는 걸 실측으로 재확인했다.
 REAL_DATA_SNAPSHOT_ID = "data_new-gfw-events-2026-04-01_2026-08-14-v2"
 DEMO_MODEL_VERSION = "axis-a-demo-v1__axis-b-demo-v1"
 REAL_PARTIAL_MODEL_VERSION = "axis-a-pressure-v1__axis-b-unavailable"
 # B축 연결(score/real_axis_b_scoring.py) — 선박별로 B축 실산출
 # 여부가 갈려서(톤수 매칭 커버리지 43.4%뿐) model_version도 응답마다 달라야
-# 한다. 고정 문자열 하나로는 재현성 계약이 안 맞는 걸 REAL_DATA_SNAPSHOT_ID
-# 때 이미 한 번 겪었다 — 같은 실수를 반복하지 않으려고 axis_b_included를
+# 한다. 고정 문자열 하나로는 재현성 계약이 안 맞아 axis_b_included를
 # response_metadata()가 직접 받게 했다.
 REAL_MODEL_VERSION_WITH_B = "axis-a-pressure-v1__axis-b-lightgbm-v1"
 SCORING_RULE_VERSION = "bluescore-0.65a-0.35b-v1"

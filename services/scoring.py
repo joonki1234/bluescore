@@ -100,7 +100,7 @@ def _discount_text(band: RateBand) -> str:
 def _fishing_type_text(fishing_type) -> str:
     """fishingType은 리스트(예: ["SET_GILLNETS"])라, f-string에 그냥 넣으면
     파이썬 repr(`['SET_GILLNETS']`)이 그대로 화면에 노출된다 — 실산출
-    화면에서 실측으로 발견함(2026-08-18). 사람이 읽는 문자열로 join한다."""
+    화면에서 실측으로 발견함. 사람이 읽는 문자열로 join한다."""
     if not fishing_type:
         return "어업종 미상"
     return ", ".join(fishing_type)

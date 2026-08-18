@@ -176,3 +176,21 @@
 
 > # 2026-08-18: score/tradeoff_coefficients.py 실제 계수로 교체되며 78.0->89.7로
 > # 바뀜(밴드 B->A 전환은 그대로 유지) — services/scoring.py 커밋 메시지 참고.
+
+## 정리 2차 — 오류해결/경위 요약 (원문 대신 요약만 보존)
+
+아래는 코드에서 완전히 삭제하고 요약만 남긴 것들이다(위 항목들과 달리 원문
+전체를 옮기지 않음 — 재현에 필요한 세부는 아니라고 판단).
+
+- **data_new/process/assemble_matches.py** (`_total_score` 근처): 매칭 오탐
+  필터(선단 번호 접두어 불일치 검사)가 CLAUDE.md 10번 근거로 인용된 검증
+  (PROCESS_LOG.md 49번)에 비해 실제 코드에는 반영이 안 돼 있던 걸 발견,
+  시뮬레이션으로 오매칭 77건(3.3%) 확인 후 반영함. 원본 raw 입력 부재로
+  전체 재검증은 못 했음 — 파이프라인 재실행 시 오매칭 카운트 재확인 필요.
+- **services/metadata.py** (`REAL_DATA_SNAPSHOT_ID` 근처): 매칭 필터·SHAP
+  연결 변경 때 스냅샷 버전 문자열을 안 올려 SQLite 캐시가 옛 응답(빈
+  shapFactors 등)을 계속 반환한 사고가 실제로 있었음 — 데이터 내용이
+  바뀌면 경로가 그대로여도 항상 버전을 올려야 한다는 걸 재확인.
+- **ui/components.py** (`real_vessel_meta_card` 근처): 실산출 화면이 숫자만
+  나열하는 느낌이라 SHAP 요인 기여도 시각화를 추가함, `axis_breakdown()`의
+  카운트업+채움 패턴을 재사용.
