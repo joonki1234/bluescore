@@ -174,29 +174,41 @@ def create_app(
         return workflow.get_score(vessel_id, source_type)
 
     @api.post("/vessels/{vessel_id}/simulate", response_model=SimulationResponse)
-    def simulate(vessel_id: str, request: SimulationRequest) -> SimulationResponse:
-        return workflow.simulate(vessel_id, request)
+    def simulate(
+        vessel_id: str,
+        request: SimulationRequest,
+        source_type: str = Query(default="demo", alias="sourceType", pattern="^(demo|real)$"),
+    ) -> SimulationResponse:
+        return workflow.simulate(vessel_id, request, source_type)
 
     @api.get(
         "/vessels/{vessel_id}/simulation-surface", response_model=SimulationSurfaceResponse
     )
-    def simulation_surface(vessel_id: str) -> SimulationSurfaceResponse:
-        return workflow.simulation_surface(vessel_id)
+    def simulation_surface(
+        vessel_id: str,
+        source_type: str = Query(default="demo", alias="sourceType", pattern="^(demo|real)$"),
+    ) -> SimulationSurfaceResponse:
+        return workflow.simulation_surface(vessel_id, source_type)
 
     @api.get("/vessels/{vessel_id}/explanation", response_model=ExplanationResponse)
     def explanation(
         vessel_id: str,
         refresh: bool = Query(default=False),
+        source_type: str = Query(default="demo", alias="sourceType", pattern="^(demo|real)$"),
     ) -> ExplanationResponse:
         
         return workflow.explanation(
-            vessel_id, use_llm=_runtime_llm_enabled(), refresh=refresh
+            vessel_id, source_type, use_llm=_runtime_llm_enabled(), refresh=refresh
         )
 
     @api.post("/vessels/{vessel_id}/questions", response_model=TextResponse)
-    def answer_question(vessel_id: str, request: QuestionRequest) -> TextResponse:
+    def answer_question(
+        vessel_id: str,
+        request: QuestionRequest,
+        source_type: str = Query(default="demo", alias="sourceType", pattern="^(demo|real)$"),
+    ) -> TextResponse:
         return workflow.answer_question(
-            vessel_id, request.question, use_llm=_runtime_llm_enabled()
+            vessel_id, request.question, source_type, use_llm=_runtime_llm_enabled()
         )
 
     @api.post("/appeals", response_model=AppealDetail, status_code=201)
@@ -205,9 +217,10 @@ def create_app(
 
     @api.get("/appeals", response_model=AppealListResponse)
     def list_appeals(
-        status: Optional[str] = Query(default=None, pattern="^(submitted|approved|held)$")
+        status: Optional[str] = Query(default=None, pattern="^(submitted|approved|held)$"),
+        source_type: str = Query(default="demo", alias="sourceType", pattern="^(demo|real)$"),
     ) -> AppealListResponse:
-        return workflow.list_appeals(status)
+        return workflow.list_appeals(status, source_type)
 
     @api.get("/appeals/{appeal_id}", response_model=AppealDetail)
     def get_appeal(appeal_id: str) -> AppealDetail:

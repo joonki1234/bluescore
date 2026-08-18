@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from api.main import create_app
 from chain.hashing import compute_result_hash
+from chain.ledger import HashLedger
 from score.real_axis_b_input import build_axis_b_rows
 from score.real_vessel_input import EXCLUDED_GEAR_LABELS
 from services.metadata import real_score_run_id, response_metadata
@@ -29,7 +30,12 @@ def real_snapshot_e2e(tmp_path_factory):
     db_path = tmp_path_factory.mktemp("real-snapshot-e2e") / "scores.db"
     scoring = ScoringService()
     client = TestClient(
-        create_app(db_path, seed_if_empty=False, scoring=scoring)
+        create_app(
+            db_path,
+            seed_if_empty=False,
+            scoring=scoring,
+            ledger=HashLedger(),
+        )
     )
 
     health_response = client.get("/health")
@@ -71,6 +77,8 @@ def real_snapshot_e2e(tmp_path_factory):
 
     yield {
         "db_path": db_path,
+        "client": client,
+        "scoring": scoring,
         "health_response": health_response,
         "list_response": list_response,
         "representatives": representatives,
@@ -247,5 +255,210 @@ def test_restart_reads_current_scores_without_recalculation(
             )
             assert response.status_code == 200
             assert response.json() == real_snapshot_e2e["score_responses"][status].json()
+    finally:
+        restarted_client.close()
+
+
+def test_real_source_type_status_limits_and_simulation_hold(
+    real_snapshot_e2e, monkeypatch
+):
+    monkeypatch.setenv("BLUESCORE_LLM_RUNTIME_ENABLED", "false")
+    client = real_snapshot_e2e["client"]
+
+    for status in ("partial", "insufficientSample", "matchingFailed"):
+        vessel_id = real_snapshot_e2e["representatives"][status]
+        explanation = client.get(
+            f"/vessels/{vessel_id}/explanation",
+            params={"sourceType": "real"},
+        )
+        question = client.post(
+            f"/vessels/{vessel_id}/questions",
+            params={"sourceType": "real"},
+            json={"question": "점수 근거를 알려 주세요."},
+        )
+        assert explanation.status_code == 422
+        assert explanation.json()["code"] == "invalid_state"
+        assert question.status_code == 422
+        assert question.json()["code"] == "invalid_state"
+        appeal = client.post(
+            "/appeals",
+            json={
+                "scoreRunId": real_snapshot_e2e["score_responses"][status].json()[
+                    "scoreRunId"
+                ],
+                "reason": "상태 제한 확인",
+                "detail": "",
+            },
+        )
+        assert appeal.status_code == 422
+        assert appeal.json()["code"] == "invalid_state"
+
+    success_id = real_snapshot_e2e["representatives"]["success"]
+    simulation = client.post(
+        f"/vessels/{success_id}/simulate",
+        params={"sourceType": "real"},
+        json={"revisitCount": 2, "speedKnots": 8.0},
+    )
+    surface = client.get(
+        f"/vessels/{success_id}/simulation-surface",
+        params={"sourceType": "real"},
+    )
+    for response in (simulation, surface):
+        assert response.status_code == 422
+        assert response.json()["code"] == "invalid_state"
+        assert "정책 파라미터 검증 전" in response.json()["message"]
+
+    unknown = client.post(
+        "/vessels/UNKNOWN_REAL_VESSEL/simulate",
+        params={"sourceType": "real"},
+        json={"revisitCount": 2, "speedKnots": 8.0},
+    )
+    assert unknown.status_code == 404
+    unknown_explanation = client.get(
+        "/vessels/UNKNOWN_REAL_VESSEL/explanation",
+        params={"sourceType": "real"},
+    )
+    assert unknown_explanation.status_code == 404
+
+
+def test_real_success_workflow_and_restart_caches(
+    real_snapshot_e2e, monkeypatch
+):
+    monkeypatch.setenv("BLUESCORE_LLM_RUNTIME_ENABLED", "false")
+    client = real_snapshot_e2e["client"]
+    scoring = real_snapshot_e2e["scoring"]
+    vessel_id = real_snapshot_e2e["representatives"]["success"]
+    score = real_snapshot_e2e["score_responses"]["success"].json()
+
+    explanation_response = client.get(
+        f"/vessels/{vessel_id}/explanation",
+        params={"sourceType": "real"},
+    )
+    assert explanation_response.status_code == 200
+    explanation = explanation_response.json()
+    assert explanation["scoreRunId"] == score["scoreRunId"]
+    assert explanation["sourceType"] == "real"
+    assert explanation["modelVersion"] == score["modelVersion"]
+    assert explanation["dataSnapshotId"] == score["dataSnapshotId"]
+    assert explanation["scoringRuleVersion"] == score["scoringRuleVersion"]
+    assert explanation["rateTableVersion"] == score["rateTableVersion"]
+    assert explanation["shapFactors"]
+    assert all(item["axis"] == "a" for item in explanation["shapFactors"])
+    assert explanation["detailedReport"] == []
+    assert explanation["improvementPlans"] == []
+    assert "None" not in explanation["summary"]
+
+    question = client.post(
+        f"/vessels/{vessel_id}/questions",
+        params={"sourceType": "real"},
+        json={"question": "이 점수는 어떤 자료로 계산됐나요?"},
+    )
+    assert question.status_code == 200
+    assert question.json()["sourceType"] == "real"
+    assert question.json()["modelVersion"] == score["modelVersion"]
+
+    appeal_response = client.post(
+        "/appeals",
+        json={
+            "scoreRunId": score["scoreRunId"],
+            "reason": "실제 산출 근거 확인",
+            "detail": "사용된 스냅샷을 검토해 주세요.",
+        },
+    )
+    assert appeal_response.status_code == 201
+    appeal = appeal_response.json()
+    assert appeal["sourceType"] == "real"
+
+    draft_response = client.post(
+        f"/appeals/{appeal['appealId']}/draft-response",
+        json={"refresh": False},
+    )
+    assert draft_response.status_code == 200
+    draft = draft_response.json()
+    assert draft["aiResponse"]
+    assert draft["sourceType"] == "real"
+
+    def fail_if_objection_is_regenerated(*args, **kwargs):
+        raise AssertionError("저장된 이의제기 답변은 다시 생성하면 안 됩니다.")
+
+    monkeypatch.setattr(
+        scoring, "respond_to_objection", fail_if_objection_is_regenerated
+    )
+    cached_draft = client.post(
+        f"/appeals/{appeal['appealId']}/draft-response",
+        json={"refresh": False},
+    )
+    assert cached_draft.status_code == 200
+    assert cached_draft.json()["aiResponse"] == draft["aiResponse"]
+
+    demo_score = client.get("/vessels/VESSEL_B/score").json()
+    demo_appeal = client.post(
+        "/appeals",
+        json={
+            "scoreRunId": demo_score["scoreRunId"],
+            "reason": "데모 목록 분리 확인",
+            "detail": "",
+        },
+    ).json()
+    real_list = client.get("/appeals", params={"sourceType": "real"}).json()
+    demo_list = client.get("/appeals", params={"sourceType": "demo"}).json()
+    assert real_list["sourceType"] == "real"
+    assert real_list["modelVersion"] == score["modelVersion"]
+    assert demo_list["sourceType"] == "demo"
+    assert {item["appealId"] for item in real_list["appeals"]} == {
+        appeal["appealId"]
+    }
+    assert {item["appealId"] for item in demo_list["appeals"]} == {
+        demo_appeal["appealId"]
+    }
+
+    review_response = client.post(
+        f"/score-runs/{score['scoreRunId']}/review",
+        json={
+            "decision": "approve",
+            "reason": "실제 산출 근거 확인 완료",
+            "reviewer": "심사역 A",
+            "finalDiscountBp": score["rateBand"]["discountBp"],
+        },
+    )
+    assert review_response.status_code == 200
+    review = review_response.json()
+    assert review["scoreRunId"] == score["scoreRunId"]
+    assert review["appealId"] == appeal["appealId"]
+    assert review["sourceType"] == "real"
+    assert review["modelVersion"] == score["modelVersion"]
+
+    commit_response = client.post(f"/reports/{score['scoreRunId']}/commit")
+    assert commit_response.status_code == 200
+    commit = commit_response.json()
+    assert commit["sourceType"] == "real"
+    assert commit["modelVersion"] == score["modelVersion"]
+    record_response = client.get(f"/chain/records/{commit['recordId']}")
+    assert record_response.status_code == 200
+    assert record_response.json()["resultHash"] == commit["resultHash"]
+    assert record_response.json()["sourceType"] == "real"
+
+    restarted_scoring = ScoringService()
+
+    def fail_if_recalculated(*args, **kwargs):
+        raise AssertionError("재시작 후 점수나 설명을 다시 계산하면 안 됩니다.")
+
+    monkeypatch.setattr(restarted_scoring, "build_score", fail_if_recalculated)
+    monkeypatch.setattr(restarted_scoring, "explain", fail_if_recalculated)
+    restarted_client = TestClient(
+        create_app(
+            real_snapshot_e2e["db_path"],
+            seed_if_empty=False,
+            scoring=restarted_scoring,
+            ledger=HashLedger(),
+        )
+    )
+    try:
+        restored = restarted_client.get(
+            f"/vessels/{vessel_id}/explanation",
+            params={"sourceType": "real"},
+        )
+        assert restored.status_code == 200
+        assert restored.json() == explanation
     finally:
         restarted_client.close()

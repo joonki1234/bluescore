@@ -281,7 +281,7 @@ class ReviewDecision(ApiModel):
     final_discount_bp: Optional[int] = Field(default=None, ge=0, le=500)
 
 
-class ReviewDetail(ApiModel):
+class ReviewDetail(VersionedResponse):
     review_id: str
     score_run_id: str
     appeal_id: Optional[str] = None

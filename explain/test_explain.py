@@ -15,7 +15,7 @@ from typing import Any, Dict, List
 
 import pytest
 
-from explain import fallback, render
+from explain import fallback, prompt, render
 from explain.contract import ExplainInput, ExplainOutput, FactorMetric, ShapFactor
 from explain.explain import answer_question, explain, generate_detailed_report, respond_to_objection
 from explain.provider import LLMProvider, ProviderError, ProviderUnavailable
@@ -212,6 +212,19 @@ def test_연료를_덜_쓰면_문장이_달라진다():
     data = make_input(fuel_delta_percent=-6.0)
     result = fallback.build(data, "test")
     assert "적게" in result.summary
+
+
+def test_없는_순위와_연료값을_설명에_만들지_않는다():
+    data = make_input(top_percent=None, fuel_delta_percent=None)
+    result = fallback.build(data, "test")
+    data_block = prompt.build_data_block(data)
+
+    assert "None" not in result.summary
+    assert "상위" not in result.summary
+    assert "연료" not in result.summary
+    assert "유사선박군_내_상위퍼센트" not in data_block
+    assert "기대대비_연료_퍼센트" not in data_block
+    assert render.find_invented_numbers(result.summary, data) == []
 
 
 # ─── 진입점 ──────────────────────────────────────────────────────────────────

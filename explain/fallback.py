@@ -12,7 +12,7 @@ LLM 없이 설명을 만드는 템플릿 폴백.
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from explain.contract import ExplainInput, ExplainOutput, Recommendation, ShapFactor
 from explain.recommendation_rules import allowed_recommendations
@@ -38,7 +38,9 @@ def _particle(word: str, with_batchim: str, without_batchim: str) -> str:
     return with_batchim if _has_batchim(word) else without_batchim
 
 
-def _fuel_sentence(fuel_delta_percent: float) -> str:
+def _fuel_sentence(fuel_delta_percent: Optional[float]) -> Optional[str]:
+    if fuel_delta_percent is None:
+        return None
     if fuel_delta_percent > 0:
         return f"다만 연료를 기대치보다 {fuel_delta_percent:g}% 더 씁니다."
     if fuel_delta_percent < 0:
@@ -57,10 +59,16 @@ def build_summary(data: ExplainInput) -> str:
     else:
         parts.append("점수를 크게 끌어올린 항목은 아직 없습니다.")
 
-    parts.append(
-        f"비슷한 배 {data.peer_count}척 가운데 상위 {data.top_percent}%입니다."
-    )
-    parts.append(_fuel_sentence(data.fuel_delta_percent))
+    if data.top_percent is not None:
+        parts.append(
+            f"비슷한 배 {data.peer_count}척 가운데 상위 {data.top_percent}%입니다."
+        )
+    else:
+        parts.append(f"비슷한 배 {data.peer_count}척과 비교해 산출했습니다.")
+
+    fuel_sentence = _fuel_sentence(data.fuel_delta_percent)
+    if fuel_sentence:
+        parts.append(fuel_sentence)
 
     negatives = data.top_negative(limit=1)
     if negatives:

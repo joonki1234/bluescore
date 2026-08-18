@@ -81,6 +81,7 @@ def build_data_block(data: ExplainInput) -> str:
             for f in data.shap_factors
         ],
     }
+    payload = {key: value for key, value in payload.items() if value is not None}
     return (
         "계산 결과 (여기 있는 숫자만 쓸 수 있습니다)\n"
         + json.dumps(payload, ensure_ascii=False, indent=2)
