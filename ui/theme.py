@@ -165,6 +165,17 @@ div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
   to {{ opacity: 1; transform: translateY(0); }}
 }}
 .bs-card, .bs-scorebar {{ animation: bs-fade-in 0.4s ease-out; }}
+
+/* 실산출처럼 첫 계산에 수 초~수십 초가 걸리는 화면에서, 빈 화면 대신
+   "불러오는 중"임을 보여주는 스켈레톤 카드. 값 없이 회색 막대만 깜빡인다 —
+   실제 숫자와 헷갈리지 않도록 굴곡·글자를 전혀 넣지 않는다. */
+@keyframes bs-skeleton-pulse {{
+  0%, 100% {{ opacity: 0.55; }}
+  50% {{ opacity: 1; }}
+}}
+.bs-skeleton-bar {{
+  background: {LINE}; border-radius: 6px; animation: bs-skeleton-pulse 1.3s ease-in-out infinite;
+}}
 </style>
 """
 

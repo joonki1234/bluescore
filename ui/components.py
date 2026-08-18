@@ -219,12 +219,62 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
+def skeleton_score_card(label: str = "불러오는 중…") -> None:
+    """
+    BlueScore/A축/B축 카드 자리의 로딩 스켈레톤.
+
+    실산출 화면은 첫 요청에서 전체 선박 상태 정렬(약 21초, 프로세스당 1회) ·
+    B축 LightGBM 학습(약 5초, 프로세스당 1회)이 걸린다. 빈 화면을 그대로
+    두면 멈춘 것처럼 보이므로, 데이터를 기다리는 동안 값 없는 회색 막대
+    카드를 보여준다.
+    """
+    bar = '<div class="bs-skeleton-bar" style="height:{h}px; width:{w}%; margin-bottom:{m}px;"></div>'
+    cols_html = "".join(
+        f'<div class="bs-card" style="flex:1;">'
+        + bar.format(h=12, w=50, m=10)
+        + bar.format(h=26, w=70, m=0)
+        + "</div>"
+        for _ in range(3)
+    )
+    st.markdown(
+        f'<div class="bs-note" style="margin-bottom:8px;">{label}</div>'
+        f'<div style="display:flex; gap:12px;">{cols_html}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+# score_bar 전용 CSS — theme.py의 .bs-scorebar/.seg/.bs-label/.big/.mid를 그대로
+# 복제한다. iframe(components_html) 안이라 전역 CSS(theme.inject())를 못 받는다.
+_SCOREBAR_CSS = f"""
+<style>
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; padding:0; background:transparent; font-family:{theme.FONT_SANS}; }}
+  .bs-scorebar {{
+    background:{theme.SURFACE}; border:1px solid {theme.LINE}; border-radius:12px;
+    padding:14px 18px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    opacity:0; transform:translateY(4px); animation:bs-fade-in 0.4s ease-out forwards;
+  }}
+  @keyframes bs-fade-in {{ to {{ opacity:1; transform:translateY(0); }} }}
+  .bs-scorebar .seg {{ padding-left:20px; border-left:1px solid {theme.LINE}; }}
+  .bs-scorebar .seg:first-child {{ padding-left:0; border-left:none; }}
+  .bs-scorebar .bs-label {{ font-size:12px; color:{theme.INK_SOFT}; margin-bottom:4px; }}
+  .bs-scorebar .big {{
+    font-family:{theme.FONT_MONO}; font-size:30px; font-weight:600; color:{theme.INK}; line-height:1.1;
+  }}
+  .bs-scorebar .mid {{ font-size:16px; font-weight:700; color:{theme.INK}; }}
+</style>
+"""
+
+
 def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
     """
     화면 최상단에 항상 붙는 점수 띠.
 
     어느 탭에 있든 점수가 보이게 해서 시뮬레이터에서 "72.6이 몇 점으로" 라는
-    변화가 시야에서 사라지지 않게 한다.
+    변화가 시야에서 사라지지 않게 한다. BlueScore 숫자는 0에서 실제 값까지
+    카운트업된다 — components.v1.html(iframe) 안에서 진짜 JS로 도는
+    _COUNT_UP_JS를 재사용한다(다른 곳과 같은 이유: st.markdown의 <script>는
+    Streamlit이 실행해주지 않는다).
     """
     if not adapter.is_scored(vessel):
         notice = adapter.blocked_notice(vessel)
@@ -246,11 +296,11 @@ def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
             f'<div class="mid">{theme.discount_text(band)}</div></div>'
         )
 
-    st.markdown(
-        f"""<div class="bs-scorebar">
+    html = f"""{_SCOREBAR_CSS}
+<div class="bs-scorebar">
   <div class="seg">
     <div class="bs-label">BlueScore</div>
-    <div class="big">{vessel['blueScore']}</div>
+    <div class="big" data-count="{vessel['blueScore']}" data-decimals="1" data-duration="900">0.0</div>
   </div>
   <div class="seg">
     <div class="bs-label">유사 선박군 {peer['count']}척 내</div>
@@ -262,9 +312,10 @@ def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
     <div class="bs-label">{vessel['fleetLabel']}</div>
     <div class="bs-label">관측 커버리지 {vessel['coveragePercent']}%</div>
   </div>
-</div>""",
-        unsafe_allow_html=True,
-    )
+</div>
+<script>{_COUNT_UP_JS}</script>
+"""
+    components_html(html, height=104, scrolling=False)
 
 
 def voyage_map(vessel: Dict, height: int = 380) -> None:
