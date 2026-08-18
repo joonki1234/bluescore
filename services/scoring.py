@@ -43,6 +43,7 @@ from explain.explain import (
     respond_to_objection as generate_objection_response,
 )
 from score.rate_mapping import RATE_GRADES, RateGrade, grade_for_score
+from score.tradeoff_coefficients import axis_b_points_per_knot, axis_b_points_per_revisit_step
 from services.exceptions import BackendUnavailableError, InvalidStateError, NotFoundError
 from services.metadata import response_metadata
 from services.real_scoring import RealAxisAAdapter
@@ -55,9 +56,12 @@ PERSONA_PATH = PROJECT_ROOT / "fixtures" / "personas.json"
 AXIS_A_WEIGHT = 0.65
 AXIS_B_WEIGHT = 0.35
 AXIS_A_GAIN_PER_REVISIT_STEP = 7.0
-AXIS_B_COST_PER_REVISIT_STEP = 2.4
-AXIS_B_GAIN_PER_KNOT = 3.2
 AXIS_A_COST_PER_KNOT = 0.8
+# B축 관련 트레이드오프 계수(속도↔B축, 재방문↔B축)는 2026-08-18에
+# score/tradeoff_coefficients.py의 실제 물리식 기반 함수로 교체했다 — 원래 여기
+# 있던 고정 상수(AXIS_B_GAIN_PER_KNOT=3.2, AXIS_B_COST_PER_REVISIT_STEP=2.4)는
+# 근거 없는 정책 예시였다. 이 파일은 services/ 소유자(최지희)의 파일이라 배선을
+# 바꾸는 것 자체가 조율 대상이었음 — 오동규가 작업, 최지희 확인 필요.
 FUEL_PERCENT_PER_AXIS_B_POINT = 0.55
 AXIS_SCORE_FLOOR = 4.0
 AXIS_SCORE_CEIL = 97.0
@@ -67,6 +71,12 @@ SIM_SPEED_DELTA_UP = 2.0
 SIM_SPEED_STEP = 0.1
 EXAMPLE_PRINCIPAL_WON = 100_000_000
 EXAMPLE_TERM_YEARS = 3
+
+# 데모 fixture 선박엔 톤수가 없다(data/mock/dashboard_mock.json의 VESSEL_A/B/C
+# 전부 tonnage=null). axis_b_points_per_knot/axis_b_points_per_revisit_step은
+# tonnage_gt가 필수 인자라, 값이 없으면 이 대표값으로 대체한다.
+# 임시값 — 근거 없음, 실제 데모 선박 톤수가 정해지면 교체 필요.
+DEMO_FALLBACK_TONNAGE_GT = 50.0
 
 
 def _rate_band(grade: RateGrade) -> RateBand:
@@ -295,12 +305,19 @@ class ScoringService:
         base_a = vessel["axisA"]["score"]
         base_b = vessel["axisB"]["score"]
         revisit_steps = vessel["revisitCount"] - request.revisit_count
-        speed_steps = vessel["averageSpeedKnots"] - request.speed_knots
+        base_speed = vessel["averageSpeedKnots"]
+        speed_steps = base_speed - request.speed_knots
+        tonnage_gt = vessel.get("tonnage") or DEMO_FALLBACK_TONNAGE_GT
+        # 톤수/현재속도에 따라 값이 달라지는 실제 물리식 기반 계수(고정 상수 아님) —
+        # 이 선박의 현재 조업 조건에서 "1노트 더 줄이면"/"재방문 1회 줄이는 대신
+        # 다른 어장으로 옮기면"의 한계 효과를 구해, 기존과 같은 선형 구조에 대입한다.
+        axis_b_gain_per_knot = axis_b_points_per_knot(tonnage_gt, base_speed)
+        axis_b_cost_per_revisit_step = axis_b_points_per_revisit_step(tonnage_gt, base_speed)
         axis_a = base_a + revisit_steps * AXIS_A_GAIN_PER_REVISIT_STEP
-        axis_b = base_b + speed_steps * AXIS_B_GAIN_PER_KNOT
+        axis_b = base_b + speed_steps * axis_b_gain_per_knot
         if include_tradeoff:
             axis_a -= speed_steps * AXIS_A_COST_PER_KNOT
-            axis_b -= revisit_steps * AXIS_B_COST_PER_REVISIT_STEP
+            axis_b -= revisit_steps * axis_b_cost_per_revisit_step
         axis_a = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_a)), 1)
         axis_b = round(min(AXIS_SCORE_CEIL, max(AXIS_SCORE_FLOOR, axis_b)), 1)
         score = round(AXIS_A_WEIGHT * axis_a + AXIS_B_WEIGHT * axis_b, 1)
@@ -313,7 +330,7 @@ class ScoringService:
         if include_tradeoff and revisit_steps > 0:
             notes.append(
                 f"어장을 더 자주 옮기면 이동거리가 늘어 운항 효율이 "
-                f"{revisit_steps * AXIS_B_COST_PER_REVISIT_STEP:.1f}점 깎입니다."
+                f"{revisit_steps * axis_b_cost_per_revisit_step:.1f}점 깎입니다."
             )
         if include_tradeoff and speed_steps > 0:
             notes.append(
