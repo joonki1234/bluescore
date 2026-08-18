@@ -25,7 +25,7 @@ DEMO_MODEL_VERSION = "axis-a-demo-v1__axis-b-demo-v1"
 # 옛 결과를 계속 돌려준다.
 REAL_PARTIAL_MODEL_VERSION = "axis-a-pressure-v2__axis-b-unavailable"
 # B축(score/real_axis_b_scoring.py)은 선박별로 실산출 여부가 갈려(톤수 매칭
-# 커버리지 23.2%뿐) model_version도 응답마다 달라야 한다. 고정 문자열 하나로는
+# 커버리지 13.4%뿐) model_version도 응답마다 달라야 한다. 고정 문자열 하나로는
 # 재현성 계약이 안 맞아 axis_b_included를 response_metadata()가 직접 받는다.
 REAL_MODEL_VERSION_WITH_B = "axis-a-pressure-v2__axis-b-lightgbm-v2"
 SCORING_RULE_VERSION = "bluescore-0.65a-0.35b-v1"
