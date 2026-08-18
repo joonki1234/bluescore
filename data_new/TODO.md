@@ -55,7 +55,19 @@
 - [x] 3월 이벤트 780건 원인 규명 완료 — GFW API가 조회기간과 이벤트 구간이 겹치기만 해도 포함시킴(경계매칭 아님), eventId 중복제거로 이미 안전하게 처리되고 있음 확인(43번)
 - [ ] 해역신호용 어항정보 확장 — 실효성 정량 확인 결과 예상보다 심각(TAC 항구명의 5.1%만 커버, locationBonus 실작동 9.9%뿐). 단순 리스트 확장보다 TAC `portNamesTac`의 항구명/행정구역명 혼재 문제부터 정리 필요(46번)
 - [x] score/ 필드명 계약 검증 완료(47번) — **A축은 문제없이 바로 실행 가능**(필드명 정확히 일치). **B축은 연결 스크립트가 없음**: tonnageGt가 중첩돼있고, 해양기상 필드명이 다름(`weather_WATER_TEMPER` vs `seaSurfaceTempC` 등, 단위도 미확인), gearType/seaArea/season flat 필드 없음 — process/에 병합 스크립트 신설 필요, 담당 논의 필요
-- [ ] (위 발견에 따라) events_with_weather.jsonl + final_vessel_matches.jsonl을 B축 요구 형태로 합치는 스크립트.
+- [x] (위 발견에 따라) events_with_weather.jsonl + final_vessel_matches.jsonl을 B축 요구 형태로 합치는 스크립트.
+      **완료(2026-08-18, 오동규)**: `score/real_axis_b_input.py` + 검증 스크립트
+      `score/scripts/run_real_axis_b.py`. 실제 이 폴더 산출물(275,782개 이벤트,
+      5,314척)로 B축 파이프라인이 실제로 도는 것까지 확인함(2,310척 실산출).
+      `population_tags.jsonl`이 아직 없다는 것 확인하고 그것과 무관하게
+      진행함 — `gearType`은 이번엔 비워둠(`None`), `seaArea`/`season`은
+      `score/peer_grouping.py`의 `region_key()`/`season_key()`를 이벤트 자체의
+      위경도·시각으로 재계산해 채움(태그 파일 안 기다림). 상세는
+      `score/TODO.md`의 같은 항목 참고. **김태윤님 확인 부탁드리는 것**: 톤수
+      (`tac.tonnageGtTac`/`mof.tonnageGtMof` 중 있는 값 사용, 둘 다 있는 행은
+      0건 실측 확인함)와 날씨 필드 매핑(단위는 정황상 m/s·°C로 추정만 하고
+      진행 — `score/real_axis_b_input.py` 모듈 docstring 참고).
+
       **담당 논의 결과(2026-08-18, 오동규·김태윤)**: score팀(오동규·김준기)이 `score/` 쪽에
       작성. 근거: 이 스크립트는 `data_new/processed/`의 기존 파일을 원본 그대로
       읽어서 score가 원하는 이름으로 새로 변환/병합하는 것뿐이라, 어느 쪽에

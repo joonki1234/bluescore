@@ -36,7 +36,21 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
 
 ---
 
-- [ ] **B축 입력 병합 스크립트** (`data_new/events_with_weather.jsonl.gz` +
+- [x] **B축 입력 병합 스크립트** — **완료(2026-08-18)**: `score/real_axis_b_input.py`
+      (`build_axis_b_rows()`)로 구현, `score/scripts/run_real_axis_b.py`로 실제
+      data_new/ 산출물(275,782개 이벤트, 5,314척)에 대고 `fit_baseline_model()` →
+      `compute_axis_b_efficiency()`까지 에러 없이 도는 것 확인함 — 2,310척이
+      실제 산출됨(나머지는 필수 3종 결측으로 자동 skip, 128,320건).
+      `services/real_scoring.py`의 `RealAxisAAdapter` 패턴과 달리 상태 캐싱 없는
+      단순 함수로 구현(데이터 규모가 A축 GFW 원본보다 작아 lru_cache 없이도
+      충분히 빠름). 테스트 16개(`score/test_real_axis_b_input.py`, 실제 커밋된
+      data_new/ 파일로 검증). **실행 중 실제 버그 하나 발견·수정**: `seaArea`를
+      `region_key()`의 `(row, col)` 튜플 그대로 LightGBM 범주형 피처에 넣었더니,
+      학습↔예측 카테고리 왕복 과정에서 numpy가 같은 길이 튜플들을 2차원 배열로
+      오인해 리스트로 망가뜨려(`.tolist()`) `TypeError: unhashable type: 'list'`로
+      예측 단계가 죽었음 — `"{row}_{col}"` 문자열로 바꿔서 해결
+      (`_sea_area_label()`). **김태윤님 확인 필요한 것**: 아래 필드 매핑표
+      (특히 톤수·날씨 단위). (`data_new/events_with_weather.jsonl.gz` +
       `final_vessel_matches.jsonl` + `population_tags.jsonl`을 `axis_b_baseline.py`가
       요구하는 평평한 필드로 변환) — **담당 논의 결과(2026-08-18, 오동규·김태윤)**:
       score팀(오동규·김준기)이 작성하기로 함. 데이터팀 원본 파일·필드명은 안
