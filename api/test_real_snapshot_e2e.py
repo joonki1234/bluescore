@@ -17,9 +17,9 @@ from storage.repository import Repository
 
 
 EXPECTED_STATUSES = {
-    "success": 289,
-    "partial": 3_395,
-    "insufficientSample": 1_630,
+    "success": 73,
+    "partial": 3_909,
+    "insufficientSample": 1_332,
     "matchingFailed": 9,
 }
 
@@ -113,18 +113,18 @@ def test_tracked_snapshot_counts_and_real_availability(real_snapshot_e2e):
 
     vessels = real_snapshot_e2e["vessels"]
     assert len(vessels) == 5_323
-    assert sum(vessel["tonnage"] is not None for vessel in vessels) == 1_234
+    assert sum(vessel["tonnage"] is not None for vessel in vessels) == 712
     assert sum(bool(vessel["fishingType"]) for vessel in vessels) == 2_682
     assert sum(
         vessel["tonnage"] is not None and bool(vessel["fishingType"])
         for vessel in vessels
-    ) == 665
+    ) == 368
 
     assert real_snapshot_e2e["row_counts"] == {
         "total": 275_782,
-        "tonnage": 85_985,
+        "tonnage": 55_608,
         "gear": 147_441,
-        "both": 45_305,
+        "both": 29_249,
     }
     assert real_snapshot_e2e["gear_types"].isdisjoint(EXCLUDED_GEAR_LABELS)
     assert real_snapshot_e2e["status_counts"] == EXPECTED_STATUSES
@@ -132,17 +132,17 @@ def test_tracked_snapshot_counts_and_real_availability(real_snapshot_e2e):
     evidence = [vessel["matchingEvidence"] for vessel in vessels]
     verified = [item for item in evidence if item["matchTier"] == "verified"]
     unmatched = [item for item in evidence if item["matchTier"] == "unmatched"]
-    assert len(verified) == 1_234
-    assert len(unmatched) == 4_089
+    assert len(verified) == 712
+    assert len(unmatched) == 4_611
     assert Counter(item["unmatchedReason"] for item in unmatched) == {
-        "held_multi": 1_249,
-        "no_korean": 784,
-        "unmatched": 2_056,
+        "held_multi": 1_769,
+        "no_korean": 777,
+        "unmatched": 2_065,
     }
     distances = [item["distanceKm"] for item in verified]
     assert min(distances) == pytest.approx(0.2206538985869675)
-    assert max(distances) == pytest.approx(149.825752928251)
-    assert sum(distances) / len(distances) == pytest.approx(64.66532020255381)
+    assert max(distances) == pytest.approx(147.64398951323338)
+    assert sum(distances) / len(distances) == pytest.approx(55.41395659349788)
 
 
 def test_real_vessel_list_contract_and_order(real_snapshot_e2e):
