@@ -22,6 +22,11 @@ import streamlit as st
 
 from ui import adapter, components, theme
 
+# services/scoring.py의 AXIS_A_WEIGHT/AXIS_B_WEIGHT와 동일 — 실산출 결과
+# 계산식을 화면에 보여줄 때 쓴다. 그쪽 값이 바뀌면 여기도 같이 바꿔야 한다.
+_AXIS_A_WEIGHT = 0.65
+_AXIS_B_WEIGHT = 0.35
+
 
 def _discount_text(band: dict) -> str:
     if band["discountBp"] <= 0:
@@ -106,6 +111,21 @@ def render() -> None:
         ],
         height=108,
     )
+
+    blue_score = score.get("blueScore")
+    if blue_score is not None and axis_a_score is not None and axis_b_score is not None:
+        # services/scoring.py의 AXIS_A_WEIGHT/AXIS_B_WEIGHT와 동일한 값을 여기 직접
+        # 쓴다 — adapter.formula_text()는 데모 fixture 설정(data/mock/dashboard_mock.json의
+        # axisWeights)에서 가중치를 읽어오는 함수라, 지금은 값이 우연히 같아도(둘 다
+        # 0.65/0.35) 실산출 화면에 데모 설정을 끌어다 쓰는 건 개념적으로 맞지 않다.
+        st.markdown(
+            f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
+            f'color:{theme.INK_SOFT};">{_AXIS_A_WEIGHT:g} × {axis_a_score:g} + '
+            f'{_AXIS_B_WEIGHT:g} × {axis_b_score:g} = {blue_score:g}</span>'
+            f'<div class="bs-note" style="margin-top:8px;">축 간 비중(자원 압력 '
+            f'{_AXIS_A_WEIGHT:g} · 운항 효율 {_AXIS_B_WEIGHT:g})은 검증 전 잠정치입니다.</div></div>',
+            unsafe_allow_html=True,
+        )
 
     if score.get("rateBand"):
         st.info(f"제안 금리 등급 · {_discount_text(score['rateBand'])}")
