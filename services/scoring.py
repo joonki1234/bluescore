@@ -45,7 +45,7 @@ from explain.explain import (
 from score.rate_mapping import RATE_GRADES, RateGrade, grade_for_score
 from score.tradeoff_coefficients import axis_b_points_per_knot, axis_b_points_per_revisit_step
 from services.exceptions import BackendUnavailableError, InvalidStateError, NotFoundError
-from services.metadata import response_metadata
+from services.metadata import real_score_run_id, response_metadata
 from services.real_scoring import RealAxisAAdapter
 
 
@@ -149,7 +149,7 @@ class ScoringService:
                 if persona["vesselId"] == vessel_id:
                     return persona["scoreRunId"]
             return f"demo-score-{vessel_id.lower()}-v1"
-        return f"real-axis-a-{vessel_id}-20260813"
+        return real_score_run_id(vessel_id)
 
     def list_vessels(self, source_type: str = "demo", limit: int = 50) -> VesselListResponse:
         metadata = response_metadata(source_type)

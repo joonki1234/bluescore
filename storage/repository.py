@@ -35,44 +35,79 @@ class Repository:
         axis_b = result.get("axisB", {})
         band = result.get("rateBand") or {}
         peer = result.get("peerGroup") or {}
+        result_json = _json(result)
+        result_hash = compute_result_hash(result)
+        values = (
+            result["vessel"]["vesselId"],
+            result["status"],
+            result["sourceType"],
+            result["dataSnapshotId"],
+            result["modelVersion"],
+            result["scoringRuleVersion"],
+            result["rateTableVersion"],
+            result.get("blueScore"),
+            axis_a.get("score"),
+            axis_b.get("score"),
+            band.get("grade"),
+            peer.get("count", 0),
+            result_json,
+            result_hash,
+            result["createdAt"],
+        )
         with self.database.transaction() as connection:
+            existing = connection.execute(
+                "SELECT result_json FROM score_runs WHERE score_run_id = ?",
+                (result["scoreRunId"],),
+            ).fetchone()
+            if existing is None:
+                connection.execute(
+                    """
+                    INSERT INTO score_runs (
+                        score_run_id, vessel_id, status, source_type,
+                        data_snapshot_id, model_version, scoring_rule_version,
+                        rate_table_version, blue_score, axis_a_score, axis_b_score,
+                        grade, peer_count, result_json, result_hash, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (result["scoreRunId"], *values),
+                )
+                return
+
+            previous_hash = compute_result_hash(json.loads(existing["result_json"]))
+            result_changed = previous_hash != result_hash
+            if result_changed:
+                audit = connection.execute(
+                    """
+                    SELECT
+                        EXISTS(SELECT 1 FROM appeals WHERE score_run_id = ?) OR
+                        EXISTS(SELECT 1 FROM reviews WHERE score_run_id = ?) OR
+                        EXISTS(SELECT 1 FROM chain_commits WHERE score_run_id = ?)
+                        AS has_audit
+                    """,
+                    (result["scoreRunId"],) * 3,
+                ).fetchone()
+                if audit["has_audit"]:
+                    raise ValueError(
+                        f"감사 기록이 연결된 산출 건은 변경할 수 없습니다: {result['scoreRunId']}"
+                    )
+
+            report_reset = (
+                ", report_json = NULL, report_hash = NULL, "
+                "report_source = NULL, report_generated_at = NULL"
+                if result_changed
+                else ""
+            )
             connection.execute(
-                """
-                INSERT INTO score_runs (
-                    score_run_id, vessel_id, status, source_type,
-                    data_snapshot_id, model_version, scoring_rule_version,
-                    rate_table_version, blue_score, axis_a_score, axis_b_score,
-                    grade, peer_count, result_json, result_hash, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(score_run_id) DO UPDATE SET
-                    result_json=excluded.result_json,
-                    result_hash=excluded.result_hash,
-                    status=excluded.status,
-                    source_type=excluded.source_type,
-                    blue_score=excluded.blue_score,
-                    axis_a_score=excluded.axis_a_score,
-                    axis_b_score=excluded.axis_b_score,
-                    grade=excluded.grade,
-                    peer_count=excluded.peer_count
+                f"""
+                UPDATE score_runs SET
+                    vessel_id = ?, status = ?, source_type = ?,
+                    data_snapshot_id = ?, model_version = ?, scoring_rule_version = ?,
+                    rate_table_version = ?, blue_score = ?, axis_a_score = ?,
+                    axis_b_score = ?, grade = ?, peer_count = ?, result_json = ?,
+                    result_hash = ?, created_at = ?{report_reset}
+                WHERE score_run_id = ?
                 """,
-                (
-                    result["scoreRunId"],
-                    result["vessel"]["vesselId"],
-                    result["status"],
-                    result["sourceType"],
-                    result["dataSnapshotId"],
-                    result["modelVersion"],
-                    result["scoringRuleVersion"],
-                    result["rateTableVersion"],
-                    result.get("blueScore"),
-                    axis_a.get("score"),
-                    axis_b.get("score"),
-                    band.get("grade"),
-                    peer.get("count", 0),
-                    _json(result),
-                    compute_result_hash(result),
-                    result["createdAt"],
-                ),
+                (*values, result["scoreRunId"]),
             )
 
     def get_score_run(self, score_run_id: str) -> Optional[Dict[str, Any]]:

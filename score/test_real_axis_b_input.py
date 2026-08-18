@@ -7,13 +7,19 @@ data_new/processed/의 실제 파일(이미 커밋됨)로 돈다 — mock을 안
 필드 구조 가정이 실제와 어긋나는 걸 더 잘 잡아내기 때문이다.
 """
 
+import gzip
+import json
+
 import pytest
 
 from score.real_axis_b_input import (
+    _event_to_axis_b_row,
     _to_float,
     build_axis_b_rows,
+    load_vessel_feature_index,
     load_vessel_tonnage_index,
 )
+from score.real_vessel_input import EXCLUDED_GEAR_LABELS
 
 
 class TestToFloat:
@@ -50,8 +56,6 @@ class TestLoadVesselTonnageIndex:
         """tac와 mof가 동시에 채워지지 않는다는 전제를 회귀로 지켜본다 —
         이게 깨지면 score/TODO.md의 '우선순위/충돌 로직 불필요' 전제가
         무효화된다."""
-        import json
-
         from score.real_axis_b_input import DEFAULT_MATCHES_PATH
 
         both_present = 0
@@ -66,6 +70,109 @@ class TestLoadVesselTonnageIndex:
         )
 
 
+class TestVesselFeatureIntegration:
+    def test_uses_common_tonnage_and_deterministic_gear_key(self, tmp_path):
+        matches_path = tmp_path / "matches.jsonl"
+        gfw_path = tmp_path / "gfw.jsonl"
+        matches_path.write_text(
+            json.dumps(
+                {
+                    "gfwVesselId": "V1",
+                    "gfwName": "TEST",
+                    "tac": {"tonnageGtTac": "24"},
+                    "mof": None,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        gfw_path.write_text(
+            json.dumps(
+                {
+                    "vesselId": "V1",
+                    "combinedGearTypes": ["SET_LONG_LINES", "PURSE_SEINES"],
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        features = load_vessel_feature_index(matches_path, gfw_path)
+
+        assert features["V1"] == {"tonnageGt": 24.0, "gearType": "PURSE_SEINES"}
+
+    def test_excluded_gear_labels_do_not_reach_axis_b(self, tmp_path):
+        matches_path = tmp_path / "matches.jsonl"
+        gfw_path = tmp_path / "gfw.jsonl"
+        matches_path.write_text(
+            json.dumps({"gfwVesselId": "V1", "tac": None, "mof": None}) + "\n",
+            encoding="utf-8",
+        )
+        gfw_path.write_text(
+            json.dumps(
+                {
+                    "vesselId": "V1",
+                    "combinedGearTypes": sorted(EXCLUDED_GEAR_LABELS),
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        assert load_vessel_feature_index(matches_path, gfw_path)["V1"]["gearType"] is None
+
+    def test_missing_vessel_metadata_stays_none(self):
+        event = {
+            "vesselId": "UNKNOWN",
+            "start": "2026-05-01T00:00:00Z",
+            "latitude": 35.1,
+            "longitude": 128.1,
+        }
+
+        row = _event_to_axis_b_row(event, None)
+
+        assert row["tonnageGt"] is None
+        assert row["gearType"] is None
+
+    def test_build_rows_joins_common_metadata(self, tmp_path):
+        matches_path = tmp_path / "matches.jsonl"
+        gfw_path = tmp_path / "gfw.jsonl"
+        events_path = tmp_path / "events.jsonl.gz"
+        matches_path.write_text(
+            json.dumps(
+                {
+                    "gfwVesselId": "V1",
+                    "tac": {"tonnageGtTac": "31"},
+                    "mof": None,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        gfw_path.write_text(
+            json.dumps({"vesselId": "V1", "combinedGearTypes": ["SET_GILLNETS"]})
+            + "\n",
+            encoding="utf-8",
+        )
+        with gzip.open(events_path, "wt", encoding="utf-8") as stream:
+            stream.write(
+                json.dumps(
+                    {
+                        "vesselId": "V1",
+                        "start": "2026-05-01T00:00:00Z",
+                        "latitude": 35.1,
+                        "longitude": 128.1,
+                    }
+                )
+                + "\n"
+            )
+
+        row = build_axis_b_rows(events_path, matches_path, gfw_path)[0]
+
+        assert row["tonnageGt"] == 31.0
+        assert row["gearType"] == "SET_GILLNETS"
+
+
 @pytest.fixture(scope="module")
 def rows():
     return build_axis_b_rows()
@@ -73,7 +180,7 @@ def rows():
 
 class TestBuildAxisBRows:
     def test_returns_one_row_per_event(self, rows):
-        assert len(rows) > 0
+        assert len(rows) == 275_782
 
     def test_every_row_has_expected_keys(self, rows):
         expected_keys = {
@@ -91,10 +198,17 @@ class TestBuildAxisBRows:
         }
         assert set(rows[0].keys()) == expected_keys
 
-    def test_gear_type_is_always_none_for_now(self, rows):
-        """gearType이 아직 채워지지 않는다는 전제의 회귀 확인 —
-        gearType을 채우기 시작하면 이 테스트를 의도적으로 고쳐야 한다."""
-        assert all(row["gearType"] is None for row in rows)
+    def test_snapshot_feature_counts(self, rows):
+        assert sum(row["tonnageGt"] is not None for row in rows) == 85_985
+        assert sum(row["gearType"] is not None for row in rows) == 147_441
+        assert sum(
+            row["tonnageGt"] is not None and row["gearType"] is not None
+            for row in rows
+        ) == 45_305
+
+    def test_excluded_gear_labels_are_absent(self, rows):
+        gear_types = {row["gearType"] for row in rows if row["gearType"] is not None}
+        assert gear_types.isdisjoint(EXCLUDED_GEAR_LABELS)
 
     def test_sea_area_is_string_not_tuple(self, rows):
         """튜플을 그대로 쓰면 LightGBM 카테고리 왕복에서 리스트로 망가져
@@ -128,3 +242,19 @@ class TestBuildAxisBRows:
         results = compute_axis_b_efficiency(rows, model)
         assert len(results) > 0
         assert any(r.used_row_count > 0 for r in results.values())
+
+
+def test_export_cli_reuses_production_rows(tmp_path, monkeypatch):
+    from data_new.process import build_axis_b_input
+
+    expected = {
+        "vesselId": "V1",
+        "tonnageGt": 24.0,
+        "gearType": "POTS_AND_TRAPS",
+    }
+    monkeypatch.setattr(build_axis_b_input, "build_axis_b_rows", lambda: [expected])
+    output_path = tmp_path / "axis_b_input.jsonl"
+
+    build_axis_b_input.run(output_path)
+
+    assert json.loads(output_path.read_text(encoding="utf-8")) == expected
