@@ -1,5 +1,4 @@
 """
-담당: 김준기, 오동규
 
 `data_new/processed/final_vessel_matches.jsonl`(김태윤 작업물)을
 `services/real_scoring.py`가 기대하는 평판화된 선박 레코드(vesselId/tonnage/

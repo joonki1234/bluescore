@@ -3,9 +3,8 @@
 로마자 유사도 대신, 사람이 GFW 영문명을 직접 한글로 변환한 후보
 (`gfw_korean_name_candidates.csv`)를 TAC/어선원부 원문 한글과 직접
 비교하면 정밀도가 얼마나 오르는지(대신 커버리지를 얼마나 잃는지)
-확인한다. **아직 실제 파이프라인(data_new/process/match_fuzzy_name.py,
-assemble_matches.py)에 반영 안 됨** — 팀 결정(README.md 참고) 전까지는
-이 스크립트가 유일한 산출 경로다.
+확인한다. 아직 실제 파이프라인(data_new/process/match_fuzzy_name.py,
+assemble_matches.py)에는 반영되지 않아 이 스크립트로만 산출된다.
 
 핵심 설계:
 - 이름비교는 exact match만 쓴다(fuzzy 0.85+는 검증 사례 19/19가
@@ -16,10 +15,8 @@ assemble_matches.py)에 반영 안 됨** — 팀 결정(README.md 참고) 전까
   없으면 held_multi(모호, 계산 불가)
 - (source,key) 동일한 후보는 데이터중복으로 보고 dedup
 
-한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은 파일도
-같이 낸다(`output/korean_matching_comparison.jsonl`) — 팀원이 숫자만
-보고 판단하지 않고, 실제 사례를 직접 열어 필터링·스팟체크해보고
-판단할 수 있게 하기 위함.
+한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은
+`output/korean_matching_comparison.jsonl`도 생성해 사례별 검토를 지원한다.
 
 사용법:
     python simulate_korean_name_matching.py

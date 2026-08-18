@@ -1,5 +1,4 @@
 """
-담당: 김준기, 오동규
 
 score/axis_a_pressure.py 단위 테스트. 실제 GFW API 없이 더미 normalized
 event 딕셔너리만으로 검증한다.

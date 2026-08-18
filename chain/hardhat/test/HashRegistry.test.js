@@ -1,4 +1,3 @@
-// 담당: 김준기, 오동규
 import { expect } from "chai";
 import { network } from "hardhat";
 import { keccak256, toUtf8Bytes } from "ethers";

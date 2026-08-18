@@ -1,6 +1,5 @@
-"""사람 라벨링 결과 분석 — analysis/generate_labeling_sample.py로 뽑은 80쌍을
-팀원이 직접 맞음/틀림/애매로 판정한 결과(`match_precision_labels.json`)를
-분석한다.
+"""analysis/generate_labeling_sample.py로 뽑은 80쌍의 사람 라벨링
+결과(`match_precision_labels.json`)를 분석한다.
 
 48번(MOF vsslKnd 교차검증)과 결과가 크게 다르게 나온 이유 확인 포함:
 48번의 "검증 가능" 대상은 GFW 자기신고명이 MOF 검색에도 걸리는 선박만이라,

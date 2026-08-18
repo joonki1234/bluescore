@@ -1,4 +1,3 @@
-// 담당: 김준기, 오동규
 import { defineConfig } from "hardhat/config";
 import hardhatToolboxMochaEthers from "@nomicfoundation/hardhat-toolbox-mocha-ethers";
 

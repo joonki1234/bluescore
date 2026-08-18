@@ -1,4 +1,3 @@
-// 담당: 김준기, 오동규
 // 배포된 HashRegistry에 실제로 commit/get을 호출해 로컬 테스트넷 연동을 확인하는 스크립트.
 import { network } from "hardhat";
 import { keccak256, toUtf8Bytes } from "ethers";

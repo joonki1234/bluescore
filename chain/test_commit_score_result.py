@@ -1,5 +1,4 @@
 """
-담당: 김준기, 오동규
 
 chain/commit_score_result.py 단위 테스트.
 """
