@@ -20,16 +20,12 @@ assemble_matches.py)에 반영 안 됨** — 팀 결정(README.md 참고) 전까
   TAC/어선원부 원문은 "제707태근호"처럼 번호를 이름에 그대로 갖고 있어
   안 떼면 exact match가 실패했음(교차분석으로 935건 중 124건 확인,
   README.md 발견 4)
-- 후보 2개+(동률)인 벡터는 독립적으로 안 풀고 전부 모아서 한번에 푼다
-  (README.md 발견 5): (a) gearType 대충매핑(9개 키워드)으로 먼저 후보를
-  거르고, (b) 그래도 안 좁혀지면 같은 후보를 다투는 GFW벡터들끼리
-  연결요소를 묶어 헝가리안 알고리즘(`scipy.optimize.linear_sum_assignment`)
-  으로 전역 최적배정 — "이 후보는 다른 GFW벡터가 이미 더 그럴듯하게
-  차지했다"를 고려 못 하던 기존의 벡터별 독립판단 한계를 보완한다.
-  비용은 거리(km), 숫자힌트(자릿수 제한 없이 아무 숫자나 일치하면
-  보너스) — 실측으로 봤을 때 이걸로도 완전히는 안 풀림(대충매핑
-  176척, 전역할당 178척 정도, 상당수 중복) — 보조 신호일 뿐 결정적이진
-  않다.
+- 벡터 단독 최근접 타이브레이크로도 안 풀리는 동률(후보 2개+) 벡터는
+  gearType 대충매핑(9개 키워드)으로 한 번 더 걸러본다(README.md 발견 5).
+  헝가리안 전역할당(GFW벡터끼리 같은 후보를 다투는 걸 고려한 최적배정)도
+  시도했었으나 폐기함 — 총비용은 최소화해도 개별 배정의 정답 여부까진
+  보장 못 해서, 스팟체크로 숫자대조 가능한 37건 중 7건(19%)이 숫자불일치인
+  걸 확인함(후보풀에 진짜 정답이 없을 때 억지로 그럴듯한 걸 골라버림).
 
 한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은 파일도
 같이 낸다(`output/korean_matching_comparison.jsonl`) — 팀원이 숫자만
@@ -46,11 +42,8 @@ import csv
 import json
 import re
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
-
-import numpy as np
-from scipy.optimize import linear_sum_assignment
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "process"))
 
@@ -76,14 +69,6 @@ def _digit_prefix(normalized: str) -> str:
     수정에만 있어서(라이브 파이프라인엔 없음) — 이 제안이 라이브 코드의
     미커밋 상태에 의존하지 않도록 여기 그대로 복제해둔다."""
     m = re.match(r"^\D*?(\d{2,4})", normalized)
-    return m.group(1) if m else ""
-
-
-def _any_digit(normalized: str) -> str:
-    """자릿수 제한 없이 아무 숫자열이나 하나(하드필터 아니라 헝가리안
-    배정의 소프트 힌트 전용 — 1자리도 씀, 검증범위 밖이라 결정적으론
-    안 쓰고 비용을 살짝 낮추는 정도로만)."""
-    m = re.search(r"(\d+)", normalized)
     return m.group(1) if m else ""
 
 
@@ -118,9 +103,6 @@ COMPARISON_OUT_PATH = Path(__file__).resolve().parent / "output" / "korean_match
 ROMAN_FALLBACK_THRESHOLD = 0.85  # 한글후보 자체가 없는 벡터에만 씀
 LOC_VERIFIED_KM = 50.0
 LOC_HELD_CAP_KM = 150.0
-ASSIGNMENT_SENTINEL = 1e6  # 헝가리안 비용행렬에서 "후보 아님"을 나타내는 값
-ASSIGNMENT_NO_LOC_COST = 300.0  # 위치정보 없는 쌍의 기본비용(멀다고 간주)
-ASSIGNMENT_DIGIT_BONUS = 60.0  # 숫자힌트 일치시 비용 할인(소프트, 확정 아님)
 
 # 참고용 — 현재 라이브에 커밋된 로마자매칭(FUZZY_NAME_THRESHOLD=0.8) 실측치.
 # assemble_matches.py를 재실행해서 얻은 값이며 여기서 재계산하지 않는다.
@@ -182,7 +164,6 @@ def _build_pool() -> list:
         p["base"] = _strip_ho(p["name"])
         p["compareBase"] = _strip_je_number(p["base"])
         p["digitPrefix"] = _digit_prefix(_normalize(p["name"]))
-        p["anyDigit"] = _any_digit(_normalize(p["name"]))
         p["romanized"] = _normalize(_romanize(p["name"]))
     return pool
 
@@ -251,7 +232,7 @@ def run() -> list:
                 continue
             if p["base"] in korean_cands or p["compareBase"] in korean_cands:  # exact만(fuzzy는 폐기, 발견 3) + "제N호" 정규화(발견 4)
                 dist = _nearest_port_km(ports, centroid, p["ports"])
-                passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "distKm": dist, "gear": p["gear"], "anyDigit": p["anyDigit"]})
+                passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "distKm": dist, "gear": p["gear"]})
 
         if not passing:
             rows.append({**row, "category": "unmatched", "matchedName": None, "distKm": None, "candidateCount": 0, "koreanCandidates": korean_cands})
@@ -263,23 +244,19 @@ def run() -> list:
             continue
 
         # 벡터 단독 최근접 타이브레이크부터 먼저 시도 — 이미 이걸로 풀리는
-        # 건(가까운 후보가 유일함) 그대로 확정한다. gearType/헝가리안은
-        # 이 단독판단으로도 진짜 안 풀리는 것에만 쓴다 — 안 그러면
-        # 전역최적화가 이미 명확했던 개별 매칭까지 흔들어버림(실측으로 확인,
-        # 계산가능 32.2%->25.5%로 되레 후퇴했었음).
+        # 건(가까운 후보가 유일함) 그대로 확정한다. gearType은 이 단독판단
+        # 으로도 진짜 안 풀리는 것에만 쓴다.
         resolved = _try_resolve_by_nearest(passing)
         if resolved is not None:
             category, matched_name, dist = resolved
             rows.append({**row, "category": category, "matchedName": matched_name, "distKm": dist, "candidateCount": len(distinct_vessels)})
             continue
 
-        # 그래도 안 풀림 — 전부 모아서 나중에 한번에 푼다(gearType 필터
-        # -> 헝가리안 전역할당, README.md 발견 5).
+        # 그래도 안 풀림 — gearType 필터로 재시도(README.md 발견 5).
         gfw_gear = {g for g in (gfw.get("combinedGearTypes") or []) if g not in GEAR_GENERIC_LABELS}
-        gfw_any_digit = _any_digit(norm)
         pending.append({
             "row": row, "vesselId": vessel_id, "passing": passing,
-            "gfwGear": gfw_gear, "gfwAnyDigit": gfw_any_digit, "centroid": centroid,
+            "gfwGear": gfw_gear, "centroid": centroid,
         })
 
     _resolve_pending(pending, ports, rows)
@@ -287,10 +264,14 @@ def run() -> list:
 
 
 def _resolve_pending(pending: list, ports: dict, rows: list) -> None:
-    """동률 후보 벡터들을 한번에 처리. 1) gearType으로 먼저 거르고,
-    2) 그래도 남으면 같은 후보를 다투는 벡터들끼리 묶어 헝가리안
-    전역할당(거리+숫자힌트 비용)으로 풀어본다."""
-    # 1) gearType 필터
+    """동률 후보 벡터들을 gearType으로 거른 뒤, 남으면 최근접 타이브레이크로
+    확정한다.
+
+    헝가리안 전역할당(scipy.optimize.linear_sum_assignment)도 시도했었으나
+    — 스팟체크 결과 숫자대조 가능한 사례 37건 중 7건(19%)이 숫자불일치인
+    걸로 확인돼(예: '2 TAE YANG HO'(2)를 '제88태양호'(88)에 배정) 폐기함.
+    전역최적화가 총비용은 최소화해도 개별 배정의 정답 여부까진 보장 못 함
+    — 후보풀에 진짜 정답이 없을 때 억지로 그럴듯한 걸 골라버리는 게 원인."""
     for item in pending:
         orig_passing = item["passing"]
         gfw_gear = item["gfwGear"]
@@ -302,8 +283,6 @@ def _resolve_pending(pending: list, ports: dict, rows: list) -> None:
             # 전부 걸러지면(=매핑이 의심스러운 경우) gearType 자체를 무시하고 원래대로.
             item["passing"] = filtered if filtered else orig_passing
 
-    still_ambiguous = []
-    for item in pending:
         distinct = {(p["source"], p["key"]) for p in item["passing"]}
         if len(distinct) == 1:
             # 버그 수정(2026-08-18): gearType으로 후보가 1개로 좁혀졌다고 거리
@@ -319,87 +298,14 @@ def _resolve_pending(pending: list, ports: dict, rows: list) -> None:
             else:
                 category = "verified" if (d is not None and d <= LOC_VERIFIED_KM) else "held_위치애매"
                 rows.append({**item["row"], "category": category, "matchedName": p["name"], "distKm": d, "candidateCount": 1, "resolvedBy": "gearType"})
-        else:
-            still_ambiguous.append(item)
-
-    # 2) 남은 것들 — 같은 (source,key) 후보를 다투는 벡터끼리 연결요소로 묶기
-    parent = {}
-
-    def find(x):
-        while parent.get(x, x) != x:
-            parent[x] = parent.get(parent[x], parent[x])
-            x = parent[x]
-        return x
-
-    def union(a, b):
-        ra, rb = find(a), find(b)
-        if ra != rb:
-            parent[ra] = rb
-
-    for item in still_ambiguous:
-        gnode = ("G", item["vesselId"])
-        parent.setdefault(gnode, gnode)
-        for p in item["passing"]:
-            cnode = ("C", p["source"], p["key"])
-            parent.setdefault(cnode, cnode)
-            union(gnode, cnode)
-
-    groups = defaultdict(lambda: {"items": [], "cands": {}})
-    for item in still_ambiguous:
-        root = find(("G", item["vesselId"]))
-        groups[root]["items"].append(item)
-        for p in item["passing"]:
-            groups[root]["cands"][(p["source"], p["key"])] = p
-
-    for group in groups.values():
-        items = group["items"]
-        cand_keys = list(group["cands"].keys())
-        if len(items) == 1:
-            # 경쟁자 없음 — 헝가리안 의미 없음. gearType으로 후보가 좁혀졌을
-            # 수 있으니 최근접 재시도 후에도 안 풀리면 held_multi로 확정.
-            item = items[0]
-            resolved = _try_resolve_by_nearest(item["passing"])
-            if resolved is not None:
-                category, matched_name, dist = resolved
-                distinct = {(p["source"], p["key"]) for p in item["passing"]}
-                rows.append({**item["row"], "category": category, "matchedName": matched_name, "distKm": dist, "candidateCount": len(distinct), "resolvedBy": "gearType"})
-            else:
-                _finalize_by_nearest(item, rows)
             continue
 
-        n, m = len(items), len(cand_keys)
-        cost = np.full((n, m), ASSIGNMENT_SENTINEL)
-        dist_matrix = np.full((n, m), None, dtype=object)
-        real_cands_per_item = [{(p["source"], p["key"]) for p in it["passing"]} for it in items]
-
-        for i, item in enumerate(items):
-            for j, key in enumerate(cand_keys):
-                if key not in real_cands_per_item[i]:
-                    continue
-                p = group["cands"][key]
-                d = p["distKm"]
-                base_cost = d if d is not None else ASSIGNMENT_NO_LOC_COST
-                bonus = ASSIGNMENT_DIGIT_BONUS if (item["gfwAnyDigit"] and p["anyDigit"] and item["gfwAnyDigit"] == p["anyDigit"]) else 0.0
-                cost[i, j] = base_cost - bonus
-                dist_matrix[i, j] = d
-
-        row_ind, col_ind = linear_sum_assignment(cost)
-        assigned = {}
-        for i, j in zip(row_ind, col_ind):
-            if cost[i, j] < ASSIGNMENT_SENTINEL:
-                assigned[i] = (cand_keys[j], dist_matrix[i, j], group["cands"][cand_keys[j]]["name"])
-
-        for i, item in enumerate(items):
-            if i not in assigned:
-                _finalize_by_nearest(item, rows)
-                continue
-            _, d, matched_name = assigned[i]
-            if d is not None and d <= LOC_VERIFIED_KM:
-                rows.append({**item["row"], "category": "verified", "matchedName": matched_name, "distKm": d, "candidateCount": len(items), "resolvedBy": "assignment"})
-            elif d is not None and d <= LOC_HELD_CAP_KM:
-                rows.append({**item["row"], "category": "held_위치애매", "matchedName": matched_name, "distKm": d, "candidateCount": len(items), "resolvedBy": "assignment"})
-            else:
-                rows.append({**item["row"], "category": "held_multi_동명이선", "matchedName": None, "distKm": None, "candidateCount": len(items), "candidateNames": [p["name"] for p in item["passing"]]})
+        resolved = _try_resolve_by_nearest(item["passing"])
+        if resolved is not None:
+            category, matched_name, dist = resolved
+            rows.append({**item["row"], "category": category, "matchedName": matched_name, "distKm": dist, "candidateCount": len(distinct), "resolvedBy": "gearType"})
+        else:
+            _finalize_by_nearest(item, rows)
 
 
 def _try_resolve_by_nearest(passing: list) -> tuple | None:
