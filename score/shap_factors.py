@@ -10,9 +10,11 @@ score/에 있어야 한다. 화면의 `shapFactors`는 원래
 모듈이 그 자리를 실제 계산으로 채운다.
 
 `axis_a_pressure_raw`는 트리 모델이 아니라 명시적 가중합+상호작용항 수식
-(`revisit_weight*revisit_raw + congestion_weight*congestion_raw +
-interaction_weight*(revisit_raw*congestion_raw)`)이라, 근사 없이 세 항으로
-정확히 분해된다 — 진짜 Shapley value 계산(`shap` 라이브러리)이 필요 없다.
+(`revisit_weight*revisit_zscore + congestion_weight*crowding_zscore +
+interaction_weight*(revisit_zscore*crowding_zscore)` — `axis_a_pressure.py`
+참고, raw 값이 아니라 population 기준 z-score로 정규화된 값을 결합한다)
+이라, 근사 없이 세 항으로 정확히 분해된다 — 진짜 Shapley value 계산
+(`shap` 라이브러리)이 필요 없다.
 
 `axis_a_factor_shares()`는 `services/real_scoring.py`(A축 실산출 경로)에
 실제로 연결돼 있다 — `axis_a_factor_contributions()`의 raw 기여도를 "전체
@@ -54,10 +56,14 @@ def axis_a_factor_contributions(
     세 항의 raw_contribution 합은 `result.axis_a_pressure_raw`와 정확히
     같다(부동소수점 오차 범위 내) — `compute_axis_a_pressure()`가 이
     가중치들로 결합한 값을 그대로 세 항으로 되돌리는 것뿐이라 근사가 없다.
+    결합에 실제로 쓰인 게 z-score 정규화된 값이라(`axis_a_pressure.py`
+    참고), 여기서도 `revisit_interval_raw`가 아니라 `revisit_zscore`
+    필드를 쓴다 — raw 필드를 쓰면 이 합이 `axis_a_pressure_raw`와
+    안 맞는다.
     """
-    revisit_contribution = revisit_weight * result.revisit_interval_raw
-    congestion_contribution = congestion_weight * result.crowding_pressure_raw
-    interaction_contribution = interaction_weight * result.interaction_raw
+    revisit_contribution = revisit_weight * result.revisit_zscore
+    congestion_contribution = congestion_weight * result.crowding_zscore
+    interaction_contribution = interaction_weight * result.interaction_zscore
 
     return [
         {"label": "재방문압력", "raw_contribution": revisit_contribution, "axis": "a"},
