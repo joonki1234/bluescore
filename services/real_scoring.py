@@ -18,7 +18,7 @@ import json
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from score.axis_a_pressure import compute_axis_a_pressure
 from score.axis_b_baseline import VesselAxisBResult
@@ -217,6 +217,25 @@ class RealAxisAAdapter:
     @lru_cache(maxsize=1)
     def list_vessels(self) -> List[dict]:
         return self._vessel_records()
+
+    @lru_cache(maxsize=1)
+    def status_ranked_vessels(self) -> List[Tuple[bool, dict, str]]:
+        """전체 스냅샷의 산출 상태를 선박별로 한 번만 계산해, BlueScore까지
+        완전 산출되는 선박(전체의 16.2%)이 앞쪽에 오도록 정렬해 둔다.
+        선박당 계산은 가벼워도 5,000여 척 전체를 매 API 호출마다 다시 돌리면
+        수십 초가 걸려(측정: 약 21초) 목록 화면이 매번 멈춘 것처럼 보인다.
+        """
+        scored: List[Tuple[bool, dict, str]] = []
+        for vessel in self.list_vessels():
+            vessel_id = vessel.get("vesselId")
+            if not vessel_id:
+                continue
+            result = self.score(vessel_id)
+            full_success = result.status == "partial" and result.axis_b_score is not None
+            status = "success" if full_success else result.status
+            scored.append((full_success, vessel, status))
+        scored.sort(key=lambda item: not item[0])
+        return scored
 
     @lru_cache(maxsize=128)
     def score(self, vessel_id: str) -> RealAxisAResult:

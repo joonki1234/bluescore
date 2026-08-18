@@ -42,18 +42,29 @@ st.set_page_config(
 )
 
 
+def _sidebar_header() -> None:
+    st.markdown(
+        f'<div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">'
+        f'<div style="width:26px; height:26px; border-radius:7px; '
+        f'background:{theme.AXIS_A};"></div>'
+        f'<div><div style="font-weight:800; font-size:16px;">BlueScore</div>'
+        f'<div style="font-size:11.5px; color:{theme.INK_SOFT};">해양 ESG 여신 스코어링</div>'
+        f'</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.divider()
+
+
+def _sidebar_freshness() -> None:
+    st.divider()
+    st.caption("데이터 기준일자")
+    for name, day in adapter.load_dataset()["dataFreshness"].items():
+        st.caption(f"{name} · {day}")
+
+
 def _sidebar(*, appeal_inbox: bool = False) -> None:
     with st.sidebar:
-        st.markdown(
-            f'<div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">'
-            f'<div style="width:26px; height:26px; border-radius:7px; '
-            f'background:{theme.AXIS_A};"></div>'
-            f'<div><div style="font-weight:800; font-size:16px;">BlueScore</div>'
-            f'<div style="font-size:11.5px; color:{theme.INK_SOFT};">해양 ESG 여신 스코어링</div>'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
-        st.divider()
+        _sidebar_header()
 
         if appeal_inbox:
             appeals = adapter.list_objections()
@@ -98,10 +109,7 @@ def _sidebar(*, appeal_inbox: bool = False) -> None:
         else:
             st.warning(adapter.blocked_notice(vessel)["title"], icon="⚠️")
 
-        st.divider()
-        st.caption("데이터 기준일자")
-        for name, day in adapter.load_dataset()["dataFreshness"].items():
-            st.caption(f"{name} · {day}")
+        _sidebar_freshness()
 
 
 def _fisher_page() -> None:
@@ -130,6 +138,10 @@ def _real_preview_page() -> None:
     from ui import real_preview
 
     try:
+        with st.sidebar:
+            _sidebar_header()
+            st.caption("실제 GFW 조업 이벤트(data_new/) 기준 미리보기 화면입니다.")
+            _sidebar_freshness()
         real_preview.render()
     except adapter.ApiClientError as exc:
         st.error(str(exc))
