@@ -74,10 +74,6 @@ def render() -> None:
 
     if score["status"] != "success":
         st.warning(f"{score['status']} — {score.get('message') or ''}")
-    else:
-        st.success("BlueScore 산출 완료")
-        with st.expander("산출 조건·한계 보기"):
-            st.caption(score.get("message") or "")
 
     axis_a_score = score["axisA"].get("score")
     axis_b_score = score["axisB"].get("score")
