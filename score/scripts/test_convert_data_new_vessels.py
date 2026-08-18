@@ -1,5 +1,4 @@
 """
-담당: 김준기, 오동규
 
 score/scripts/convert_data_new_vessels.py 단위 테스트.
 """

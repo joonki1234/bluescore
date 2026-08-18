@@ -1,10 +1,7 @@
-"""한글 직접비교 매칭 재설계 시뮬레이션 (이 폴더의 README.md 근거).
+"""한글 직접비교 매칭 재설계 시뮬레이션.
 
-**2026-08-18 채택됨 — 라이브 파이프라인(`data_new/process/match_fuzzy_name.py`,
-`assemble_matches.py`)에 이미 반영됨.** 이 스크립트는 그 검증 과정의
-기록으로 남겨둔다(로직은 라이브 버전과 동일, 카테고리 세분화·old/new
-비교 파일 출력 등 탐색용 기능만 더 있음) — 실제 매칭 산출은 이제
-`process/match_fuzzy_name.py`가 담당한다.
+라이브 파이프라인에 반영된 매칭 로직을 검증하고 기존 결과와 비교한다.
+실제 매칭 산출은 `data_new/process/match_fuzzy_name.py`가 담당한다.
 
 핵심 설계(자세한 배경은 README.md 참고):
 - 이름비교는 exact match만 쓴다(로마자 유사도 fuzzy는 구조적 오탐이 있어 안 씀)
@@ -19,10 +16,8 @@
   계산 불가) — "모른다"를 "가깝다"로 오판하지 않는다
 - (source,key) 동일한 후보는 데이터중복으로 보고 dedup
 
-한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은 파일도
-같이 낸다(`output/korean_matching_comparison.jsonl`) — 팀원이 숫자만
-보고 판단하지 않고, 실제 사례를 직접 열어 필터링·스팟체크해보고
-판단할 수 있게 하기 위함.
+한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은
+`output/korean_matching_comparison.jsonl`도 생성해 사례별 검토를 지원한다.
 
 사용법:
     python simulate_korean_name_matching.py

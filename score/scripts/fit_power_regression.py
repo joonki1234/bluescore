@@ -1,5 +1,4 @@
 """
-담당: 김준기, 오동규
 
 TAC(할당승인정보) 원본의 실제 톤수-마력 쌍으로, score/axis_b_physics.py의
 POWER_COEFF_A/B(GT -> 설치출력 kW 회귀식)를 직접 재적합(calibration)해본다.

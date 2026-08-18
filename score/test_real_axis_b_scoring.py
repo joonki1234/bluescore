@@ -1,5 +1,4 @@
 """
-담당: 김준기, 오동규
 
 score/real_axis_b_scoring.py 단위 테스트.
 """
