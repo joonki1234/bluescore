@@ -322,9 +322,9 @@ class ScoringService:
             matching_method=result.matching_method,
             matching_reason=result.matching_reason,
             # 2026-08-18: A축 요인 기여도(SHAP) 실연결(오동규, 최지희 확인 필요).
-            # B축은 연결 안 함 — score/shap_factors.py의
-            # axis_b_baseline_factor_contributions() docstring 참고
-            # ("점수"가 아니라 "기준선 조건"만 설명하는 의미론적 제약).
+            # B축은 연결 안 함 — score/shap_factors.py 모듈 docstring 참고
+            # ("점수"가 아니라 "기준선 조건"만 설명 가능하다는 의미론적
+            # 제약으로, B축 SHAP 코드 자체를 팀 결정으로 들어냄).
             shap_factors=[ShapFactorSchema(**item) for item in result.shap_factors],
             message=message,
             created_at=datetime.now(timezone.utc),
