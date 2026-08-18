@@ -22,6 +22,12 @@ import streamlit as st
 
 from ui import adapter, components
 
+# 실측 규모 — API가 전체 모집단 크기를 별도 필드로 안 주기 때문에(목록
+# 엔드포인트는 limit개만 반환) 캡션·커버리지 링에 쓰는 값으로 고정해둔다.
+# score/TODO.md의 매칭 오탐 필터 적용 결과(2026-08-18)와 같은 숫자다.
+_TOTAL_VESSELS = 5323
+_FULL_SUCCESS_VESSELS = 807
+
 
 def _discount_text(band: dict) -> str:
     if band["discountBp"] <= 0:
@@ -36,10 +42,9 @@ def render() -> None:
         unsafe_allow_html=True,
     )
     st.caption(
-        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(2026-04~08월)로 "
-        "계산한 결과입니다. 실제 5,323척 규모 데이터 중 807척에 대해 BlueScore가 "
-        "완전 산출됩니다."
+        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(2026-04~08월)로 계산한 결과입니다."
     )
+    components.coverage_ring(_FULL_SUCCESS_VESSELS, _TOTAL_VESSELS)
 
     list_placeholder = st.empty()
     with list_placeholder.container():
@@ -75,6 +80,14 @@ def render() -> None:
     if score["status"] != "success":
         st.warning(f"{score['status']} — {score.get('message') or ''}")
 
+    peer = score.get("peerGroup") or {}
+    components.real_vessel_meta_card(
+        score["vessel"]["meta"],
+        score.get("matchingReason"),
+        peer.get("count", 0),
+        score["axisA"].get("usedEventCount"),
+    )
+
     axis_a_score = score["axisA"].get("score")
     axis_b_score = score["axisB"].get("score")
     components.animated_stat_cards(
@@ -104,8 +117,10 @@ def render() -> None:
     if score.get("rateBand"):
         st.info(f"제안 금리 등급 · {_discount_text(score['rateBand'])}")
 
-    peer = score.get("peerGroup") or {}
-    st.caption(f"유사 선박군 표본 {peer.get('count', 0)}척")
+    shap_factors = score.get("shapFactors") or []
+    if shap_factors:
+        st.markdown("###### A축 요인 기여도")
+        components.real_shap_factor_bars(shap_factors)
 
     with st.expander("원본 API 응답 (디버그용)"):
         st.json(score)
