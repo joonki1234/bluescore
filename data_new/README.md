@@ -68,7 +68,6 @@ cd ../process
 python normalize_gfw_events.py
 python normalize_gfw_vessels.py
 python normalize_tac.py
-python normalize_ports.py
 
 # 3. 매칭 (GFW<->TAC 한글 직접비교, matching_redesign_proposal/README.md 참고)
 python match_fuzzy_name.py              # 3단계: 한글 직접비교 + 카카오 지오코딩 거리확인
