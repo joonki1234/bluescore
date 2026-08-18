@@ -19,13 +19,19 @@ DEMO_DATA_SNAPSHOT_ID = "dashboard-demo-seed-20260814-v1"
 # 한다는 걸 실측으로 재확인했다.
 REAL_DATA_SNAPSHOT_ID = "data_new-gfw-events-2026-04-01_2026-08-14-v2"
 DEMO_MODEL_VERSION = "axis-a-demo-v1__axis-b-demo-v1"
-REAL_PARTIAL_MODEL_VERSION = "axis-a-pressure-v1__axis-b-unavailable"
+# (axis-a-pressure-v2) A축 raw 결합에 z-score 정규화 적용
+# (score/axis_a_pressure.py, 오동규, 재방문압력 기여비중 1%→39%로 개선) —
+# 실제 점수 계산 로직이 바뀌었는데 이 버전 문자열을 안 올린 채 커밋된 걸
+# 김준기가 실측 캐시 확인 중 발견함. REAL_DATA_SNAPSHOT_ID 때(-v2)와
+# 같은 실수를 세 번째로 반복한 것 — "데이터 출처는 안 바뀌어도 계산 로직이
+# 바뀌면 버전을 올려야 한다"가 이제 model_version 쪽에서도 재확인됐다.
+REAL_PARTIAL_MODEL_VERSION = "axis-a-pressure-v2__axis-b-unavailable"
 # B축 연결(score/real_axis_b_scoring.py) — 선박별로 B축 실산출
 # 여부가 갈려서(톤수 매칭 커버리지 43.4%뿐) model_version도 응답마다 달라야
 # 한다. 고정 문자열 하나로는 재현성 계약이 안 맞는 걸 REAL_DATA_SNAPSHOT_ID
 # 때 이미 한 번 겪었다 — 같은 실수를 반복하지 않으려고 axis_b_included를
 # response_metadata()가 직접 받게 했다.
-REAL_MODEL_VERSION_WITH_B = "axis-a-pressure-v1__axis-b-lightgbm-v1"
+REAL_MODEL_VERSION_WITH_B = "axis-a-pressure-v2__axis-b-lightgbm-v1"
 SCORING_RULE_VERSION = "bluescore-0.65a-0.35b-v1"
 RATE_TABLE_VERSION = "demo-rate-table-78-68-55-v1"
 

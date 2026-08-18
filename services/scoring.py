@@ -322,6 +322,8 @@ class ScoringService:
                 raw_value=result.axis_b_raw,
                 used_event_count=result.axis_b_used_row_count,
                 missing_reason=None if has_axis_b else "톤수 미매칭이거나 유사군 내 B축 표본이 부족합니다.",
+                estimated_fuel_kg=result.axis_b_estimated_fuel_kg,
+                expected_fuel_kg=result.axis_b_expected_fuel_kg,
             ),
             rate_band=band,
             peer_group=PeerContext(count=result.peer_count),

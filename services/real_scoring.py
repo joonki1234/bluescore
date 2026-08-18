@@ -55,6 +55,10 @@ class RealAxisAResult:
     axis_b_score: Optional[float] = None
     axis_b_raw: Optional[float] = None
     axis_b_used_row_count: Optional[int] = None
+    # 2026-08-18 후속: B축 SHAP 대신 쓰는 "산출 근거" 두 값(실측 추정 vs
+    # 기준선 예측 연료, kg). axis_b_raw = estimated - expected와 정확히 같다.
+    axis_b_estimated_fuel_kg: Optional[float] = None
+    axis_b_expected_fuel_kg: Optional[float] = None
     # A축 요인 기여도(SHAP) 연결 필드. B축은 연결 안 함 — score/shap_factors.py
     # 모듈 docstring 참고("점수"가 아니라 "기준선 조건"만 설명 가능하다는
     # 의미론적 제약으로 B축 SHAP 코드 자체를 들어냄).
@@ -67,18 +71,31 @@ def _axis_b_score_for_vessel(
     axis_b_results: Optional[Dict[str, VesselAxisBResult]],
     min_peer_size: int,
 ):
-    """B축 raw(잔차)를 같은 유사 선박군 안에서 백분위로 바꾼다.
+    """B축 raw(잔차)를 같은 유사 선박군 안에서 백분위로 바꾸고, 그 잔차를
+    만든 두 값(실측 기반 추정 연료 vs 유사조건 기준선 예측 연료)도 같이 낸다.
 
     A축 상태(group)는 이미 확정된 뒤 호출되므로, 여기서는 "B축 표본이 그
     그룹 안에서 따로 충분한가"만 별도로 판단한다 — 톤수 매칭 커버리지가
     43.4%뿐이라 A축 표본은 충분해도 B축 표본은 부족한 그룹이 많다.
+
+    estimated_fuel_kg/expected_fuel_kg는 유사군 백분위와 무관하게(peer
+    표본 부족·group=None이어도) 이 선박 하나의 물리식/LightGBM 계산
+    결과라 항상 낼 수 있다 — B축 SHAP을 못 쓰는 대신(순환성 문제,
+    score/shap_factors.py 참고) "점수 대신 근거가 된 두 숫자"를 그대로
+    보여주는 쪽으로 2026-08-18에 방향을 잡았다(score/TODO.md).
     """
-    if not axis_b_results or group is None:
-        return None, None, None
+    if not axis_b_results:
+        return None, None, None, None, None
 
     this_result = axis_b_results.get(vessel_id)
     if this_result is None or this_result.used_row_count == 0:
-        return None, None, None
+        return None, None, None, None, None
+
+    estimated_fuel_kg = this_result.estimated_fuel_kg
+    expected_fuel_kg = this_result.expected_fuel_kg
+
+    if group is None:
+        return None, this_result.residual_raw, this_result.used_row_count, estimated_fuel_kg, expected_fuel_kg
 
     peer_raws = [
         axis_b_results[peer_id].residual_raw
@@ -86,10 +103,16 @@ def _axis_b_score_for_vessel(
         if peer_id in axis_b_results and axis_b_results[peer_id].used_row_count > 0
     ]
     if len(peer_raws) < min_peer_size:
-        return None, this_result.residual_raw, this_result.used_row_count
+        return (
+            None, this_result.residual_raw, this_result.used_row_count,
+            estimated_fuel_kg, expected_fuel_kg,
+        )
 
     axis_b_score = raw_to_score(this_result.residual_raw, peer_raws)
-    return axis_b_score, this_result.residual_raw, this_result.used_row_count
+    return (
+        axis_b_score, this_result.residual_raw, this_result.used_row_count,
+        estimated_fuel_kg, expected_fuel_kg,
+    )
 
 
 def compute_axis_a_for_vessel(
@@ -163,8 +186,10 @@ def _result_from_context(
         if status == "success"
         else None
     )
-    axis_b_score, axis_b_raw, axis_b_used_row_count = _axis_b_score_for_vessel(
-        vessel_id, group if status == "success" else None, axis_b_results, min_peer_size
+    axis_b_score, axis_b_raw, axis_b_used_row_count, axis_b_estimated_fuel_kg, axis_b_expected_fuel_kg = (
+        _axis_b_score_for_vessel(
+            vessel_id, group if status == "success" else None, axis_b_results, min_peer_size
+        )
     )
     has_specs = vessel.get("tonnage") is not None and bool(vessel.get("fishingType"))
     return RealAxisAResult(
@@ -181,6 +206,8 @@ def _result_from_context(
         axis_b_score=axis_b_score,
         axis_b_raw=axis_b_raw,
         axis_b_used_row_count=axis_b_used_row_count,
+        axis_b_estimated_fuel_kg=axis_b_estimated_fuel_kg,
+        axis_b_expected_fuel_kg=axis_b_expected_fuel_kg,
         # status(insufficientSample 포함)와 무관하게 채운다 — raw 분해
         # 자체는 유사군 표본과 무관하게 항상 계산 가능하다.
         shap_factors=axis_a_factor_shares(axis_result),

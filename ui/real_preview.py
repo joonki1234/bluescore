@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from ui import adapter, components
+from ui import adapter, components, theme
 
 
 def _discount_text(band: dict) -> str:
@@ -115,3 +115,21 @@ def render() -> None:
     if shap_factors:
         st.markdown("###### A. 자원 압력 — 요인 기여도")
         components.real_shap_factor_bars(shap_factors)
+
+    estimated_fuel = score["axisB"].get("estimatedFuelKg")
+    expected_fuel = score["axisB"].get("expectedFuelKg")
+    if estimated_fuel is not None and expected_fuel is not None:
+        st.markdown("###### B. 운항 효율 — 산출 근거")
+        components.animated_transition_card(
+            "유사 조건 기준선 예측 → 실측 기반 추정 연료",
+            expected_fuel,
+            estimated_fuel,
+            unit="kg",
+            decimals=1,
+            color=theme.direction_color(expected_fuel - estimated_fuel),
+            note_html=(
+                "같은 톤수·속도·조업시간대 다른 배들의 평균(기준선)보다 실제로 "
+                "덜 태웠으면 초록, 더 태웠으면 빨강입니다. B축 점수는 이 차이를 "
+                "유사 선박군 안에서 백분위로 바꾼 값입니다."
+            ),
+        )
