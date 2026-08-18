@@ -2,30 +2,37 @@
 
 # score TODO
 
-## 진행 현황 정리 (2026-08-15)
+## 진행 현황 정리 (2026-08-18 갱신)
 
 score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이드오프까지 전부 코드+테스트
 완료 상태고, chain/도 Hardhat 실배포+Python 연동까지 end-to-end 확인 끝났다
-(`chain/TODO.md` 참고). **지금은 오동규·김준기 단독으로 더 진행할 수 있는 항목이
-없고, 남은 건 전부 아래 두 그룹뿐이다.**
+(`chain/TODO.md` 참고). B축 LightGBM 순환성 문제도 해결됨(아래 항목).
+
+**2026-08-15 시점에 "최지희님과 조율 필요"로 묶었던 4개 배선 항목은 그 사이
+최지희님의 API/서비스 계층 작업(`services/`, `api/` 신설)으로 3개가 이미 실제로
+연결돼 있었고, 남은 1개(트레이드오프 계수)도 오동규가 2026-08-18에 배선
+완료했다** — `services/scoring.py`가 최지희님 소유 파일이라 이 배선은 **최지희
+확인 필요** 상태로 남겨둠(상세는 아래 트레이드오프 계수 항목). 나머지 배선
+3개(raw_to_score·rate_mapping, score_hash, scoring_backend mock→실산출)는
+`services/real_scoring.py`·`services/scoring.py`·`services/workflow.py`에서
+이미 호출되고 있는 것을 확인함(오동규, 2026-08-17 앱 실행 확인).
+
+**지금 오동규·김준기 단독으로 더 진행할 수 있는 항목은 없고, 남은 건 전부
+아래 팀 논의 필요 목록뿐이다.**
 
 **팀 논의 필요 (최지희 제외)**
 - AIS 위치정보 통계를 A축에 어떻게 반영할지 (아래 항목, 제안만 해둔 상태)
 - 선박제원 매칭 품질 이슈 — 확정 매칭 663건 중 90.5%(600건)가 비어선으로 확인됨
-  (`data/BlueScore_지희님질문_매칭품질_20260814.md` 참고)
+  (`data/BlueScore_지희님질문_매칭품질_20260814.md`,
+  `data/BlueScore_모집단뒤집기_조사_20260818.md` 참고)
 - 국내→GFW 어업종 매핑표(19종) — 담당 미정 (`data/TODO.md` 참고)
 - CLAUDE.md "미확정 항목" 5개 (격자 크기, 재방문 기간, 유사군 최소 표본, GAP 비율
   임계값, 매칭 신뢰도 임계값)
 - 기관출력 단위(HP/PS) 확인 (`data/TODO.md` 참고)
 - GT→설치출력 회귀계수·SFOC 원출처 — 이번 조사로는 못 찾음, 새 단서 없이는
   더 진행 불가 (아래 항목)
-
-**최지희님과 조율 필요 (`ui/adapter.py` 배선 — 현재 병목)**
-- `raw_to_score`·`rate_mapping` 실제로 쓰게 배선 (아래 점수조립 항목)
-- `ui/adapter.score_hash()` → `chain.hashing.compute_result_hash()` 교체
-  (`chain/TODO.md` 참고)
-- 트레이드오프 계수를 고정 상수에서 함수 호출로 바꿀지 결정 (아래 항목)
-- `scoring_backend()` mock→실산출(A축) 전환 (아래 실산출 검증 항목)
+- `AXIS_A_COST_PER_KNOT`(`services/scoring.py`) 미검증 계수 부작용 — 트레이드오프
+  계수 배선 항목 참고
 
 ---
 
@@ -76,8 +83,23 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       `axis_b_physics.py`의 실제 Coello 물리식(속도 3제곱 법칙)에서 차분으로
       계산 — 고정 상수가 아니라 선박 톤수/현재속도에 따라 달라짐(예: tonnage=50,
       operating_hours=5 기준 속도 8kn일 때 약 60점/kn, 20kn일 때 약 26점/kn —
-      기존 잠정값 3.2보다 훨씬 크고 속도 의존적임, **ui/adapter.py 배선을 고정
-      상수에서 이 함수 호출로 바꿀지는 최지희님과 상의 필요**).
+      기존 잠정값 3.2보다 훨씬 크고 속도 의존적임).
+      **(2026-08-18 배선 완료)** B축 관련 2개(`axis_b_points_per_knot`,
+      `axis_b_points_per_revisit_step`)를 `services/scoring.py`의
+      `ScoringService.simulate()`에 실제로 연결함 — 고정 상수
+      `AXIS_B_GAIN_PER_KNOT`/`AXIS_B_COST_PER_REVISIT_STEP`은 제거하고, 선박별
+      톤수(데모 fixture는 톤수가 없어 `DEMO_FALLBACK_TONNAGE_GT=50.0` 임시값 사용,
+      근거 없음)·현재속도 기준으로 매 호출마다 계산. `services/scoring.py`는
+      최지희님 소유 파일이라 **오동규가 작업, 최지희 확인 필요**.
+      부작용 확인: `explain/TODO.md` 시연 구성 ③번("최고점은 중간에 있고 끝에서는
+      떨어진다")이 실제로 성립하게 됨(VESSEL_A 기준 최고점이 구간 끝이 아니라
+      8.6kn에서 나옴, 기존엔 구간 끝이 최고점이었음). 다만 고속 구간 일부에서
+      "반작용이 있는 점수가 없는 점수보다 미세하게 높은" 역전이 생기는데, 원인은
+      B축 계수가 커지며 바닥값(4.0) 클램프 구간이 넓어졌고 그 구간에서 A축의
+      `AXIS_A_COST_PER_KNOT`(위에서 이미 "근거 공식 없음"이라고 밝힌 미검증
+      계수)가 그대로 드러나기 때문 — A축 계수는 이번 작업 범위 밖이라 안 건드림,
+      `ui/test_simulator_surface.py`의 `TestTradeoffIsVisibleInTheSurface`에
+      회귀 테스트로 남겨둠. A축 관련 나머지는 아래 문단과 동일.
       A축 관련 1개(재방문→A축)는 raw 압력값 변화량만 계산 가능
       (`axis_a_pressure_raw_delta_for_revisit_step`) — 백분위 변환은 유사군
       분포가 있어야 해서 "점수"로는 못 뽑음. 나머지 1개(속도→A축 비용)는

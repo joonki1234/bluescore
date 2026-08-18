@@ -133,6 +133,15 @@
 - [x] B축은 실산출/추정/시연값 상태를 명시하고 검증되지 않은 부분을 숨기지 않는다.
 - [x] 시뮬레이터의 UI 고정상수를 `score/tradeoff_coefficients.py` 결과로 교체하거나,
       미연결 시 정책 시뮬레이션 예시임을 명시.
+      **(2026-08-18 추가, 오동규)** B축 관련 2개(`AXIS_B_GAIN_PER_KNOT`,
+      `AXIS_B_COST_PER_REVISIT_STEP`)를 실제로 `axis_b_points_per_knot`/
+      `axis_b_points_per_revisit_step` 호출로 교체함(`services/scoring.py`).
+      데모 fixture에 톤수가 없어 임시 대표값(`DEMO_FALLBACK_TONNAGE_GT=50.0`)을
+      씀 — **최지희님 확인 필요** (`services/`는 최지희님 소유 파일이라 배선
+      자체를 오동규가 대신 넣어둔 상태). 부작용으로 시뮬레이터 곡선 최고점이
+      실제로 구간 중간(예: VESSEL_A 기준 8.6kn)으로 이동함 — 아래 "4. 우선순위"
+      P1-1 "시뮬레이터 점수 곡선과 축 간 상충효과 시각화" 항목과 연결됨.
+      상세는 `score/TODO.md` 참고.
 - [x] 매칭 신뢰도·실측/추정·결측 사유를 응답에 포함.
 
 ### 5단계 — FastAPI 구현

@@ -27,7 +27,9 @@ def test_persona_fixtures_are_deterministic(tmp_path):
     score_b = service.get_score("VESSEL_B")
 
     assert score_a.rate_band.grade == "B"
-    assert simulation.simulated_score == 78.0
+    # 2026-08-18: score/tradeoff_coefficients.py 실제 계수로 교체되며 78.0->89.7로
+    # 바뀜(밴드 B->A 전환은 그대로 유지) — services/scoring.py 커밋 메시지 참고.
+    assert simulation.simulated_score == 89.7
     assert simulation.after_band.grade == "A"
     assert score_b.rate_band.grade == "C"
     assert score_a.source_type == "demo"
