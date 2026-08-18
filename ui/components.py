@@ -216,22 +216,18 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
-def page_title(vessel_name: str, subtitle: str) -> None:
-    """어업인/금융기관 화면 최상단 제목 — 선박명 + 화면 종류.
-
+def page_title(title: str, subtitle: str, *, badge_html: str = "") -> None:
+    """어업인/금융기관/실산출 화면 최상단 제목 — 담백한 사각 박스 하나로 표시한다.
     Streamlit 기본 헤딩은 다른 카드들과 존재감이 비슷해 화면 최상단이라는 게
     눈에 잘 안 들어온다. 좌측 축색 강조 바 + 더 크고 굵은 제목으로 구분한다.
     """
     st.markdown(
-        f"""<div style="display:flex; align-items:center; gap:14px; margin:2px 0 16px;">
-  <div style="width:6px; height:40px; border-radius:3px; background:{theme.AXIS_A};
-    flex-shrink:0;"></div>
-  <div>
-    <div style="font-size:29px; font-weight:800; color:{theme.INK}; line-height:1.25;">
-      {vessel_name}</div>
-    <div style="font-size:13px; font-weight:700; color:{theme.AXIS_A}; letter-spacing:.02em;
-      margin-top:1px;">{subtitle}</div>
+        f"""<div class="bs-card" style="padding:16px 18px; margin-bottom:16px;">
+  <div style="display:flex; align-items:baseline; gap:10px;">
+    <span style="font-size:20px; font-weight:700; color:{theme.INK};">{title}</span>
+    {badge_html}
   </div>
+  <div class="bs-label" style="margin-top:2px;">{subtitle}</div>
 </div>""",
         unsafe_allow_html=True,
     )
