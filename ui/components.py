@@ -246,7 +246,12 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
     """A축 요인 기여도(SHAP)를 axis_breakdown()과 같은 카운트업+채움 막대로 보여준다.
 
     factors는 score/shap_factors.axis_a_factor_shares()가 낸 {"label","value","axis"} 리스트 —
-    value는 세 항 절댓값 합 대비 부호 있는 비중(%)이다.
+    value는 세 항 절댓값 합 대비 부호 있는 비중(%)이다. value는 axis_a_pressure_raw에
+    더해지는 방향이고, score/score_assembly.raw_to_score()는 raw가 낮을수록(=압력이
+    적을수록) A축 점수를 높게 준다 — 그래서 value가 음수(압력을 깎는 방향)일수록
+    이 선박에는 좋은 신호라 direction_color(-value)로 부호를 뒤집어 칠한다(양수=압력
+    증가=나쁨=빨강, 음수=압력 감소=좋음=초록). 그냥 direction_color(value)를 쓰면
+    "압력이 적어서 좋은 상황"이 빨간색으로 표시돼 정반대로 오해를 준다.
     """
     if not factors:
         return
@@ -254,7 +259,7 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
     rows = []
     for f in factors:
         value = f["value"]
-        color = theme.direction_color(value) if value != 0 else theme.INK_SOFT
+        color = theme.direction_color(-value) if value != 0 else theme.INK_SOFT
         width = min(abs(value), 100.0)
         rows.append(
             f"""<div class="bs-mini-card" style="margin-bottom:10px;">
