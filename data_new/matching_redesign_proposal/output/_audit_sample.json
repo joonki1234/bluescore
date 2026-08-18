@@ -1,0 +1,760 @@
+[
+ {
+  "gfwVesselId": "14d0ddc34-45a9-10ac-a458-aa24eb64449b",
+  "gfwName": "CHEONG HAE",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "청해호",
+   "fuzzyScore": 0.9
+  },
+  "category": "verified",
+  "matchedName": "청해호",
+  "distKm": 18.344788548234188,
+  "candidateCount": 7,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "29db46785-54b0-a34c-6190-a992e9542685",
+  "gfwName": "101 CHEONG HAE",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "제302용선호",
+   "fuzzyScore": 0.815
+  },
+  "category": "verified",
+  "matchedName": "청해호",
+  "distKm": 31.857072189157968,
+  "candidateCount": 5,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "409ff4cf7-73be-7971-ef36-0f33d2459e03",
+  "gfwName": "CHEONG HAE 11",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "청해호",
+   "fuzzyScore": 0.818
+  },
+  "category": "verified",
+  "matchedName": "청해호",
+  "distKm": 31.349812529709425,
+  "candidateCount": 6,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "4fc573442-2df8-dc65-bb6c-e6fa552e7bb8",
+  "gfwName": "JIN SEONG  HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "진성호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "제2024진성호",
+  "distKm": 16.635736897128993,
+  "candidateCount": 7,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "56009db40-0cfc-8fd7-ee58-c5b5286e4209",
+  "gfwName": "SANGJIN",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "상진호",
+  "distKm": 43.54231622627408,
+  "candidateCount": 5,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "726d851db-bc04-9312-2655-d8f5dced0783",
+  "gfwName": "MYUNGSEONGHO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "문성호",
+   "fuzzyScore": 0.909
+  },
+  "category": "verified",
+  "matchedName": "명성호",
+  "distKm": 20.483260252099534,
+  "candidateCount": 7,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "807ba8181-1640-35c9-bc6f-9f1bd7c98f8c",
+  "gfwName": "MYEONG SEONG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "명성호",
+   "fuzzyScore": 1.067
+  },
+  "category": "verified",
+  "matchedName": "명성호",
+  "distKm": 5.805597388645973,
+  "candidateCount": 9,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "839aa556c-c24e-3e5b-664b-3065c51c3a4d",
+  "gfwName": "606PUNGSUNG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제7풍성호",
+  "distKm": 44.177094127090605,
+  "candidateCount": 2,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "95d2fd1d3-3758-b010-d4af-3edf39543c3b",
+  "gfwName": "DAE YEONG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "대영호",
+   "fuzzyScore": 1.058
+  },
+  "category": "verified",
+  "matchedName": "대영호",
+  "distKm": 41.584009092947795,
+  "candidateCount": 9,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "b8c6b90b3-3e35-a1f7-e4eb-4e77035b9cf7",
+  "gfwName": "5DAE PUNG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "제5대풍호",
+   "fuzzyScore": 0.909
+  },
+  "category": "verified",
+  "matchedName": "제505대풍호",
+  "distKm": 15.43802765176433,
+  "candidateCount": 1,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "b92d41896-6d20-889c-2a3e-def9d077761b",
+  "gfwName": "JIN SUNG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제2024진성호",
+  "distKm": 47.63966446105876,
+  "candidateCount": 7,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "b9af9ac12-2bea-41d7-5762-ede20dcfd1fa",
+  "gfwName": "MYUNG SEONG",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 0.842
+  },
+  "category": "verified",
+  "matchedName": "명성호",
+  "distKm": 13.209438745060208,
+  "candidateCount": 7,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "bef247636-6cde-eef2-078c-520301f11e6d",
+  "gfwName": "103MYEONGJIN",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "107명진호",
+   "fuzzyScore": 0.846
+  },
+  "category": "verified",
+  "matchedName": "명진호",
+  "distKm": 46.51153311025529,
+  "candidateCount": 4,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "d4ca3c261-1251-f785-1796-d0cf42bbbf03",
+  "gfwName": "DAE .KWANG",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "대왕호",
+   "fuzzyScore": 0.824
+  },
+  "category": "verified",
+  "matchedName": "제369대광호",
+  "distKm": 30.97011062244275,
+  "candidateCount": 7,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "d87e9922e-e9e7-343f-25f2-170ddd9995de",
+  "gfwName": "CHEONG HAE 109",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "청해호",
+  "distKm": 27.059676921464597,
+  "candidateCount": 5,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "ec9bdb735-593c-d016-c147-63cec5ef49a3",
+  "gfwName": "KEUM SEONG",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 0.878
+  },
+  "category": "verified",
+  "matchedName": "금성호",
+  "distKm": 22.134337037701812,
+  "candidateCount": 9,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "fd3e0caba-aafe-5ef9-85f2-0d96ee1c1897",
+  "gfwName": "GEUM SEONG",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 0.978
+  },
+  "category": "verified",
+  "matchedName": "금성호",
+  "distKm": 21.997471680895856,
+  "candidateCount": 13,
+  "resolvedBy": "gearType"
+ },
+ {
+  "gfwVesselId": "a1e3fab6c-c77f-367f-036f-95eb97bb0465",
+  "gfwName": "GI SEONG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "기성호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "제201기성호",
+  "distKm": 46.80014904691872,
+  "candidateCount": 6
+ },
+ {
+  "gfwVesselId": "15fffc9c4-4cfc-20f2-d06c-85ddc3dcf692",
+  "gfwName": "101 AN YANG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "제101안양호",
+   "fuzzyScore": 0.917
+  },
+  "category": "verified",
+  "matchedName": "제101안양호",
+  "distKm": 34.43687342583918,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "03c9169cd-dbea-1323-888e-3c472564f657",
+  "gfwName": "1GEUM MYUNG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제1금명호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "beb545b1a-a804-d1cf-5b8e-e54ba439ee9e",
+  "gfwName": "3MOON SOENG HO",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "문성호",
+  "distKm": 336.426824731181,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "409f6f4b7-7e74-55a5-bc1a-c2a683e9c4b5",
+  "gfwName": "HAENG BOK HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "행복호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "제508행복호",
+  "distKm": 20.658389214786766,
+  "candidateCount": 10
+ },
+ {
+  "gfwVesselId": "38a9711a4-4500-344e-a539-fed1f00d50d8",
+  "gfwName": "JIN YOUNG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "진용호",
+   "fuzzyScore": 0.947
+  },
+  "category": "verified",
+  "matchedName": "진영호",
+  "distKm": 26.193656852847727,
+  "candidateCount": 12
+ },
+ {
+  "gfwVesselId": "3447ce603-376b-57bb-61d7-44a20a9f8928",
+  "gfwName": "NO.988 HAESUNG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "해성호",
+  "distKm": 26.983571964329343,
+  "candidateCount": 21
+ },
+ {
+  "gfwVesselId": "1d56b5d78-889e-8494-1cfd-7c783459b77d",
+  "gfwName": "JANG MYUNG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "장명호",
+   "fuzzyScore": 0.87
+  },
+  "category": "verified",
+  "matchedName": "장명호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "bd8f4bf5d-df7b-a491-d248-4479f219e154",
+  "gfwName": "SIN IL HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "신길호",
+   "fuzzyScore": 0.933
+  },
+  "category": "verified",
+  "matchedName": "제2022신일호",
+  "distKm": 310.2521521297692,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "148623c2e-e6ce-5d62-985d-60670b0d4378",
+  "gfwName": "NYU GEURIN 3 HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "뉴그린3호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "뉴그린호",
+  "distKm": 29.13573250656934,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "acae43da3-38df-1d15-a102-f3f38c55e661",
+  "gfwName": "707 TAE GEUN",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "제707태근호",
+   "fuzzyScore": 0.833
+  },
+  "category": "verified",
+  "matchedName": "제707태근호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "be56a4e76-6105-f17e-1a9d-724e2e53c7b4",
+  "gfwName": "505 GANG SEONG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "강성호",
+  "distKm": 30.37930861979808,
+  "candidateCount": 3
+ },
+ {
+  "gfwVesselId": "e63852e33-38e3-f79e-0c58-67529b7d73ff",
+  "gfwName": "GWANG DEOCK",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제322광덕호",
+  "distKm": 388.6268950932925,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "8aef7dbf0-0a06-e37c-f3c4-de5583d80a14",
+  "gfwName": "CHIN SEON HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "칠성호",
+   "fuzzyScore": 0.857
+  },
+  "category": "verified",
+  "matchedName": "진선호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "11717d3d9-9537-4adc-8963-df53d45da570",
+  "gfwName": "SEONG JIN HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "성진호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "제586성진호",
+  "distKm": 38.82017738970767,
+  "candidateCount": 9
+ },
+ {
+  "gfwVesselId": "990fef0d5-50c5-3c70-992f-a8a3548d719a",
+  "gfwName": "GEO SEONG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "제1거성호",
+  "distKm": 33.37310894987989,
+  "candidateCount": 2
+ },
+ {
+  "gfwVesselId": "6bc6137b0-0d0c-04a8-5437-b1adb267c5c8",
+  "gfwName": "3 GEUM JEONG",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "금정호",
+   "fuzzyScore": 0.857
+  },
+  "category": "verified",
+  "matchedName": "금정호",
+  "distKm": 41.79483738122812,
+  "candidateCount": 4
+ },
+ {
+  "gfwVesselId": "054b60e68-8ae3-7227-3bce-dfe33bf6e8a0",
+  "gfwName": "DONG IN HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "동인호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "동인호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "04c50b2fc-cde6-77dd-6838-46c6795f6109",
+  "gfwName": "DEOK SUNG",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 0.824
+  },
+  "category": "verified",
+  "matchedName": "덕성호",
+  "distKm": 16.364453265112125,
+  "candidateCount": 24
+ },
+ {
+  "gfwVesselId": "1263f779d-dea7-43d7-b43f-091935e20edb",
+  "gfwName": "1 MAN SEON",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 0.875
+  },
+  "category": "verified",
+  "matchedName": "제301만선호",
+  "distKm": 26.910023818759775,
+  "candidateCount": 8
+ },
+ {
+  "gfwVesselId": "32f304214-4ef8-823d-9cd2-297c4649f2e2",
+  "gfwName": "JIN YANG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "진양호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "진양호",
+  "distKm": 49.91490228139352,
+  "candidateCount": 8
+ },
+ {
+  "gfwVesselId": "3649c7a5d-dceb-8a04-f4bc-11c3d8482add",
+  "gfwName": "2SEONG HWA HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 0.952
+  },
+  "category": "verified",
+  "matchedName": "제1성화호",
+  "distKm": 27.868134507417437,
+  "candidateCount": 2
+ },
+ {
+  "gfwVesselId": "80b5efe36-699d-aa59-11c0-961a9866a1b8",
+  "gfwName": "101 NAM YOUN4",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "남영호",
+  "distKm": 17.751117614548043,
+  "candidateCount": 7
+ },
+ {
+  "gfwVesselId": "9abea90bf-facc-c216-add6-3770c2001ca5",
+  "gfwName": "2017 GIL SEONG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "2017길성호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "길성호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "045db2976-695f-a219-9103-433920275f6c",
+  "gfwName": "DONG IK",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": null,
+   "fuzzyScore": 0.8
+  },
+  "category": "verified",
+  "matchedName": "제33동익호",
+  "distKm": 414.90751239803564,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "9093896f5-5b57-ccc5-87b3-ecb111cae693",
+  "gfwName": "NALA",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제203나라호",
+  "distKm": 166.4050340172793,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "2bd4b92a0-0cde-780c-1655-778b22f89b80",
+  "gfwName": "DAE YEON HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "대영호",
+   "fuzzyScore": 1.006
+  },
+  "category": "verified",
+  "matchedName": "제807대연호",
+  "distKm": 330.41324683418844,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "b9cee86ef-f1f4-c3ac-0896-2ecc379871b5",
+  "gfwName": "7SEONG UNG",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "성운호",
+   "fuzzyScore": 0.866
+  },
+  "category": "verified",
+  "matchedName": "제102성웅호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "a404928bd-d5ba-57b6-cd85-6c8340048330",
+  "gfwName": "155HUIYUNG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "희영호",
+  "distKm": 10.700774704153554,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "b5f834004-403c-1b0b-5fd4-d0bf0b2bdbd3",
+  "gfwName": "668DAEBOK",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "제668대복호",
+   "fuzzyScore": 0.818
+  },
+  "category": "verified",
+  "matchedName": "제668대복호",
+  "distKm": 49.76342280488766,
+  "candidateCount": 2
+ },
+ {
+  "gfwVesselId": "6afe0b3fb-b73d-eaba-6fb7-056afc503887",
+  "gfwName": "HAE IN HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "해진호",
+   "fuzzyScore": 0.933
+  },
+  "category": "verified",
+  "matchedName": "제101해인호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "332a940c5-5965-1acb-189a-af9571b015b9",
+  "gfwName": "888 NAM YANG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "제888남양호",
+   "fuzzyScore": 0.923
+  },
+  "category": "verified",
+  "matchedName": "제888남양호",
+  "distKm": 25.179764675749375,
+  "candidateCount": 2
+ },
+ {
+  "gfwVesselId": "720477669-982d-1a57-8a6d-51d5c32d67e6",
+  "gfwName": "707WONKWANG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제707원광호",
+  "distKm": 254.72350385832436,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "98d7627f6-6812-26cf-13c9-c0ed101ef222",
+  "gfwName": "202 MI SEONG HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "202진성호",
+   "fuzzyScore": 0.88
+  },
+  "category": "verified",
+  "matchedName": "미성호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "418c612f5-5529-f18e-9ff5-68bcb7a2d6b4",
+  "gfwName": "SOON IL HO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "성일호",
+   "fuzzyScore": 0.824
+  },
+  "category": "verified",
+  "matchedName": "순일호",
+  "distKm": 60.82162553596789,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "d31470a76-6aae-a34a-4c3d-bd4c64bc508a",
+  "gfwName": "707 SAM HAE",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "삼해호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "e1dad5f8e-e2b9-9be3-7862-5ed7a3ee054e",
+  "gfwName": "109MOONCHANG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제109문창호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "010504ff2-22bb-55ac-2992-e492908560d1",
+  "gfwName": "1CHUN SA",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "천사호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "c3003112e-eeb3-c855-8ed3-86a9bb0ab66f",
+  "gfwName": "JINBOHO",
+  "old": {
+   "matchTier": "tier3_fuzzy_name",
+   "matchedName": "진보호",
+   "fuzzyScore": 1.0
+  },
+  "category": "verified",
+  "matchedName": "진보호",
+  "distKm": null,
+  "candidateCount": 1
+ },
+ {
+  "gfwVesselId": "d18396cbb-b2fb-792d-1ab3-23511b0f0d44",
+  "gfwName": "SINKWANG",
+  "old": {
+   "matchTier": "unmatched",
+   "matchedName": null,
+   "fuzzyScore": null
+  },
+  "category": "verified",
+  "matchedName": "제3006신광호",
+  "distKm": 14.779834001325835,
+  "candidateCount": 5
+ }
+]

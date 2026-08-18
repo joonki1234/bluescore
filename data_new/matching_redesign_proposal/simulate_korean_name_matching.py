@@ -310,11 +310,18 @@ def _resolve_pending(pending: list, ports: dict, rows: list) -> None:
 
 def _try_resolve_by_nearest(passing: list) -> tuple | None:
     """동률 후보 중 유일하게 최근접인 게 있으면 (category, matchedName, distKm),
-    없으면 None. 벡터 단독 판단 — 다른 벡터가 그 후보를 원하는지는 안 봄."""
-    with_dist = [p for p in passing if p["distKm"] is not None]
-    if not with_dist:
+    없으면 None. 벡터 단독 판단 — 다른 벡터가 그 후보를 원하는지는 안 봄.
+
+    버그 수정(2026-08-18): 후보 중 하나라도 지오코딩 실패로 거리를 못
+    구했으면 여기서 확정하지 않는다 — "거리 모름"을 "후보 아님"으로
+    취급해서, 지오코딩 안 된 후보가 조용히 비교에서 빠지고 지오코딩된
+    후보 1개만 "유일한 최근접"으로 둔갑하는 사례를 실측으로 확인함
+    (동률 2,150척 중 336척, 15.6%가 이 패턴 — TAC 항구명 지오코딩
+    성공률 66.2%, 어선원부는 18.7%뿐이라 흔하게 발생함). 후보 전원의
+    거리를 알 때만 "진짜 유일하게 가깝다"고 판단한다."""
+    if any(p["distKm"] is None for p in passing):
         return None
-    with_dist.sort(key=lambda x: x["distKm"])
+    with_dist = sorted(passing, key=lambda x: x["distKm"])
     nearest = with_dist[0]
     second = with_dist[1]["distKm"] if len(with_dist) > 1 else None
     unique_nearest = second is None or abs(second - nearest["distKm"]) > 0.05
