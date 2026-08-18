@@ -221,6 +221,7 @@ def run() -> list:
 
         norm = _normalize(name)
         digit = _digit_prefix(norm)
+        gfw_any_digit = _any_digit(norm)
         centroid = centroids.get(vessel_id)
         korean_cands = gfw_korean.get(vessel_id, [])
 
@@ -244,11 +245,13 @@ def run() -> list:
         for p in pool:
             if digit and p["digitPrefix"] and digit != p["digitPrefix"]:
                 continue
-            # 발견 8: candidate 숫자가 1자리라 위 2~4자리 하드필터에 안
-            # 걸리는 사각지대 — GFW 쪽에 검증된 2~4자리 숫자가 있는데
-            # 후보 이름에 눈에 보이는 다른 숫자가 있으면(1자리 포함)
-            # 명백한 반대증거로 보고 배제("102HAE SANG"->"제8해상호" 사례).
-            if digit and p["anyDigit"] and digit != p["anyDigit"]:
+            # 발견 8(+대칭 보완): 2~4자리 하드필터는 양쪽 다 2~4자리일
+            # 때만 비교해서, 한쪽이 1자리면 사각지대가 생김 — "102HAE
+            # SANG"(102)vs"제8해상호"(8)만이 아니라 "NO.2JAESUNGHO"(2,
+            # 1자리라 하드필터 대상 밖)vs"제22재성호"(22) 같은 반대
+            # 방향도 마찬가지로 새는 걸 확인함. 자릿수 무관하게 눈에
+            # 보이는 숫자 자체가 다르면(양쪽 다 있을 때) 반대증거로 배제.
+            if gfw_any_digit and p["anyDigit"] and gfw_any_digit != p["anyDigit"]:
                 continue
             if p["base"] in korean_cands or p["compareBase"] in korean_cands:  # exact만(fuzzy는 폐기, 발견 3) + "제N호" 정규화(발견 4)
                 dist = _nearest_port_km(centroid, p["ports"])
