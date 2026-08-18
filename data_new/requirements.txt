@@ -4,3 +4,4 @@
 # 직접 건드리지 않는다(사용자 지시, 2026-08-17).
 
 korean-romanizer  # process/match_fuzzy_name.py — 한글 선박명 로마자 변환
+scipy  # matching_redesign_proposal/simulate_korean_name_matching.py — 헝가리안 전역할당(linear_sum_assignment)
