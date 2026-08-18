@@ -7,10 +7,15 @@
 - A축과 B축은 같은 추적 선박 입력을 사용하며 서비스는 파생
   `vessels_for_score.jsonl.gz`/`axis_b_input.jsonl`을 요구하지 않는다.
 - 구체적인 GFW fishingType을 B축 `gearType`에 연결했다. 현재 서비스 입력은
-  선박 5,323척, 톤수 1,234척, fishingType 2,682척, 둘 다 665척이다.
-- 실산출 상태는 success 289척, partial 3,395척, insufficientSample 1,630척,
+  선박 5,323척, 톤수 712척(13.4%, TAC 유일성 강제 + 원양선 제외 반영 후
+  최종값), fishingType 2,682척, 둘 다 368척이다.
+- 실산출 상태는 success 73척, partial 3,909척, insufficientSample 1,332척,
   matchingFailed 9척이다. 아래 864척·807척 등의 값은 중간 스냅샷 결과다.
-- 날씨 단위, 모델 계수, 가중치와 금리 정책은 아직 검증 전이며 완료로 보지 않는다.
+- 모델·정책 파라미터 검증은 `MODEL_POLICY_VALIDATION.md`와 검증 CLI로 완료했다.
+  production 상수는 변경하지 않았으며 날씨 단위·출력식·시뮬레이션 계수는
+  `unverified`, A/B 가중치와 금리표는 `policyDecision`으로 분류했다.
+- 데이터 스냅샷과 Streamlit 어업인·금융기관 화면은 2026-08-19 기준 완성본으로
+  동결한다. 아래 과거 조사 항목은 현재 production 수정 작업이 아니다.
 
 ## 진행 현황 정리 (2026-08-18 기록)
 
@@ -18,20 +23,20 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
 완료 상태고, chain/도 Hardhat 실배포+Python 연동까지 end-to-end 확인 끝났다
 (`chain/TODO.md` 참고). B축 LightGBM 순환성 문제도 해결됨(아래 항목).
 
-**2026-08-15 시점에 "최지희님과 조율 필요"로 묶었던 4개 배선 항목은 그 사이
-최지희님의 API/서비스 계층 작업(`services/`, `api/` 신설)으로 3개가 이미 실제로
+**2026-08-15 시점에 "최지희와 조율 필요"로 묶었던 4개 배선 항목은 그 사이
+최지희의 API/서비스 계층 작업(`services/`, `api/` 신설)으로 3개가 이미 실제로
 연결돼 있었고, 남은 1개(트레이드오프 계수)도 오동규가 2026-08-18에 배선
-완료했다** — `services/scoring.py`가 최지희님 소유 파일이라 이 배선은 **최지희
+완료했다** — `services/scoring.py`가 최지희 소유 파일이라 이 배선은 **최지희
 확인 완료(2026-08-18)**(오늘 추가된 A축 격자 크기·재방문 스케일 변경분 포함,
 상세는 아래 트레이드오프 계수 항목). 나머지 배선
 3개(raw_to_score·rate_mapping, score_hash, scoring_backend mock→실산출)는
 `services/real_scoring.py`·`services/scoring.py`·`services/workflow.py`에서
 이미 호출되고 있는 것을 확인함(오동규, 2026-08-17 앱 실행 확인).
 
-**지금 오동규·김준기 단독으로 더 진행할 수 있는 항목은 없고, 남은 건 전부
-아래 팀 논의 필요 목록뿐이다.**
+**현재 score/ 구현과 검증은 완료됐다. 아래 목록은 데이터 동결 이전의 조사 기록과
+외부 근거·정책 결정이 필요한 보류 항목이며, 현재 production 수정 범위가 아니다.**
 
-**팀 논의 필요 (최지희 제외)**
+**동결 범위 밖 또는 외부 결정 필요**
 - AIS 위치정보 통계를 A축에 **얼마나/어떻게** 결합할지(조회 가능하게 만드는
   것까지는 2026-08-18 완료, 아래 항목 참고 — 결합 설계는 아직 팀 논의 필요)
 - 선박제원 매칭 품질 이슈 — 확정 매칭 663건 중 90.5%(600건)가 비어선으로 확인됨
@@ -60,7 +65,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
   설계적 안전장치"라고 정직하게 라벨링하는 쪽으로 정리. 근본 원인(B축 조기
   포화)은 A축 계수로 덮는 임시방편이라, 시뮬레이터 속도 구간 설계
   (`SIM_SPEED_DELTA_DOWN` 등, `services/scoring.py`) 자체를 재검토하는
-  게 더 근본적인 해법일 수 있음 — 최지희님 판단 필요, 화면 문구
+  게 더 근본적인 해법일 수 있음 — 최지희 판단 필요, 화면 문구
   갱신 여부도 함께.
 
 ---
@@ -226,7 +231,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         89.7이 그대로 유지되는 게 우연이 아니라 이 클램핑 때문임을 확인.
         다만 이건 "이 페르소나 조건에서는 안 보인다"는 것이지 계수 자체가
         안 바뀐 건 아니므로, 상한에 안 걸리는 다른 시나리오에서는 재방문
-        비용이 실제로 2배 커진다는 점은 최지희님께 공유 필요.
+        비용이 실제로 2배 커진다는 점은 최지희에게 공유 필요.
       - `REVISIT_PRESSURE_SCALE_HOURS`는 현재 `services/scoring.py`가 아예
         참조하지 않는다(`axis_a_pressure_raw_delta_for_revisit_step`을 쓰는
         곳이 코드베이스 전체에 아직 없음 — 정의만 있고 미배선 상태) — 그래서
@@ -255,18 +260,18 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       학습↔예측 카테고리 왕복 과정에서 numpy가 같은 길이 튜플들을 2차원 배열로
       오인해 리스트로 망가뜨려(`.tolist()`) `TypeError: unhashable type: 'list'`로
       예측 단계가 죽었음 — `"{row}_{col}"` 문자열로 바꿔서 해결
-      (`_sea_area_label()`). **김태윤님 확인 필요한 것**: 아래 필드 매핑표
+      (`_sea_area_label()`). **김태윤 확인 필요한 것**: 아래 필드 매핑표
       (특히 톤수·날씨 단위). (`data_new/events_with_weather.jsonl.gz` +
       `final_vessel_matches.jsonl` + `population_tags.jsonl`을 `axis_b_baseline.py`가
       요구하는 평평한 필드로 변환) — **담당 논의 결과(2026-08-18, 오동규·김태윤)**:
       score팀(오동규·김준기)이 작성하기로 함. 데이터팀 원본 파일·필드명은 안
       건드리고(같은 패턴: `data/vessel_spec_client.py`, `services/real_scoring.py`),
-      받는 쪽에서 새로 변환만 한다는 게 근거. **필드 매핑표는 김태윤님이 확인**
+      받는 쪽에서 새로 변환만 한다는 게 근거. **필드 매핑표는 김태윤이 확인**
       (원본 구조는 데이터팀이 가장 잘 앎). 상세 배경·결정 근거는
       `data_new/TODO.md` 해당 항목 참고. 처리해야 할 것:
       - 톤수: `tac.tonnageGtTac`/`mof.tonnageGtMof`(문자열, 중첩)를 `tonnageGt`
         (float, 평평한 구조)로. 둘 다 있으면 우선순위 또는 충돌표시 필요
-        (아직 미정 — 김태윤님과 확인).
+        (아직 미정 — 김태윤과 확인).
       - 날씨: `weather_WATER_TEMPER`/`weather_WIND_SPEED`/`weather_SURFACE_CURR_SPEED`
         (문자열, "미제공" 결측 표기) -> `seaSurfaceTempC`/`windSpeedMs`/
         `currentSpeedMs`(float). **단위는 여전히 공식 확인은 안 됐지만, 풍속만
@@ -287,7 +292,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         `season_key(start)`를 그대로 재사용하기로 함. 이벤트 자체의
         위경도·시작시각만 있으면 계산되고 `events_with_weather.jsonl.gz`에
         이미 다 있어서 즉시 채울 수 있음.
-      - `gearType`: **(2026-08-18 결정) 영문(GFW) 표기로 통일** — 태윤님이
+      - `gearType`: **(2026-08-18 결정) 영문(GFW) 표기로 통일** — 태윤이
         국내 어업종↔GFW 영문 체계 통합 작업을 진행 중. 완료되면 A축(`score/
         scripts/convert_data_new_vessels.py`)과 B축이 같은 영문 taxonomy를
         쓰게 된다 — 지금 `build_axis_b_input.py`가 쓰는 TAC 한글 원본
@@ -307,8 +312,8 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         확인함, 다만 LightGBM이 그 피처를 못 씀).
         **(2026-08-18 추가 조사)** `final_vessel_matches.jsonl`을 직접 열어보니
         TAC 매칭 2,279척 중 `tac.gearTypeNamesTac`가 채워진 건 **1척뿐**이었다
-        — 김태윤님이 참고자료로 준 "19개 업종, 상위 7개 200척+" 분포는 이 파일
-        기준이 아니라 TAC 원본 전체 기준으로 보임. 원인은 김태윤님이 독립적으로
+        — 김태윤이 참고자료로 준 "19개 업종, 상위 7개 200척+" 분포는 이 파일
+        기준이 아니라 TAC 원본 전체 기준으로 보임. 원인은 김태윤이 독립적으로
         같은 시점에 만든 `data_new/process/build_axis_b_input.py`의 주석에 이미
         나와 있었다 — `final_vessel_matches.jsonl`의 `tac` 딕셔너리가 "축약형"이라
         `gearTypeNamesTac`을 안 담고 있고, `vesselNoTac`으로
@@ -320,7 +325,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         `tac_vessels_normalized.jsonl`이 공개되면, 이 파일의 gearType 복구
         로직을 `score/real_axis_b_input.py`에 그대로 가져와 반영하면 됨 —
         그때 (a)/(b)/(c) 중 정할 필요 없이 원문 그대로(세분화된 19종) 쓰는
-        쪽으로 사실상 답이 나온 셈(표본도 충분하다는 김태윤님 확인 참고, 다만
+        쪽으로 사실상 답이 나온 셈(표본도 충분하다는 김태윤 확인 참고, 다만
         그 확인도 TAC 원본 기준이라 실제 매칭된 부분집합에서 표본이 충분한지는
         파일이 나온 뒤 재확인 필요).
         **seaArea 설계 관련 참고**: `build_axis_b_input.py`는 `seaArea`를
@@ -410,7 +415,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       `AXIS_B_GAIN_PER_KNOT`/`AXIS_B_COST_PER_REVISIT_STEP`은 제거하고, 선박별
       톤수(데모 fixture는 톤수가 없어 `DEMO_FALLBACK_TONNAGE_GT=50.0` 임시값 사용,
       근거 없음)·현재속도 기준으로 매 호출마다 계산. `services/scoring.py`는
-      최지희님 소유 파일이라 오동규가 작업 — **최지희 확인 완료(2026-08-18)**,
+      최지희 소유 파일이라 오동규가 작업 — **최지희 확인 완료(2026-08-18)**,
       같은 날짜에 추가된 A축 격자 크기·재방문 스케일 확정값 변경분도 포함해서 확인받음.
       부작용 확인: `explain/TODO.md` 시연 구성 ③번("최고점은 중간에 있고 끝에서는
       떨어진다")이 실제로 성립하게 됨(VESSEL_A 기준 최고점이 구간 끝이 아니라
@@ -458,13 +463,13 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
 - [x] **(2026-08-18) `services/real_scoring.py`의 A축 실산출을 `data_new/`로
       전환** — 구 `data/`(31,605척, 확정매칭 순도 9.5%) 대신 `data_new/`
       (EEZ 제한 5,323척, 사람 라벨링 실측 정밀도 약 75%)를 쓰도록
-      `DEFAULT_EVENTS_PATH`/`DEFAULT_VESSELS_PATH`를 교체(최지희님 파일이라
+      `DEFAULT_EVENTS_PATH`/`DEFAULT_VESSELS_PATH`를 교체(최지희 파일이라
       확인 후 진행). 이벤트는 `data_new/processed/events_with_weather.jsonl.gz`
       필드가 그대로 맞아서 변환 없이 바로 씀. 선박은
       `scripts/convert_data_new_vessels.py`로 `final_vessel_matches.jsonl`의
       중첩·문자열 톤수(`tac.tonnageGtTac`/`mof.tonnageGtMof`)를 평판화(테스트
       6개). `services/metadata.py`의 `REAL_DATA_SNAPSHOT_ID`도 실제 데이터
-      출처와 맞게 갱신(최지희님 파일, 라벨이 실제와 안 맞으면 재현성 계약이
+      출처와 맞게 갱신(최지희 파일, 라벨이 실제와 안 맞으면 재현성 계약이
       깨져서 같이 고침).
       **이전 결과(gearType 미반영 시점)**: 5,323척 중 `partial`(A축 실산출됨)
       3,887척(73%), `insufficientSample` 1,427척(27%), `matchingFailed` 9척.
@@ -475,14 +480,14 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       실산출이 73%→32%로 급락함. 자기모순 라벨(CARGO 등)과 함께 뭉뚱그려진
       라벨도 제외(=None 취급, 구체적 gear만 그룹핑에 씀)하도록 수정해서
       42.6%(2,269척)까지 회복. **여전히 gearType 미사용(73%)보다는 낮음** —
-      팀 논의 결과 현재 버전(구체적 gear만)으로 일단 유지, 태윤님이 국내
+      팀 논의 결과 현재 버전(구체적 gear만)으로 일단 유지, 태윤이 국내
       어업종↔GFW 영문 통합 작업을 별도로 진행 중이라 그 결과 나오면
       재검토 예정. 테스트 7개 추가(자기모순/뭉뚱그림 라벨 제외 검증 포함).
 - [x] **(2026-08-18) B축 실산출을 API에 연결** — `score/real_axis_b_scoring.py`
       신설(B축 이벤트 입력→학습→추론을 캐싱해 API에서 쓸 수 있게 함).
-      `services/real_scoring.py`(최지희님 파일)에 B축 결과를 연결해 A축과
+      `services/real_scoring.py`(최지희 파일)에 B축 결과를 연결해 A축과
       같은 유사 선박군으로 백분위 변환, `services/scoring.py`에서 A+B
-      가중합(0.65/0.35)으로 BlueScore·금리구간까지 완성(최지희님 확인 후
+      가중합(0.65/0.35)으로 BlueScore·금리구간까지 완성(최지희 확인 후
       진행). **이전 결과**: 5,323척 중 864척(16.2%)이 A축+B축 모두 실산출돼
       `success` 상태로 BlueScore·금리구간까지 나옴(나머지는 이전처럼 A축만
       `partial` 또는 표본부족/매칭실패 — B축 연결이 기존 A축 단독 경로를
@@ -500,7 +505,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       추가해서 `data_snapshot_id`/`model_version`이 지금 코드가 낼 수 있는
       값과 다르면 캐시를 버리고 재계산하도록 고침 — 앞으로 데이터/모델
       버전을 올리는 변경이 있으면 이 체크가 자동으로 캐시를 무효화한다.
-- [x] **(2026-08-18) 매칭 오탐 필터(숫자접두어 불일치) 적용** — 태윤님이 올린
+- [x] **(2026-08-18) 매칭 오탐 필터(숫자접두어 불일치) 적용** — 태윤이 올린
       `data_new/matching_redesign_proposal/`(한글비교 매칭 재설계 제안) 검토 중,
       제안서가 인용한 PROCESS_LOG 49번 근거("번호 일치 시 정밀도 95~100%,
       불일치 시 0%")가 실제 라이브 코드(`data_new/process/assemble_matches.py`)엔
@@ -514,8 +519,8 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       있는데 서로 다른 경우 77건 확인(예: `26 NAM GANG HO`↔`203남광호`,
       fuzzyScore 0.833으로 이미 고신뢰 판정돼 있었음). `assemble_matches.py`에
       `_numeric_mismatch()` 필터를 추가해 향후 재실행에도 반영되게 하고
-      (2026-08-18, 김준기, 태윤님 원본 raw 데이터가 로컬에 없어 파이프라인
-      처음부터 재실행해 전체 재검증은 못 함 — 태윤님 재실행 결과가 이 설명과
+      (2026-08-18, 김준기, 태윤 원본 raw 데이터가 로컬에 없어 파이프라인
+      처음부터 재실행해 전체 재검증은 못 함 — 태윤 재실행 결과가 이 설명과
       크게 다르면 확인 필요), 같은 로직으로 이미 커밋된
       `final_vessel_matches.jsonl`에도 직접 78건(런타임 재확인 시 1건 추가
       포착)을 `unmatched`로 강등 적용 후 `convert_data_new_vessels.py`로

@@ -127,18 +127,18 @@ def test_tracked_snapshot_service_record_counts():
     records = load_real_vessel_records(DEFAULT_MATCHES_PATH, DEFAULT_GFW_VESSELS_PATH)
 
     assert len(records) == 5_323
-    assert sum(record["tonnage"] is not None for record in records) == 1_234
+    assert sum(record["tonnage"] is not None for record in records) == 712
     assert sum(bool(record["fishingType"]) for record in records) == 2_682
     assert sum(
         record["tonnage"] is not None and bool(record["fishingType"])
         for record in records
-    ) == 665
+    ) == 368
 
     evidence = [record["matchingEvidence"] for record in records]
     verified = [item for item in evidence if item["matchTier"] == "verified"]
     unmatched = [item for item in evidence if item["matchTier"] == "unmatched"]
-    assert len(verified) == 1_234
-    assert len(unmatched) == 4_089
+    assert len(verified) == 712
+    assert len(unmatched) == 4_611
     assert all(item["confidenceLabel"] == "high" for item in verified)
     assert all(not isinstance(item["confidenceLabel"], float) for item in evidence)
     assert all(item["source"] == "TAC" for item in verified)

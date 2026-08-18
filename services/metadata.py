@@ -13,18 +13,19 @@ DEMO_DATA_SNAPSHOT_ID = "dashboard-demo-seed-20260814-v1"
 # data_new/ 스냅샷 기준(services/real_scoring.py의 기본 입력 경로 참고).
 # 데이터 출처를 바꿀 때는 항상 같이 갱신한다 —
 # 안 그러면 응답 재현성 계약이 깨진다.
-# (-v3) 태윤님이 data_new/ 매칭을 GFW-TAC 한글 직접비교 단일 소스로
-# 전환(어선원부 후보풀 제외, 톤수 매칭 1,234척=23.2%로 커버리지는 줄고
-# 정밀도는 오름 — CLAUDE.md 참고). final_vessel_matches.jsonl 내용이
-# 바뀐 거라 버전을 안 올리면 캐시가 옛 매칭 결과를 계속 돌려준다.
-REAL_DATA_SNAPSHOT_ID = "data_new-gfw-events-2026-04-01_2026-08-14-v3"
+# (-v4) 매칭에 TAC 쪽 유일성 강제를 추가(중복배정 787척 제거, verified
+# 1,234→713척)하고 이어서 GFW registryInfo 있는 원양선을 후보풀에서
+# 제외(오매칭 1건 확인, 713→712척=13.4% 최종 — CLAUDE.md 참고)했다.
+# final_vessel_matches.jsonl 내용이 두 번 더 바뀐 거라 버전을 안 올리면
+# 캐시가 중복배정·원양선 오매칭이 섞인 옛 매칭 결과를 계속 돌려준다.
+REAL_DATA_SNAPSHOT_ID = "data_new-gfw-events-2026-04-01_2026-08-14-v4"
 DEMO_MODEL_VERSION = "axis-a-demo-v1__axis-b-demo-v1"
 # score/axis_a_pressure.py의 raw 결합 방식이 바뀔 때마다 버전을 올려야 한다 —
 # 안 올리면 services/workflow.py의 캐시 신선도 체크가 변경을 못 알아채고
 # 옛 결과를 계속 돌려준다.
 REAL_PARTIAL_MODEL_VERSION = "axis-a-pressure-v2__axis-b-unavailable"
 # B축(score/real_axis_b_scoring.py)은 선박별로 실산출 여부가 갈려(톤수 매칭
-# 커버리지 23.2%뿐) model_version도 응답마다 달라야 한다. 고정 문자열 하나로는
+# 커버리지 13.4%뿐) model_version도 응답마다 달라야 한다. 고정 문자열 하나로는
 # 재현성 계약이 안 맞아 axis_b_included를 response_metadata()가 직접 받는다.
 REAL_MODEL_VERSION_WITH_B = "axis-a-pressure-v2__axis-b-lightgbm-v2"
 SCORING_RULE_VERSION = "bluescore-0.65a-0.35b-v1"
