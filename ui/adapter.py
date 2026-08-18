@@ -115,8 +115,29 @@ def scoring_backend() -> Backend:
     health = _api.health()
     return Backend(
         live=True,
-        reason=f"REST 연결 · 체인 {health.get('chainMode', 'local')} · 런타임 LLM {'켜짐' if health.get('runtimeLlmEnabled') else '캐시 우선'}",
+        reason=(
+            f"REST 연결 · 체인 {health.get('chainMode', 'local')} · "
+            f"런타임 LLM {_llm_label(health)}"
+        ),
     )
+
+
+def _llm_label(health: Dict) -> str:
+    """
+    런타임 LLM 상태를 한 줄로.
+
+    "켜짐/꺼짐"만으로는 부족하다 — 플래그를 켜도 API 프로세스에 키가 없으면
+    폴백으로 떨어지는데, 화면에는 그냥 "기본 문구"로만 보여서 원인을 찾는 데
+    한참 걸린다. 발표 전 점검이 이 한 줄로 끝나게 한다.
+    """
+    status = health.get("llm") or {}
+    if not status:  # 구버전 API 응답 호환
+        return "켜짐" if health.get("runtimeLlmEnabled") else "캐시 우선"
+    if status.get("enabled") and status.get("available"):
+        return f"켜짐 ({status.get('provider', '?')})"
+    if not status.get("enabled"):
+        return "꺼짐 · 캐시 우선"
+    return f"키 없음 ({status.get('provider', '?')}) · 폴백"
 
 
 def load_dataset() -> Dict:

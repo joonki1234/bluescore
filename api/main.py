@@ -12,6 +12,19 @@ import os
 from pathlib import Path
 from typing import Optional
 
+# .env를 환경변수로 올린다. uvicorn은 Streamlit 진입점(app.py)과 **다른
+# 프로세스**라 app.py의 load_dotenv가 여기까지 오지 않는다. 이게 없으면
+# 파일에 키를 넣어도 OPENAI_API_KEY도 BLUESCORE_LLM_RUNTIME_ENABLED도
+# 보이지 않아, 질의응답이 조용히 llm_disabled 폴백으로 떨어진다.
+# python-dotenv가 없어도 앱은 돌아간다 — 환경변수를 직접 export한 경우도 있고,
+# 키 없이 폴백으로 도는 것이 정상 동작이기 때문이다.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+except ImportError:  # pragma: no cover
+    pass
+
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -53,6 +66,34 @@ from storage.repository import Repository
 
 def _runtime_llm_enabled() -> bool:
     return os.getenv("BLUESCORE_LLM_RUNTIME_ENABLED", "false").lower() in {"1", "true", "yes"}
+
+
+def _llm_status() -> dict:
+    """
+    런타임 LLM이 실제로 답할 수 있는 상태인가.
+
+    플래그(`runtimeLlmEnabled`)만으로는 부족하다 — 플래그를 켜도 이 프로세스에
+    `OPENAI_API_KEY`가 없으면 폴백으로 떨어지는데, 화면에는 둘 다 그냥
+    "기본 문구"로만 보여서 원인을 구분할 수 없다. 여기서 갈라 둔다.
+    """
+    from explain.provider import ProviderUnavailable, get_provider
+
+    enabled = _runtime_llm_enabled()
+    try:
+        provider = get_provider(flow="qa")
+        available = provider.is_available()
+        name = provider.name
+    except ProviderUnavailable as exc:
+        return {"enabled": enabled, "available": False, "provider": "unknown", "detail": str(exc)}
+    return {
+        "enabled": enabled,
+        "available": available,
+        "provider": name,
+        "detail": "" if enabled and available else (
+            "BLUESCORE_LLM_RUNTIME_ENABLED가 꺼져 있습니다." if not enabled
+            else f"{name} 프로바이더를 쓸 수 없습니다 (API 키를 확인하세요)."
+        ),
+    }
 
 
 def _configured_ledger() -> LedgerLike:
@@ -115,6 +156,7 @@ def create_app(
             "realAxisASnapshotAvailable": scoring.real_adapter.available,
             "chainMode": "onchain" if isinstance(workflow.ledger, OnChainHashLedger) else "local",
             "runtimeLlmEnabled": _runtime_llm_enabled(),
+            "llm": _llm_status(),
         }
 
     @api.get("/config", response_model=ConfigResponse)
@@ -150,8 +192,27 @@ def create_app(
         return workflow.simulation_surface(vessel_id)
 
     @api.get("/vessels/{vessel_id}/explanation", response_model=ExplanationResponse)
-    def explanation(vessel_id: str) -> ExplanationResponse:
-        return workflow.explanation(vessel_id)
+    def explanation(
+        vessel_id: str,
+        refresh: bool = Query(default=False),
+    ) -> ExplanationResponse:
+        """
+        요약·요인별 상세 설명. 처음 만들 때 LLM을 타고, 이후에는 저장된 것을
+        그대로 돌려준다.
+
+        매번 다시 만들지 않는 이유는 심사역 화면(`ui/bank.py`)이 어업인과 같은
+        리포트를 읽기 때문이다. 온도가 있어 재생성할 때마다 문장이 흔들리는데,
+        이의제기 건에서 어업인이 본 리포트와 심사역이 검토하는 리포트가 다르면
+        "금융기관이 근거를 확인해 결정한다"는 전제가 무너진다. 설명 문장은
+        온체인 해시 대상이 아니므로(`commit_report` 참고) 재현성 요구는 아니고,
+        **두 화면이 같은 것을 봐야 한다**는 요구다.
+
+        `refresh=true`는 시연 전 워밍업용이다 — 저장된 템플릿 리포트를 LLM
+        문장으로 갈아끼울 때 쓴다.
+        """
+        return workflow.explanation(
+            vessel_id, use_llm=_runtime_llm_enabled(), refresh=refresh
+        )
 
     @api.post("/vessels/{vessel_id}/questions", response_model=TextResponse)
     def answer_question(vessel_id: str, request: QuestionRequest) -> TextResponse:

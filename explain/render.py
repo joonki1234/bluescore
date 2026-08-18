@@ -39,6 +39,23 @@ _ALWAYS_ALLOWED_MAX_SMALL_INT = 12
 _YEAR_RANGE = (2020, 2030)
 
 
+# 개선 팁에 나오면 안 되는 조언.
+#
+# 자원 압력(A축)의 해법은 "같은 자리를 다시 찾기까지 간격을 두라"이지
+# "다른 어장으로 옮겨라"가 아니다. 어장을 옮기면 연료를 더 태워 운항
+# 효율(B축)이 깎이므로, 점수를 올리려는 사람에게 정반대 조언이 된다.
+#
+# 프롬프트에 금지 문구를 넣어도 앨런과 OpenAI 둘 다 계속 새어 나왔다.
+# 숫자 검증과 같은 이유로 여기서 검사한다 — 프롬프트는 부탁이고 이건 검사다.
+# 어미가 활용되므로 어간만 잡는다 ("옮기세요" / "옮겨 보세요" 둘 다).
+_FORBIDDEN_TIP_PATTERNS = (
+    re.compile(r"다른\s*어장"),
+    re.compile(r"어장을?\s*옮[기겨]"),
+    re.compile(r"어장을?\s*바[꾸꿔]"),
+    re.compile(r"새로운\s*어장"),
+)
+
+
 class RenderError(ValueError):
     """응답이 검증을 통과하지 못했다. 호출부는 폴백으로 강등해야 한다."""
 
@@ -82,6 +99,21 @@ def find_invented_numbers(text: str, data: ExplainInput) -> List[float]:
         if not _is_allowed(number, allowed) and number not in invented:
             invented.append(number)
     return invented
+
+
+def find_forbidden_advice(text: str) -> List[str]:
+    """
+    개선 팁에 섞이면 안 되는 조언을 찾는다.
+
+    Returns:
+        걸린 문구 목록. 비어 있으면 통과.
+    """
+    found: List[str] = []
+    for pattern in _FORBIDDEN_TIP_PATTERNS:
+        match = pattern.search(text)
+        if match and match.group(0) not in found:
+            found.append(match.group(0))
+    return found
 
 
 def parse_json(raw: str) -> Dict[str, Any]:
@@ -188,12 +220,18 @@ def safe_parse(
     return summary, recommendations, None
 
 
-def parse_and_validate_text(raw: str, data: ExplainInput, field: str) -> str:
+def parse_and_validate_text(
+    raw: str, data: ExplainInput, field: str, *, check_forbidden_advice: bool = False
+) -> str:
     """
     단일 문장 필드만 있는 응답(질의응답·이의제기 응답·상세 리포트)을 검증한다.
 
     구조 검증과 숫자 검증 둘 다 `parse_and_validate`와 같은 규칙을 쓴다 —
     스키마만 다르고 "숫자를 창작하지 않는다"는 계약은 동일하게 강제된다.
+
+    Args:
+        check_forbidden_advice: 개선 팁 전용. 점수를 되레 깎는 조언이
+            섞였는지 함께 본다 (`_FORBIDDEN_TIP_PATTERNS` 참고).
     """
     parsed = parse_json(raw)
 
@@ -209,15 +247,24 @@ def parse_and_validate_text(raw: str, data: ExplainInput, field: str) -> str:
             + ", ".join(f"{n:g}" for n in invented)
         )
 
+    if check_forbidden_advice:
+        forbidden = find_forbidden_advice(text)
+        if forbidden:
+            raise RenderError(
+                "점수를 깎는 조언이 포함되어 있습니다: " + ", ".join(forbidden)
+            )
+
     return text
 
 
 def safe_parse_text(
-    raw: str, data: ExplainInput, field: str
+    raw: str, data: ExplainInput, field: str, *, check_forbidden_advice: bool = False
 ) -> Tuple[Optional[str], Optional[str]]:
     """예외를 던지지 않는 단일 문장 파싱. Returns: (text, error)."""
     try:
-        text = parse_and_validate_text(raw, data, field)
+        text = parse_and_validate_text(
+            raw, data, field, check_forbidden_advice=check_forbidden_advice
+        )
     except RenderError as exc:
         return None, str(exc)
     return text, None

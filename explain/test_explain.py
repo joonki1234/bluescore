@@ -57,11 +57,13 @@ class StubProvider(LLMProvider):
         self._response = response
         self._error = error
         self._available = available
+        self.last_prompts = None
 
     def is_available(self) -> bool:
         return self._available
 
-    def generate_json(self, system_prompt, user_prompt, schema, schema_name) -> str:
+    def generate_json(self, prompts, schema, schema_name) -> str:
+        self.last_prompts = prompts
         if self._error is not None:
             raise self._error
         return self._response
@@ -386,3 +388,68 @@ def test_mock_스키마와_같은_키로_직렬화된다():
     assert set(payload) == {"summary", "shapFactors", "recommendations", "source"}
     assert set(payload["shapFactors"][0]) == {"label", "value", "axis"}
     assert set(payload["recommendations"][0]) == {"action", "axis"}
+
+
+def test_선박_라벨의_톤수는_창작_숫자가_아니다():
+    """
+    "근해통발 · 29톤 · 남해"의 29를 모델이 옮겨 적는 것은 창작이 아니다.
+
+    앨런 프로바이더를 붙이며 드러난 구멍이다 — 라벨 숫자가 허용 집합에
+    없어서 이의제기 답변이 전량 폴백으로 떨어졌다. 화면에 이미 보이는
+    숫자를 문장에서 금지할 이유가 없다.
+    """
+    data = make_input()
+    assert render.find_invented_numbers("귀 선박은 29톤급입니다.", data) == []
+    assert render.find_invented_numbers("20–30톤 구간에서 비교했습니다.", data) == []
+
+
+def test_라벨에_없는_숫자는_여전히_잡힌다():
+    data = make_input()
+    assert render.find_invented_numbers("연료를 999리터 아꼈습니다.", data) == [999.0]
+
+
+def test_어장을_옮기라는_조언은_팁에서_걸러진다():
+    """
+    자원 압력의 해법은 "다시 찾기까지 간격을 두라"이지 "다른 데로 가라"가
+    아니다. 어장을 옮기면 연료를 더 태워 운항 효율이 깎이므로, 점수를
+    올리려는 사람에게 정반대 조언이 된다.
+
+    프롬프트에 금지 문구를 넣어도 앨런과 OpenAI 둘 다 계속 새어 나와서
+    검사로 바꿨다.
+    """
+    assert render.find_forbidden_advice("다른 어장으로 이동해 보세요.") == ["다른 어장"]
+    assert render.find_forbidden_advice("어장을 옮겨 보세요.") == ["어장을 옮겨"]
+    assert render.find_forbidden_advice("새로운 어장을 찾아보세요.") == ["새로운 어장"]
+
+
+def test_올바른_A축_조언은_통과한다():
+    """조업 순서를 돌리는 것은 장소 이동이 아니라 시간 간격 확보다."""
+    good = "조업 순서를 바꿔 같은 자리는 나중에 찾아가세요. 항해 속도를 낮추세요."
+    assert render.find_forbidden_advice(good) == []
+
+
+def test_팁_검증은_금지_조언을_폴백으로_강등한다():
+    from explain.explain import generate_improvement_tip
+
+    stub = StubProvider(response=json.dumps(
+        {"tip": "같은 어장 조업을 줄이려면 다른 어장으로 이동하세요."}, ensure_ascii=False
+    ))
+    result = generate_improvement_tip(
+        make_input(), "가장 쉬운 개선", ["같은 어장에서 연달아 조업하는 횟수를 줄인다"],
+        provider=stub, use_cache=False,
+    )
+    assert result.source == "fallback:validation_failed"
+
+
+def test_질의응답은_어장_이동_표현을_막지_않는다():
+    """
+    금지 검사는 팁 전용이다. 질의응답에서 "다른 어장은 어떻게 되나요"에
+    답하는 것까지 막으면 안 된다.
+    """
+    from explain.explain import answer_question
+
+    stub = StubProvider(response=json.dumps(
+        {"answer": "다른 어장의 기록은 이 리포트에 없습니다."}, ensure_ascii=False
+    ))
+    result = answer_question(make_input(), "다른 어장은요?", provider=stub)
+    assert result.source == "llm:stub"

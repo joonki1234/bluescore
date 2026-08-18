@@ -127,3 +127,64 @@ def test_commit_requires_review_and_errors_are_ui_safe(tmp_path):
     missing = client.get("/vessels/UNKNOWN/score")
     assert missing.status_code == 404
     assert missing.json()["code"] == "not_found"
+
+
+def test_health가_런타임_LLM_상태를_구분해_알려준다(tmp_path, monkeypatch):
+    """
+    "플래그가 꺼짐"과 "키가 없음"은 화면에 똑같이 기본 문구로 보인다.
+    원인을 찾는 데 한참 걸렸던 자리라 health에서 갈라 둔다.
+    """
+    from api import main
+
+    monkeypatch.setenv("BLUESCORE_LLM_RUNTIME_ENABLED", "false")
+    status = main._llm_status()
+    assert status["enabled"] is False
+    assert "BLUESCORE_LLM_RUNTIME_ENABLED" in status["detail"]
+
+    monkeypatch.setenv("BLUESCORE_LLM_RUNTIME_ENABLED", "true")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    status = main._llm_status()
+    assert status["enabled"] is True
+    assert status["available"] is False
+    assert "키" in status["detail"]
+
+    body = _client(tmp_path).get("/health").json()
+    assert set(body["llm"]) == {"enabled", "available", "provider", "detail"}
+
+
+def test_api_프로세스가_env_파일을_직접_읽는다():
+    """
+    uvicorn은 app.py와 다른 프로세스라 app.py의 load_dotenv가 여기까지 오지
+    않는다. 이게 빠져 있어서 .env에 키를 넣어도 질의응답이 조용히
+    llm_disabled 폴백으로 떨어졌다.
+    """
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    if not (root / ".env").exists():
+        import pytest
+
+        pytest.skip(".env가 없는 환경 (CI 등)")
+
+    result = subprocess.run(
+        [sys.executable, "-c",
+         "import os, sys; sys.path.insert(0, '.'); import api.main; "
+         "print(bool(os.getenv('BLUESCORE_LLM_RUNTIME_ENABLED')))"],
+        cwd=root, capture_output=True, text=True,
+        env={"PATH": os.environ.get("PATH", ""), "HOME": os.environ.get("HOME", "")},
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "True", result.stdout
+
+
+def test_질의응답이_런타임_플래그를_실제로_탄다(tmp_path, monkeypatch):
+    """화면에서 llm_disabled가 뜬 경로를 API 경계에서 고정한다."""
+    monkeypatch.setenv("BLUESCORE_LLM_RUNTIME_ENABLED", "false")
+    response = _client(tmp_path).post(
+        "/vessels/VESSEL_A/questions", json={"question": "왜 점수가 낮나요?"}
+    )
+    assert response.status_code == 200
+    assert response.json()["source"] == "fallback:llm_disabled"
