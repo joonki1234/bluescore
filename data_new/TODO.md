@@ -3,6 +3,19 @@
 > 상세 진행 기록(왜 그렇게 정했는지)은 `PROCESS_LOG.md` 참고. 전체
 > 구조·실행법은 `README.md` 참고. 여기는 체크리스트만.
 
+## 현재 서비스 통합 상태 (2026-08-19)
+
+- production은 추적 파일 `final_vessel_matches.jsonl`,
+  `gfw_vessels_normalized.jsonl`, `events_with_weather.jsonl.gz`를 직접 읽는다.
+- `tac_vessels_normalized.jsonl`은 현재 Git에서 추적하지만 매칭 재생성·검증용이며
+  production 서비스 입력은 아니다.
+- B축 입력은 `score/real_axis_b_input.py`에서 공용 선박 입력을 재사용한다.
+  `gearType`은 구체적인 GFW fishingType을 결정론적 대표값으로 연결하며 147,441개
+  이벤트에 존재한다. 제외 규칙은 CARGO/PASSENGER/CARRIER와 FISHING/OTHER/NA/
+  INCONCLUSIVE/GEAR/FIXED_GEAR/TROLLERS/OTHER_PURSE_SEINES/OTHER_SEINES다.
+- 현재 건수는 선박 5,323척, 톤수 1,234척, fishingType 2,682척, 둘 다 665척이다.
+  아래의 다른 건수와 파일 부재 설명은 당시 조사 기록으로 보존한다.
+
 ## 완료 — 1~6번(계획·설계 단계)
 
 - [x] 도메인 지식 정리 (수산업 제도·어법·AIS·선박공학·해양환경·수산자원관리)
@@ -54,8 +67,8 @@
 - [x] totalDistanceKm 이상치(772.99km) 원인 규명 완료 — 4.5일짜리 실제 장기 조업이벤트, 속도×시간 물리적으로 일관됨, 이상치 아님(42번)
 - [x] 3월 이벤트 780건 원인 규명 완료 — GFW API가 조회기간과 이벤트 구간이 겹치기만 해도 포함시킴(경계매칭 아님), eventId 중복제거로 이미 안전하게 처리되고 있음 확인(43번)
 - [ ] 해역신호용 어항정보 확장 — 실효성 정량 확인 결과 예상보다 심각(TAC 항구명의 5.1%만 커버, locationBonus 실작동 9.9%뿐). 단순 리스트 확장보다 TAC `portNamesTac`의 항구명/행정구역명 혼재 문제부터 정리 필요(46번)
-- [x] score/ 필드명 계약 검증 완료(47번) — **A축은 문제없이 바로 실행 가능**(필드명 정확히 일치). **B축은 연결 스크립트가 없음**: tonnageGt가 중첩돼있고, 해양기상 필드명이 다름(`weather_WATER_TEMPER` vs `seaSurfaceTempC` 등, 단위도 미확인), gearType/seaArea/season flat 필드 없음 — process/에 병합 스크립트 신설 필요, 담당 논의 필요
-- [x] (위 발견에 따라) events_with_weather.jsonl + final_vessel_matches.jsonl을 B축 요구 형태로 합치는 스크립트.
+- [x] score/ 필드명 계약 검증 완료(47번) — **47번 당시에는 B축 연결 스크립트가 없었으나 현재 해결됨.** A축은 공용 선박 입력, B축은 `score/real_axis_b_input.py`가 필드 변환을 담당한다. 당시 발견한 날씨 단위 미확인 사항은 8번 모델·정책 검증 대상으로 유지한다.
+- [x] (위 발견에 따라) events_with_weather.jsonl.gz + final_vessel_matches.jsonl을 B축 요구 형태로 합치는 스크립트.
       **완료(2026-08-18, 오동규)**: `score/real_axis_b_input.py` + 검증 스크립트
       `score/scripts/run_real_axis_b.py`. 실제 이 폴더 산출물(275,782개 이벤트,
       5,314척)로 B축 파이프라인이 실제로 도는 것까지 확인함(2,310척 실산출).
@@ -68,7 +81,7 @@
       0건 실측 확인함)와 날씨 필드 매핑(단위는 정황상 m/s·°C로 추정만 하고
       진행 — `score/real_axis_b_input.py` 모듈 docstring 참고).
 
-      **(2026-08-18 병합 시 발견) 같은 목적의 스크립트가 두 개가 됐다** —
+      **(2026-08-18 병합 당시 기록 — 현재 해결됨) 같은 목적의 스크립트가 두 개가 됐다** —
       김태윤님이 거의 같은 시각에 독립적으로 `data_new/process/
       build_axis_b_input.py`를 만들어서 git merge 충돌이 났다(`score/scripts/
       run_real_axis_b.py`에서, 서로 다른 두 스크립트를 각자 참조하고 있었음).
@@ -80,8 +93,8 @@
         **`tac_vessels_normalized.jsonl`이 `.gitignore`로 제외돼 있어서
         (`data_new/processed/`는 3개 파일만 예외) 지금 이 환경에서는 파일이
         없어서 실행 자체가 안 됨**(`FileNotFoundError` 직접 확인).
-      - 부수적으로 하나 더: 이 스크립트는 `events_with_weather.jsonl`(압축 안 된
-        파일명)을 찾는데, 실제 커밋된 파일명은 `events_with_weather.jsonl.gz`라
+      - 부수적으로 하나 더: 당시 이 스크립트는 확장자 `.gz`가 빠진 비압축
+        파일명을 찾았는데, 실제 커밋된 파일명은 `events_with_weather.jsonl.gz`라
         `tac_vessels_normalized.jsonl`이 채워져도 이 부분은 한 번 더 고쳐야 할
         것으로 보임.
       - 일단 `run_real_axis_b.py`는 실제로 지금 돌아가는 `score/real_axis_b_input.py`
@@ -106,3 +119,10 @@
       **단, 필드 매핑표(원본 필드 -> score/ 필드, 특히 날씨 단위·gearType 근거)는
       김태윤님이 확인**하기로 함 — 원본 구조는 데이터팀이 제일 잘 앎.
       진행 상황은 `score/TODO.md`에 기록.
+
+      **현재 정리(2026-08-19)**: `tac_vessels_normalized.jsonl`은 Git에서 추적
+      중이다. 다만 production은 이 파일이나 `axis_b_input.jsonl`을 읽지 않고,
+      공용 GFW fishingType과 압축 이벤트 스냅샷을 메모리에서 직접 변환한다.
+      `data_new/process/build_axis_b_input.py`는 같은 공용 함수를 호출하는 선택적
+      분석용 exporter로만 남겼다. `attach_weather.py`의 기본 출력도 현재 추적
+      파일명인 `events_with_weather.jsonl.gz`로 통일했다.

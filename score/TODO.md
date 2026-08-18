@@ -2,7 +2,17 @@
 
 # score TODO
 
-## 진행 현황 정리 (2026-08-18 갱신)
+## 현재 production 상태 (2026-08-19)
+
+- A축과 B축은 같은 추적 선박 입력을 사용하며 서비스는 파생
+  `vessels_for_score.jsonl.gz`/`axis_b_input.jsonl`을 요구하지 않는다.
+- 구체적인 GFW fishingType을 B축 `gearType`에 연결했다. 현재 서비스 입력은
+  선박 5,323척, 톤수 1,234척, fishingType 2,682척, 둘 다 665척이다.
+- 실산출 상태는 success 289척, partial 3,395척, insufficientSample 1,630척,
+  matchingFailed 9척이다. 아래 864척·807척 등의 값은 중간 스냅샷 결과다.
+- 날씨 단위, 모델 계수, 가중치와 금리 정책은 아직 검증 전이며 완료로 보지 않는다.
+
+## 진행 현황 정리 (2026-08-18 기록)
 
 score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이드오프까지 전부 코드+테스트
 완료 상태고, chain/도 Hardhat 실배포+Python 연동까지 end-to-end 확인 끝났다
@@ -443,6 +453,8 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       담당 — 여기서는 "된다"만 증명, 배선은 안 건드림.**
       주의: 대부분 선박의 톤수 매칭이 아직 안 끝나서(tonnage_band=None인 채로
       그룹핑됨) 정식 실행 전 매칭 완료를 기다리는 게 맞다.
+      **현재** `scripts/run_real_axis_a.py`는 위 레거시 파일이 아니라
+      `load_real_vessel_records()`의 추적 스냅샷을 직접 사용한다.
 - [x] **(2026-08-18) `services/real_scoring.py`의 A축 실산출을 `data_new/`로
       전환** — 구 `data/`(31,605척, 확정매칭 순도 9.5%) 대신 `data_new/`
       (EEZ 제한 5,323척, 사람 라벨링 실측 정밀도 약 75%)를 쓰도록
@@ -454,7 +466,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       6개). `services/metadata.py`의 `REAL_DATA_SNAPSHOT_ID`도 실제 데이터
       출처와 맞게 갱신(최지희님 파일, 라벨이 실제와 안 맞으면 재현성 계약이
       깨져서 같이 고침).
-      **결과(gearType 미반영 시점)**: 5,323척 중 `partial`(A축 실산출됨)
+      **이전 결과(gearType 미반영 시점)**: 5,323척 중 `partial`(A축 실산출됨)
       3,887척(73%), `insufficientSample` 1,427척(27%), `matchingFailed` 9척.
       **(2026-08-18 후속) `gfw_vessels_normalized.jsonl` 공개돼 fishingType
       반영함** — `load_gear_types()`가 GFW `combinedGearTypes`를 읽어 채움.
@@ -471,7 +483,7 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       `services/real_scoring.py`(최지희님 파일)에 B축 결과를 연결해 A축과
       같은 유사 선박군으로 백분위 변환, `services/scoring.py`에서 A+B
       가중합(0.65/0.35)으로 BlueScore·금리구간까지 완성(최지희님 확인 후
-      진행). **결과**: 5,323척 중 864척(16.2%)이 A축+B축 모두 실산출돼
+      진행). **이전 결과**: 5,323척 중 864척(16.2%)이 A축+B축 모두 실산출돼
       `success` 상태로 BlueScore·금리구간까지 나옴(나머지는 이전처럼 A축만
       `partial` 또는 표본부족/매칭실패 — B축 연결이 기존 A축 단독 경로를
       깨지 않음, 예외로 안전하게 흡수). 한계는 응답 `message`에 항상 명시
@@ -511,5 +523,6 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       (사실상 동일), BlueScore 완전 산출 16.2%(864척)→15.2%(807척)로 소폭
       감소 — 확인된 오탐 제거의 정상적인 대가. `ui/real_preview.py`·
       `services/scoring.py`·`services/real_scoring.py`의 하드코딩된 커버리지
-      수치 주석도 갱신함. 제안 C(한글비교 전체 교체)는 이번 제출 범위에서는
+      수치 주석도 갱신함. **이 값도 현재 TAC 한글 직접비교 스냅샷 이전 결과이며,
+      현재 완전 산출은 289척이다.** 제안 C(한글비교 전체 교체)는 이번 제출 범위에서는
       보류 — 다음 라운드에 사람 검증 거쳐 재논의.

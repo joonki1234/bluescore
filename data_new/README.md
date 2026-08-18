@@ -30,24 +30,20 @@ data_new/
 └── requirements.txt  이 파이프라인 전용 추가 의존성(bluescore/requirements.txt에 더해 설치)
 ```
 
-## 현재 상태 (2026-08-17 기준)
+## 현재 서비스 스냅샷 (2026-08-19 기준)
 
-**실규모(전체 기간, 2026-04-01~08-14) 수집·가공 완료. score/ 단계로 넘길
-준비가 된 상태.**
+실규모 수집·가공 결과가 `sourceType=real` 서비스에 연결됐다. 현재 production
+런타임은 아래 추적 파일 3개만 직접 읽는다.
 
-- GFW 이벤트: 276,562건, 검증 게이트 통과
-- GFW 선박 상세: 5,323척(distinct vesselId 전수), 검증 게이트 통과
-- 해양기상: 4/1~8/14 전체, 13개 지방청, 검증 게이트 통과
-- MOF: 4,662건 검색(병렬화로 단축 수집), 후보 1,770건
-- 매칭(임계값 0.8, 잠정): tier2(콜사인 정확일치) 0.1%, tier3(이름 fuzzy)
-  54.1%, unmatched 45.9%(PROCESS_LOG.md 35번 — MOF 어선타입 필터
-  적용 후 41번 기준 최신 수치)
-- 해양기상 부착: 275,782/275,782건(100%) — 나머지 780건은 수집기간보다
-  이른 3월 이벤트라 원천적으로 대상 아님
-- **B축 실질 병목은 톤수 매칭률(43.4%)** — 해양기상은 병목 아님
-  (PROCESS_LOG.md 36·41번 품질평가 참고)
-- 매칭 임계값 재조정은 회의 안건(38번, 육안실사 결과 단순 인하는
-  비추천 — 숫자접두어 신호 추가안이 대안)
+- `processed/final_vessel_matches.jsonl`: GFW↔TAC 최종 매칭 5,323척
+- `processed/gfw_vessels_normalized.jsonl`: GFW 선박명·어업종
+- `processed/events_with_weather.jsonl.gz`: 기상 결합 이벤트 275,782건
+
+최종 매칭은 TAC 한글 직접비교 방식이며 verified 1,234척, unmatched 4,089척이다.
+서비스 입력은 톤수 1,234척, 구체적인 GFW fishingType 2,682척, 둘 다 665척이다.
+실산출 상태는 success 289척, partial 3,395척, insufficientSample 1,630척,
+matchingFailed 9척이다. 과거 fuzzy/MOF 파이프라인의 수치와 조사 기록은
+`PROCESS_LOG.md`에 당시 결과로 보존한다.
 
 ## 전체 파이프라인 실행 순서
 
@@ -79,7 +75,33 @@ python tag_population.py                                 # 근해/연안·양식
 python attach_weather.py --start 20260401 --end 20260814  # 해양기상 부착(수집한 기간과 맞춰서)
 ```
 
-## 알아두어야 할 한계 (전체 목록은 PROCESS_LOG.md)
+## 서비스 소비와 선택적 파생 파일
+
+수집·가공 단계는 로컬 `raw/`와 여러 중간 산출물을 사용하지만, 서비스는 위의
+최종 스냅샷 3개만 소비한다. `tac_vessels_normalized.jsonl`과
+`kakao_geocode_cache.json`은 매칭 재생성·검증용 추적 자료이며 production 점수
+런타임 입력은 아니다.
+
+다음 명령은 레거시 분석 도구와 파일 검사를 위한 선택적 exporter다. 생성 결과가
+없어도 API와 `/real` 화면은 동작한다.
+
+```bash
+python -m score.scripts.convert_data_new_vessels  # vessels_for_score.jsonl.gz
+python -m data_new.process.build_axis_b_input     # axis_b_input.jsonl
+```
+
+A축·B축 진단은 파생 파일을 먼저 만들지 않고 공용 production 변환을 직접 사용한다.
+
+```bash
+python -m score.scripts.run_real_axis_a
+python -m score.scripts.run_real_axis_b
+```
+
+## 과거 재구축 과정에서 확인한 한계
+
+아래 수치는 당시 fuzzy/MOF 파이프라인을 평가한 기록이며 현재 TAC 한글 직접비교
+스냅샷의 운영 건수는 위 “현재 서비스 스냅샷”을 기준으로 한다. 조사에서 확인한
+데이터 품질 한계와 결정 근거는 비교를 위해 보존한다.
 
 - **매칭률 54.1%의 실제 정밀도는 사람 라벨링으로 재확인함**(49번) —
   층화 랜덤추출 80쌍을 직접 라벨링한 결과 **약 75%**(0.95+ 구간은

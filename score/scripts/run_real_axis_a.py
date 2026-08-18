@@ -7,13 +7,11 @@
 peer_grouping.py, score_assembly.py)을 실제 수집 데이터에 붙여서 확인한다.
 API 서버 없이 CLI에서 바로 돌려볼 수 있는 진단용 스크립트라 계속 남겨둔다.
 
-데이터 소스는 `data_new/`를 쓴다 — `services/real_scoring.py`와 동일한
-스냅샷(EEZ 제한 5,323척, 실측 정밀도 약 75%)이다. 선박 목록은
-`convert_data_new_vessels.py`가 만드는 파생 파일을 그대로 읽는다(먼저
-`python -m score.scripts.convert_data_new_vessels`로 생성해둘 것).
+데이터 소스는 `services/real_scoring.py`와 같은 추적 스냅샷을 쓴다.
+선박 목록은 `score.real_vessel_input.load_real_vessel_records()`로 만들므로
+선택적 호환 파일인 `vessels_for_score.jsonl.gz`가 없어도 실행된다.
 
 실행:
-    python -m score.scripts.convert_data_new_vessels  # 선박 파일 먼저 생성
     python -m score.scripts.run_real_axis_a
 """
 
@@ -28,16 +26,21 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from score.axis_a_pressure import compute_axis_a_pressure
 from score.peer_grouping import MIN_PEER_GROUP_SAMPLE_SIZE, build_peer_groups, peer_group_for_vessel
+from score.real_vessel_input import load_real_vessel_records
 from score.score_assembly import raw_to_score, score_status_for_group
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EVENTS_PATH = PROJECT_ROOT / "data_new" / "processed" / "events_with_weather.jsonl.gz"
-VESSELS_PATH = PROJECT_ROOT / "data_new" / "processed" / "vessels_for_score.jsonl.gz"
 
 
 def _load_jsonl_gz(path: Path) -> list:
     with gzip.open(path, "rt", encoding="utf-8") as f:
         return [json.loads(line) for line in f]
+
+
+def load_service_vessels() -> list:
+    """production과 같은 추적 스냅샷에서 서비스 선박 입력을 만든다."""
+    return load_real_vessel_records()
 
 
 def main() -> None:
@@ -46,9 +49,9 @@ def main() -> None:
     events = _load_jsonl_gz(EVENTS_PATH)
     print(f"      {len(events):,}건, {time.time() - t0:.1f}초")
 
-    print(f"[2/4] 선박 로드: {VESSELS_PATH.name}")
+    print("[2/4] 선박 로드: 추적 매칭·GFW 스냅샷")
     t0 = time.time()
-    vessels = _load_jsonl_gz(VESSELS_PATH)
+    vessels = load_service_vessels()
     print(f"      {len(vessels):,}척, {time.time() - t0:.1f}초")
 
     print("[3/4] A축 raw 값 산출 (compute_axis_a_pressure) — 전체 이벤트 기준")
