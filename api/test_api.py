@@ -38,7 +38,9 @@ def test_persona_one_reaches_a_band(tmp_path):
     body = response.json()
     assert body["beforeBand"]["grade"] == "B"
     assert body["afterBand"]["grade"] == "A"
-    assert body["simulatedScore"] == 78.0
+    # 2026-08-18: score/tradeoff_coefficients.py 실제 계수로 교체되며 78.0->89.7로
+    # 바뀜(밴드 B->A 전환은 그대로 유지) — services/scoring.py 커밋 메시지 참고.
+    assert body["simulatedScore"] == 89.7
     assert body["bandChanged"] is True
     assert body["assumptions"]
 

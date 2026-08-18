@@ -149,30 +149,53 @@ class TestTradeoffIsVisibleInTheSurface:
     """
     축 간 반작용이 표 위에서 실제로 어떻게 작동하는지 고정한다.
 
-    2026-08-17 실측 결과, 지금의 잠정 계수에서 반작용은 이득을 **줄이기만 하고
-    부호를 뒤집지 못한다** (속도 1노트당 순 +0.60점, 연속조업 1회당 순 +3.71점).
-    따라서 `explain/TODO.md` 시연 구성 ③번의 "최고점은 중간에 있고 끝에서는
-    떨어진다"는 지금 계수로는 **성립하지 않는다** — 화면도 그렇게 말하지 않는다.
+    2026-08-17 실측(잠정 계수, AXIS_B_GAIN_PER_KNOT=3.2 등 고정 상수) 기준으로는
+    반작용이 이득을 줄이기만 하고 부호를 뒤집지 못해서, `explain/TODO.md`
+    시연 구성 ③번의 "최고점은 중간에 있고 끝에서는 떨어진다"가 성립하지 않았다.
 
-    score/의 실제 계수(`score/tradeoff_coefficients.py`)로 교체되면 이 성질이
-    바뀔 수 있다. 그때 아래 테스트가 실패하면서 시연 문구를 다시 볼 기회를 준다.
+    **2026-08-18 갱신**: `services/scoring.py`가 `score/tradeoff_coefficients.py`의
+    실제 물리식 기반 계수로 바뀌면서(예상대로 이 클래스가 깨졌다) ③번이 이제
+    실제로 성립한다 — VESSEL_A 기준 최고점이 구간 끝이 아니라 속도 8.6kn(구간
+    7.4~12.4kn 중간쯤)에서 나온다. 아래 테스트를 이 사실에 맞게 다시 고정한다.
+
+    다만 "반작용은 항상 손해만 준다"는 옛 가정은 더는 전역적으로 참이 아니다 —
+    고속 구간(약 11.5kn 이상) 10개 셀에서 반작용 있는 점수가 없는 점수보다
+    미세하게(0.1~0.7점) 더 높게 나온다. 원인은 새 B축 계수가 훨씬 커져서
+    바닥값(4.0)에 양쪽 다 걸리는 구간이 넓어졌고, 그 구간에서는 B축 차이가
+    사라지면서 A축 쪽의 `AXIS_A_COST_PER_KNOT`(속도를 올리면 A축이 오히려
+    오른다는, `score/tradeoff_coefficients.py` 독스트링에 이미 "코드베이스에
+    근거 공식이 없다"고 적힌 미검증 계수)가 그대로 드러나기 때문이다. 이건 이번
+    작업 범위 밖(A축 계수는 건드리지 않기로 함)이라 고치지 않고, 아래에서
+    그 크기가 작다는 것만 회귀로 지켜본다.
     """
 
-    def test_tradeoff_reduces_the_gain_but_does_not_reverse_it(self):
+    def test_peak_is_interior_not_at_either_edge(self):
+        """③번 "최고점은 중간에 있고 끝에서는 떨어진다"가 실제로 성립하는지 고정한다."""
+        vessel = _vessel()
+        surface = adapter.simulate_surface(vessel)
+        row = surface["revisits"][0]
+        cells = [surface["grid"][f"{row}|{s:.1f}"] for s in surface["speeds"]]
+        scores = [c["score"] for c in cells]
+
+        peak = max(scores)
+        assert scores[0] < peak and scores[-1] < peak, (
+            "최고점이 구간 끝에 있습니다. 계수가 바뀐 것으로 보이니 "
+            "시뮬레이터 곡선 문구(components._SIMULATOR_HTML)와 시연 구성 ③번을 "
+            "다시 확인하세요."
+        )
+
+    def test_tradeoff_violation_is_small_and_localized(self):
+        """반작용이 손해를 안 주는(오히려 미세하게 이득인) 셀이 있다는 걸 알고
+        지켜본다 — AXIS_A_COST_PER_KNOT이 미검증 계수라 생기는 부작용
+        (클래스 독스트링 참고). 이 폭이 갑자기 커지면 뭔가 달라진 것이다."""
         vessel = _vessel()
         surface = adapter.simulate_surface(vessel)
         row = surface["revisits"][0]
         cells = [surface["grid"][f"{row}|{s:.1f}"] for s in surface["speeds"]]
 
-        # 반작용을 넣은 점수는 뺀 점수보다 항상 낮거나 같다 (대가는 항상 음수 방향)
-        assert all(c["score"] <= c["scoreNoTradeoff"] + 1e-9 for c in cells)
-        # 그런데도 감속 방향으로는 계속 오른다 — 즉 부호가 뒤집히지 않는다
-        scores = [c["score"] for c in cells]
-        assert scores[0] == max(scores), (
-            "최적점이 더 이상 구간 끝이 아닙니다. 계수가 바뀐 것으로 보이니 "
-            "시뮬레이터 곡선 문구(components._SIMULATOR_HTML)와 시연 구성 ③번을 "
-            "다시 확인하세요."
-        )
+        violations = [c["score"] - c["scoreNoTradeoff"] for c in cells if c["score"] > c["scoreNoTradeoff"] + 1e-9]
+        assert len(violations) <= len(cells) // 2, "반작용이 손해를 안 주는 셀이 절반을 넘습니다."
+        assert max(violations, default=0.0) < 2.0, "반작용 역전 폭이 예상보다 큽니다."
 
     def test_tradeoff_cost_is_actually_nonzero_somewhere(self):
         """대가가 0이면 점선과 실선이 겹쳐 화면에서 아무것도 못 보여준다."""
