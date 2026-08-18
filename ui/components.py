@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import math
+from html import escape as escape_html
 from typing import Dict, List, Optional
 
 import plotly.graph_objects as go
@@ -2065,7 +2066,10 @@ def ai_qa_widget(vessel: Dict) -> None:
 
     answer = st.session_state.get(f"qa_answer_{vessel['vesselId']}")
     if answer and answer.get("text"):
-        st.markdown(f'<div class="bs-card">{answer["text"]}</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="bs-card">{escape_html(answer["text"])}</div>',
+            unsafe_allow_html=True,
+        )
         explanation_source(answer)
 
 
@@ -2077,10 +2081,12 @@ def objection_form(vessel: Dict) -> None:
         st.markdown(
             f'<div class="bs-card"><div class="bs-label">접수된 이의제기 · '
             f'{"답변 완료" if existing["status"] == "answered" else "심사역 검토 중"}</div>'
-            f'<div class="bs-note"><b>{existing["reason"]}</b><br>{existing["detail"]}</div>'
+            f'<div class="bs-note"><b>{escape_html(existing["reason"])}</b><br>'
+            f'{escape_html(existing["detail"])}</div>'
             + (
                 f'<div class="bs-note" style="margin-top:10px; padding-top:10px; '
-                f'border-top:1px solid {theme.LINE};"><b>심사역 답변</b><br>{existing["aiResponse"]}</div>'
+                f'border-top:1px solid {theme.LINE};"><b>심사역 답변</b><br>'
+                f'{escape_html(existing["aiResponse"])}</div>'
                 if existing.get("aiResponse")
                 else ""
             )
@@ -2136,9 +2142,9 @@ def objection_panel_bank(vessel: Dict) -> None:
         f'<div style="display:flex; align-items:baseline; gap:8px;">'
         f'<span class="bs-label" style="margin:0;">사유</span>'
         f'<span class="bs-pill info" style="margin-left:auto;">{status_label}</span></div>'
-        f'<div style="font-weight:700; margin:2px 0 8px;">{objection["reason"]}</div>'
+        f'<div style="font-weight:700; margin:2px 0 8px;">{escape_html(objection["reason"])}</div>'
         f'<div class="bs-label">상세 내용</div>'
-        f'<div class="bs-note">{objection["detail"] or "(추가 설명 없음)"}</div></div>',
+        f'<div class="bs-note">{escape_html(objection["detail"]) or "(추가 설명 없음)"}</div></div>',
         unsafe_allow_html=True,
     )
 
@@ -2152,7 +2158,8 @@ def objection_panel_bank(vessel: Dict) -> None:
     if refreshed and refreshed.get("aiResponse"):
         st.markdown(
             f'<div class="bs-card"><div class="bs-label">AI 답변 초안 · 검토 후 전달</div>'
-            f'<div style="font-size:13.5px; line-height:1.8;">{refreshed["aiResponse"]}</div></div>',
+            f'<div style="font-size:13.5px; line-height:1.8;">'
+            f'{escape_html(refreshed["aiResponse"])}</div></div>',
             unsafe_allow_html=True,
         )
         explanation_source({"source": refreshed["aiResponseSource"]})

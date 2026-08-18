@@ -47,11 +47,16 @@ def _score(vessel_id: str) -> Dict:
 @lru_cache(maxsize=1)
 def real_vessel_options(limit: int = 50) -> List[Dict]:
     """실산출 선박 목록(최대 limit척). 5,323척 전체를 드롭다운에 넣는 건
-    비현실적이라 API의 기본 limit(50)을 그대로 쓴다."""
-    try:
-        return _vessel_summaries("real")["vessels"][:limit]
-    except ApiClientError:
-        return []
+    비현실적이라 API의 기본 limit(50)을 그대로 쓴다.
+
+    ApiClientError를 여기서 삼키지 않는다 — 예전엔 삼키고 빈 리스트를
+    반환했는데, 이 함수가 @lru_cache라 그 빈 리스트가 프로세스 수명 내내
+    캐싱돼서 첫 요청이 한 번만 타임아웃 나도(실산출 첫 요청은 최대 20여
+    초 걸림) 이후 백엔드가 정상화돼도 계속 빈 화면만 떴다(실측으로 확인한
+    버그). lru_cache는 예외를 캐싱하지 않으므로, 예외를 그대로 올려서
+    app.py의 except adapter.ApiClientError가 처리하게 하면 다음 재시도가
+    실제로 다시 API를 부른다."""
+    return _vessel_summaries("real")["vessels"][:limit]
 
 
 @lru_cache(maxsize=64)
