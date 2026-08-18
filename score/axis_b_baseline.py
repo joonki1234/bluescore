@@ -167,7 +167,17 @@ def _prepare_valid_rows(rows: List[dict]) -> Tuple[List[Tuple[dict, float]], Dic
 
 
 def _rows_to_feature_dataframe(rows: List[dict]) -> pd.DataFrame:
-    """행 리스트를 LightGBM 입력용 DataFrame으로 변환한다 (범주형 컬럼은 category dtype)."""
+    """행 리스트를 LightGBM 입력용 DataFrame으로 변환한다 (범주형 컬럼은 category dtype).
+
+    행이 하나뿐이고 그 값이 None인 수치형 컬럼은, pandas가 다른 float 값과
+    섞어볼 게 없어 dtype을 object로 추론해버린다(고전적인 단일행 함정). 이
+    상태로는 `model.predict()`는 그냥 통과하지만, `shap.TreeExplainer`가
+    쓰는 LightGBM의 `pred_contrib=True` 경로는 object dtype을 거부한다
+    (2026-08-18, `score/shap_factors.py` 실데이터 검증 중 실제로 겪음—
+    `ValueError: pandas dtypes must be int, float or bool`). 그래서 수치형
+    컬럼은 행 개수와 무관하게 항상 `pd.to_numeric()`으로 float dtype을
+    명시적으로 강제한다(None은 NaN이 된다).
+    """
     feature_columns = NUMERIC_FEATURE_COLUMNS + CATEGORICAL_FEATURE_COLUMNS
     df = pd.DataFrame(rows)
 
@@ -176,6 +186,8 @@ def _rows_to_feature_dataframe(rows: List[dict]) -> pd.DataFrame:
             df[column] = None
 
     df = df[feature_columns].copy()
+    for column in NUMERIC_FEATURE_COLUMNS:
+        df[column] = pd.to_numeric(df[column], errors="coerce")
     for column in CATEGORICAL_FEATURE_COLUMNS:
         df[column] = df[column].astype("category")
 

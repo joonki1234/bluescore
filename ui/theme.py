@@ -165,6 +165,50 @@ div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
   to {{ opacity: 1; transform: translateY(0); }}
 }}
 .bs-card, .bs-scorebar {{ animation: bs-fade-in 0.4s ease-out; }}
+
+/* 실산출처럼 첫 계산에 수 초~수십 초가 걸리는 화면에서, 빈 화면 대신
+   "불러오는 중"임을 보여주는 스켈레톤 카드. 값 없이 회색 막대만 깜빡인다 —
+   실제 숫자와 헷갈리지 않도록 굴곡·글자를 전혀 넣지 않는다. */
+@keyframes bs-skeleton-pulse {{
+  0%, 100% {{ opacity: 0.55; }}
+  50% {{ opacity: 1; }}
+}}
+.bs-skeleton-bar {{
+  background: {LINE}; border-radius: 6px; animation: bs-skeleton-pulse 1.3s ease-in-out infinite;
+}}
+
+/* 실산출 화면이 데모와 같은 톤이라 "이건 진짜 계산값"이라는 게 안 드러났다.
+   초록 점을 맥동시켜 실시간 산출임을 시각적으로도 표시한다. */
+@keyframes bs-live-pulse {{
+  0%   {{ box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.45); }}
+  70%  {{ box-shadow: 0 0 0 6px rgba(15, 118, 110, 0); }}
+  100% {{ box-shadow: 0 0 0 0 rgba(15, 118, 110, 0); }}
+}}
+.bs-live-badge {{
+  display: inline-flex; align-items: center; gap: 6px; margin-left: 10px;
+  padding: 3px 10px 3px 8px; border-radius: 999px;
+  background: {POSITIVE_SOFT}; color: {POSITIVE}; font-size: 11.5px; font-weight: 700;
+  vertical-align: middle;
+}}
+.bs-live-badge .dot {{
+  width: 7px; height: 7px; border-radius: 50%; background: {POSITIVE};
+  animation: bs-live-pulse 1.8s ease-out infinite;
+}}
+
+/* 온체인 기록 완료 체크마크 — 결과가 뜨자마자 나타나는 대신 획이 그려지는
+   느낌을 줘서, 이의제기→심사→해시 기록 흐름의 마지막 단계임을 체감하게 한다. */
+.bs-check-circle {{
+  stroke: {POSITIVE}; stroke-width: 2; fill: none;
+  stroke-dasharray: 63; stroke-dashoffset: 63;
+  animation: bs-check-draw 0.5s ease-out forwards;
+}}
+.bs-check-mark {{
+  stroke: {POSITIVE}; stroke-width: 2.4; fill: none;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 18; stroke-dashoffset: 18;
+  animation: bs-check-draw 0.3s ease-out 0.45s forwards;
+}}
+@keyframes bs-check-draw {{ to {{ stroke-dashoffset: 0; }} }}
 </style>
 """
 

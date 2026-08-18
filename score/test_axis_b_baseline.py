@@ -54,6 +54,23 @@ def make_dummy_dataset():
     return large_fast, small_slow
 
 
+class TestRowsToFeatureDataframe:
+    def test_single_row_with_missing_numeric_feature_is_float_dtype(self):
+        """단일 행 + 수치형 컬럼이 None이면 pandas가 dtype을 object로
+        추론해버리는 함정(2026-08-18, score/shap_factors.py 실데이터
+        검증 중 실제로 겪음) 회귀 확인. object dtype은 LightGBM의
+        pred_contrib=True(SHAP) 경로에서 ValueError를 낸다."""
+        from score.axis_b_baseline import NUMERIC_FEATURE_COLUMNS, _rows_to_feature_dataframe
+
+        row = make_row("v1", tonnage_gt=50.0, average_speed_knots=10.0, duration_hours=5.0)
+        row["seaSurfaceTempC"] = None
+        row["currentSpeedMs"] = None
+
+        df = _rows_to_feature_dataframe([row])
+        for column in NUMERIC_FEATURE_COLUMNS:
+            assert df[column].dtype.kind == "f", f"{column}의 dtype이 {df[column].dtype}입니다"
+
+
 class TestComputeEstimatedFuelKg:
     def test_matches_axis_b_physics_directly(self):
         row = make_row("v1", tonnage_gt=50.0, average_speed_knots=10.0, duration_hours=5.0)

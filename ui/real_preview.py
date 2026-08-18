@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from ui import adapter
+from ui import adapter, components
 
 
 def _discount_text(band: dict) -> str:
@@ -30,7 +30,11 @@ def _discount_text(band: dict) -> str:
 
 
 def render() -> None:
-    st.markdown("### 실산출 미리보기")
+    st.markdown(
+        '### 실산출 미리보기'
+        '<span class="bs-live-badge"><span class="dot"></span>LIVE DATA</span>',
+        unsafe_allow_html=True,
+    )
     st.caption(
         "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(data_new/, 2026-04~08월)로 "
         "계산한 결과입니다. 표본 5,323척 중 A축 실산출 61.0%, BlueScore까지 완전 "
@@ -38,7 +42,15 @@ def render() -> None:
         "아니라 정황 추정이며, 유속·일부 어업종 필드는 미확인 상태입니다."
     )
 
+    list_placeholder = st.empty()
+    with list_placeholder.container():
+        components.skeleton_score_card(
+            "실산출 선박 목록을 불러오는 중입니다 — 프로세스 첫 요청은 전체 5,323척의 "
+            "산출 상태를 정렬하느라 최대 20여 초 걸릴 수 있습니다(이후엔 즉시 응답)…"
+        )
     vessels = adapter.real_vessel_options()
+    list_placeholder.empty()
+
     if not vessels:
         st.warning("실산출 스냅샷을 불러올 수 없습니다. API 서버가 떠 있는지 확인하세요.")
         return
@@ -55,19 +67,42 @@ def render() -> None:
         key="real_vessel_id",
     )
 
+    score_placeholder = st.empty()
+    with score_placeholder.container():
+        components.skeleton_score_card("점수를 계산하는 중입니다(B축은 첫 요청에서 모델을 새로 학습합니다)…")
     score = adapter.get_real_score(vessel_id)
+    score_placeholder.empty()
 
     if score["status"] != "success":
         st.warning(f"{score['status']} — {score.get('message') or ''}")
     else:
         st.success(score.get("message") or "")
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("BlueScore", score.get("blueScore") if score.get("blueScore") is not None else "—")
     axis_a_score = score["axisA"].get("score")
     axis_b_score = score["axisB"].get("score")
-    col2.metric("A축", axis_a_score if axis_a_score is not None else "—")
-    col3.metric("B축", axis_b_score if axis_b_score is not None else "—")
+    components.animated_stat_cards(
+        [
+            {
+                "label": "BlueScore",
+                "value": score["blueScore"] if score.get("blueScore") is not None else "—",
+                "decimals": 1,
+                "size": 26,
+            },
+            {
+                "label": "A축",
+                "value": axis_a_score if axis_a_score is not None else "—",
+                "decimals": 1,
+                "size": 26,
+            },
+            {
+                "label": "B축",
+                "value": axis_b_score if axis_b_score is not None else "—",
+                "decimals": 1,
+                "size": 26,
+            },
+        ],
+        height=108,
+    )
 
     if score.get("rateBand"):
         st.info(f"제안 금리 등급 · {_discount_text(score['rateBand'])}")

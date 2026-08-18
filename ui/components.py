@@ -219,12 +219,62 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
+def skeleton_score_card(label: str = "불러오는 중…") -> None:
+    """
+    BlueScore/A축/B축 카드 자리의 로딩 스켈레톤.
+
+    실산출 화면은 첫 요청에서 전체 선박 상태 정렬(약 21초, 프로세스당 1회) ·
+    B축 LightGBM 학습(약 5초, 프로세스당 1회)이 걸린다. 빈 화면을 그대로
+    두면 멈춘 것처럼 보이므로, 데이터를 기다리는 동안 값 없는 회색 막대
+    카드를 보여준다.
+    """
+    bar = '<div class="bs-skeleton-bar" style="height:{h}px; width:{w}%; margin-bottom:{m}px;"></div>'
+    cols_html = "".join(
+        f'<div class="bs-card" style="flex:1;">'
+        + bar.format(h=12, w=50, m=10)
+        + bar.format(h=26, w=70, m=0)
+        + "</div>"
+        for _ in range(3)
+    )
+    st.markdown(
+        f'<div class="bs-note" style="margin-bottom:8px;">{label}</div>'
+        f'<div style="display:flex; gap:12px;">{cols_html}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+# score_bar 전용 CSS — theme.py의 .bs-scorebar/.seg/.bs-label/.big/.mid를 그대로
+# 복제한다. iframe(components_html) 안이라 전역 CSS(theme.inject())를 못 받는다.
+_SCOREBAR_CSS = f"""
+<style>
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; padding:0; background:transparent; font-family:{theme.FONT_SANS}; }}
+  .bs-scorebar {{
+    background:{theme.SURFACE}; border:1px solid {theme.LINE}; border-radius:12px;
+    padding:14px 18px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    opacity:0; transform:translateY(4px); animation:bs-fade-in 0.4s ease-out forwards;
+  }}
+  @keyframes bs-fade-in {{ to {{ opacity:1; transform:translateY(0); }} }}
+  .bs-scorebar .seg {{ padding-left:20px; border-left:1px solid {theme.LINE}; }}
+  .bs-scorebar .seg:first-child {{ padding-left:0; border-left:none; }}
+  .bs-scorebar .bs-label {{ font-size:12px; color:{theme.INK_SOFT}; margin-bottom:4px; }}
+  .bs-scorebar .big {{
+    font-family:{theme.FONT_MONO}; font-size:30px; font-weight:600; color:{theme.INK}; line-height:1.1;
+  }}
+  .bs-scorebar .mid {{ font-size:16px; font-weight:700; color:{theme.INK}; }}
+</style>
+"""
+
+
 def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
     """
     화면 최상단에 항상 붙는 점수 띠.
 
     어느 탭에 있든 점수가 보이게 해서 시뮬레이터에서 "72.6이 몇 점으로" 라는
-    변화가 시야에서 사라지지 않게 한다.
+    변화가 시야에서 사라지지 않게 한다. BlueScore 숫자는 0에서 실제 값까지
+    카운트업된다 — components.v1.html(iframe) 안에서 진짜 JS로 도는
+    _COUNT_UP_JS를 재사용한다(다른 곳과 같은 이유: st.markdown의 <script>는
+    Streamlit이 실행해주지 않는다).
     """
     if not adapter.is_scored(vessel):
         notice = adapter.blocked_notice(vessel)
@@ -246,11 +296,11 @@ def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
             f'<div class="mid">{theme.discount_text(band)}</div></div>'
         )
 
-    st.markdown(
-        f"""<div class="bs-scorebar">
+    html = f"""{_SCOREBAR_CSS}
+<div class="bs-scorebar">
   <div class="seg">
     <div class="bs-label">BlueScore</div>
-    <div class="big">{vessel['blueScore']}</div>
+    <div class="big" data-count="{vessel['blueScore']}" data-decimals="1" data-duration="900">0.0</div>
   </div>
   <div class="seg">
     <div class="bs-label">유사 선박군 {peer['count']}척 내</div>
@@ -262,9 +312,10 @@ def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
     <div class="bs-label">{vessel['fleetLabel']}</div>
     <div class="bs-label">관측 커버리지 {vessel['coveragePercent']}%</div>
   </div>
-</div>""",
-        unsafe_allow_html=True,
-    )
+</div>
+<script>{_COUNT_UP_JS}</script>
+"""
+    components_html(html, height=104, scrolling=False)
 
 
 def voyage_map(vessel: Dict, height: int = 380) -> None:
@@ -527,7 +578,10 @@ def _leaflet_html(payload: Dict, height: int) -> str:
   .leaflet-container {{ font-family:{theme.FONT_SANS}; }}
   .leaflet-control-attribution {{ font-size:9.5px; }}
   .bs-heat-layer {{ opacity:0; transition:opacity 1.1s ease-out; }}
-  .bs-glow-dot {{ filter:drop-shadow(0 0 4px var(--dot-color)); }}
+  .bs-glow-dot {{
+    filter:drop-shadow(0 0 4px var(--dot-color)); transition:filter 0.15s ease-out;
+  }}
+  .bs-glow-dot-hover {{ filter:drop-shadow(0 0 9px var(--dot-color)) drop-shadow(0 0 3px var(--dot-color)); }}
 
   /* 점수를 내린 지점은 계속 맥동시켜 지도에서 먼저 눈에 띄게 한다. */
   @keyframes bs-pulse {{
@@ -545,18 +599,27 @@ def _leaflet_html(payload: Dict, height: int) -> str:
   .bs-drop {{ opacity:0; animation:bs-fadein .45s ease-out forwards; }}
   @keyframes bs-fadein {{ to {{ opacity:1; }} }}
 
+  /* Leaflet 기본값이 `.leaflet-tooltip {{ white-space:nowrap }}`이라 반드시
+     덮어야 한다. max-width만 주면 상자 너비는 잘리는데 글자는 줄바꿈을 못 해
+     상자 밖으로 그대로 흘러나온다 — 실제로 조업 툴팁 제목이 그렇게 넘쳤다.
+     한국어는 어절 단위로 끊는 keep-all이 자연스럽고, 끊을 자리가 없는 긴
+     토큰만 break-word가 받아낸다. */
   .bs-tip {{
     background:rgba(255,255,255,.97) !important; border:none !important;
     border-radius:9px !important; box-shadow:0 4px 14px rgba(16,24,40,.28) !important;
-    padding:9px 11px !important; max-width:260px !important;
+    padding:9px 11px !important;
     color:{theme.INK} !important; font-size:12px !important; line-height:1.6 !important;
+    white-space:normal !important; word-break:keep-all; overflow-wrap:break-word;
+    width:max-content !important; max-width:260px !important;
   }}
   .bs-tip .bs-tip-badge {{
     display:inline-block; font-size:10.5px; font-weight:700; padding:1px 7px;
     border-radius:999px; margin-bottom:5px;
   }}
   .bs-tip .bs-tip-head {{ font-weight:700; display:block; margin-bottom:3px; }}
-  .bs-tip .bs-tip-detail {{ color:{theme.INK_SOFT}; font-size:11.5px; }}
+  /* 설명 줄도 block이어야 제목 아래로 떨어진다. inline이면 제목 끝에 이어 붙어
+     한 줄이 그만큼 길어지고, 배지까지 있는 툴팁에서 특히 지저분해진다. */
+  .bs-tip .bs-tip-detail {{ display:block; color:{theme.INK_SOFT}; font-size:11.5px; }}
 
   .bs-legend {{
     position:absolute; left:10px; bottom:12px; z-index:600;
@@ -693,15 +756,49 @@ D.events.forEach(function(e, i) {{
     marker._path.style.animationDelay = delay + 'ms';
   }}
 
-  // 마우스를 올리면 그 지점만 커져서, 어느 점을 읽고 있는지 헷갈리지 않는다.
-  marker.on('mouseover', function() {{ marker.setRadius(e.radius + 3); }});
-  marker.on('mouseout',  function() {{ marker.setRadius(e.radius); }});
+  // 마우스를 올리면 그 지점만 커지고 발광이 강해져서, 어느 점을 읽고 있는지
+  // 헷갈리지 않는다.
+  marker.on('mouseover', function() {{
+    marker.setRadius(e.radius + 3);
+    if (marker._path) marker._path.classList.add('bs-glow-dot-hover');
+  }});
+  marker.on('mouseout', function() {{
+    marker.setRadius(e.radius);
+    if (marker._path) marker._path.classList.remove('bs-glow-dot-hover');
+  }});
 
   if (e.home) {{
     L.circleMarker([e.lat, e.lng], {{ radius:0, opacity:0 }}).addTo(map)
       .bindTooltip('모항', {{ permanent:true, direction:'right', offset:[8,0], className:'geo-label' }});
   }}
 }});
+
+// 툴팁을 지도 안쪽으로 물린다.
+//
+// Leaflet은 툴팁을 가리키는 지점 기준으로만 놓고 컨테이너 경계는 보지 않는다.
+// 어업인 화면은 2단 레이아웃이라 지도 폭이 500px도 안 되는데, 가장자리 지점에
+// 마우스를 올리면 툴팁이 밖으로 나가 `.leaflet-container{{overflow:hidden}}`에
+// 잘려 글자가 반쯤 사라진다.
+//
+// sticky 툴팁은 마우스를 따라다니므로 tooltipopen 한 번으로는 부족하다.
+// 매번 marginLeft를 0으로 되돌리고 다시 재서, 이전 보정이 누적되지 않게 한다.
+function clampTooltips() {{
+  const box = map.getContainer().getBoundingClientRect();
+  const pad = 8;
+  document.querySelectorAll('.leaflet-tooltip-pane .bs-tip').forEach(function(el) {{
+    el.style.marginLeft = '0px';
+    const tip = el.getBoundingClientRect();
+    let shift = 0;
+    if (tip.left < box.left + pad) {{
+      shift = (box.left + pad) - tip.left;
+    }} else if (tip.right > box.right - pad) {{
+      shift = (box.right - pad) - tip.right;
+    }}
+    if (shift) {{ el.style.marginLeft = shift + 'px'; }}
+  }});
+}}
+map.on('tooltipopen', clampTooltips);
+map.on('mousemove', clampTooltips);
 
 // 범례 — 색과 선이 무엇을 뜻하는지 지도 안에서 바로 확인한다.
 const legend = L.DomUtil.create('div', 'bs-legend');
@@ -1639,11 +1736,18 @@ def rate_gauge(vessel: Dict) -> None:
         if [g for g in ordered if g["minScore"] < floor["minScore"]] else 0
     )
 
+    # 핀이 정적으로 뜨면 "경계까지 여유가 있다"는 게 숫자를 읽어야만 전달된다.
+    # @keyframes로 왼쪽 끝에서 실제 위치까지 슬라이드시켜 여유를 체감하게 한다.
+    # bs-fill과 같은 이유로 CSS transition이 아니라 정적 keyframe을 쓴다 —
+    # transition은 초기 렌더에서 중간 상태 없이 최종값을 바로 페인트해버린다.
     st.markdown(
         f'<div class="bs-card">'
+        f'  <style>@keyframes bs-gauge-pin-slide {{ from {{ left:-1px; }} '
+        f'  to {{ left:calc({pos}% - 1px); }} }}</style>'
         f'  <div class="bs-gauge">'
         f'    <div class="track">{"".join(segs)}</div>'
-        f'    <div class="pin" style="left:calc({pos}% - 1px);"></div>'
+        f'    <div class="pin" style="animation:bs-gauge-pin-slide 0.9s '
+        f'    cubic-bezier(0.22, 1, 0.36, 1) forwards;"></div>'
         f'    {"".join(ticks)}'
         f'  </div>'
         f'  <div class="bs-note" style="margin-top:16px;">{headroom}<br>'
@@ -2159,11 +2263,20 @@ def interest_impact(
     )
 
 
+_ONCHAIN_CHECK_SVG = """
+<svg width="22" height="22" viewBox="0 0 24 24" style="flex-shrink:0;">
+  <circle class="bs-check-circle" cx="12" cy="12" r="10" />
+  <polyline class="bs-check-mark" points="7,12.5 10.5,16 17,8" />
+</svg>
+"""
+
+
 def onchain_receipt(commit: Dict) -> None:
     """온체인 커밋 영수증 — 기록된 해시와 블록 정보."""
     st.markdown(
         f'<div class="bs-card" style="border-left:3px solid {theme.POSITIVE};">'
-        f'<div style="display:flex; align-items:baseline; gap:8px; margin-bottom:8px;">'
+        f'<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">'
+        f'{_ONCHAIN_CHECK_SVG}'
         f'<span style="font-weight:700; color:{theme.POSITIVE};">온체인 기록 완료</span>'
         f'<span class="bs-note">{commit["committedAt"]}</span></div>'
         f'<div class="bs-label">Record ID</div>'
