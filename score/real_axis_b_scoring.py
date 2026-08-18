@@ -9,7 +9,7 @@ A축과 같은 유사 선박군(`peer_grouping.build_peer_groups`)으로 백분�
 건 호출부(`services/real_scoring.py`)가 한다 — 그룹핑은 A축 쪽에서 이미 한
 번 계산되므로 여기서 중복하지 않는다.
 
-⚠ 이 결과를 쓸 때 같이 알아야 할 한계(2026-08-18 기준, score/TODO.md 참고):
+⚠ 이 결과를 쓸 때 같이 알아야 할 한계(score/TODO.md 참고):
     - 해양기상 단위(풍속 m/s)는 공식 확인이 아니라 정황 추정이다.
     - 유속(currentSpeedMs) 단위는 추정 근거조차 없다.
     - gearType은 TAC 매칭된 선박만 채워지고 나머지는 None이다.
