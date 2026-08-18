@@ -36,6 +36,28 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
 
 ---
 
+- [ ] **B축 입력 병합 스크립트** (`data_new/events_with_weather.jsonl.gz` +
+      `final_vessel_matches.jsonl` + `population_tags.jsonl`을 `axis_b_baseline.py`가
+      요구하는 평평한 필드로 변환) — **담당 논의 결과(2026-08-18, 오동규·김태윤)**:
+      score팀(오동규·김준기)이 작성하기로 함. 데이터팀 원본 파일·필드명은 안
+      건드리고(같은 패턴: `data/vessel_spec_client.py`, `services/real_scoring.py`),
+      받는 쪽에서 새로 변환만 한다는 게 근거. **필드 매핑표는 김태윤님이 확인**
+      (원본 구조는 데이터팀이 가장 잘 앎). 상세 배경·결정 근거는
+      `data_new/TODO.md` 해당 항목 참고. 처리해야 할 것:
+      - 톤수: `tac.tonnageGtTac`/`mof.tonnageGtMof`(문자열, 중첩)를 `tonnageGt`
+        (float, 평평한 구조)로. 둘 다 있으면 우선순위 또는 충돌표시 필요
+        (아직 미정 — 김태윤님과 확인).
+      - 날씨: `weather_WATER_TEMPER`/`weather_WIND_SPEED`/`weather_SURFACE_CURR_SPEED`
+        (문자열, "미제공" 결측 표기) -> `seaSurfaceTempC`/`windSpeedMs`/
+        `currentSpeedMs`(float, 단위 확인 필요 — 미확인 상태로 김태윤님 확인 중).
+      - `gearType`/`seaArea`/`season`: 지금 데이터엔 이 이름으로 존재하지 않음.
+        `population_tags.jsonl`의 `licenseTag`/`locationTag`(근해/연안/원양/양식/
+        내수면/기타, 뭉뚱그려진 수준)를 쓸지, `data/gear_type_mapping_draft.py`
+        (TAC 19종)까지 동원해 세분화할지 미정.
+      아직 착수 전.
+
+---
+
 - [x] A축(재방문간격, 혼잡가중압력) 계산 함수 (기획서: 축 A - 자원 지속가능성 지표 산출)
       — `axis_a_pressure.py`. self-exclusion + revisit×congestion 상호작용항까지 반영,
       GFW 이벤트만 있으면 바로 실행 가능.

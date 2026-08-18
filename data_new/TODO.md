@@ -55,4 +55,15 @@
 - [x] 3월 이벤트 780건 원인 규명 완료 — GFW API가 조회기간과 이벤트 구간이 겹치기만 해도 포함시킴(경계매칭 아님), eventId 중복제거로 이미 안전하게 처리되고 있음 확인(43번)
 - [ ] 해역신호용 어항정보 확장 — 실효성 정량 확인 결과 예상보다 심각(TAC 항구명의 5.1%만 커버, locationBonus 실작동 9.9%뿐). 단순 리스트 확장보다 TAC `portNamesTac`의 항구명/행정구역명 혼재 문제부터 정리 필요(46번)
 - [x] score/ 필드명 계약 검증 완료(47번) — **A축은 문제없이 바로 실행 가능**(필드명 정확히 일치). **B축은 연결 스크립트가 없음**: tonnageGt가 중첩돼있고, 해양기상 필드명이 다름(`weather_WATER_TEMPER` vs `seaSurfaceTempC` 등, 단위도 미확인), gearType/seaArea/season flat 필드 없음 — process/에 병합 스크립트 신설 필요, 담당 논의 필요
-- [ ] (위 발견에 따라) events_with_weather.jsonl + final_vessel_matches.jsonl을 B축 요구 형태로 합치는 스크립트 — 데이터팀 vs score/팀 중 누가 만들지 논의 후 진행
+- [ ] (위 발견에 따라) events_with_weather.jsonl + final_vessel_matches.jsonl을 B축 요구 형태로 합치는 스크립트.
+      **담당 논의 결과(2026-08-18, 오동규·김태윤)**: score팀(오동규·김준기)이 `score/` 쪽에
+      작성. 근거: 이 스크립트는 `data_new/processed/`의 기존 파일을 원본 그대로
+      읽어서 score가 원하는 이름으로 새로 변환/병합하는 것뿐이라, 어느 쪽에
+      둬도 `data_new/process/`의 기존 코드·필드명은 안 건드림(같은 패턴:
+      `data/vessel_spec_client.py`가 MOF 원본 필드명을 그대로 받아 자체
+      정규화, `services/real_scoring.py`가 GFW 원본 필드명을 그대로 읽어 A축
+      계산 — 둘 다 원본 소스는 안 바꾸고 받는 쪽에서 번역함). 최종 형태(score/
+      요구 스키마)를 score팀이 제일 잘 알아서 score팀이 짜기로 함.
+      **단, 필드 매핑표(원본 필드 -> score/ 필드, 특히 날씨 단위·gearType 근거)는
+      김태윤님이 확인**하기로 함 — 원본 구조는 데이터팀이 제일 잘 앎.
+      진행 상황은 `score/TODO.md`에 기록.
