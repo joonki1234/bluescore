@@ -85,8 +85,8 @@ _MINI_CARD_CSS = f"""
     display:inline-block; border-radius:999px; padding:3px 10px;
     font-size:11px; font-weight:700; margin-top:8px;
   }}
-  .bs-mini-pill.pass {{ background:{theme.POSITIVE_SOFT}; color:{theme.POSITIVE}; }}
-  .bs-mini-pill.fail {{ background:{theme.NEGATIVE_SOFT}; color:{theme.NEGATIVE}; }}
+  .bs-mini-pill.favorable {{ background:{theme.AXIS_A_SOFT}; color:{theme.AXIS_A}; }}
+  .bs-mini-pill.unfavorable {{ background:{theme.NEGATIVE_SOFT}; color:{theme.NEGATIVE}; }}
 </style>
 """
 
@@ -254,10 +254,9 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
     factors는 score/shap_factors.axis_a_factor_shares()가 낸 {"label","value","axis"} 리스트 —
     value는 세 항 절댓값 합 대비 부호 있는 비중(%)이다. value는 axis_a_pressure_raw에
     더해지는 방향이고, score/score_assembly.raw_to_score()는 raw가 낮을수록(=압력이
-    적을수록) A축 점수를 높게 준다 — 즉 value의 +/- 부호만 보고는 좋은 건지 나쁜
-    건지 바로 알기 어렵다(부호를 뒤집어야 함). 그래서 숫자·막대는 축 중립색으로
-    두고, "압력 감소/증가(좋음/나쁨)" 판정은 부호와 분리해 아래 pill로 따로
-    보여준다 — 숫자의 +/-가 곧 좋고 나쁨이라고 오해하지 않도록.
+    적을수록) A축 점수를 높게 준다 — 즉 value의 +/- 부호는 좋고 나쁨과 반대로
+    읽혀서 오독하기 쉽다. +/- 부호는 아예 빼고 절댓값만 보여주며, 유리(압력 감소,
+    value<0)는 파란색, 불리(압력 증가, value>0)는 빨간색으로 직접 칠한다.
     """
     if not factors:
         return
@@ -267,21 +266,24 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
         value = f["value"]
         width = min(abs(value), 100.0)
         if value < 0:
-            pill = '<span class="bs-mini-pill pass">압력 감소 · 이 선박에 유리</span>'
+            color = theme.AXIS_A
+            pill = f'<span class="bs-mini-pill favorable">압력 감소 · 이 선박에 유리</span>'
         elif value > 0:
-            pill = '<span class="bs-mini-pill fail">압력 증가 · 이 선박에 불리</span>'
+            color = theme.NEGATIVE
+            pill = f'<span class="bs-mini-pill unfavorable">압력 증가 · 이 선박에 불리</span>'
         else:
+            color = theme.INK_SOFT
             pill = ""
         rows.append(
             f"""<div class="bs-mini-card" style="margin-bottom:10px;">
   <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:6px;">
     <span style="font-size:13.5px; font-weight:700; color:{theme.INK};">{f['label']}</span>
     <span class="bs-mini-value" style="margin-left:auto; font-size:16px; font-weight:800;
-      color:{theme.AXIS_A};" data-count="{value}" data-decimals="1" data-signed="1">0</span>
+      color:{color};" data-count="{width}" data-decimals="1">0</span>
     <span class="bs-mini-unit">%</span>
   </div>
   <div class="bs-mini-track">
-    <div class="bs-mini-fill" style="background:{theme.AXIS_A};" data-fill="{width}"></div>
+    <div class="bs-mini-fill" style="background:{color};" data-fill="{width}"></div>
   </div>
   {pill}
 </div>"""
