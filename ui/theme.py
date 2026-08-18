@@ -209,6 +209,17 @@ div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
   animation: bs-check-draw 0.3s ease-out 0.45s forwards;
 }}
 @keyframes bs-check-draw {{ to {{ stroke-dashoffset: 0; }} }}
+
+/* 실산출 화면의 선박 선택 — 화면에서 유일하게 클릭해서 다른 결과를
+   보는 조작 지점이라, 다른 카드와 같은 무채색 테두리 대신 브랜드 색
+   테두리·배경으로 눈에 띄게 한다. key="real_vessel_id"로 만든 위젯에
+   Streamlit이 자동으로 붙이는 st-key-* 클래스를 그대로 활용한다.
+   Streamlit 1.61의 selectbox는 BaseWeb이 아니라 react-aria ComboBox로
+   렌더되므로(data-baseweb 없음), role="group"인 실제 테두리 박스를 잡는다. */
+.st-key-real_vessel_id div[role="group"] {{
+  border: 2px solid {AXIS_A} !important; border-radius: 8px;
+  background: {AXIS_A_SOFT} !important;
+}}
 </style>
 """
 

@@ -97,6 +97,15 @@ def _discount_text(band: RateBand) -> str:
     return f"{band.grade} · 우대 없음" if band.discount_bp <= 0 else f"{band.grade} · −{band.discount_bp}bp"
 
 
+def _fishing_type_text(fishing_type) -> str:
+    """fishingType은 리스트(예: ["SET_GILLNETS"])라, f-string에 그냥 넣으면
+    파이썬 repr(`['SET_GILLNETS']`)이 그대로 화면에 노출된다 — 실산출
+    화면에서 실측으로 발견함(2026-08-18). 사람이 읽는 문자열로 join한다."""
+    if not fishing_type:
+        return "어업종 미상"
+    return ", ".join(fishing_type)
+
+
 class ScoringService:
     def __init__(
         self,
@@ -151,7 +160,7 @@ class ScoringService:
         if source_type == "real":
             if not self.real_adapter.available:
                 raise BackendUnavailableError("실데이터 스냅샷을 찾을 수 없습니다.")
-            # BlueScore까지 완전 산출되는 선박(16.2%)이 목록 앞쪽에 안 걸리면
+            # BlueScore까지 완전 산출되는 선박(15.2%)이 목록 앞쪽에 안 걸리면
             # 화면을 처음 열었을 때 A축만 나온 사례부터 보여서 "B축은 안 되나?"로
             # 오해를 살 수 있다. status_ranked_vessels()가 성공 사례부터 정렬해 둔다.
             ranked = self.real_adapter.status_ranked_vessels()
@@ -159,7 +168,7 @@ class ScoringService:
                 VesselSummary(
                     vessel_id=v["vesselId"],
                     name=v.get("name") or "가명 선박",
-                    meta=f"{v.get('fishingType') or '어업종 미상'} · {v.get('tonnage') or '톤수 미상'}",
+                    meta=f"{_fishing_type_text(v.get('fishingType'))} · {v.get('tonnage') or '톤수 미상'}",
                     fleet_label="실데이터 A축 산출 후보",
                     status=status,
                 )
@@ -293,7 +302,7 @@ class ScoringService:
             vessel=VesselSummary(
                 vessel_id=vessel_id,
                 name=vessel.get("name") or "가명 선박",
-                meta=f"{vessel.get('fishingType') or '어업종 미상'} · {vessel.get('tonnage') or '톤수 미상'}",
+                meta=f"{_fishing_type_text(vessel.get('fishingType'))} · {vessel.get('tonnage') or '톤수 미상'}",
                 fleet_label="GFW 고정 스냅샷 유사군",
                 status=status,
             ),

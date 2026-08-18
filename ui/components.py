@@ -219,6 +219,65 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
+# ─── 실산출 미리보기 전용 시각화 ────────────────────────────────────────────
+# 2026-08-18(김준기, 최지희 확인 필요): 실산출 화면이 "숫자만 던지는" 느낌이라
+# 요인 기여도(SHAP)처럼 이미 API 응답에 있지만 화면에 안 쓰이던 값을
+# 시각화로 추가함. axis_breakdown()과 같은 components.v1.html 카운트업+채움
+# 패턴을 그대로 재사용해 톤을 맞췄다.
+def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer_count: int,
+                           axis_a_event_count: Optional[int], axis_b_event_count: Optional[int]) -> None:
+    """선택한 선박의 어업종·톤수·A/B축 각각의 이벤트 건수를 pill 형태로 보여준다.
+
+    A/B축 건수는 같은 개념이 아니다 — A축은 GFW 원본 이벤트 전체, B축은
+    거기서 해양기상 결합·톤수 매칭까지 된 부분집합이라 서로 다를 수 있다
+    (score/real_axis_b_input.py 참고). 그래서 각각 표시한다 — 하나로 합치면
+    "B축이 왜 이 값 미만인지"를 설명할 근거가 사라진다.
+    """
+    pills = [f'<span class="bs-pill info">{vessel_meta}</span>']
+    if axis_a_event_count is not None:
+        pills.append(f'<span class="bs-pill info">A축 이벤트 {axis_a_event_count:,}건</span>')
+    if axis_b_event_count is not None:
+        pills.append(f'<span class="bs-pill info">B축 이벤트 {axis_b_event_count:,}건</span>')
+    pills.append(f'<span class="bs-pill info">유사 선박군 {peer_count}척</span>')
+    note = f'<div class="bs-note" style="margin-top:8px;">{matching_reason}</div>' if matching_reason else ""
+    st.markdown(
+        f'<div class="bs-card">{"".join(pills)}{note}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def real_shap_factor_bars(factors: List[Dict]) -> None:
+    """A축 요인 기여도(SHAP)를 axis_breakdown()과 같은 카운트업+채움 막대로 보여준다.
+
+    factors는 score/shap_factors.axis_a_factor_shares()가 낸 {"label","value","axis"} 리스트 —
+    value는 세 항 절댓값 합 대비 부호 있는 비중(%)이다.
+    """
+    if not factors:
+        return
+
+    rows = []
+    for f in factors:
+        value = f["value"]
+        color = theme.direction_color(value) if value != 0 else theme.INK_SOFT
+        width = min(abs(value), 100.0)
+        rows.append(
+            f"""<div class="bs-mini-card" style="margin-bottom:10px;">
+  <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:6px;">
+    <span style="font-size:13.5px; font-weight:700; color:{theme.INK};">{f['label']}</span>
+    <span class="bs-mini-value" style="margin-left:auto; font-size:16px; font-weight:800;
+      color:{color};" data-count="{value}" data-decimals="1" data-signed="1">0</span>
+    <span class="bs-mini-unit">%</span>
+  </div>
+  <div class="bs-mini-track">
+    <div class="bs-mini-fill" style="background:{color};" data-fill="{width}"></div>
+  </div>
+</div>"""
+        )
+
+    html = f"{_MINI_CARD_CSS}{''.join(rows)}<script>{_COUNT_UP_JS}</script>"
+    components_html(html, height=92 * len(factors), scrolling=False)
+
+
 def skeleton_score_card(label: str = "불러오는 중…") -> None:
     """
     BlueScore/A축/B축 카드 자리의 로딩 스켈레톤.

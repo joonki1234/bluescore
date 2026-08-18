@@ -11,7 +11,7 @@
 (데모 fixture 전용 기능들). 그래서 이 화면은 "점수가 실제로 계산됐다"를
 보여주는 최소 기능만 담당하는 별도 페이지로 뺐다.
 
-커버리지가 낮다(A축 61.0%, BlueScore까지 나오는 건 16.2%뿐)는 것과, 해양기상
+커버리지가 낮다(A축 61.4%, BlueScore까지 나오는 건 15.2%뿐)는 것과, 해양기상
 단위 등 미검증 가정이 있다는 걸 화면에 항상 같이 보여준다 — "모르면 모른다"
 원칙.
 """
@@ -36,10 +36,7 @@ def render() -> None:
         unsafe_allow_html=True,
     )
     st.caption(
-        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(data_new/, 2026-04~08월)로 "
-        "계산한 결과입니다. 표본 5,323척 중 A축 실산출 61.0%, BlueScore까지 완전 "
-        "산출되는 건 16.2%(864척)뿐입니다. 해양기상 단위(풍속 m/s)는 공식 확인이 "
-        "아니라 정황 추정이며, 유속·일부 어업종 필드는 미확인 상태입니다."
+        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(2026-04~08월)로 계산한 결과입니다."
     )
 
     list_placeholder = st.empty()
@@ -61,7 +58,7 @@ def render() -> None:
     }
 
     vessel_id = st.selectbox(
-        f"선박 (실데이터, 상위 {len(vessels)}척)",
+        "선박 선택 (실데이터)",
         options=options,
         format_func=lambda vid: label_by_id.get(vid, vid),
         key="real_vessel_id",
@@ -75,8 +72,15 @@ def render() -> None:
 
     if score["status"] != "success":
         st.warning(f"{score['status']} — {score.get('message') or ''}")
-    else:
-        st.success(score.get("message") or "")
+
+    peer = score.get("peerGroup") or {}
+    components.real_vessel_meta_card(
+        score["vessel"]["meta"],
+        score.get("matchingReason"),
+        peer.get("count", 0),
+        score["axisA"].get("usedEventCount"),
+        score["axisB"].get("usedEventCount"),
+    )
 
     axis_a_score = score["axisA"].get("score")
     axis_b_score = score["axisB"].get("score")
@@ -89,13 +93,13 @@ def render() -> None:
                 "size": 26,
             },
             {
-                "label": "A축",
+                "label": "A. 자원 압력",
                 "value": axis_a_score if axis_a_score is not None else "—",
                 "decimals": 1,
                 "size": 26,
             },
             {
-                "label": "B축",
+                "label": "B. 운항 효율",
                 "value": axis_b_score if axis_b_score is not None else "—",
                 "decimals": 1,
                 "size": 26,
@@ -107,8 +111,7 @@ def render() -> None:
     if score.get("rateBand"):
         st.info(f"제안 금리 등급 · {_discount_text(score['rateBand'])}")
 
-    peer = score.get("peerGroup") or {}
-    st.caption(f"유사 선박군 표본 {peer.get('count', 0)}척")
-
-    with st.expander("원본 API 응답 (디버그용)"):
-        st.json(score)
+    shap_factors = score.get("shapFactors") or []
+    if shap_factors:
+        st.markdown("###### A. 자원 압력 — 요인 기여도")
+        components.real_shap_factor_bars(shap_factors)

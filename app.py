@@ -140,7 +140,7 @@ def _real_preview_page() -> None:
     try:
         with st.sidebar:
             _sidebar_header()
-            st.caption("실제 GFW 조업 이벤트(data_new/) 기준 미리보기 화면입니다.")
+            st.caption("실제 GFW 조업 이벤트 기준 미리보기 화면입니다.")
             _sidebar_freshness()
         real_preview.render()
     except adapter.ApiClientError as exc:
