@@ -58,7 +58,7 @@ def render() -> None:
     }
 
     vessel_id = st.selectbox(
-        "선박 선택 (실데이터, 클릭해서 다른 선박 보기)",
+        "선박 선택 (실데이터)",
         options=options,
         format_func=lambda vid: label_by_id.get(vid, vid),
         key="real_vessel_id",
@@ -79,6 +79,7 @@ def render() -> None:
         score.get("matchingReason"),
         peer.get("count", 0),
         score["axisA"].get("usedEventCount"),
+        score["axisB"].get("usedEventCount"),
     )
 
     axis_a_score = score["axisA"].get("score")

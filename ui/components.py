@@ -225,11 +225,19 @@ def card(body: str) -> None:
 # 시각화로 추가함. axis_breakdown()과 같은 components.v1.html 카운트업+채움
 # 패턴을 그대로 재사용해 톤을 맞췄다.
 def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer_count: int,
-                           used_event_count: Optional[int]) -> None:
-    """선택한 선박의 어업종·톤수·조업 이벤트 건수를 pill 형태로 보여준다."""
+                           axis_a_event_count: Optional[int], axis_b_event_count: Optional[int]) -> None:
+    """선택한 선박의 어업종·톤수·A/B축 각각의 이벤트 건수를 pill 형태로 보여준다.
+
+    A/B축 건수는 같은 개념이 아니다 — A축은 GFW 원본 이벤트 전체, B축은
+    거기서 해양기상 결합·톤수 매칭까지 된 부분집합이라 서로 다를 수 있다
+    (score/real_axis_b_input.py 참고). 그래서 각각 표시한다 — 하나로 합치면
+    "B축이 왜 이 값 미만인지"를 설명할 근거가 사라진다.
+    """
     pills = [f'<span class="bs-pill info">{vessel_meta}</span>']
-    if used_event_count is not None:
-        pills.append(f'<span class="bs-pill info">조업 이벤트 {used_event_count:,}건 사용</span>')
+    if axis_a_event_count is not None:
+        pills.append(f'<span class="bs-pill info">A축 이벤트 {axis_a_event_count:,}건</span>')
+    if axis_b_event_count is not None:
+        pills.append(f'<span class="bs-pill info">B축 이벤트 {axis_b_event_count:,}건</span>')
     pills.append(f'<span class="bs-pill info">유사 선박군 {peer_count}척</span>')
     note = f'<div class="bs-note" style="margin-top:8px;">{matching_reason}</div>' if matching_reason else ""
     st.markdown(
