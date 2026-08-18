@@ -30,11 +30,21 @@ FINALS = [
 BEAM = 3
 
 
+# 받침 인덱스(FINALS)는 라틴 철자가 겹치는 경우가 많다(예: "p" = ㄿ/ㅂ/ㅄ/ㅍ).
+# 홑받침이 겹받침보다 훨씬 흔하므로, 테이블을 채울 때 홑받침을 먼저 순회해
+# 같은 철자 충돌 시 홑받침이 이기게 한다(그냥 index 순으로 돌면 희귀한
+# 겹받침 ㄿ이 흔한 ㅂ보다 먼저 채워지는 버그가 있었음).
+_SINGLE_FINALS = [0, 1, 2, 4, 7, 8, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+_CLUSTER_FINALS = [3, 5, 6, 9, 10, 11, 12, 13, 14, 15, 18]
+_FINAL_PRIORITY = _SINGLE_FINALS + _CLUSTER_FINALS
+
+
 def _build_reverse_table() -> dict:
     table: dict[str, tuple[str, bool]] = {}
     for fi, ini in enumerate(INITIALS):
         for fm, med in enumerate(MEDIALS):
-            for ff, fin in enumerate(FINALS):
+            for ff in _FINAL_PRIORITY:
+                fin = FINALS[ff]
                 code = 0xAC00 + (fi * 21 + fm) * 28 + ff
                 latin = (ini + med + fin).lower()
                 if latin and latin not in table:

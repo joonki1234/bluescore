@@ -68,6 +68,33 @@
       0건 실측 확인함)와 날씨 필드 매핑(단위는 정황상 m/s·°C로 추정만 하고
       진행 — `score/real_axis_b_input.py` 모듈 docstring 참고).
 
+      **(2026-08-18 병합 시 발견) 같은 목적의 스크립트가 두 개가 됐다** —
+      김태윤님이 거의 같은 시각에 독립적으로 `data_new/process/
+      build_axis_b_input.py`를 만들어서 git merge 충돌이 났다(`score/scripts/
+      run_real_axis_b.py`에서, 서로 다른 두 스크립트를 각자 참조하고 있었음).
+      정리한 내용:
+      - `build_axis_b_input.py`가 `gearTypeNamesTac`이 `final_vessel_matches.jsonl`의
+        축약 `tac` 딕셔너리엔 없다는 것까지 이미 정확히 찾아내서
+        `tac_vessels_normalized.jsonl`을 `vesselNoTac`으로 재조회해 복구하는
+        방식으로 해결해뒀음 — 오동규가 직접 실행해보려 했지만
+        **`tac_vessels_normalized.jsonl`이 `.gitignore`로 제외돼 있어서
+        (`data_new/processed/`는 3개 파일만 예외) 지금 이 환경에서는 파일이
+        없어서 실행 자체가 안 됨**(`FileNotFoundError` 직접 확인).
+      - 부수적으로 하나 더: 이 스크립트는 `events_with_weather.jsonl`(압축 안 된
+        파일명)을 찾는데, 실제 커밋된 파일명은 `events_with_weather.jsonl.gz`라
+        `tac_vessels_normalized.jsonl`이 채워져도 이 부분은 한 번 더 고쳐야 할
+        것으로 보임.
+      - 일단 `run_real_axis_b.py`는 실제로 지금 돌아가는 `score/real_axis_b_input.py`
+        쪽(HEAD)으로 충돌 해결함 — `build_axis_b_input.py`를 못 쓰는 게 아니라
+        지금 당장 재현이 안 돼서다.
+      - **부탁드리는 것**: `tac_vessels_normalized.jsonl`을 다른 두 파일처럼
+        `data_new/processed/`에 공개해주시면, 그 gearType 복구 로직을
+        `score/real_axis_b_input.py`에 그대로 반영해서 `gearType`을 채우겠음.
+        `seaArea`도 이 스크립트는 TAC 항구명(`portNamesTac`)으로 채우는데,
+        `data_new/README.md`에 이미 적힌 "TAC 항구정보 커버리지 5.1%뿐" 한계가
+        마음에 걸려서 오동규는 지금 방식(위경도 격자)을 당분간 유지하고
+        싶음 — 파일 받은 뒤 실측치 보고 다시 얘기하면 좋겠음.
+
       **담당 논의 결과(2026-08-18, 오동규·김태윤)**: score팀(오동규·김준기)이 `score/` 쪽에
       작성. 근거: 이 스크립트는 `data_new/processed/`의 기존 파일을 원본 그대로
       읽어서 score가 원하는 이름으로 새로 변환/병합하는 것뿐이라, 어느 쪽에

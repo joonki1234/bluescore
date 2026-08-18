@@ -7,7 +7,11 @@
 """
 
 DEMO_DATA_SNAPSHOT_ID = "dashboard-demo-seed-20260814-v1"
-REAL_DATA_SNAPSHOT_ID = "gfw-events-2026-01-01_2026-08-13"
+# 2026-08-18: data_new/(김태윤) 스냅샷으로 전환 — services/real_scoring.py의
+# DEFAULT_EVENTS_PATH/DEFAULT_VESSELS_PATH 참고. 이 상수가 실제 데이터 출처와
+# 안 맞으면 응답 재현성 계약이 깨지므로, 데이터 출처를 바꿀 때는 항상 같이
+# 갱신해야 한다.
+REAL_DATA_SNAPSHOT_ID = "data_new-gfw-events-2026-04-01_2026-08-14-v1"
 DEMO_MODEL_VERSION = "axis-a-demo-v1__axis-b-demo-v1"
 REAL_PARTIAL_MODEL_VERSION = "axis-a-pressure-v1__axis-b-unavailable"
 SCORING_RULE_VERSION = "bluescore-0.65a-0.35b-v1"

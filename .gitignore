@@ -233,3 +233,4 @@ data_new/raw/
 data_new/processed/*
 !data_new/processed/final_vessel_matches.jsonl
 !data_new/processed/events_with_weather.jsonl.gz
+!data_new/processed/gfw_vessels_normalized.jsonl

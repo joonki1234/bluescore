@@ -88,6 +88,31 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         세분화, (c) 일단 비워두고(`None`) 톤수·날씨·seaArea·season만 먼저
         연결(`axis_b_baseline.py`는 `gearType`이 없어도 에러 없이 도는 걸
         확인함, 다만 LightGBM이 그 피처를 못 씀).
+        **(2026-08-18 추가 조사)** `final_vessel_matches.jsonl`을 직접 열어보니
+        TAC 매칭 2,279척 중 `tac.gearTypeNamesTac`가 채워진 건 **1척뿐**이었다
+        — 김태윤님이 참고자료로 준 "19개 업종, 상위 7개 200척+" 분포는 이 파일
+        기준이 아니라 TAC 원본 전체 기준으로 보임. 원인은 김태윤님이 독립적으로
+        같은 시점에 만든 `data_new/process/build_axis_b_input.py`의 주석에 이미
+        나와 있었다 — `final_vessel_matches.jsonl`의 `tac` 딕셔너리가 "축약형"이라
+        `gearTypeNamesTac`을 안 담고 있고, `vesselNoTac`으로
+        `tac_vessels_normalized.jsonl`을 다시 조회해야 복구된다는 것. **다만 이
+        파일이 지금 리포에 커밋돼 있지 않아(`.gitignore`로 제외됨,
+        `final_vessel_matches.jsonl`/`events_with_weather.jsonl.gz`/
+        `gfw_vessels_normalized.jsonl` 3개만 예외) `build_axis_b_input.py`는
+        지금 이 환경에서 실행 자체가 안 됨**(`FileNotFoundError`로 직접 확인).
+        `tac_vessels_normalized.jsonl`이 공개되면, 이 파일의 gearType 복구
+        로직을 `score/real_axis_b_input.py`에 그대로 가져와 반영하면 됨 —
+        그때 (a)/(b)/(c) 중 정할 필요 없이 원문 그대로(세분화된 19종) 쓰는
+        쪽으로 사실상 답이 나온 셈(표본도 충분하다는 김태윤님 확인 참고, 다만
+        그 확인도 TAC 원본 기준이라 실제 매칭된 부분집합에서 표본이 충분한지는
+        파일이 나온 뒤 재확인 필요).
+        **seaArea 설계 관련 참고**: `build_axis_b_input.py`는 `seaArea`를
+        위경도 격자가 아니라 TAC `portNamesTac`(항구명 문자열)로 채우는데,
+        `data_new/README.md`에 이미 "TAC 항구정보 커버리지 5.1%뿐"이라는 한계가
+        기록돼 있어(다른 용도지만 같은 원본 데이터) 항구명 기반은 결측이 많을
+        수 있음 — `region_key()` 격자 기반(현재 방식)을 유지하는 쪽을 오동규는
+        더 선호하지만, 이것도 `tac_vessels_normalized.jsonl` 공개 후 실측치
+        보고 다시 판단.
       - 결측/미매칭 선박 처리: **해결됨(2026-08-18)** — 병합 스크립트에서 따로
         걸러내지 않고, 없는 필드는 그냥 `None`으로 내려보내 `axis_b_baseline.py`의
         기존 로직(필수 3종 중 하나라도 없으면 `SkippedRow`로 자동 skip, 그 외
@@ -189,3 +214,21 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       담당 — 여기서는 "된다"만 증명, 배선은 안 건드림.**
       주의: 대부분 선박의 톤수 매칭이 아직 안 끝나서(tonnage_band=None인 채로
       그룹핑됨) 정식 실행 전 매칭 완료를 기다리는 게 맞다.
+- [x] **(2026-08-18) `services/real_scoring.py`의 A축 실산출을 `data_new/`로
+      전환** — 구 `data/`(31,605척, 확정매칭 순도 9.5%) 대신 `data_new/`
+      (EEZ 제한 5,323척, 사람 라벨링 실측 정밀도 약 75%)를 쓰도록
+      `DEFAULT_EVENTS_PATH`/`DEFAULT_VESSELS_PATH`를 교체(최지희님 파일이라
+      확인 후 진행). 이벤트는 `data_new/processed/events_with_weather.jsonl.gz`
+      필드가 그대로 맞아서 변환 없이 바로 씀. 선박은
+      `scripts/convert_data_new_vessels.py`로 `final_vessel_matches.jsonl`의
+      중첩·문자열 톤수(`tac.tonnageGtTac`/`mof.tonnageGtMof`)를 평판화(테스트
+      6개). `services/metadata.py`의 `REAL_DATA_SNAPSHOT_ID`도 실제 데이터
+      출처와 맞게 갱신(최지희님 파일, 라벨이 실제와 안 맞으면 재현성 계약이
+      깨져서 같이 고침).
+      **결과**: 5,323척 중 `partial`(A축 실산출됨) 3,887척(73%),
+      `insufficientSample` 1,427척(27%), `matchingFailed` 9척.
+      **알려진 한계**: `fishingType`을 아직 못 채움 — data_new의 공개분에
+      GFW 자체 gear 정보(`gfw_vessels_normalized.jsonl` 등)가 없어서
+      전부 빈 리스트. 유사군이 톤수·해역·계절만으로 묶여서 `insufficientSample`
+      비율이 실제보다 다소 높게 나올 수 있음 — GFW gear 정보가 추가
+      공개되면 `convert_data_new_vessels.py`만 보강하면 됨.

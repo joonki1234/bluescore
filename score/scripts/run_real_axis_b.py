@@ -10,6 +10,10 @@
 도는지 증명한다(`score/scripts/run_real_axis_a.py`가 A축에서 한 것과 같은
 목적). 화면 연결은 범위 밖 — 여기서는 "된다"만 증명한다.
 
+참고: `data_new/process/build_axis_b_input.py`(김태윤)도 같은 목적의 병합을
+독립적으로 시도한 것이다 — `data_new/TODO.md`/`score/TODO.md`의 "B축 입력
+병합 스크립트" 항목에 두 접근을 어떻게 정리했는지 기록해뒀다.
+
 실행:
     python -m score.scripts.run_real_axis_b
 """
