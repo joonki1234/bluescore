@@ -96,9 +96,16 @@ verified 916척(정밀도 최상) + held 535척(계산 가능, 낮은신뢰도) 
 ## 재현/참고
 
 - 입력 데이터: `data_new/gfw_korean_name_candidates.csv`(커밋됨)
-- 시뮬레이션 스크립트: 이번 세션 로컬 작업물, 실반영 시
-  `data_new/process/match_fuzzy_name.py`·`assemble_matches.py`에 포팅 필요
-  (아직 미반영)
-- 관련 커밋: `9e62092b`(한글변환 데이터 추가)
+- 재현: `python data_new/analysis/simulate_korean_name_matching.py` —
+  요약 통계 출력 + `data_new/analysis/output/korean_matching_comparison.jsonl`
+  생성(GFW 5,323척 전부, 척당 기존 판정과 이번 판정을 나란히 기록). 숫자만
+  보지 말고 이 파일을 직접 열어 카테고리별로 필터링·스팟체크해보고
+  판단할 것 — 예를 들어 `2 DEOKSEUNGHO`는 기존이 오히려 맞았는데(제2덕성호,
+  fuzzyScore 0.996) 새 방식은 한글변환 추측이 틀려서(`덕승`) unmatched로
+  떨어지는 역행 사례도 있다. "새 방식이 무조건 낫다"가 아니라 실제로
+  써보고 판단해야 하는 이유.
+- 아직 실제 파이프라인(`data_new/process/match_fuzzy_name.py`·
+  `assemble_matches.py`)에는 미반영 — 채택 결정 후 포팅 필요
+- 관련 커밋: `9e62092b`(한글변환 데이터 추가), `d38099d7`(제안서+시뮬레이션)
 - 관련 근거: CLAUDE.md 10번(매칭 임계값 확정), PROCESS_LOG.md 49번(숫자신호
   검증)

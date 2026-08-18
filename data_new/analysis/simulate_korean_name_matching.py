@@ -16,6 +16,11 @@ assemble_matches.py)에 반영 안 됨** — 팀 결정(제안서 참고) 전까
   없으면 held_multi(모호, 계산 불가)
 - (source,key) 동일한 후보는 데이터중복으로 보고 dedup
 
+한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은 파일도
+같이 낸다(`output/korean_matching_comparison.jsonl`) — 팀원이 숫자만
+보고 판단하지 않고, 실제 사례를 직접 열어 필터링·스팟체크해보고
+판단할 수 있게 하기 위함.
+
 사용법:
     python simulate_korean_name_matching.py
 """
@@ -23,9 +28,9 @@ assemble_matches.py)에 반영 안 됨** — 팀 결정(제안서 참고) 전까
 from __future__ import annotations
 
 import csv
+import json
 import sys
 from collections import Counter
-from difflib import SequenceMatcher
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "process"))
@@ -47,6 +52,8 @@ from match_fuzzy_name import (  # noqa: E402
 )
 
 KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "gfw_korean_name_candidates.csv"
+OLD_MATCHES_PATH = Path(__file__).resolve().parent.parent / "processed" / "final_vessel_matches.jsonl"
+COMPARISON_OUT_PATH = Path(__file__).resolve().parent / "output" / "korean_matching_comparison.jsonl"
 ROMAN_FALLBACK_THRESHOLD = 0.85  # 한글후보 자체가 없는 벡터에만 씀
 LOC_VERIFIED_KM = 50.0
 LOC_HELD_CAP_KM = 150.0
@@ -57,6 +64,22 @@ BASELINE_TIER2_CALLSIGN = 3
 BASELINE_TIER3_FUZZY = 2878
 BASELINE_UNMATCHED = 2442
 BASELINE_PRECISION = 0.75  # PROCESS_LOG.md 49번, 사람 라벨링 80쌍
+
+
+def _load_old_matches() -> dict:
+    """현재 라이브 커밋본(final_vessel_matches.jsonl)을 gfwVesselId로 색인.
+    old/new 나란히 비교용 — 재실행하지 않고 커밋된 그대로 읽는다."""
+    out = {}
+    if not OLD_MATCHES_PATH.exists():
+        return out
+    for row in _load_jsonl(OLD_MATCHES_PATH):
+        tac = row.get("tac") or {}
+        out[row["gfwVesselId"]] = {
+            "matchTier": row.get("matchTier"),
+            "matchedName": tac.get("nameTac"),
+            "fuzzyScore": row.get("fuzzyScore"),
+        }
+    return out
 
 
 def _strip_ho(name: str) -> str:
@@ -100,39 +123,47 @@ def _nearest_port_km(ports: dict, centroid, port_names) -> float | None:
     return best
 
 
-def run() -> Counter:
+def run() -> list:
+    """GFW 선박 1척당 1행. `category`가 이번 시뮬레이션 판정,
+    `old`가 현재 라이브 판정(비교용)."""
     gfw_vessels = _load_jsonl(GFW_VESSELS_PATH)
     pool = _build_pool()
     ports = {p["portName"]: (p["latitude"], p["longitude"]) for p in _load_jsonl(PORTS_PATH)}
     centroids = _vessel_centroids(_load_jsonl(EVENTS_PATH))
     gfw_korean = _load_korean_candidates()
+    old_matches = _load_old_matches()
 
-    counts = Counter()
+    rows = []
 
     for gfw in gfw_vessels:
+        vessel_id = gfw["vesselId"]
         name = gfw["selfReportedName"] or gfw["registryName"]
+        old = old_matches.get(vessel_id)
+        row = {"gfwVesselId": vessel_id, "gfwName": name, "old": old}
+
         if not name:
-            counts["no_name"] += 1
+            rows.append({**row, "category": "no_name", "matchedName": None, "distKm": None, "candidateCount": 0})
             continue
 
         norm = _normalize(name)
         digit = _digit_prefix(norm)
-        centroid = centroids.get(gfw["vesselId"])
-        korean_cands = gfw_korean.get(gfw["vesselId"], [])
+        centroid = centroids.get(vessel_id)
+        korean_cands = gfw_korean.get(vessel_id, [])
 
         if not korean_cands:
             # 한글변환 후보가 없는 벡터(범용영문명 등) — 로마자 fallback만 시도.
             best = None
+            best_name = None
             for p in pool:
                 if digit and p["digitPrefix"] and digit != p["digitPrefix"]:
                     continue
                 s = _similarity(norm, p["romanized"])
                 if best is None or s > best:
-                    best = s
+                    best, best_name = s, p["name"]
             if best is not None and best >= ROMAN_FALLBACK_THRESHOLD:
-                counts["held_로마자fallback"] += 1
+                rows.append({**row, "category": "held_로마자fallback", "matchedName": best_name, "romanScore": round(best, 3), "distKm": None, "candidateCount": 1})
             else:
-                counts["unmatched"] += 1
+                rows.append({**row, "category": "unmatched", "matchedName": None, "distKm": None, "candidateCount": 0})
             continue
 
         passing = []
@@ -141,15 +172,15 @@ def run() -> Counter:
                 continue
             if p["base"] in korean_cands:  # exact만, fuzzy는 폐기(제안서 발견 3)
                 dist = _nearest_port_km(ports, centroid, p["ports"])
-                passing.append({"source": p["source"], "key": p["key"], "distKm": dist})
+                passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "distKm": dist})
 
         if not passing:
-            counts["unmatched"] += 1
+            rows.append({**row, "category": "unmatched", "matchedName": None, "distKm": None, "candidateCount": 0, "koreanCandidates": korean_cands})
             continue
 
         distinct_vessels = {(c["source"], c["key"]) for c in passing}
         if len(distinct_vessels) == 1:
-            counts["verified"] += 1
+            rows.append({**row, "category": "verified", "matchedName": passing[0]["name"], "distKm": passing[0]["distKm"], "candidateCount": len(distinct_vessels)})
             continue
 
         with_dist = [c for c in passing if c["distKm"] is not None]
@@ -159,20 +190,28 @@ def run() -> Counter:
             second = with_dist[1]["distKm"] if len(with_dist) > 1 else None
             unique_nearest = second is None or abs(second - nearest["distKm"]) > 0.05
             if unique_nearest and nearest["distKm"] <= LOC_VERIFIED_KM:
-                counts["verified"] += 1
+                rows.append({**row, "category": "verified", "matchedName": nearest["name"], "distKm": nearest["distKm"], "candidateCount": len(distinct_vessels)})
                 continue
             if unique_nearest and nearest["distKm"] <= LOC_HELD_CAP_KM:
-                counts["held_위치애매"] += 1
+                rows.append({**row, "category": "held_위치애매", "matchedName": nearest["name"], "distKm": nearest["distKm"], "candidateCount": len(distinct_vessels)})
                 continue
 
-        counts["held_multi_동명이선"] += 1
+        rows.append({**row, "category": "held_multi_동명이선", "matchedName": None, "distKm": None, "candidateCount": len(distinct_vessels), "candidateNames": [c["name"] for c in passing]})
 
-    return counts
+    return rows
 
 
 def main() -> None:
-    counts = run()
-    total = sum(counts.values())
+    rows = run()
+    counts = Counter(r["category"] for r in rows)
+    total = len(rows)
+
+    COMPARISON_OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with COMPARISON_OUT_PATH.open("w", encoding="utf-8") as out:
+        for r in rows:
+            out.write(json.dumps(r, ensure_ascii=False) + "\n")
+    print(f"척별 old/new 비교 파일 -> {COMPARISON_OUT_PATH}")
+    print("(카테고리로 필터링해서 직접 스팟체크해보세요: grep 'held_multi_동명이선' ... 등)\n")
 
     print(f"=== 한글직접비교 시뮬레이션 결과 (GFW {total}척) ===\n")
     for k, v in counts.most_common():
