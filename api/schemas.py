@@ -93,11 +93,9 @@ class AxisScore(ApiModel):
     used_event_count: Optional[int] = None
     skipped_event_count: Optional[int] = None
     missing_reason: Optional[str] = None
-    # 2026-08-18(김준기, 최지희 확인 필요): B축은 SHAP 요인 기여도를 못 쓴다
-    # (순환성 문제로 속도가 기준선 입력에서 빠져서 구조적으로 설명 불가,
-    # score/shap_factors.py 참고) — 그 대신 잔차(raw_value)를 만든 두 값을
-    # 그대로 낸다. estimated_fuel_kg - expected_fuel_kg = raw_value.
-    # A축·데모 경로는 항상 None.
+    # B축은 순환성 문제로 SHAP 요인 기여도를 못 쓴다(score/shap_factors.py
+    # 참고) — 대신 잔차(raw_value)를 만든 두 값을 그대로 낸다:
+    # estimated_fuel_kg - expected_fuel_kg = raw_value. A축·데모 경로는 항상 None.
     estimated_fuel_kg: Optional[float] = None
     expected_fuel_kg: Optional[float] = None
 

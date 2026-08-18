@@ -1,22 +1,21 @@
 """해양기상 부착 — 조업이벤트에 가장 가까운 관측소·시각의 해양기상을 붙인다.
 
-⚠ 시간 정합성 주의: `collect/marine_weather.py`를 `--date` 없이 돌리면
+시간 정합성 주의: `collect/marine_weather.py`를 `--date` 없이 돌리면
 "최신"(수집 시점) 값만 나와서, 몇 주 전 이벤트에 붙이면 시간이 안 맞는
 값을 붙이는 꼴이 된다. 이벤트가 걸친 날짜들로 `--date YYYYMMDD`를 따로
 수집해야 한다.
 
 날짜별 조회(`openWeatherDate`)는 최신조회와 응답 구조가 다르다 — 지점당
-값 1개가 아니라 **그 날 하루 전체의 10분 단위 시계열**이 옴(실측 확인:
-12지점 x 144건 = 1,728건, PROCESS_LOG.md 참고). 그래서 이벤트 시각에
-가장 가까운 시간대를 골라야 한다.
+값 1개가 아니라 **그 날 하루 전체의 10분 단위 시계열**이 온다. 그래서
+이벤트 시각에 가장 가까운 시간대를 골라야 한다.
 
 raw/는 읽기만 한다. processed/에 새로 쓰며 재실행 시 덮어써도 무방.
 
 사용법:
     python attach_weather.py --start 20260401 --end 20260814
     (그 기간 raw/marine_weather/*가 미리 collect/marine_weather_range.py로
-    수집돼 있어야 함. 이벤트 날짜인데 해당 날짜 기상이 없으면 그만큼
-    부착 불가로 집계만 되고 건너뜀 — 3월 이벤트 780건이 그런 경우, 30번 참고)
+    수집돼 있어야 함. 이벤트 날짜인데 해당 날짜 기상이 없으면 부착 불가로
+    집계만 되고 건너뜀)
 """
 
 from __future__ import annotations
@@ -99,9 +98,7 @@ def _nearest_reading(event_lat, event_lon, event_dt, by_station: dict):
 
 
 def run(dates: list) -> None:
-    """실규모(여러 날짜) 대응 — 원래 단일 --date만 받던 버전은 OUT_PATH를
-    "w"로 매번 덮어써서 날짜별로 반복 호출하면 마지막 날짜 결과만 남는
-    버그가 있었다. 이벤트를 한 번만 읽어 날짜별로 묶고, 날짜마다 그날
+    """여러 날짜에 걸친 이벤트를 한 번만 읽어 날짜별로 묶고, 날짜마다 그날
     관측소만 로드해 매칭한 뒤 한 파일에 누적한다."""
     events_by_date = {}
     with EVENTS_PATH.open(encoding="utf-8") as f:

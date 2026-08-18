@@ -1,61 +1,20 @@
 """
 담당: 김준기, 오동규
 
-B축(운항 효율) LightGBM 기준선 파이프라인 — "비슷한 조건이면 보통 이만큼
-연료를 쓴다"는 기준선을 학습하고, 물리식 추정치(estimated proxy)와의 차이(잔차)를
-B축 원값으로 산출한다.
-
-참고: BlueScore 프로젝트 기획서(2026-08-11)
-  - 4번 "문제 해결 방안" ① BlueScore 산출 - B축(운항 효율, 가중치 35%):
-    "AI가 '어구·톤수·해역·계절이 이 조건이면 보통 연료를 이만큼 쓴다'는
-    기준선을 학습하고, 실제 소비와의 차이를 점수화"
-  - 7번 MVP 설계서: "B축 산출 - 물리식 연료·CO2 추정 → LightGBM 기준선 학습 → 잔차"
-  - 8-3번 AI 모델: "LightGBM (기준선 회귀) - 입력: 선박 제원(톤수·길이), 어업종,
-    해역, 계절, 해황(수온·풍속·유속), 이벤트별 평균속도·이동거리·지속시간 /
-    출력: 기대 연료 소비량. 실제 - 기대 = 잔차가 B축 원값"
-
-산출 절차:
-    1. score/axis_b_physics.py의 estimate_fuel_consumption()으로 "추정(estimated
-       proxy)" 연료소비량을 물리식으로 근사한다 (실측 연료 데이터가 없기 때문).
-    2. LightGBM 회귀 모델이 선박 제원·어업종·해역·계절·해황·항해 특징으로부터
-       "기대(기준선)" 연료소비량을 학습한다.
-    3. 잔차 = 추정(물리식) - 기대(LightGBM) = B축 원값(raw value).
-       잔차가 음수면(추정치보다 기대치가 큼) 기대보다 적게 썼다는 뜻으로,
-       운항 효율이 좋다는 신호다.
-    4. 이벤트 단위 잔차를 선박 단위로 평균내 반환한다.
+B축(운항 효율) LightGBM 기준선 파이프라인. 물리식 추정치(estimated,
+axis_b_physics.py)와 LightGBM이 학습한 기준선(expected) 사이의 잔차를 B축
+원값으로 산출한다 — 잔차가 음수면(추정 > 기대) 예상보다 적게 써서 운항
+효율이 좋다는 뜻이다. 실측 연료 데이터가 없어 물리식 추정치를 "실제" 대신
+쓴다. 이벤트 단위 잔차는 선박 단위로 평균내 반환한다.
 
 주의:
-    - 이 모듈은 유사 선박군 내 백분위 정규화 이전의 원값(raw value) 산출까지만
-      담당한다. 점수조립 단계에서 유사 선박군 내 상대값/개선률로 다시
-      정규화되어야 한다.
-    - 별도의 학습/검증(holdout) 분리를 하지 않는다. 지금은 전체 데이터로 학습한
-      기준선에 대해 잔차를 구하는 단순한 방식이며, 데이터 양이 늘어나면
-      train/holdout 분리나 교차검증 도입을 검토해야 한다.
-    - LightGBM 하이퍼파라미터(NUM_LEAVES, MIN_CHILD_SAMPLES 등)는 실데이터가
-      없는 지금 단계에서 수십 건짜리 더미 데이터로도 학습이 되도록 낮게 잡은
-      잠정값이다. 실데이터 확보 후 재튜닝이 필요하다.
-    - 입력 피처(NUMERIC_FEATURE_COLUMNS, CATEGORICAL_FEATURE_COLUMNS)는 기획서에
-      나열된 후보를 전부 반영한 것이며, 실제 어떤 피처를 쓸 수 있는지는
-      데이터팀(김태윤) 확인 후 확정해야 한다.
-    - estimated_fuel_kg는 실측 연료 데이터가 없어 물리식 추정치로 대체한
-      값인데, 그 물리식이 정확히 tonnageGt/averageSpeedKnots/durationHours만의
-      매끈한 함수(잡음 없음)다. averageSpeedKnots를 LightGBM 기준선 입력에도
-      그대로 두면, 모델이 "기대"를 사실상 그 물리식 자체로 근사해버려
-      잔차(residual_raw)가 진짜 운항 효율 차이가 아니라 LightGBM의 곡선 근사
-      오차(노이즈)에 가까워지는 문제가 있다.
-      판단 기준: 기대치(baseline) 입력에는 "그 배가 어쩔 수 없이 처한 조건"만
-      남기고, "그 배가 스스로 선택한 조업 방식"은 뺀다 — 그래야 그 선택의
-      결과가 잔차에 남는다. tonnageGt(배 크기)·durationHours(조업에 걸리는
-      시간, 어장 규모에 좌우됨)·해황·어업종·해역·계절은 조건이라 남기고,
-      averageSpeedKnots(속도 선택)는 뺀다.
-      **totalDistanceKm도 같이 빼야 한다** — totalDistanceKm ≈
-      averageSpeedKnots × durationHours × 1.852라서, durationHours가 이미
-      피처에 있는 상태로 totalDistanceKm만 남기면 속도가 (거리 ÷ 기간)으로
-      뒷문으로 다시 들어온다. 둘 다 NUMERIC_FEATURE_COLUMNS에서 뺐다.
-      기획서 원문은 평균속도도 입력에 포함하도록 명시하지만, 물리식 잔차
-      구조상 그러면 순환성이 생겨 신호가 노이즈가 되므로 이 변경이 맞다.
-      `test_axis_b_baseline.py`의 `TestResidualCapturesSpeedSignal`이 조건이
-      같고 속도만 다른 선박들에서 잔차가 실제로 속도와 함께 단조증가하는지
+    - train/holdout 분리 없이 전체 데이터로 학습한 기준선에 잔차를 구하는
+      단순한 방식이다. 데이터가 늘면 교차검증 도입을 검토해야 한다.
+    - LightGBM 하이퍼파라미터는 소규모 더미 데이터로도 학습되도록 낮게 잡은
+      잠정값이다(재튜닝 필요).
+    - averageSpeedKnots/totalDistanceKm을 입력 피처에서 뺀 이유는
+      NUMERIC_FEATURE_COLUMNS 주석 참고. `TestResidualCapturesSpeedSignal`이
+      조건이 같고 속도만 다른 선박들에서 잔차가 속도와 함께 단조증가하는지
       검증한다.
 """
 
@@ -77,10 +36,10 @@ LGBM_MIN_CHILD_SAMPLES = 2
 LGBM_RANDOM_STATE = 42
 LGBM_VERBOSITY = -1
 
-# LightGBM 입력 피처 컬럼. 기획서 원문 후보 중 averageSpeedKnots/totalDistanceKm은
-# 뺐다 — 물리식 추정치(estimated_fuel_kg)도 이 값들의 함수라, 기준선 입력에
-# 그대로 두면 "기대"가 물리식을 베껴버려 잔차가 노이즈가 된다. 자세한 이유는
-# 모듈 docstring 참고.
+# LightGBM 입력 피처. averageSpeedKnots/totalDistanceKm은 뺐다 — 물리식
+# 추정치(estimated_fuel_kg)도 이 값들의 함수라, 그대로 두면 LightGBM이
+# "기대"를 물리식 자체로 근사해버려 잔차가 노이즈가 된다. totalDistanceKm은
+# durationHours×speed로 속도가 뒷문으로 들어오므로 함께 뺀다.
 NUMERIC_FEATURE_COLUMNS = [
     "tonnageGt",
     "seaSurfaceTempC",
@@ -167,13 +126,10 @@ def _prepare_valid_rows(rows: List[dict]) -> Tuple[List[Tuple[dict, float]], Dic
 def _rows_to_feature_dataframe(rows: List[dict]) -> pd.DataFrame:
     """행 리스트를 LightGBM 입력용 DataFrame으로 변환한다 (범주형 컬럼은 category dtype).
 
-    행이 하나뿐이고 그 값이 None인 수치형 컬럼은, pandas가 다른 float 값과
-    섞어볼 게 없어 dtype을 object로 추론해버린다(고전적인 단일행 함정). 이
-    상태로는 `model.predict()`는 그냥 통과하지만, `shap.TreeExplainer`가
-    쓰는 LightGBM의 `pred_contrib=True` 경로는 object dtype을 거부해서
-    `ValueError: pandas dtypes must be int, float or bool`이 난다. 그래서
-    수치형 컬럼은 행 개수와 무관하게 항상 `pd.to_numeric()`으로 float dtype을
-    명시적으로 강제한다(None은 NaN이 된다).
+    단일 행이고 값이 None인 수치형 컬럼은 pandas가 dtype을 object로 추론해버려,
+    `shap.TreeExplainer`(pred_contrib=True)가 `ValueError: pandas dtypes must
+    be int, float or bool`로 죽는다. 그래서 수치형 컬럼은 항상
+    `pd.to_numeric()`으로 float dtype을 강제한다.
     """
     feature_columns = NUMERIC_FEATURE_COLUMNS + CATEGORICAL_FEATURE_COLUMNS
     df = pd.DataFrame(rows)

@@ -1,13 +1,10 @@
 """해양기상 수집 — 전국 관측지점의 기상센서정보.
 
-사용자 제공 공식 매뉴얼(marineweather.nmpnt.go.kr) 기준. 지방청(mmaf)
-단위로 소속 관측지점(mmsi)을 콤마로 묶어 한 번에 조회한다 — 지점별로
-따로 호출하지 않음(GFW Events 배치 조회와 같은 효율 원칙).
+공식 매뉴얼(marineweather.nmpnt.go.kr) 기준. 지방청(mmaf) 단위로 소속
+관측지점(mmsi)을 콤마로 묶어 한 번에 조회한다 — 지점별 개별 호출 없음.
 
-`dataType=2`를 쓴다 — 수집원칙(PROCESS_LOG.md 10번) 결정사항: 기본값(1)은
-결측/미관측 항목을 응답에서 아예 빼버려 원칙1(원본 그대로 저장)과 충돌
-소지가 있음. 2는 "미제공"(장비 없음)과 "데이터없음"(장비는 있으나 결측)을
-구분해서 다 보여줌.
+`dataType=2`를 쓴다 — 기본값(1)은 결측/미관측 항목을 응답에서 빼버리지만,
+2는 "미제공"(장비 없음)과 "데이터없음"(장비는 있으나 결측)을 구분해 보여준다.
 
 `mmsi` 파라미터는 선박 MMSI가 아니라 관측지점(등대·등부표) 코드다(매뉴얼
 용어 그대로 씀, 우리 스키마의 선박 MMSI와 혼동 주의).
@@ -31,8 +28,8 @@ BASE_NOW = "http://marineweather.nmpnt.go.kr:8001/openWeatherNow.do"
 BASE_DATE = "http://marineweather.nmpnt.go.kr:8001/openWeatherDate.do"
 RAW_DIR = Path(__file__).resolve().parent.parent / "raw" / "marine_weather"
 
-# 지방청(mmaf) -> 소속 관측지점(mmsi) 목록. 출처: 사용자 제공 OPEN API 매뉴얼
-# "관측지점 목록"(2026-08-17). API로 조회하는 방법이 없어 매뉴얼 원문을 그대로 옮김.
+# 지방청(mmaf) -> 소속 관측지점(mmsi) 목록. 출처: OPEN API 매뉴얼 "관측지점 목록".
+# API로 조회하는 방법이 없어 매뉴얼 원문을 그대로 옮김.
 STATIONS = {
     "101": "1019001,1019002,1019003,1019004,994401578,994401579,994401583,994401584,994401587,994401588,994401594,994401597",
     "102": "0010,0020,1021000,1021013,1021014,1021018,1021024,1021040,1029001,994401001,994401015,994401020,994401021,994401022,994401023,994401039",
@@ -51,8 +48,8 @@ STATIONS = {
 
 
 def already_done(date: str) -> set:
-    """해당 날짜에 이미 성공적으로 받은 mmaf 목록(메타파일 스캔) — 실규모
-    범위수집 중 끊겨도 이어서 하기 위함(원칙5)."""
+    """해당 날짜에 이미 성공적으로 받은 mmaf 목록(메타파일 스캔) — 범위수집
+    중 끊겨도 이어서 하기 위함."""
     done = set()
     for f in glob.glob(str(RAW_DIR / "weather_mmaf*__*Z.meta.json")):
         meta = json.loads(Path(f).read_text(encoding="utf-8"))
@@ -79,7 +76,7 @@ def collect(api_key: str, date: str = None) -> None:
             params["date"] = date
 
         resp = request_with_retry("GET", url, params=params)
-        # resp.url엔 serviceKey가 그대로 박혀있어 메타에 못 씀(원칙4) — 직접 구성해서 키만 가림.
+        # resp.url엔 serviceKey가 그대로 박혀있어 메타에 못 씀 — 직접 구성해서 키만 가림.
         safe_params = {**params, "serviceKey": "REDACTED"}
         meta = {"request_params": safe_params, "status_code": resp.status_code, "mmaf": mmaf, "date": date}
 

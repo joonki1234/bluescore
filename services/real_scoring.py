@@ -28,13 +28,10 @@ from score.shap_factors import axis_a_factor_shares
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-# data_new/ 스냅샷을 쓴다 — 구 data/의 31,605척(확정매칭 순도 9.5%) 대신 EEZ 제한
-# 모집단 5,323척(사람 라벨링 실측 정밀도 약 75%, data_new/README.md 참고)을 쓴다.
-# 이벤트는 data_new/processed/의 산출물을 그대로 쓰고, 선박은
-# score/scripts/convert_data_new_vessels.py로 미리 평판화해둔 파생 파일을 쓴다
-# (vesselId/tonnage/fishingType 등 이 모듈이 기대하는 평평한 스키마로 변환 — 원본
-# final_vessel_matches.jsonl은 톤수가 tac.tonnageGtTac처럼 중첩·문자열이라 그대로
-# 못 씀).
+# data_new/ 스냅샷을 쓴다 — 구 data/보다 매칭 정밀도가 높다(data_new/README.md
+# 참고). 선박은 score/scripts/convert_data_new_vessels.py로 이 모듈이 기대하는
+# 평평한 스키마(vesselId/tonnage/fishingType)로 미리 변환해둔 파생 파일이다 —
+# 원본 final_vessel_matches.jsonl은 톤수가 중첩·문자열이라 그대로 못 쓴다.
 DEFAULT_EVENTS_PATH = PROJECT_ROOT / "data_new" / "processed" / "events_with_weather.jsonl.gz"
 DEFAULT_VESSELS_PATH = PROJECT_ROOT / "data_new" / "processed" / "vessels_for_score.jsonl.gz"
 
@@ -51,17 +48,17 @@ class RealAxisAResult:
     vessel: dict
     matching_method: str
     matching_reason: Optional[str]
-    # B축 연결 추가 필드 — 전부 기본값 있음, 기존 호출부는 안 건드려도 됨.
+    # B축 연결 필드 — 전부 기본값 있어 기존 호출부는 안 건드려도 됨.
     axis_b_score: Optional[float] = None
     axis_b_raw: Optional[float] = None
     axis_b_used_row_count: Optional[int] = None
-    # 2026-08-18 후속: B축 SHAP 대신 쓰는 "산출 근거" 두 값(실측 추정 vs
-    # 기준선 예측 연료, kg). axis_b_raw = estimated - expected와 정확히 같다.
+    # B축 SHAP 대신 쓰는 산출 근거 두 값(실측 추정 vs 기준선 예측 연료, kg).
+    # axis_b_raw = estimated - expected와 정확히 같다.
     axis_b_estimated_fuel_kg: Optional[float] = None
     axis_b_expected_fuel_kg: Optional[float] = None
-    # A축 요인 기여도(SHAP) 연결 필드. B축은 연결 안 함 — score/shap_factors.py
-    # 모듈 docstring 참고("점수"가 아니라 "기준선 조건"만 설명 가능하다는
-    # 의미론적 제약으로 B축 SHAP 코드 자체를 들어냄).
+    # A축 요인 기여도(SHAP)만 연결한다. B축은 score/shap_factors.py 모듈
+    # docstring 참고 — "점수"가 아니라 "기준선 조건"만 설명 가능한 의미론적
+    # 제약으로 B축 SHAP 자체를 들어냈다.
     shap_factors: List[dict] = field(default_factory=list)
 
 
@@ -78,11 +75,10 @@ def _axis_b_score_for_vessel(
     그룹 안에서 따로 충분한가"만 별도로 판단한다 — 톤수 매칭 커버리지가
     43.4%뿐이라 A축 표본은 충분해도 B축 표본은 부족한 그룹이 많다.
 
-    estimated_fuel_kg/expected_fuel_kg는 유사군 백분위와 무관하게(peer
-    표본 부족·group=None이어도) 이 선박 하나의 물리식/LightGBM 계산
-    결과라 항상 낼 수 있다 — B축 SHAP을 못 쓰는 대신(순환성 문제,
-    score/shap_factors.py 참고) "점수 대신 근거가 된 두 숫자"를 그대로
-    보여주는 쪽으로 2026-08-18에 방향을 잡았다(score/TODO.md).
+    estimated_fuel_kg/expected_fuel_kg는 peer 표본 부족·group=None이어도
+    이 선박 하나의 물리식/LightGBM 계산 결과라 항상 낼 수 있다 — B축 SHAP을
+    못 쓰는 대신(순환성 문제, score/shap_factors.py 참고) 점수 대신 근거가
+    된 두 숫자를 그대로 보여준다.
     """
     if not axis_b_results:
         return None, None, None, None, None

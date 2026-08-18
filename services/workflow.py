@@ -80,11 +80,10 @@ class WorkflowService:
 
     @staticmethod
     def _is_current_demo_score(score: ScoreResponse) -> bool:
-        """현재 UI가 요구하는 데모 점수 필드가 캐시에 모두 있는지 확인한다.
+        """캐시된 데모 점수에 현재 UI가 요구하는 화면 필드가 모두 있는지 확인한다.
 
-        이전 버전의 SQLite ``result_json``도 Pydantic 검증은 통과하지만, 새로
-        추가된 화면 필드는 ``None``일 수 있다. 성공 점수에 한해 지도·비교 차트
-        필드가 빠졌다면 같은 결정론적 데모 점수를 다시 만들어 캐시를 승격한다.
+        옛 SQLite 캐시는 Pydantic 검증은 통과해도 새로 추가된 필드가 ``None``일
+        수 있어, 성공 점수인데 지도·비교 차트 필드가 비어 있으면 다시 만든다.
         """
         if score.status != "success":
             return True
@@ -110,13 +109,11 @@ class WorkflowService:
 
     @staticmethod
     def _is_current_real_score(score: ScoreResponse) -> bool:
-        """실데이터 점수 캐시가 지금 코드/데이터 기준으로 유효한지 확인한다.
+        """실데이터 점수 캐시가 지금 코드/데이터 버전과 맞는지 확인한다.
 
-        `sourceType=real`의 score_run_id는 `f"real-axis-a-{vesselId}-20260813"`처럼
-        고정 문자열이라, 한 번 SQLite에 캐싱되면 코드를 고쳐도 그 캐시가 그대로
-        반환된다 — 데모 캐시와 달리 신선도 체크가 아예 없다. `data_snapshot_id`/
-        `model_version`이 지금 코드가 낼 수 있는 값과 다르면(예: data_new 전환,
-        B축 연결처럼 버전을 올리는 변경이 있었으면) 캐시를 버리고 다시 계산한다.
+        `sourceType=real`의 score_run_id는 고정 문자열이라 캐시된 뒤에는 코드를
+        고쳐도 그대로 반환된다. `data_snapshot_id`/`model_version`이 지금 코드가
+        낼 수 있는 값과 다르면 캐시를 버리고 다시 계산한다.
         """
         if score.status not in ("success", "partial"):
             return True
@@ -237,12 +234,10 @@ class WorkflowService:
         return self.get_appeal(appeal_id)
 
     def review_score_run(self, score_run_id: str, request: ReviewDecision) -> ReviewDetail:
-        """
-        점수 산출 건에 대한 심사 결정을 저장한다.
+        """점수 산출 건의 심사 결정을 저장한다.
 
-        이의제기가 접수돼 있으면 그 건에 함께 매달아 상태를 전이시키고, 없으면
-        심사 결정만 남긴다 — 여신 심사는 차주가 이의를 제기해야만 이루어지는
-        절차가 아니다. 이의제기는 심사의 입력 중 하나일 뿐이다.
+        이의제기가 접수돼 있으면 함께 매달아 상태를 전이시키고, 없으면 심사
+        결정만 남긴다 — 여신 심사는 이의제기가 있어야만 열리는 절차가 아니다.
         """
         score = self.get_score_run(score_run_id)
         appeal = next(
@@ -325,11 +320,10 @@ class WorkflowService:
         try:
             committed = self.ledger.commit(record_id, result_hash)
         except ValueError as exc:
-            # 원장에는 있는데 DB에는 없는 상태가 될 수 있다 — 시연 중 DB만
-            # 리셋하고 API 프로세스(인메모리 원장)는 계속 살아 있는 경우다.
-            # 같은 내용의 해시가 이미 올라가 있다면 커밋은 이미 사실이므로
-            # 원장 기록을 그대로 받아 DB만 맞춘다. 해시가 다르면 진짜 충돌이라
-            # 그대로 막는다 — 기록을 덮어쓰지 않는 것이 이 기능의 존재 이유다.
+            # DB만 리셋되고 인메모리 원장은 남아 있으면 원장에는 있는데 DB에는
+            # 없는 상태가 될 수 있다. 같은 해시면 원장 기록을 그대로 받아 DB만
+            # 맞추고, 해시가 다르면 진짜 충돌이므로 막는다 — 기록을 덮어쓰지
+            # 않는 것이 이 기능의 존재 이유다.
             existing_record = self.ledger.get(record_id)
             if existing_record is None or existing_record.result_hash != result_hash:
                 raise ConflictError(str(exc)) from exc

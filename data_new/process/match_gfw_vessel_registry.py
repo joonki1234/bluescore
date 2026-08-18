@@ -1,15 +1,12 @@
 """매칭 2단계 — 어선원부 ↔ GFW, 콜사인 + 이름 교차확인.
 
-조인키 설계(PROCESS_LOG.md 12번) 2단계 구현.
+GFW `selfReportedInfo.callsign`은 신뢰도가 낮아(POLARIS PRINCE 사례로 확인)
+콜사인 일치만으로 확정하지 않고 이름도 같이 남겨 사람이 검토할 근거로 쓴다
+(자동 accept/reject 아님).
 
-GFW `selfReportedInfo.callsign`은 신뢰도 낮다고 이미 확인됨(POLARIS PRINCE
-사례, PROCESS_LOG.md 9번) — 콜사인 일치만으로 확정하지 않고 이름도 같이
-봐서 사람이 검토할 근거를 남긴다(자동 accept/reject 아님, 원칙1: 판단은
-가공 단계에서도 신중하게).
-
-**접두어(prefix) 매칭은 폐기함**(PROCESS_LOG.md 18번) — "306" 같은 짧은
-숫자 코드가 어선원부에서 서로 다른 배 6척과 동시에 prefix 매칭돼 동명이인
-충돌을 그대로 재현하는 게 실측으로 확인됨. 정확일치(exact)만 신호로 쓴다.
+**접두어(prefix) 매칭은 폐기함** — "306" 같은 짧은 숫자 코드가 어선원부에서
+서로 다른 배 6척과 동시에 prefix 매칭돼 동명이인 충돌을 그대로 재현하는 게
+실측으로 확인됨. 정확일치(exact)만 신호로 쓴다.
 
 사용법:
     python match_gfw_vessel_registry.py
@@ -32,7 +29,7 @@ def _load_jsonl(path: Path) -> list:
 
 
 def _callsign_signal(gfw_callsign: str, registry_callsign: str) -> str:
-    # prefix 매칭은 폐기(위 docstring 참고) — 정확일치만 신호로 인정.
+    # prefix 매칭은 폐기(모듈 docstring 참고) — 정확일치만 신호로 인정.
     return "exact" if gfw_callsign == registry_callsign else "none"
 
 

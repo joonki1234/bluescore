@@ -1,5 +1,5 @@
-"""해양기상 실규모 수집 — GFW 이벤트 수집기간(PROCESS_LOG.md 26번)과 같은
-날짜범위를 하루씩 marine_weather.py의 collect()로 반복 호출한다.
+"""해양기상 실규모 수집 — 지정한 날짜범위를 하루씩 marine_weather.py의
+collect()로 반복 호출한다.
 
 날짜/mmaf 단위 재개는 marine_weather.py의 already_done()이 처리 — 중간에
 끊겨도 그냥 다시 실행하면 이미 받은 (날짜,mmaf)는 건너뛴다.
