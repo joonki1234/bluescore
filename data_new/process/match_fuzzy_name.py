@@ -207,7 +207,7 @@ def run() -> None:
         winner = None
         if len(distinct) == 1:
             p = passing[0]
-            if p["distKm"] is None or p["distKm"] <= LOC_VERIFIED_KM:
+            if p["distKm"] is not None and p["distKm"] <= LOC_VERIFIED_KM:
                 winner = p
         else:
             winner = _try_resolve_by_nearest(passing)

@@ -1213,3 +1213,15 @@ EUNSEONGHO(은성호)가 금성호로, DEOG YANG HO(덕양호)가 동양호로
 `data_new/process/match_fuzzy_name.py`·`assemble_matches.py`에 반영,
 `final_vessel_matches.jsonl` 재생성 완료(2026-08-18). `korean-romanizer`
 의존성 제거, 카카오맵 API(`KAKAO_API_KEY`) 의존성 추가.
+
+## 51. verified 기준에서 "이름만으로 확정"(거리 미확인 28척) 제외 — 예외 없이 단일화(2026-08-18)
+
+50번 verified 1,290척 중 28척은 후보가 이름만으로 유일했지만 거리를
+확인 못 한 채(distKm=None) 통과된 것이었다 — 코드가 `distKm is None
+or distKm <= 150` 조건이라, 진짜 150km 이내인지 검증 안 된 케이스가
+verified에 섞여 있었다. 사용자 확인 결과 기준이 예외 없이 확실한 게
+낫다고 판단, `distKm is not None and distKm <= 150`으로 단일화 —
+후보 개수와 무관하게 거리를 모르면 무조건 held_multi로 보류한다.
+
+**결과**: verified 1,290척 → **1,262척**(28척은 held_multi로 이동,
+1,402→1,430척). `final_vessel_matches.jsonl` 재생성 완료.
