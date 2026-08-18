@@ -1225,3 +1225,35 @@ verified에 섞여 있었다. 사용자 확인 결과 기준이 예외 없이 �
 
 **결과**: verified 1,290척 → **1,262척**(28척은 held_multi로 이동,
 1,402→1,430척). `final_vessel_matches.jsonl` 재생성 완료.
+
+## 52. 어선원부를 후보풀에서 완전히 제외 — GFW-TAC 매칭만 사용(2026-08-18)
+
+51번까지도 `match_fuzzy_name.py`의 후보풀은 TAC와 어선원부를 같이 썼다.
+어선원부는 전체 등록대장이 아니라 2006년 처리배치 일부(1,379행, 전부
+현행여부='N')라 TAC보다 신뢰도가 떨어지고, 별도 경로였던 2단계
+(GFW<->어선원부 콜사인 정확일치)도 기여분이 0.1%(3척)뿐이라 사실상
+의미가 없었다. 정리 겸 사용자 결정으로 어선원부를 완전히 빼고
+GFW-TAC 매칭만 쓰기로 확정했다.
+
+**삭제한 것**: `process/match_tac_vessel_registry.py`(1단계),
+`process/match_gfw_vessel_registry.py`(2단계), `process/
+normalize_vessel_registry.py`, 그 산출물(`vessel_registry_normalized.
+jsonl` 등 3개, 원래도 git 비추적). `assemble_matches.py`는 1·2단계
+분기를 걷어내고 verified/unmatched 두 카테고리만 남기게 단순화(필드는
+그대로 `matchTier`/`tac`/`mof` 유지, `mof`는 여전히 None — B축 소비
+코드는 값 안 봐서 영향 없음, 50번에서 확인함).
+
+같은 정리 과정에서 MOF 수집·정규화 스크립트(`collect/mof.py`·
+`mof_korean_retry.py`·`hangul_reverse.py`·`process/normalize_mof.py`)도
+삭제했다 — 매칭 후보풀에서는 이미 50번에서 빠졌고(오탐 위험,
+MOF 경유 저정밀도), 라이브 파이프라인 어디서도 더 이상 안 읽었다
+(`assemble_matches.py`가 `mof`를 항상 None으로 채움). 유일한
+소비처였던 `analysis/explore_match_precision_groundtruth.py`(48번
+분석, 49번에서 이미 결론이 뒤집힘)도 같이 삭제. 미사용 1회성
+스크립트 `collect/static_files_check.py`, 미커밋 실험
+`collect/mof_from_tac.py`도 정리.
+
+**결과**: verified 1,262척(23.7%) → **1,234척(23.2%)**, held_multi
+1,430→1,249척, unmatched 1,847→2,056척. `final_vessel_matches.jsonl`
+재생성 완료. 파이프라인이 GFW 이벤트/선박 수집 → TAC 정규화 → 한글
+직접비교 매칭으로 단순해짐(`data_new/README.md` 실행 순서 갱신).

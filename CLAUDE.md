@@ -146,12 +146,15 @@ ownership changes.
     유사도의 구조적 오탐("-성호"류, 서로 다른 이름인데 로마자로 바꾸면
     끝부분이 겹쳐서 점수가 높게 나옴)을 없앨 수 있었다(전체 검증 과정은
     `data_new/matching_redesign_proposal/README.md`). matched
-    2,881척(54.1%, 추정 오탐 ~720척) → verified 1,262척(23.7%, 추정
+    2,881척(54.1%, 추정 오탐 ~720척) → verified 1,234척(23.2%, 추정
     오탐 거의 0)으로 커버리지는 줄고 정밀도는 크게 오름 — 오탐 하나가
     B축 점수를 그 배 단위로 완전히 틀어지게 만들 수 있어 커버리지보다
     정밀도를 우선함. `data_new/process/match_fuzzy_name.py`·
     `assemble_matches.py`에 반영·재실행 완료, `final_vessel_matches.jsonl`도
     이 결과로 갱신됨. 카카오맵 API 키 필요(`.env`의 `KAKAO_API_KEY`).
+    이후(같은 날) 어선원부를 후보풀에서 완전히 빼고 GFW-TAC 매칭만
+    쓰기로 정리(1,262→1,234척, PROCESS_LOG.md 52번) — 어선원부 관련
+    수집·정규화·1·2단계 매칭 스크립트 전부 삭제.
 
 ## 미확정 항목 (하드코딩 금지)
 

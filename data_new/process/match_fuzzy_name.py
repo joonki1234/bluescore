@@ -1,4 +1,4 @@
-"""매칭 3단계 — GFW 선박과 TAC/어선원부를 한글 직접비교로 매칭한다.
+"""매칭 3단계 — GFW 선박과 TAC를 한글 직접비교로 매칭한다.
 
 기존엔 GFW 자기신고 로마자명을 로마자로 변환한 TAC/어선원부 이름과
 유사도(SequenceMatcher)로 비교했다. 사람이 GFW 영문명 4,662척 전체를
@@ -9,11 +9,17 @@
 높게 나옴)을 없앨 수 있다고 확인돼 이 방식으로 교체함(2026-08-18,
 `data_new/matching_redesign_proposal/README.md`에 검증 과정 전체 기록).
 
+어선원부는 후보풀에서 아예 뺐다(2026-08-18) — 전체 등록대장이 아니라
+2006년 처리배치 일부(1,379행, 전부 현행여부='N')라 TAC 대비 신뢰도가
+낮고, 기여분(tier2_callsign)도 0.1%(3척)뿐이라 GFW-TAC 매칭만 쓰기로
+정리함. 1단계(TAC<->어선원부 연결)·2단계(GFW<->어선원부 콜사인)도 같이
+폐기.
+
 매칭 규칙 4단계:
 1. 한글 직접비교(exact match만, fuzzy 유사도는 안 씀)
 2. 숫자 하드필터 — 자릿수 상관없이 GFW·후보 양쪽에 다 숫자가 보이는데
    값이 다르면 배제
-3. "제N호" 정규화 — TAC/어선원부 원문은 "제707태근호"처럼 선단
+3. "제N호" 정규화 — TAC 원문은 "제707태근호"처럼 선단
    일련번호를 이름에 그대로 갖고 있는데 GFW 쪽 한글변환은 숫자를
    분리해서 뺐으므로, 비교 시 pool 쪽에서도 이 접두어를 한 번 더 뗀다
 4. 카카오 지오코딩 거리 확인 — 이름이 동률(후보 2개+)이면 GFW
@@ -44,7 +50,6 @@ from geocode_kakao import geocode_kakao
 PROCESSED = Path(__file__).resolve().parent.parent / "processed"
 GFW_VESSELS_PATH = PROCESSED / "gfw_vessels_normalized.jsonl"
 TAC_PATH = PROCESSED / "tac_vessels_normalized.jsonl"
-REGISTRY_PATH = PROCESSED / "vessel_registry_normalized.jsonl"
 EVENTS_PATH = PROCESSED / "gfw_events_normalized.jsonl"
 KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "gfw_korean_name_candidates.csv"
 OUT_PATH = PROCESSED / "fuzzy_name_candidates.jsonl"
@@ -113,11 +118,7 @@ def _load_korean_candidates() -> dict:
 
 
 def _build_pool() -> list:
-    pool = []
-    for t in _load_jsonl(TAC_PATH):
-        pool.append({"source": "tac", "name": t["nameTac"], "key": t["vesselNoTac"], "tonnage": t["tonnageGtTac"], "ports": t.get("portNamesTac") or []})
-    for r in _load_jsonl(REGISTRY_PATH):
-        pool.append({"source": "vessel_registry", "name": r["nameRegistry"], "key": r["vesselNoRegistry"], "tonnage": r["tonnageGtRegistry"], "ports": [r["portNameRegistry"]] if r.get("portNameRegistry") else []})
+    pool = [{"source": "tac", "name": t["nameTac"], "key": t["vesselNoTac"], "tonnage": t["tonnageGtTac"], "ports": t.get("portNamesTac") or []} for t in _load_jsonl(TAC_PATH)]
     for p in pool:
         p["base"] = _strip_ho(p["name"])
         p["compareBase"] = _strip_je_number(p["base"])
