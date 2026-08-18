@@ -262,7 +262,31 @@ class ScoringService:
         except KeyError as exc:
             raise NotFoundError(f"실데이터 선박을 찾을 수 없습니다: {vessel_id}") from exc
         vessel = result.vessel
-        status = result.status
+
+        # 2026-08-18: B축 연결(오동규, 최지희 확인 후 진행). A축만 되던 대다수
+        # 선박은 그대로 "partial"이고(톤수 매칭 커버리지 43.4%뿐이라 B축 자체가
+        # 안 나오는 경우가 흔함), A축+B축이 둘 다 유사군 백분위까지 나온 선박만
+        # "success"로 승격해 BlueScore·금리구간을 낸다.
+        has_axis_b = result.axis_b_score is not None
+        status = "success" if result.status == "partial" and has_axis_b else result.status
+
+        blue_score = None
+        band = None
+        if status == "success":
+            blue_score = round(AXIS_A_WEIGHT * result.axis_a_score + AXIS_B_WEIGHT * result.axis_b_score, 1)
+            band = _rate_band(grade_for_score(blue_score))
+
+        if status == "success":
+            message = (
+                "A축·B축 모두 실산출되었습니다. 해양기상 단위(풍속 m/s)는 공식 확인이 "
+                "아니라 정황 추정이며, 유속·어업종 일부 필드는 아직 미확인·미보강 "
+                "상태입니다 — data_new/README.md 한계 목록 참고."
+            )
+        elif result.axis_a_score is not None:
+            message = "A축만 실산출되었습니다. 이 선박은 유사군 내 B축 표본이 부족해 BlueScore·금리구간은 산출하지 않습니다."
+        else:
+            message = "A축만 실산출되었습니다. B축·BlueScore·금리구간은 산출하지 않습니다."
+
         return ScoreResponse(
             score_run_id=self.score_run_id(vessel_id, "real"),
             vessel=VesselSummary(
@@ -273,7 +297,7 @@ class ScoringService:
                 status=status,
             ),
             status=status,
-            blue_score=None,
+            blue_score=blue_score,
             axis_a=AxisScore(
                 score=result.axis_a_score,
                 state="real" if result.axis_a_score is not None else "unavailable",
@@ -283,17 +307,20 @@ class ScoringService:
                 missing_reason=None if result.axis_a_score is not None else "유사군 표본이 부족합니다.",
             ),
             axis_b=AxisScore(
-                state="unavailable",
-                missing_reason="B축 LightGBM 실데이터 검증이 완료되지 않았습니다.",
+                score=result.axis_b_score,
+                state="real" if has_axis_b else "unavailable",
+                raw_value=result.axis_b_raw,
+                used_event_count=result.axis_b_used_row_count,
+                missing_reason=None if has_axis_b else "톤수 미매칭이거나 유사군 내 B축 표본이 부족합니다.",
             ),
-            rate_band=None,
+            rate_band=band,
             peer_group=PeerContext(count=result.peer_count),
             matching_confidence=None,
             matching_method=result.matching_method,
             matching_reason=result.matching_reason,
-            message="A축만 실산출되었습니다. B축·BlueScore·금리구간은 산출하지 않습니다.",
+            message=message,
             created_at=datetime.now(timezone.utc),
-            **response_metadata("real"),
+            **response_metadata("real", axis_b_included=has_axis_b),
         )
 
     def simulate(

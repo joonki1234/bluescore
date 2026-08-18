@@ -34,7 +34,12 @@ from api.schemas import (
 from chain.hashing import compute_result_hash
 from chain.ledger import HashLedger, LedgerLike
 from services.exceptions import ConflictError, InvalidStateError, NotFoundError
-from services.metadata import response_metadata
+from services.metadata import (
+    REAL_DATA_SNAPSHOT_ID,
+    REAL_MODEL_VERSION_WITH_B,
+    REAL_PARTIAL_MODEL_VERSION,
+    response_metadata,
+)
 from services.scoring import ScoringService
 from storage.repository import Repository
 
@@ -103,12 +108,35 @@ class WorkflowService:
             and bool(score.peer_group.scores)
         )
 
+    @staticmethod
+    def _is_current_real_score(score: ScoreResponse) -> bool:
+        """실데이터 점수 캐시가 지금 코드/데이터 기준으로 유효한지 확인한다.
+
+        2026-08-18에 실제로 겪은 버그: `sourceType=real`의 score_run_id가
+        `f"real-axis-a-{vesselId}-20260813"`처럼 고정 문자열이라, 예전
+        코드(데이터 소스 전환 전, B축 연결 전)로 SQLite에 한 번 캐싱된 뒤로는
+        코드를 아무리 고쳐도 그 캐시가 영원히 반환됐다 — 데모 캐시와 달리
+        신선도 체크가 아예 없었다. `data_snapshot_id`/`model_version`이 지금
+        코드가 낼 수 있는 값과 다르면(예: data_new 전환, B축 연결처럼 버전을
+        올리는 변경이 있었으면) 캐시를 버리고 다시 계산한다.
+        """
+        if score.status not in ("success", "partial"):
+            return True
+        if score.data_snapshot_id != REAL_DATA_SNAPSHOT_ID:
+            return False
+        return score.model_version in (REAL_PARTIAL_MODEL_VERSION, REAL_MODEL_VERSION_WITH_B)
+
     def get_score(self, vessel_id: str, source_type: str = "demo") -> ScoreResponse:
         score_run_id = self.scoring.score_run_id(vessel_id, source_type)
         stored = self.repository.get_score_run(score_run_id)
         if stored:
             cached = ScoreResponse.model_validate(stored["result"])
-            if source_type != "demo" or self._is_current_demo_score(cached):
+            is_current = (
+                self._is_current_demo_score(cached)
+                if source_type == "demo"
+                else self._is_current_real_score(cached)
+            )
+            if is_current:
                 return cached
         score = self.scoring.build_score(vessel_id, source_type)
         self.repository.save_score_run(score.model_dump(mode="json", by_alias=True))
@@ -121,6 +149,8 @@ class WorkflowService:
         cached = ScoreResponse.model_validate(stored["result"])
         if cached.source_type == "demo" and not self._is_current_demo_score(cached):
             return self.get_score(cached.vessel.vessel_id, "demo")
+        if cached.source_type == "real" and not self._is_current_real_score(cached):
+            return self.get_score(cached.vessel.vessel_id, "real")
         return cached
 
     def simulate(self, vessel_id: str, request: SimulationRequest) -> SimulationResponse:

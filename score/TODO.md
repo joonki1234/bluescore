@@ -329,3 +329,25 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       팀 논의 결과 현재 버전(구체적 gear만)으로 일단 유지, 태윤님이 국내
       어업종↔GFW 영문 통합 작업을 별도로 진행 중이라 그 결과 나오면
       재검토 예정. 테스트 7개 추가(자기모순/뭉뚱그림 라벨 제외 검증 포함).
+- [x] **(2026-08-18) B축 실산출을 API에 연결** — `score/real_axis_b_scoring.py`
+      신설(B축 이벤트 입력→학습→추론을 캐싱해 API에서 쓸 수 있게 함).
+      `services/real_scoring.py`(최지희님 파일)에 B축 결과를 연결해 A축과
+      같은 유사 선박군으로 백분위 변환, `services/scoring.py`에서 A+B
+      가중합(0.65/0.35)으로 BlueScore·금리구간까지 완성(최지희님 확인 후
+      진행). **결과**: 5,323척 중 864척(16.2%)이 A축+B축 모두 실산출돼
+      `success` 상태로 BlueScore·금리구간까지 나옴(나머지는 이전처럼 A축만
+      `partial` 또는 표본부족/매칭실패 — B축 연결이 기존 A축 단독 경로를
+      깨지 않음, 예외로 안전하게 흡수). 한계는 응답 `message`에 항상 명시
+      (해양기상 단위 추정, 유속 단위 미확인, gearType 커버리지 등).
+      `services/metadata.py`의 `model_version`도 선박별 B축 포함 여부에 따라
+      동적으로 갈리도록 고침(`REAL_MODEL_VERSION_WITH_B` 추가).
+
+      **연결 중 실제로 겪은 캐싱 버그**: `services/workflow.py.get_score()`가
+      `sourceType=real`에는 캐시 신선도 체크가 아예 없었다(데모만 체크) —
+      `score_run_id`가 `real-axis-a-{vesselId}-20260813`처럼 고정 문자열이라
+      SQLite에 한 번 캐싱되면 코드를 고쳐도 영원히 옛날 응답이 나오는 걸
+      실제로 겪음(오늘 세션에서 data_new 전환 이후 첫 캐시가 이미 껴 있어서
+      B축 연결 직후에도 옛 modelVersion이 계속 나왔음). `_is_current_real_score()`
+      추가해서 `data_snapshot_id`/`model_version`이 지금 코드가 낼 수 있는
+      값과 다르면 캐시를 버리고 재계산하도록 고침 — 앞으로 데이터/모델
+      버전을 올리는 변경이 있으면 이 체크가 자동으로 캐시를 무효화한다.

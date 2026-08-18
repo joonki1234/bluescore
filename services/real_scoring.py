@@ -1,10 +1,14 @@
 """담당: 최지희
 
-버전 고정 GFW 스냅샷을 실제 A축 산출 파이프라인에 연결한다.
+버전 고정 GFW 스냅샷을 실제 A축·B축 산출 파이프라인에 연결한다.
 
-B축은 실데이터 검증이 끝나지 않았으므로 이 어댑터가 총점이나 금리구간을 만들지
-않는다. 호출자는 A축만 `real`, B축은 `unavailable`, 전체 상태는 `partial`로
-표시해야 한다.
+2026-08-18(해커톤 제출): B축도 연결했다(오동규, 최지희 확인 후 진행) —
+`score/real_axis_b_scoring.py`가 B축 raw(잔차)를 내고, 여기서 A축과 같은
+유사 선박군으로 백분위 변환한다. **알려진 한계(화면에 정직하게 표기할 것)**:
+해양기상 단위(풍속 m/s)는 공식 확인이 아니라 정황 추정, 유속 단위는 추정
+근거조차 없음, gearType은 TAC 매칭된 선박만 채워짐, 톤수 매칭 커버리지
+43.4%뿐이라 B축 자체가 대부분 선박에서 계산되지 않음(그 경우 A축만 `partial`
+로 유지되고 이전과 동일하게 동작 — B축 연결이 A축 단독 경로를 깨지 않는다).
 """
 
 from __future__ import annotations
@@ -17,7 +21,9 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from score.axis_a_pressure import compute_axis_a_pressure
+from score.axis_b_baseline import VesselAxisBResult
 from score.peer_grouping import MIN_PEER_GROUP_SAMPLE_SIZE, build_peer_groups, peer_group_for_vessel
+from score.real_axis_b_scoring import compute_axis_b_results
 from score.score_assembly import raw_to_score, score_status_for_group
 
 
@@ -45,6 +51,41 @@ class RealAxisAResult:
     vessel: dict
     matching_method: str
     matching_reason: Optional[str]
+    # 2026-08-18 B축 연결 추가분 — 전부 기본값 있음, 기존 호출부는 안 건드려도 됨.
+    axis_b_score: Optional[float] = None
+    axis_b_raw: Optional[float] = None
+    axis_b_used_row_count: Optional[int] = None
+
+
+def _axis_b_score_for_vessel(
+    vessel_id: str,
+    group,
+    axis_b_results: Optional[Dict[str, VesselAxisBResult]],
+    min_peer_size: int,
+):
+    """B축 raw(잔차)를 같은 유사 선박군 안에서 백분위로 바꾼다.
+
+    A축 상태(group)는 이미 확정된 뒤 호출되므로, 여기서는 "B축 표본이 그
+    그룹 안에서 따로 충분한가"만 별도로 판단한다 — 톤수 매칭 커버리지가
+    43.4%뿐이라 A축 표본은 충분해도 B축 표본은 부족한 그룹이 많다.
+    """
+    if not axis_b_results or group is None:
+        return None, None, None
+
+    this_result = axis_b_results.get(vessel_id)
+    if this_result is None or this_result.used_row_count == 0:
+        return None, None, None
+
+    peer_raws = [
+        axis_b_results[peer_id].residual_raw
+        for peer_id in group.vessel_ids
+        if peer_id in axis_b_results and axis_b_results[peer_id].used_row_count > 0
+    ]
+    if len(peer_raws) < min_peer_size:
+        return None, this_result.residual_raw, this_result.used_row_count
+
+    axis_b_score = raw_to_score(this_result.residual_raw, peer_raws)
+    return axis_b_score, this_result.residual_raw, this_result.used_row_count
 
 
 def compute_axis_a_for_vessel(
@@ -53,8 +94,9 @@ def compute_axis_a_for_vessel(
     events: List[dict],
     *,
     min_peer_size: int = MIN_PEER_GROUP_SAMPLE_SIZE,
+    axis_b_results: Optional[Dict[str, VesselAxisBResult]] = None,
 ) -> RealAxisAResult:
-    """메모리의 스냅샷 레코드를 A축→유사군→백분위 점수까지 연결한다."""
+    """메모리의 스냅샷 레코드를 A축(+가능하면 B축)→유사군→백분위 점수까지 연결한다."""
     vessel_by_id = {v.get("vesselId"): v for v in vessels if v.get("vesselId")}
     axis_results = compute_axis_a_pressure(events)
     groups, vessel_to_key = build_peer_groups(vessels, events)
@@ -65,6 +107,7 @@ def compute_axis_a_for_vessel(
         groups,
         vessel_to_key,
         min_peer_size=min_peer_size,
+        axis_b_results=axis_b_results,
     )
 
 
@@ -76,6 +119,7 @@ def _result_from_context(
     vessel_to_key: dict,
     *,
     min_peer_size: int,
+    axis_b_results: Optional[Dict[str, VesselAxisBResult]] = None,
 ) -> RealAxisAResult:
     vessel = vessel_by_id.get(vessel_id)
     if vessel is None:
@@ -115,6 +159,9 @@ def _result_from_context(
         if status == "success"
         else None
     )
+    axis_b_score, axis_b_raw, axis_b_used_row_count = _axis_b_score_for_vessel(
+        vessel_id, group if status == "success" else None, axis_b_results, min_peer_size
+    )
     has_specs = vessel.get("tonnage") is not None and bool(vessel.get("fishingType"))
     return RealAxisAResult(
         vessel_id=vessel_id,
@@ -127,6 +174,9 @@ def _result_from_context(
         vessel=vessel,
         matching_method="snapshotVesselId",
         matching_reason=None if has_specs else "톤수 또는 어업종 메타데이터가 비어 있습니다.",
+        axis_b_score=axis_b_score,
+        axis_b_raw=axis_b_raw,
+        axis_b_used_row_count=axis_b_used_row_count,
     )
 
 
@@ -170,7 +220,7 @@ class RealAxisAAdapter:
 
     @lru_cache(maxsize=128)
     def score(self, vessel_id: str) -> RealAxisAResult:
-        vessel_by_id, axis_results, groups, vessel_to_key = self._computed_context()
+        vessel_by_id, axis_results, groups, vessel_to_key, axis_b_results = self._computed_context()
         return _result_from_context(
             vessel_id,
             vessel_by_id,
@@ -178,6 +228,7 @@ class RealAxisAAdapter:
             groups,
             vessel_to_key,
             min_peer_size=MIN_PEER_GROUP_SAMPLE_SIZE,
+            axis_b_results=axis_b_results,
         )
 
     @lru_cache(maxsize=1)
@@ -187,4 +238,11 @@ class RealAxisAAdapter:
         vessel_by_id = {v.get("vesselId"): v for v in vessels if v.get("vesselId")}
         axis_results = compute_axis_a_pressure(events)
         groups, vessel_to_key = build_peer_groups(vessels, events)
-        return vessel_by_id, axis_results, groups, vessel_to_key
+        # 2026-08-18: B축은 실패해도(입력 파일 없음 등) A축 단독 경로가 죽지
+        # 않게 예외를 흡수한다 — B축 연결은 "있으면 더 좋은 것"이지 A축의
+        # 전제조건이 아니다.
+        try:
+            axis_b_results = compute_axis_b_results()
+        except (FileNotFoundError, ValueError):
+            axis_b_results = None
+        return vessel_by_id, axis_results, groups, vessel_to_key, axis_b_results
