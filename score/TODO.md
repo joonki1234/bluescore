@@ -26,8 +26,9 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
   (`data/BlueScore_지희님질문_매칭품질_20260814.md`,
   `data/BlueScore_모집단뒤집기_조사_20260818.md` 참고)
 - 국내→GFW 어업종 매핑표(19종) — 담당 미정 (`data/TODO.md` 참고)
-- CLAUDE.md "미확정 항목" 5개 (격자 크기, 재방문 기간, 유사군 최소 표본, GAP 비율
-  임계값, 매칭 신뢰도 임계값)
+- CLAUDE.md "미확정 항목" 3개 (유사군 최소 표본, GAP 비율 임계값, 매칭 신뢰도
+  임계값) — 격자 크기·재방문 기간은 2026-08-18 확정됨(아래 항목, CLAUDE.md
+  확정된 규칙 8번 참고)
 - 기관출력 단위(HP/PS) 확인 (`data/TODO.md` 참고)
 - GT→설치출력 회귀계수·SFOC 원출처 — 이번 조사로는 못 찾음, 새 단서 없이는
   더 진행 불가 (아래 항목)
@@ -35,6 +36,46 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
   계수 배선 항목 참고
 
 ---
+
+- [x] **A축 격자 크기·재방문 스케일 확정** — **완료(2026-08-18, 오동규, 최지희 요청
+      회의)**: `GRID_CELL_SIZE_DEG` 0.05→**0.1도**, `REVISIT_PRESSURE_SCALE_HOURS`
+      24→**60시간**으로 확정. CLAUDE.md 확정된 규칙 8번에 근거 전문 기록함
+      (data_new/ 실측 275,782건으로 격자 후보 0.02~1.0도 비교 — 0.1도가
+      과소분할/과잉병합 사이 균형점, 60시간은 그 격자 기준 실측 재방문 간격
+      중앙값). `REGION_GRID_SIZE_DEG`(peer_grouping.py, 유사군 해역 근사용)는
+      별개 항목이라 이번 결정에서 제외 — 여전히 잠정값.
+
+      **코드 반영 완료(2026-08-18)**: `score/axis_a_pressure.py`의 두 상수·주석·
+      모듈 docstring 갱신. 하위 파급 확인 결과:
+      - `pytest score/test_axis_a_pressure.py score/test_tradeoff_coefficients.py
+        api/test_api.py storage/test_workflow.py ui/test_simulator_surface.py -q`
+        전부 통과, 전체 `pytest -q`도 254 passed·1 skipped로 기존과 동일(회귀 없음).
+      - **시뮬레이터 데모 값은 실제로 안 바뀜** — 이유를 실측으로 확인함:
+        `axis_b_points_per_revisit_step`은 격자가 2배(0.05→0.1도)가 되면서
+        반환값도 약 2배로 커지는 게 맞다(예: VESSEL_A 조건 톤수 50GT·속도
+        10.4kn 기준 21.02→42.03). 하지만 `services/scoring.py.simulate()`에서
+        이 값이 쓰이는 `axis_b`는 같은 호출에서 `axis_b_points_per_knot`발
+        속도 이득 항이 워낙 커서(계산해보면 사전클램프 값이 169.2→148.2로,
+        둘 다 `AXIS_SCORE_CEIL=97.0`을 초과) 상한 클램프에 걸려 결과적으로
+        기존과 동일한 97.0으로 수렴함 — `test_persona_one_reaches_a_band`의
+        89.7이 그대로 유지되는 게 우연이 아니라 이 클램핑 때문임을 확인.
+        다만 이건 "이 페르소나 조건에서는 안 보인다"는 것이지 계수 자체가
+        안 바뀐 건 아니므로, 상한에 안 걸리는 다른 시나리오에서는 재방문
+        비용이 실제로 2배 커진다는 점은 최지희님께 공유 필요.
+      - `REVISIT_PRESSURE_SCALE_HOURS`는 현재 `services/scoring.py`가 아예
+        참조하지 않는다(`axis_a_pressure_raw_delta_for_revisit_step`을 쓰는
+        곳이 코드베이스 전체에 아직 없음 — 정의만 있고 미배선 상태) — 그래서
+        이 상수 변경은 지금 시점엔 시연 화면에 어떤 영향도 없음. `axis_a_pressure.py`
+        자체의 raw 계산(재방문압력)에는 반영됨(테스트로 확인).
+      - `python -m score.scripts.run_real_axis_a`(실제 GFW raw 91만 건)로
+        재실행 확인 — 정상 동작(9,723척 계산, 표본 60척짜리 유사군에서
+        A축 점수 55.0 산출). 스크립트 자체에 이번 상수와 무관한 기존
+        인코딩 버그(`sys.stdout.reconfigure` 누락으로 한글 출력 시
+        `UnicodeEncodeError`)가 있어 `run_real_axis_b.py`와 같은 방식으로
+        같이 고침. `python -m score.scripts.run_real_axis_b`도 재실행해
+        B축은 이번 변경과 무관하게 동일한 결과(2,310척)임을 재확인함
+        (B축은 `REGION_GRID_SIZE_DEG` 기반 `region_key()`를 쓰지
+        `GRID_CELL_SIZE_DEG`를 쓰지 않음).
 
 - [x] **B축 입력 병합 스크립트** — **완료(2026-08-18)**: `score/real_axis_b_input.py`
       (`build_axis_b_rows()`)로 구현, `score/scripts/run_real_axis_b.py`로 실제

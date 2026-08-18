@@ -15,8 +15,12 @@ peer_grouping.py, score_assembly.py)을 실제 수집 데이터(data/raw/)에 �
 
 import gzip
 import json
+import sys
 import time
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 from score.axis_a_pressure import compute_axis_a_pressure
 from score.peer_grouping import MIN_PEER_GROUP_SAMPLE_SIZE, build_peer_groups, peer_group_for_vessel

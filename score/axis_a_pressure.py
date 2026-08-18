@@ -34,9 +34,12 @@ A축(자원 압력) 지표 산출 — 동일·인접 격자 내 조업 이벤트
     - 이 모듈은 유사 선박군 내 백분위 정규화 이전의 원값(raw value) 산출까지만
       담당한다. 절대 점수가 아니며, 점수조립 단계에서 유사 선박군 내 상대값으로
       다시 정규화되어야 한다.
-    - 격자 크기(GRID_CELL_SIZE_DEG), 재방문압력 변환 계수, 결합 가중치
-      (AXIS_A_REVISIT_WEIGHT, AXIS_A_CONGESTION_WEIGHT, AXIS_A_INTERACTION_WEIGHT)는
-      전부 팀에서 아직 확정하지 않은 잠정값이며 검증 후 교체해야 한다.
+    - 격자 크기(GRID_CELL_SIZE_DEG=0.1도)와 재방문압력 변환 스케일
+      (REVISIT_PRESSURE_SCALE_HOURS=60시간)은 2026-08-18 확정됐다(CLAUDE.md
+      "확정된 규칙" 8번 참고 — data_new/ 실측 275,782건으로 격자 후보
+      0.02~1.0도를 비교해 근거를 마련함). 결합 가중치 3개(AXIS_A_REVISIT_WEIGHT,
+      AXIS_A_CONGESTION_WEIGHT, AXIS_A_INTERACTION_WEIGHT)는 여전히 팀에서
+      확정하지 않은 잠정값이며 검증 후 교체해야 한다.
       세 항의 스케일이 서로 달라(revisit_interval_raw는 시간 기반 반비례 값,
       crowding_pressure_raw는 이벤트 개수, 상호작용항은 그 곱) 결합 raw 값
       (axis_a_pressure_raw)을 그대로 쓰기보다 점수조립 단계에서 각 raw 값을
@@ -54,8 +57,11 @@ from typing import Dict, List, Optional, Tuple
 import geopandas as gpd
 from shapely.geometry import Point
 
-# 격자 한 변의 크기 (도 단위, 위경도 기준) — 잠정값, 검증 필요
-GRID_CELL_SIZE_DEG = 0.05
+# 격자 한 변의 크기 (도 단위, 위경도 기준) — 확정값(2026-08-18, CLAUDE.md
+# 확정된 규칙 8번). data_new/ 실측 275,782건으로 0.02~1.0도 후보를 비교해
+# 재방문 검출률·격자당 평균 이벤트 수를 근거로 정함(0.25도부터 검출률이
+# 91%대로 포화되며 격자당 이벤트가 급증해 "재방문"의 의미가 흐려짐).
+GRID_CELL_SIZE_DEG = 0.1
 
 # "인접 격자"로 볼 체비쇼프 거리(칸 수). 1이면 자기 자신 + 상하좌우/대각선 8방향
 ADJACENT_GRID_CHEBYSHEV_DISTANCE = 1
@@ -63,8 +69,12 @@ ADJACENT_GRID_CHEBYSHEV_DISTANCE = 1
 # 재방문간격(시간) -> 압력 점수 변환식의 파라미터.
 #   revisit_pressure = REVISIT_PRESSURE_SCALE_HOURS / (interval_hours + REVISIT_INTERVAL_EPSILON_HOURS)
 # interval이 REVISIT_PRESSURE_SCALE_HOURS(시간)일 때 압력이 대략 1.0이 되도록
-# 스케일링한 잠정값. 0시간 나눗셈 방지를 위해 EPSILON을 더한다.
-REVISIT_PRESSURE_SCALE_HOURS = 24.0
+# 스케일링한다. 0시간 나눗셈 방지를 위해 EPSILON을 더한다.
+# 확정값(2026-08-18, CLAUDE.md 확정된 규칙 8번) — GRID_CELL_SIZE_DEG=0.1도
+# 기준 실측 재방문 간격 중앙값(59.1시간)에 맞춤. 기존 잠정값 24시간은 실측
+# 중앙값의 1/3도 안 돼 대부분의 선박이 압력 0.1~0.3대에 몰려 변별력이 거의
+# 없었다.
+REVISIT_PRESSURE_SCALE_HOURS = 60.0
 REVISIT_INTERVAL_EPSILON_HOURS = 1.0
 
 # A축 raw 값 결합 시 재방문압력/혼잡압력/상호작용항 가중치 — 잠정값.
