@@ -87,6 +87,7 @@ html, body, [class*="css"] {{ font-family: {FONT_SANS}; }}
   border-radius: 0 12px 12px 0; padding: 18px 20px;
 }}
 .bs-blocked .t {{ font-size: 19px; font-weight: 700; color: {INK}; margin-bottom: 8px; }}
+.bs-blocked .bs-note {{ font-size: 15px; line-height: 1.7; }}
 
 .bs-hash {{
   font-family: {FONT_MONO}; font-size: 12px; background: {BG};
