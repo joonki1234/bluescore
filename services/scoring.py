@@ -153,7 +153,7 @@ class ScoringService:
         if source_type == "real":
             if not self.real_adapter.available:
                 raise BackendUnavailableError("실데이터 스냅샷을 찾을 수 없습니다.")
-            # BlueScore까지 완전 산출되는 선박(16.2%)이 목록 앞쪽에 안 걸리면
+            # BlueScore까지 완전 산출되는 선박(15.2%)이 목록 앞쪽에 안 걸리면
             # 화면을 처음 열었을 때 A축만 나온 사례부터 보여서 "B축은 안 되나?"로
             # 오해를 살 수 있다. status_ranked_vessels()가 성공 사례부터 정렬해 둔다.
             ranked = self.real_adapter.status_ranked_vessels()

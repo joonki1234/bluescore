@@ -229,7 +229,7 @@ class RealAxisAAdapter:
     @lru_cache(maxsize=1)
     def status_ranked_vessels(self) -> List[Tuple[bool, dict, str]]:
         """전체 스냅샷의 산출 상태를 선박별로 한 번만 계산해, BlueScore까지
-        완전 산출되는 선박(전체의 16.2%)이 앞쪽에 오도록 정렬해 둔다.
+        완전 산출되는 선박(전체의 15.2%)이 앞쪽에 오도록 정렬해 둔다.
         선박당 계산은 가벼워도 5,000여 척 전체를 매 API 호출마다 다시 돌리면
         수십 초가 걸려(측정: 약 21초) 목록 화면이 매번 멈춘 것처럼 보인다.
         """

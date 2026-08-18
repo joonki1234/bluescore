@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 PROCESSED = Path(__file__).resolve().parent.parent / "processed"
@@ -40,6 +41,29 @@ def _load_jsonl(path: Path) -> list:
 
 def _total_score(candidate: dict) -> float:
     return candidate["nameScore"] + candidate["tonnageBonus"] + candidate.get("locationBonus", 0.0)
+
+
+# 2026-08-18(김준기, 태윤님 확인 필요): PROCESS_LOG.md 49번 검증("번호 일치 시
+# 정밀도 95~100%, 불일치 시 0%")이 CLAUDE.md 10번의 근거로 이미 인용됐는데
+# _total_score에는 실제로 반영돼 있지 않았다. 이미 커밋된 final_vessel_matches.jsonl
+# (2,878 tier3_fuzzy_name 중 이름 텍스트 확인 가능한 2,311척)로 시뮬레이션한
+# 결과, "26 NAM GANG HO" ↔ "203남광호"처럼 fuzzyScore 0.8~0.92로 높게 나왔는데도
+# 선단 번호가 명백히 다른 오매칭 77건(3.3%)을 확인했다. 원본 raw 입력
+# (fuzzy_name_candidates.jsonl 등)이 로컬에 없어 이 필터를 넣은 채로 파이프라인을
+# 처음부터 재실행해 전체 재검증은 못 했다 — 태윤님이 다음에 재실행할 때 카운트가
+# 이 설명과 크게 어긋나면 알려주시길.
+def _digit_prefix(name: str) -> str:
+    normalized = re.sub(r"[^A-Z0-9]", "", (name or "").upper())
+    m = re.match(r"^\D*?(\d{2,4})", normalized)
+    return m.group(1) if m else ""
+
+
+def _numeric_mismatch(gfw_name: str, candidate_name: str) -> bool:
+    """둘 다 숫자(선단 번호 등)를 갖고 있는데 서로 다르면 오매칭으로 본다.
+    둘 중 하나라도 숫자가 없으면(판정 근거 없음) 통과시킨다 — 과잉 거부 방지."""
+    gfw_digit = _digit_prefix(gfw_name)
+    candidate_digit = _digit_prefix(candidate_name)
+    return bool(gfw_digit and candidate_digit and gfw_digit != candidate_digit)
 
 
 def run() -> None:
@@ -73,13 +97,15 @@ def run() -> None:
         c3 = fuzzy_candidates.get(vessel_id)
         top3 = c3["candidates"][0] if c3 and c3["candidates"] else None
 
+        numeric_mismatch = bool(top3) and _numeric_mismatch(result["gfwName"], top3["name"])
+
         if c2:
             result["matchTier"] = "tier2_callsign_exact"
             result["matchConfidence"] = "high"
             result["registryVesselNo"] = c2["registryVesselNo"]
             result["tac"] = tac_registry_by_registry_no.get(c2["registryVesselNo"])
             counts["tier2_callsign"] += 1
-        elif top3 and _total_score(top3) >= FUZZY_NAME_THRESHOLD:
+        elif top3 and _total_score(top3) >= FUZZY_NAME_THRESHOLD and not numeric_mismatch:
             result["matchTier"] = "tier3_fuzzy_name"
             result["matchConfidence"] = "medium"
             result["fuzzyScore"] = round(_total_score(top3), 3)
@@ -99,6 +125,8 @@ def run() -> None:
             result["matchConfidence"] = None
             if top3:
                 result["bestRejectedCandidate"] = {"name": top3["name"], "score": round(_total_score(top3), 3)}
+                if numeric_mismatch:
+                    result["bestRejectedCandidate"]["rejectedReason"] = "numericPrefixMismatch"
             counts["unmatched"] += 1
 
         results.append(result)
