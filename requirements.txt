@@ -2,7 +2,6 @@ fastapi
 uvicorn
 streamlit
 lightgbm
-shap
 openai
 pandas
 openpyxl

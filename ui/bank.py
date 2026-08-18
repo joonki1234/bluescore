@@ -352,7 +352,7 @@ def render() -> None:
     vessel = adapter.get_vessel(vessel_id)
     issued = date.today().isoformat()
 
-    st.markdown(f"### {vessel['name']} · 여신 심사")
+    components.page_title(vessel['name'], "여신 심사")
 
     if not adapter.is_scored(vessel):
         notice = adapter.blocked_notice(vessel)

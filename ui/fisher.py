@@ -43,7 +43,7 @@ def render() -> None:
     vessel_id = st.session_state.get("vessel_id", adapter.vessel_options()[0])
     vessel = adapter.get_vessel(vessel_id)
 
-    st.markdown(f"### {vessel['name']} · 내 조업 성적")
+    components.page_title(vessel['name'], "내 조업 성적")
 
     if not adapter.is_scored(vessel):
         components.blocked_page(vessel)

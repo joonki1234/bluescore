@@ -55,6 +55,64 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
 
 ---
 
+- [x] **A축 raw 결합에 z-score 정규화 적용** — **완료(오동규)**: `score/axis_a_pressure.py`의
+      `compute_axis_a_pressure()`가 `revisit_interval_raw`(실측 중앙값 0.88)와
+      `crowding_pressure_raw`(격자 내 다른 배 이벤트 카운트, 실측 중앙값
+      371.83 — 약 400배 차이)를 그대로 가중합하고 있었는데, 이 단위 불균형
+      때문에 `AXIS_A_REVISIT_WEIGHT=0.5`/`AXIS_A_CONGESTION_WEIGHT=0.5`가
+      이름만 50:50이지 실제로는 재방문압력의 평균 기여비중이 1.08%로
+      거의 묻혀 있었다(실측 확인).
+      - **적용 방법**: 두 raw 값을 population(같은 호출에 넘긴 이벤트 전체
+        중 `used_event_count > 0`인 선박) 기준 z-score로 정규화한 뒤 결합.
+        상호작용항도 정규화된 값끼리 곱하도록 바꿨다(`interaction_zscore =
+        revisit_zscore * crowding_zscore`). `revisit_interval_raw`/
+        `crowding_pressure_raw`/`interaction_raw` 필드는 원래 raw 값 그대로
+        유지하고(화면·진단 스크립트가 원래 단위로 보여줄 수 있어야 하므로),
+        결합에는 새로 추가한 `revisit_zscore`/`crowding_zscore`/
+        `interaction_zscore` 필드만 쓴다.
+      - **왜 z-score를 택했나**: min-max 정규화(실측 22.31%), 유사군 내
+        백분위 정규화(실측 47.81%, 이론적으로 가장 정확)와 비교 시뮬레이션한
+        결과, z-score(실측 40.45%)가 구현 난이도 대비 개선 폭이 제일
+        좋았다. 유사군 백분위 방식은 결합 단계에서 유사군 정보가 필요해
+        지금 구조(유사군은 점수조립 단계에서만 있음) 변경이 필요한데, 시간
+        여유를 고려해 우선순위에서 밀렸다 — **향후 개선 후보로 남겨둠**.
+      - **실데이터로 확인한 개선**: 재방문압력 평균 기여비중이 1.08% →
+        약 38.75%(실제 구현으로 5,314척 전체 재계산, 시뮬레이션값 40.45%와
+        비슷한 수준)로 개선됨.
+      - **연쇄 수정**: `score/shap_factors.py`의 `axis_a_factor_contributions()`가
+        기존에 raw 필드로 가중합을 재현하고 있었는데, 결합이 z-score
+        기반으로 바뀌었으니 이것도 zscore 필드를 쓰도록 고쳤다(안 고쳤으면
+        세 항의 합이 `axis_a_pressure_raw`와 안 맞아 가법성 불변식 테스트가
+        깨짐). 실데이터로 가법성도 재확인함(합계 +0.9718 = axis_a_pressure_raw
+        +0.9718).
+      - **`axis_a_pressure_raw`의 절대 크기 자체가 완전히 달라짐**(raw 결합
+        시절엔 수백 단위, 이제는 z-score 단위라 대략 -3~+5 범위). 전체
+        소비처(`grep -rn "axis_a_pressure_raw"`)를 확인한 결과
+        `score/score_assembly.py::raw_to_score()`와
+        `services/real_scoring.py`는 전부 상대 순위(백분위)만 쓰므로 문제
+        없음. `score/tradeoff_coefficients.py`의
+        `axis_a_pressure_raw_delta_for_revisit_step()`은 이름은 비슷하지만
+        별개 함수(`revisit_pressure_from_interval()`만 직접 씀, 이 결합
+        로직과 무관 — 게다가 아직 아무 데도 안 쓰이는 미배선 함수)라 영향
+        없음.
+      - 테스트: `score/test_axis_a_pressure.py`에 z-score 관련 테스트 3개
+        추가(population 평균 0/표준편차 1 확인, 표준편차 0일 때 0으로
+        나누기 없이 0.0 처리, 이벤트 없는 선박은 z-score도 0). 기존
+        `test_interaction_term_amplifies_when_both_signals_high`는 raw
+        기준 비교라 새 결합 방식과 안 맞아 실패했었는데, self-exclusion
+        설계(확정된 규칙 6번) 때문에 "혼자 반복 방문"만으로는 재방문·혼잡
+        둘 다 population 평균보다 높게(z-score 양수) 나오지 않는다는 걸
+        발견해(자기 몫이 혼잡압력에서 빠지므로) — 실제로 재방문·혼잡 둘 다
+        높은 선박을 만들려면 비슷하게 자주 오는 다른 배가 여러 척 더
+        있어야 한다는 걸 반영해 테스트 시나리오를 다시 만듦.
+        `score/test_shap_factors.py`의 `_make_axis_a_result()` 헬퍼도
+        zscore 필드를 채우도록 수정(raw 필드는 일부러 `-999.0`으로 채워서
+        실수로 raw 필드를 쓰면 테스트가 바로 깨지게 함).
+      - `pytest -q` 307 passed(env 서브프로세스 테스트 1개만 무관하게
+        실패), `python -m score.scripts.run_real_axis_a`·
+        `python -m score.scripts.run_shap_factors` 둘 다 실데이터로
+        에러 없이 재확인.
+
 - [x] **요인 기여도(SHAP) 실제 계산 구현** — **완료(2026-08-18, 오동규)**:
       `score/shap_factors.py` 신설. 그동안 `requirements.txt`에 `shap`
       패키지만 있고 실제로 쓰는 코드는 없어서, 화면의 `shapFactors`는 전부
@@ -92,6 +150,47 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       - **다음 단계(범위 밖, 팀 논의 필요)**: raw 값을 화면 "점수(포인트)"
         단위로 바꾸는 환산 정책, `explain/contract.ShapFactor`로의 배선,
         `services/`(최지희) 연결.
+
+      **(2026-08-18 후속) A축만 `services/real_scoring.py`에 실제 연결
+      완료(오동규, 최지희 확인 필요)**: 위 "raw→포인트 환산" 문제를 A축은
+      다르게 풀었다 — 개별 요인의 절대 "점수"는 유사군 분포 없이 못 구하지만,
+      "전체 A축 raw 압력에서 이 요인이 차지하는 상대적 비중(%)"은 유사군
+      없이도 정직하게 계산된다는 걸 이용해서 `axis_a_factor_shares()`를
+      새로 추가(`score/shap_factors.py`). `RealAxisAResult.shap_factors`
+      필드 신설 → `_result_from_context()`에서 `axis_result`가 있으면
+      status(insufficientSample 포함)와 무관하게 채움(raw 분해 자체가 유사군
+      표본과 무관하니까) → `services/scoring.py::_build_real_score`가
+      `ShapFactorSchema`로 감싸 `ScoreResponse.shap_factors`에 실제로 담음
+      (지금까지 이 인자가 아예 빠져 있어서 실산출 경로는 조용히 항상
+      빈 리스트였음). **B축은 여전히 미연결** — SHAP이 "점수"가 아니라
+      "기준선 조건"만 설명한다는 의미론적 제약은 그대로 유효하기 때문
+      (`axis_b_baseline_factor_contributions()` docstring 참고).
+      실측 확인: `RealAxisAAdapter`로 실제 3척 조회 — 3개 요인·`axis="a"`만·
+      절댓값 합 100.00%로 정확히 나옴. 테스트 4개 추가
+      (`score/test_shap_factors.py`의 `TestAxisAFactorShares` +
+      `services/test_real_scoring.py`), `pytest -q` 334 passed(env
+      서브프로세스 테스트 1개만 무관하게 실패). `explain/`(LLM 문장화) 연결은
+      여전히 범위 밖 — 실산출 경로가 아직 `explain/explain()`을 안 써서
+      (B축 `unavailable`이라 완전한 설명을 못 만듦) 별도 작업 필요.
+
+      **(2026-08-18 후속 — B축 SHAP 코드 자체를 들어냄, 팀 결정)**: 위에서
+      만들었던 `axis_b_baseline_factor_contributions()`/
+      `axis_b_baseline_expected_value()`(테스트로 검증까지 마쳤던 것)를
+      완전히 삭제했다. 이유를 대화로 다시 짚어본 결과 — 잔차(B축 raw)를
+      만드는 진짜 원인(속도)이 순환성 방지를 위해 애초에 LightGBM 기준선
+      모델 입력에서 빠져있어서, SHAP이 그 원인을 구조적으로 찾아낼 수
+      없다는 게 명확해졌다. 즉 "기준선이 왜 이 값인지"는 설명해도 "왜
+      점수가 이렇다"는 절대 설명 못 하는데, 아무도 이 함수를 호출할
+      계획이 없으니(B축은 이 방식으로 설명 안 하기로 함) 오해 소지만
+      남기고 쓰이지 않을 코드를 유지할 이유가 없다고 판단함. 같이 정리한
+      것: `requirements.txt`의 `shap` 의존성 제거(A축은 라이브러리 없이
+      수식 직접 분해라 애초에 필요 없었음), `score/test_shap_factors.py`의
+      B축 테스트 4개 제거, `score/scripts/run_shap_factors.py`의 B축
+      섹션 제거. **`axis_b_baseline.py`의 dtype 버그 수정(`pd.to_numeric`)과
+      그 회귀 테스트는 SHAP과 무관하게 유효한 일반 견고성 수정이라 그대로
+      유지함.** 필요해지면 이전 커밋(`4536b08c`)에서 복원 가능. B축 설명은
+      대신 "자기 속도 vs 유사군 평균 속도" 같은 단순 비교로 가는 쪽으로
+      방향만 잡아둠(구현은 미착수).
 
 - [x] **A축 격자 크기·재방문 스케일 확정** — **완료(2026-08-18, 오동규, 최지희 요청
       회의)**: `GRID_CELL_SIZE_DEG` 0.05→**0.1도**, `REVISIT_PRESSURE_SCALE_HOURS`
@@ -389,3 +488,28 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
       추가해서 `data_snapshot_id`/`model_version`이 지금 코드가 낼 수 있는
       값과 다르면 캐시를 버리고 재계산하도록 고침 — 앞으로 데이터/모델
       버전을 올리는 변경이 있으면 이 체크가 자동으로 캐시를 무효화한다.
+- [x] **(2026-08-18) 매칭 오탐 필터(숫자접두어 불일치) 적용** — 태윤님이 올린
+      `data_new/matching_redesign_proposal/`(한글비교 매칭 재설계 제안) 검토 중,
+      제안서가 인용한 PROCESS_LOG 49번 근거("번호 일치 시 정밀도 95~100%,
+      불일치 시 0%")가 실제 라이브 코드(`data_new/process/assemble_matches.py`)엔
+      반영이 안 돼 있던 걸 발견. 제안 A(현행 유지)/B(숫자필터만 추가)/C(한글
+      비교로 전체 교체, 커버리지 54.1%→17.2~27.3%) 중 B를 선택 — C는 정밀도
+      98%+가 사람 검증 0건인 추정치라 마감 임박 시점에 들이기엔 위험 판단.
+      이미 커밋된 `final_vessel_matches.jsonl`(5,323척)로 먼저 시뮬레이션해
+      확인: tier3_fuzzy_name 2,878척 중 매칭명 텍스트 확인 가능한 2,311척
+      (tac/mof 출처, vessel_registry 출처 567척은 로컬에 매칭명 텍스트가 없어
+      검증 불가) 안에서 GFW 자기신고명과 매칭명의 숫자(선단 번호)가 둘 다
+      있는데 서로 다른 경우 77건 확인(예: `26 NAM GANG HO`↔`203남광호`,
+      fuzzyScore 0.833으로 이미 고신뢰 판정돼 있었음). `assemble_matches.py`에
+      `_numeric_mismatch()` 필터를 추가해 향후 재실행에도 반영되게 하고
+      (2026-08-18, 김준기, 태윤님 원본 raw 데이터가 로컬에 없어 파이프라인
+      처음부터 재실행해 전체 재검증은 못 함 — 태윤님 재실행 결과가 이 설명과
+      크게 다르면 확인 필요), 같은 로직으로 이미 커밋된
+      `final_vessel_matches.jsonl`에도 직접 78건(런타임 재확인 시 1건 추가
+      포착)을 `unmatched`로 강등 적용 후 `convert_data_new_vessels.py`로
+      `vessels_for_score.jsonl.gz` 재생성함. **결과**: A축 실산출 61.0%→61.4%
+      (사실상 동일), BlueScore 완전 산출 16.2%(864척)→15.2%(807척)로 소폭
+      감소 — 확인된 오탐 제거의 정상적인 대가. `ui/real_preview.py`·
+      `services/scoring.py`·`services/real_scoring.py`의 하드코딩된 커버리지
+      수치 주석도 갱신함. 제안 C(한글비교 전체 교체)는 이번 제출 범위에서는
+      보류 — 다음 라운드에 사람 검증 거쳐 재논의.

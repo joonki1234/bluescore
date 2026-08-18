@@ -57,12 +57,8 @@ AXIS_A_WEIGHT = 0.65
 AXIS_B_WEIGHT = 0.35
 AXIS_A_GAIN_PER_REVISIT_STEP = 7.0
 AXIS_A_COST_PER_KNOT = 0.8
-# B축 관련 트레이드오프 계수(속도↔B축, 재방문↔B축)는 2026-08-18에
-# score/tradeoff_coefficients.py의 실제 물리식 기반 함수로 교체했다 — 원래 여기
-# 있던 고정 상수(AXIS_B_GAIN_PER_KNOT=3.2, AXIS_B_COST_PER_REVISIT_STEP=2.4)는
-# 근거 없는 정책 예시였다. 이 파일은 services/ 소유자(최지희)의 파일이라 배선을
-# 바꾸는 것 자체가 조율 대상이었음 — 오동규가 작업, 최지희 확인 완료(2026-08-18,
-# 같은 날짜에 추가된 A축 격자 크기·재방문 스케일 확정값 변경분 포함).
+# B축 관련 트레이드오프 계수(속도↔B축, 재방문↔B축)는 score/tradeoff_coefficients.py의
+# 실제 물리식 기반 함수를 쓴다(고정 상수 아님).
 FUEL_PERCENT_PER_AXIS_B_POINT = 0.55
 AXIS_SCORE_FLOOR = 4.0
 AXIS_SCORE_CEIL = 97.0
@@ -73,10 +69,8 @@ SIM_SPEED_STEP = 0.1
 EXAMPLE_PRINCIPAL_WON = 100_000_000
 EXAMPLE_TERM_YEARS = 3
 
-# 데모 fixture 선박엔 톤수가 없다(data/mock/dashboard_mock.json의 VESSEL_A/B/C
-# 전부 tonnage=null). axis_b_points_per_knot/axis_b_points_per_revisit_step은
-# tonnage_gt가 필수 인자라, 값이 없으면 이 대표값으로 대체한다.
-# 임시값 — 근거 없음, 실제 데모 선박 톤수가 정해지면 교체 필요.
+# 데모 fixture 선박엔 톤수가 없어(tonnage=null) axis_b_points_per_knot 등의
+# 필수 인자를 이 대표값으로 대체한다. 임시값 — 근거 없음, 교체 필요.
 DEMO_FALLBACK_TONNAGE_GT = 50.0
 
 
@@ -97,6 +91,15 @@ def _top_percent(value: float, population: List[float]) -> int:
 
 def _discount_text(band: RateBand) -> str:
     return f"{band.grade} · 우대 없음" if band.discount_bp <= 0 else f"{band.grade} · −{band.discount_bp}bp"
+
+
+def _fishing_type_text(fishing_type) -> str:
+    """fishingType은 리스트(예: ["SET_GILLNETS"])라, f-string에 그냥 넣으면
+    파이썬 repr(`['SET_GILLNETS']`)이 그대로 화면에 노출된다 — 실산출
+    화면에서 실측으로 발견함. 사람이 읽는 문자열로 join한다."""
+    if not fishing_type:
+        return "어업종 미상"
+    return ", ".join(fishing_type)
 
 
 class ScoringService:
@@ -153,15 +156,14 @@ class ScoringService:
         if source_type == "real":
             if not self.real_adapter.available:
                 raise BackendUnavailableError("실데이터 스냅샷을 찾을 수 없습니다.")
-            # BlueScore까지 완전 산출되는 선박(16.2%)이 목록 앞쪽에 안 걸리면
-            # 화면을 처음 열었을 때 A축만 나온 사례부터 보여서 "B축은 안 되나?"로
-            # 오해를 살 수 있다. status_ranked_vessels()가 성공 사례부터 정렬해 둔다.
+            # BlueScore까지 완전 산출되는 선박이 목록 앞쪽에 오도록 정렬한다 —
+            # A축만 나온 사례부터 보이면 "B축은 안 되나?"로 오해를 살 수 있다.
             ranked = self.real_adapter.status_ranked_vessels()
             vessels = [
                 VesselSummary(
                     vessel_id=v["vesselId"],
                     name=v.get("name") or "가명 선박",
-                    meta=f"{v.get('fishingType') or '어업종 미상'} · {v.get('tonnage') or '톤수 미상'}",
+                    meta=f"{_fishing_type_text(v.get('fishingType'))} · {v.get('tonnage') or '톤수 미상'}",
                     fleet_label="실데이터 A축 산출 후보",
                     status=status,
                 )
@@ -266,10 +268,9 @@ class ScoringService:
             raise NotFoundError(f"실데이터 선박을 찾을 수 없습니다: {vessel_id}") from exc
         vessel = result.vessel
 
-        # 2026-08-18: B축 연결(오동규, 최지희 확인 후 진행). A축만 되던 대다수
-        # 선박은 그대로 "partial"이고(톤수 매칭 커버리지 43.4%뿐이라 B축 자체가
-        # 안 나오는 경우가 흔함), A축+B축이 둘 다 유사군 백분위까지 나온 선박만
-        # "success"로 승격해 BlueScore·금리구간을 낸다.
+        # A축만 되는 대다수 선박은 그대로 "partial"이고(톤수 매칭 커버리지
+        # 43.4%뿐), A축+B축이 둘 다 유사군 백분위까지 나온 선박만 "success"로
+        # 승격해 BlueScore·금리구간을 낸다.
         has_axis_b = result.axis_b_score is not None
         status = "success" if result.status == "partial" and has_axis_b else result.status
 
@@ -295,7 +296,7 @@ class ScoringService:
             vessel=VesselSummary(
                 vessel_id=vessel_id,
                 name=vessel.get("name") or "가명 선박",
-                meta=f"{vessel.get('fishingType') or '어업종 미상'} · {vessel.get('tonnage') or '톤수 미상'}",
+                meta=f"{_fishing_type_text(vessel.get('fishingType'))} · {vessel.get('tonnage') or '톤수 미상'}",
                 fleet_label="GFW 고정 스냅샷 유사군",
                 status=status,
             ),
@@ -315,12 +316,17 @@ class ScoringService:
                 raw_value=result.axis_b_raw,
                 used_event_count=result.axis_b_used_row_count,
                 missing_reason=None if has_axis_b else "톤수 미매칭이거나 유사군 내 B축 표본이 부족합니다.",
+                estimated_fuel_kg=result.axis_b_estimated_fuel_kg,
+                expected_fuel_kg=result.axis_b_expected_fuel_kg,
             ),
             rate_band=band,
             peer_group=PeerContext(count=result.peer_count),
             matching_confidence=None,
             matching_method=result.matching_method,
             matching_reason=result.matching_reason,
+            # A축 요인 기여도(SHAP)만 연결한다. B축은 score/shap_factors.py 모듈
+            # docstring 참고("점수"가 아니라 "기준선 조건"만 설명 가능한 제약).
+            shap_factors=[ShapFactorSchema(**item) for item in result.shap_factors],
             message=message,
             created_at=datetime.now(timezone.utc),
             **response_metadata("real", axis_b_included=has_axis_b),

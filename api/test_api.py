@@ -38,8 +38,7 @@ def test_persona_one_reaches_a_band(tmp_path):
     body = response.json()
     assert body["beforeBand"]["grade"] == "B"
     assert body["afterBand"]["grade"] == "A"
-    # 2026-08-18: score/tradeoff_coefficients.py 실제 계수로 교체되며 78.0->89.7로
-    # 바뀜(밴드 B->A 전환은 그대로 유지) — services/scoring.py 커밋 메시지 참고.
+    # score/tradeoff_coefficients.py의 실제 계수 기준 산출값(밴드 B->A 전환은 유지됨).
     assert body["simulatedScore"] == 89.7
     assert body["bandChanged"] is True
     assert body["assumptions"]
@@ -153,11 +152,7 @@ def test_health가_런타임_LLM_상태를_구분해_알려준다(tmp_path, monk
 
 
 def test_api_프로세스가_env_파일을_직접_읽는다():
-    """
-    uvicorn은 app.py와 다른 프로세스라 app.py의 load_dotenv가 여기까지 오지
-    않는다. 이게 빠져 있어서 .env에 키를 넣어도 질의응답이 조용히
-    llm_disabled 폴백으로 떨어졌다.
-    """
+
     import os
     import subprocess
     import sys
@@ -181,7 +176,7 @@ def test_api_프로세스가_env_파일을_직접_읽는다():
 
 
 def test_질의응답이_런타임_플래그를_실제로_탄다(tmp_path, monkeypatch):
-    """화면에서 llm_disabled가 뜬 경로를 API 경계에서 고정한다."""
+    
     monkeypatch.setenv("BLUESCORE_LLM_RUNTIME_ENABLED", "false")
     response = _client(tmp_path).post(
         "/vessels/VESSEL_A/questions", json={"question": "왜 점수가 낮나요?"}

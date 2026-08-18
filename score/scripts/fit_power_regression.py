@@ -4,13 +4,12 @@
 TAC(할당승인정보) 원본의 실제 톤수-마력 쌍으로, score/axis_b_physics.py의
 POWER_COEFF_A/B(GT -> 설치출력 kW 회귀식)를 직접 재적합(calibration)해본다.
 
-배경: Coello et al. (2015) 논문 원문을 오동규가 직접 대조했는데
-POWER_COEFF_A/B(5.46, 0.70)는 그 논문에 나오는 값이 아니었다(원문은 GT 회귀가
-아니라 실제 선박 등록부 값을 씀) — Whall et al./Parker & Tyedmers/ICES/IMO
-GHG Study도 뒤졌지만 출처를 못 찾았다. "어디서 왔는지 모르는 외국 문헌 값"을
-계속 찾는 대신, 우리가 이미 갖고 있는 한국 어선 실측 데이터(TAC 원본의
-선박 톤수/선박 마력)로 회귀식 자체를 다시 적합해서 "우리 모집단으로 검증한
-계수"로 바꾼다.
+배경: POWER_COEFF_A/B(5.46, 0.70)는 Coello et al. (2015) 논문 원문에 나오는
+값이 아니다(원문은 GT 회귀가 아니라 실제 선박 등록부 값을 씀) — Whall
+et al./Parker & Tyedmers/ICES/IMO GHG Study도 뒤졌지만 출처를 못 찾았다.
+"어디서 왔는지 모르는 외국 문헌 값"을 계속 찾는 대신, 이미 갖고 있는 한국
+어선 실측 데이터(TAC 원본의 선박 톤수/선박 마력)로 회귀식 자체를 다시
+적합해서 "우리 모집단으로 검증한 계수"로 바꾼다.
 
 물리식(axis_b_physics.py)은 P(kW) = a * GT^b 형태 -> log(P) = log(a) + b*log(GT)
 로 선형화해서 최소자승 회귀.

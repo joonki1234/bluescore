@@ -9,15 +9,12 @@
 한 번 커밋된 record_id는 덮어쓸 수 없다 — 증적(evidence)이라는 목적상 같은 산출
 결과에 대해 나중에 값이 바뀌어 보이면 안 되기 때문이다.
 
-이 파일엔 같은 commit/get/verify 인터페이스를 가진 구현이 두 개 있다:
-    - `HashLedger`: 인메모리. Node/Hardhat 없이 어디서나 동작하고, 이 프로젝트의
-      기본 pytest 스위트가 이걸로 돈다.
-    - `OnChainHashLedger` (2026-08-14 추가): `chain/hardhat/`에 배포된
-      `HashRegistry.sol`을 web3.py로 실제 호출한다. `HashLedger`를 대체하는 게
-      아니라 나란히 두는 것 — 로컬에 Hardhat 노드를 안 띄운 컴퓨터에서도 기존
-      테스트가 그대로 통과해야 하기 때문이다. 실제 사용은 호출부가 어느 클래스를
-      쓸지 선택하면 된다(`chain/commit_score_result.py`는 둘 다 받는다, `LedgerLike`
-      참고).
+같은 commit/get/verify 인터페이스를 가진 구현이 두 개 있다: `HashLedger`(인메모리,
+Node/Hardhat 없이 어디서나 동작하며 기본 pytest 스위트가 이걸로 돈다)와
+`OnChainHashLedger`(`chain/hardhat/`에 배포된 `HashRegistry.sol`을 web3.py로 실제
+호출). 후자가 전자를 대체하는 게 아니라 나란히 두는 것 — Hardhat 노드가 없는
+컴퓨터에서도 기존 테스트가 통과해야 하기 때문이다. 호출부는 `LedgerLike` 인터페이스로
+둘 중 하나를 선택해 쓴다(`chain/commit_score_result.py` 참고).
 """
 
 import json
@@ -40,7 +37,6 @@ class HashRecord:
 
 
 class HashLedger:
-    """해시 커밋/조회를 위한 최소 스코프 인메모리 원장."""
 
     def __init__(self) -> None:
         self._records: Dict[str, HashRecord] = {}
@@ -102,16 +98,12 @@ class OnChainHashLedger:
     `HashRegistry` 스마트컨트랙트(web3.py) 기반 구현.
 
     로컬 Hardhat 노드(`npx hardhat node` + `chain/hardhat/ignition/modules/
-    HashRegistry.js` 배포)가 떠 있어야 실제로 동작한다. 이 프로젝트엔 Node가
-    없는 컴퓨터도 있을 수 있어(2026-08-14 기준 이 코드를 작성한 컴퓨터가 그렇다),
-    생성자에서 네트워크에 바로 접속하지는 않는다 — 실제 RPC 호출은 commit/get/
-    verify를 부를 때 처음 일어난다.
+    HashRegistry.js` 배포)가 떠 있어야 동작한다. 생성자는 네트워크에 바로
+    접속하지 않는다 — 실제 RPC 호출은 commit/get/verify를 부를 때 처음 일어난다.
 
-    서명 방식은 두 가지를 지원한다:
-        - private_key(또는 BLUESCORE_CHAIN_PRIVATE_KEY)를 주면 그 키로 직접
-          서명해서 보낸다 — 공개 테스트넷 등 어디서나 동작.
-        - 안 주면 `w3.eth.accounts[0]`(연결된 노드가 잠금 해제해서 제공하는
-          첫 계정)을 보내는 사람으로 쓴다 — 로컬 Hardhat 노드 전용 지름길이다.
+    서명 방식 두 가지를 지원: private_key(또는 BLUESCORE_CHAIN_PRIVATE_KEY)를
+    주면 그 키로 직접 서명하고(공개 테스트넷 등 어디서나 동작), 안 주면
+    `w3.eth.accounts[0]`을 보내는 사람으로 쓴다(로컬 Hardhat 노드 전용 지름길).
     """
 
     def __init__(

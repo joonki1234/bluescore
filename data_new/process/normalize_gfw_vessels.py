@@ -2,17 +2,17 @@
 score/ 계약 + 조인키 설계에 쓸 형태로 정리한다.
 
 **출처를 섞지 않는다** — registryInfo(공식 등록부 매칭, 신뢰도 높음)와
-selfReportedInfo(AIS 자기신고, 신뢰도 낮음 — POLARIS PRINCE 사례,
-PROCESS_LOG.md 9번)를 하나의 필드로 합쳐버리면 어느 쪽에서 온 값인지
-잃어버려서, 매칭 단계(조인키 설계 2~3단계)가 신뢰도를 구분해서 쓸 수 없게
-된다. 그래서 `registry*` / `selfReported*` 접두어로 따로 남긴다.
+selfReportedInfo(AIS 자기신고, 신뢰도 낮음 — POLARIS PRINCE 사례로 확인)를
+하나의 필드로 합쳐버리면 어느 쪽에서 온 값인지 잃어버려, 매칭 단계가
+신뢰도를 구분해서 쓸 수 없게 된다. 그래서 `registry*` / `selfReported*`
+접두어로 따로 남긴다.
 
 가공 단계라 raw/는 읽기만 한다. processed/에 새로 쓰며, 원본에서 결정론적
 으로 재생성 가능해 스냅샷 원칙(재조회 덮어쓰기 금지) 적용 대상이 아니다.
 
 vesselId는 응답 본문이 아니라 **파일명**에서 뽑는다 — 우리가 실제로
-요청한 ID 그대로라 가장 신뢰도 높음(combinedSourcesInfo가 비어있는
-경우에도 항상 있음, 방금 실측으로 확인됨).
+요청한 ID 그대로라 가장 신뢰도 높다(combinedSourcesInfo가 비어있는
+경우에도 항상 있음).
 
 사용법:
     python normalize_gfw_vessels.py

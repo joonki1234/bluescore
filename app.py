@@ -3,10 +3,9 @@
 
 BlueScore 대시보드 진입점.
 
-어업인용 화면과 금융기관(심사역)용 화면을 **별도 페이지**로 분리한다. 두 화면은
-보여주는 범위가 다르지만, 숫자는 반드시 ui/adapter.py 한 곳에서만 나온다 —
-같은 선박에 대해 서로 다른 점수가 보이면 "제3자가 관측한 동일한 점수"라는
-서비스 전제가 무너지기 때문이다.
+어업인용 화면과 금융기관(심사역)용 화면을 별도 페이지로 분리하되, 숫자는 반드시
+ui/adapter.py 한 곳에서만 나온다 — 같은 선박에 서로 다른 점수가 보이면 "제3자가
+관측한 동일한 점수"라는 서비스 전제가 무너지기 때문이다.
 
 실행:
     streamlit run app.py
@@ -21,10 +20,8 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-# .env를 환경변수로 올린다. Streamlit은 .env를 자동으로 읽지 않기 때문에,
-# 이게 없으면 파일에 키를 넣어도 os.getenv()가 못 본다.
-# python-dotenv가 없어도 앱은 돌아간다 — 환경변수를 직접 export한 경우도 있고,
-# 키 없이 폴백으로 도는 것이 정상 동작이기 때문이다.
+# Streamlit은 .env를 자동으로 읽지 않으므로 직접 로드한다.
+# python-dotenv가 없어도 앱은 폴백으로 정상 동작한다.
 try:
     from dotenv import load_dotenv
 
@@ -140,7 +137,7 @@ def _real_preview_page() -> None:
     try:
         with st.sidebar:
             _sidebar_header()
-            st.caption("실제 GFW 조업 이벤트(data_new/) 기준 미리보기 화면입니다.")
+            st.caption("실제 GFW 조업 이벤트 기준 미리보기 화면입니다.")
             _sidebar_freshness()
         real_preview.render()
     except adapter.ApiClientError as exc:

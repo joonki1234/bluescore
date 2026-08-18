@@ -7,11 +7,11 @@ fishingType)로 변환한다.
 
 톤수 우선순위: tac.tonnageGtTac > mof.tonnageGtMof (둘 다 문자열이라 float로
 변환, 파싱 실패/누락은 None). 실측 확인 결과 이 둘이 동시에 채워진 행은
-0건이라(2026-08-18) 실제로는 우선순위가 발동하지 않는다 — 다만 나중에
+0건이라 실제로는 우선순위가 발동하지 않는다 — 다만 나중에
 데이터가 바뀌어 둘 다 채워지는 경우가 생기면 이 우선순위가 조용히 MOF 값을
 버린다는 점은 알아둘 것.
 
-fishingType은 (2026-08-18) `data_new/processed/gfw_vessels_normalized.jsonl`
+fishingType은 `data_new/processed/gfw_vessels_normalized.jsonl`
 (GFW 자체 gear 정보, `combinedGearTypes`)이 공개돼서 이제 채운다.
 CARGO/PASSENGER/CARRIER(자기모순 라벨, 구 `data/filter_self_contradicting_labels.py`
 참고 — "어업선박"이라는 앵커 분류와 자기 gear 신고가 모순되는 경우)는 제외한다 —
@@ -20,7 +20,7 @@ CARGO/PASSENGER/CARRIER(자기모순 라벨, 구 `data/filter_self_contradicting
 
 FISHING/NA/OTHER/GEAR/FIXED_GEAR 같은 뭉뚱그려진 라벨(구
 `filter_self_contradicting_labels.py`의 AMBIGUOUS_LABELS와 동일)도 제외한다.
-**(2026-08-18 실측으로 발견)** 처음엔 이것도 그냥 남겨뒀는데, 유사군 그룹핑에
+처음엔 이것도 그냥 남겨뒀는데, 유사군 그룹핑에
 gearType을 추가한 결과를 실제로 돌려보니 A축 실산출 비율이 73%(3,887/5,323)
 →32%(1,684/5,323)로 급락했다 — 전체의 44%가 이 뭉뚱그려진 라벨이라, 그룹이
 톤수×**gear**×해역×계절로 과도하게 쪼개지면서 최소표본(20척) 미달 그룹이

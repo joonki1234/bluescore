@@ -8,13 +8,9 @@
     축 색     A 자원압력 = 파랑 · B 운항효율 = 앰버
     방향 색   가점 = 청록 · 감점 = 빨강
 
-발표 목업에서는 주황 하나가 '지도의 조업 이벤트'와 'B축 운항효율' 양쪽에
-쓰여 2축 분해 화면에서 오독을 부를 수 있었다. 여기서는 지도의 조업 이벤트를
-파랑(A축)으로 칠한다 — 조업 위치와 재방문이 만들어내는 값이 A축이기 때문이다.
-그 결과 앰버는 연료·효율에만 남고, 색이 곧 축을 뜻하게 된다.
-
-대비: 목업의 보조 텍스트 #98A2B3은 흰 배경에서 2.58:1로 WCAG AA(4.5:1)에
-미달해 폐기했다. INK_SOFT(#667085, 4.98:1)를 하한으로 쓴다.
+지도의 조업 이벤트는 파랑(A축)으로 칠한다 — 조업 위치·재방문이 A축 값을
+만들기 때문이며, 앰버는 연료·효율에만 남겨 색이 곧 축을 뜻하게 한다.
+보조 텍스트는 WCAG AA 대비(4.5:1)를 만족하는 INK_SOFT(#667085)를 하한으로 쓴다.
 """
 
 from typing import List, Tuple
@@ -102,9 +98,7 @@ html, body, [class*="css"] {{ font-family: {FONT_SANS}; }}
 
 div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
 
-/* ─── 금융기관(PC웹) 화면 ─────────────────────────────────────────────────
-   심사 화면은 항목이 많아 섹션 경계가 없으면 카드가 흩어져 보인다. 아래
-   클래스는 "제목 → 내용" 한 덩어리를 만들어 화면 전체에 같은 리듬을 준다. */
+/* ─── 금융기관(PC웹) 화면 — 섹션 제목 → 내용 리듬 ────────────────────── */
 .bs-sec {{
   font-size: 11px; font-weight: 700; letter-spacing: .06em;
   color: {INK_SOFT}; text-transform: uppercase;
@@ -155,9 +149,8 @@ div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
   font-family: {FONT_MONO}; transform: translateX(-50%);
 }}
 
-/* 축 막대·비교 막대가 채워지는 느낌을 주는 트랜지션. Streamlit은 JS 트리거를
-   못 주므로, 요소가 렌더되며 폭이 확정되는 순간 브라우저가 자동 재생하는
-   순수 CSS 트랜지션으로 대체한다. */
+/* 축 막대가 채워지는 트랜지션. Streamlit이 JS 트리거를 못 주므로 폭이
+   확정되는 순간 브라우저가 자동 재생하는 순수 CSS로 대체한다. */
 .bs-fill {{ transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1); }}
 
 @keyframes bs-fade-in {{
@@ -166,9 +159,8 @@ div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
 }}
 .bs-card, .bs-scorebar {{ animation: bs-fade-in 0.4s ease-out; }}
 
-/* 실산출처럼 첫 계산에 수 초~수십 초가 걸리는 화면에서, 빈 화면 대신
-   "불러오는 중"임을 보여주는 스켈레톤 카드. 값 없이 회색 막대만 깜빡인다 —
-   실제 숫자와 헷갈리지 않도록 굴곡·글자를 전혀 넣지 않는다. */
+/* 첫 계산에 시간이 걸리는 화면용 로딩 스켈레톤. 실제 숫자와 헷갈리지
+   않도록 회색 막대만 깜빡이고 글자는 넣지 않는다. */
 @keyframes bs-skeleton-pulse {{
   0%, 100% {{ opacity: 0.55; }}
   50% {{ opacity: 1; }}
@@ -209,6 +201,14 @@ div[data-testid="stMetricValue"] {{ font-family: {FONT_MONO}; }}
   animation: bs-check-draw 0.3s ease-out 0.45s forwards;
 }}
 @keyframes bs-check-draw {{ to {{ stroke-dashoffset: 0; }} }}
+
+/* 실산출 화면의 선박 선택(key="real_vessel_id")을 브랜드 색으로 강조.
+   Streamlit 1.61 selectbox는 BaseWeb이 아닌 react-aria ComboBox라
+   data-baseweb이 없으므로 role="group" 박스를 직접 잡는다. */
+.st-key-real_vessel_id div[role="group"] {{
+  border: 2px solid {AXIS_A} !important; border-radius: 8px;
+  background: {AXIS_A_SOFT} !important;
+}}
 </style>
 """
 

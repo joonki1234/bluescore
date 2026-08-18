@@ -1,9 +1,8 @@
 """
 담당: 김태윤
 
-data/ais_location_stats_loader.py 단위 테스트. mock 없이 실제로 커밋되어
-있는 data/raw/해양수산부_AIS 위치정보 통계_20201027.TXT를 그대로 읽어서
-검증한다. 파일이 774,843행이라 모듈 스코프 fixture로 한 번만 읽는다.
+data/ais_location_stats_loader.py 단위 테스트. mock 없이 커밋된 원본 TXT를
+그대로 읽어서 검증한다. 774,843행이라 모듈 스코프 fixture로 한 번만 읽는다.
 """
 
 import pytest

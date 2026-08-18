@@ -67,13 +67,12 @@ class Database:
 
     @staticmethod
     def _migrate_reviews_to_score_run(connection: sqlite3.Connection) -> None:
-        """
-        `reviews`를 이의제기 종속에서 점수 산출 건 종속으로 옮긴다.
+        """`reviews`를 이의제기 종속에서 점수 산출 건 종속으로 옮긴다.
 
-        예전 스키마는 `appeal_id NOT NULL`이라 이의제기가 없으면 심사 결정을
+        예전 스키마는 `appeal_id NOT NULL`이라 이의제기 없이는 심사 결정을
         저장할 수 없었다. SQLite는 컬럼의 NOT NULL을 떼지 못하므로 테이블을
         새로 만들어 옮긴다. 기존 행의 `score_run_id`는 연결된 이의제기에서
-        가져온다 — 이 경로로 만들어진 심사는 전부 이의제기가 있었기 때문이다.
+        가져온다.
         """
         columns = {row["name"] for row in connection.execute("PRAGMA table_info(reviews)")}
         if not columns or "score_run_id" in columns:

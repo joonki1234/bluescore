@@ -1,13 +1,12 @@
 """GFW Events 수집 — 한국 EEZ 내 FISHING 이벤트 (본수집 1단계).
 
-모집단 정의(PROCESS_LOG.md 6번): flag='KOR' AND 한국 EEZ(marineregions.org
-MRGID 8327) 내 FISHING 타입 이벤트 1건 이상. Events API는 POST(공식
-파이썬 클라이언트 소스코드로 확인, PROCESS_LOG.md 5번).
+모집단 정의: flag='KOR' AND 한국 EEZ(marineregions.org MRGID 8327) 내
+FISHING 타입 이벤트 1건 이상. Events API는 POST.
 
-수집 순서(PROCESS_LOG.md 7번 결정): Vessels Search를 먼저 넓게 받지 않고,
-이 스크립트로 실제 조업 이벤트를 먼저 모아 vesselId를 추출한 뒤
-gfw_vessels.py로 그 배들만 상세조회한다 — 우리 모집단(근해/연안)은
-registryInfo 매칭 자체가 없어 Search 선(先)수집이 의미가 작기 때문.
+Vessels Search를 먼저 넓게 받지 않고, 이 스크립트로 실제 조업 이벤트를
+먼저 모아 vesselId를 추출한 뒤 gfw_vessels.py로 그 배들만 상세조회한다 —
+우리 모집단(근해/연안)은 registryInfo 매칭이 없어 Search 선수집의 의미가
+작기 때문.
 
 중단 후 재개: 같은 조건(기간 등)으로 다시 실행하면 이어서 진행한다.
 조건이 다르면 이어받지 않고 새로 시작한다(수집원칙 표 참고).
@@ -35,10 +34,9 @@ from http_common import (
 EVENTS_URL = "https://gateway.api.globalfishingwatch.org/v3/events"
 RAW_DIR = Path(__file__).resolve().parent.parent / "raw" / "gfw" / "events"
 PROGRESS_PATH = RAW_DIR / "_progress.json"
-# 실측 확인(2026-08-17): limit=50000도 API가 그대로 받아주고, 요청 하나당
-# 걸리는 시간이 건수와 거의 무관(고정 오버헤드가 대부분) — 1000짜리
-# 277번보다 50000짜리 6번이 압도적으로 빠름(28초 vs 20초x277). PROCESS_LOG.md
-# 28번 참고.
+# limit=50000도 API가 그대로 받아주고, 요청 하나당 걸리는 시간이 건수와
+# 거의 무관(고정 오버헤드가 대부분) — 1000짜리 여러 번보다 50000짜리 소수
+# 회 요청이 압도적으로 빠르다.
 PAGE_LIMIT = 50000
 
 
@@ -58,8 +56,7 @@ def collect(start_date: str, end_date: str, api_key: str) -> None:
     total = None
     while True:
         # 파일명은 "페이지 번호"가 아니라 offset 자체로 — PAGE_LIMIT을 실행마다
-        # 바꿔도(실제로 1000->50000으로 바뀐 적 있음, PROCESS_LOG.md 28번)
-        # 파일명이 서로 안 겹치고 뜻이 헷갈리지 않음.
+        # 바꿔도 파일명이 서로 안 겹치고 뜻이 헷갈리지 않음.
         url = f"{EVENTS_URL}?limit={PAGE_LIMIT}&offset={offset}"
         resp = request_with_retry(
             "POST",
@@ -104,10 +101,8 @@ def collect(start_date: str, end_date: str, api_key: str) -> None:
 
 def _validate_this_run(params: dict, expected_total: int, secret: str) -> list:
     """건수 일치 검증 — 같은 폴더에 다른 조회조건(기간 등)의 과거 스냅샷이
-    남아있을 수 있어(실제로 겪음, PROCESS_LOG.md 28번: 테스트용 7/1~10
-    파일이 본수집 폴더에 섞여 건수 불일치로 오검출됨), 파일명 패턴만으로
-    다 세지 않고 각 파일의 메타데이터(request_body)가 **이번 실행의
-    params와 정확히 같은 파일만** 골라서 센다."""
+    남아있을 수 있어, 파일명 패턴만으로 다 세지 않고 각 파일의 메타데이터
+    (request_body)가 **이번 실행의 params와 정확히 같은 파일만** 골라서 센다."""
     problems, parsed = check_files_valid_and_secret_free(
         RAW_DIR,
         [

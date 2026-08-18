@@ -1,15 +1,13 @@
 """GFW Vessels 상세조회 — gfw_events.py로 모은 이벤트에서 vesselId를 추출해
 각 배의 신원 정보를 받는다 (본수집 2단계).
 
-수집 순서(PROCESS_LOG.md 7번 결정): Vessels Search를 국적 기준으로 먼저
-넓게 받지 않고, 실제 조업 이벤트에 등장한 배만 상세조회한다 — 우리
-모집단(근해/연안)은 registryInfo 매칭 자체가 없어 Search 선(先)수집이
-의미가 작기 때문. 엔드포인트는 GET /v3/vessels/{id}(공식 소스코드로 확인,
-PROCESS_LOG.md 5번) — 응답이 목록(entries)이 아니라 선박 1척짜리 단일
-객체라 이벤트 수집과 검증 방식이 다름.
+Vessels Search로 국적 기준 선(先)수집을 하지 않고, 실제 조업 이벤트에 등장한
+배만 상세조회한다 — 우리 모집단(근해/연안)은 registryInfo 매칭이 없어 Search
+선수집의 의미가 작기 때문. 엔드포인트(GET /v3/vessels/{id})는 응답이 목록이
+아니라 선박 1척짜리 단일 객체라 이벤트 수집과 검증 방식이 다르다.
 
-재개: 이미 받은 vesselId는 건너뛴다(파일 존재 여부로 판단 — 페이지네이션이
-없어 offset 진행상태가 필요 없음).
+재개는 이미 받은 vesselId 파일 존재 여부로 판단한다(페이지네이션이 없어
+offset 진행상태 불필요).
 
 사용법:
     python gfw_vessels.py

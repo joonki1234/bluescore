@@ -41,12 +41,9 @@ def _score(vessel_id: str) -> Dict:
 
 
 # ─── 실산출(sourceType=real) 미리보기 ────────────────────────────────────────
-# 2026-08-18(오동규, 최지희 확인 필요): A/B축 실산출이 API까지는 연결됐는데
-# 화면 어디서도 안 보이길래 추가함. 데모(fisher.py/bank.py)와 달리 시뮬레이터·
-# 설명(explain)·이의제기는 없다 — services/scoring.py._build_real_score()가
-# 그 기능들을 아직 지원하지 않는다(데모 fixture 전용). API 응답을 화면 키로
-# 변환하지 않고 그대로 쓴다 — 실산출은 아직 "다듬어진 데모 스키마"가 아니라
-# API 원본 그대로 정직하게 보여주는 쪽이 맞다고 판단.
+# 데모(fisher.py/bank.py)와 달리 시뮬레이터·설명(explain)·이의제기는 아직
+# services/scoring.py._build_real_score()가 지원하지 않는다. API 응답을 화면
+# 키로 변환하지 않고 원본(camelCase) 그대로 쓴다.
 @lru_cache(maxsize=1)
 def real_vessel_options(limit: int = 50) -> List[Dict]:
     """실산출 선박 목록(최대 limit척). 5,323척 전체를 드롭다운에 넣는 건
@@ -123,13 +120,8 @@ def scoring_backend() -> Backend:
 
 
 def _llm_label(health: Dict) -> str:
-    """
-    런타임 LLM 상태를 한 줄로.
-
-    "켜짐/꺼짐"만으로는 부족하다 — 플래그를 켜도 API 프로세스에 키가 없으면
-    폴백으로 떨어지는데, 화면에는 그냥 "기본 문구"로만 보여서 원인을 찾는 데
-    한참 걸린다. 발표 전 점검이 이 한 줄로 끝나게 한다.
-    """
+    """런타임 LLM 상태를 한 줄로. 플래그가 켜져도 API 프로세스에 키가 없으면
+    폴백으로 떨어지므로, 켜짐/꺼짐뿐 아니라 키 유무까지 구분해 보여준다."""
     status = health.get("llm") or {}
     if not status:  # 구버전 API 응답 호환
         return "켜짐" if health.get("runtimeLlmEnabled") else "캐시 우선"
@@ -320,8 +312,7 @@ def objection_ai_response(vessel: Dict, reason: str = "", detail: str = "") -> D
     return {"text": item.get("aiResponse", ""), "source": item.get("aiResponseSource", "")}
 
 
-# `review_objection()`(이의제기가 있어야만 심사할 수 있던 경로)은 제거했다.
-# 심사는 이의제기 유무와 무관하게 성립하므로 화면은 `review_score_run()`만 쓴다.
+# 심사는 이의제기 유무와 무관하게 성립하므로 화면은 review_score_run()만 쓴다.
 # 이의제기가 접수돼 있으면 서비스 계층이 알아서 같은 심사에 매달아 준다.
 def review_score_run(
     score_run_id: str,
