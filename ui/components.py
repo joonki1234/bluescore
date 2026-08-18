@@ -596,18 +596,27 @@ def _leaflet_html(payload: Dict, height: int) -> str:
   .bs-drop {{ opacity:0; animation:bs-fadein .45s ease-out forwards; }}
   @keyframes bs-fadein {{ to {{ opacity:1; }} }}
 
+  /* Leaflet 기본값이 `.leaflet-tooltip {{ white-space:nowrap }}`이라 반드시
+     덮어야 한다. max-width만 주면 상자 너비는 잘리는데 글자는 줄바꿈을 못 해
+     상자 밖으로 그대로 흘러나온다 — 실제로 조업 툴팁 제목이 그렇게 넘쳤다.
+     한국어는 어절 단위로 끊는 keep-all이 자연스럽고, 끊을 자리가 없는 긴
+     토큰만 break-word가 받아낸다. */
   .bs-tip {{
     background:rgba(255,255,255,.97) !important; border:none !important;
     border-radius:9px !important; box-shadow:0 4px 14px rgba(16,24,40,.28) !important;
-    padding:9px 11px !important; max-width:260px !important;
+    padding:9px 11px !important;
     color:{theme.INK} !important; font-size:12px !important; line-height:1.6 !important;
+    white-space:normal !important; word-break:keep-all; overflow-wrap:break-word;
+    width:max-content !important; max-width:260px !important;
   }}
   .bs-tip .bs-tip-badge {{
     display:inline-block; font-size:10.5px; font-weight:700; padding:1px 7px;
     border-radius:999px; margin-bottom:5px;
   }}
   .bs-tip .bs-tip-head {{ font-weight:700; display:block; margin-bottom:3px; }}
-  .bs-tip .bs-tip-detail {{ color:{theme.INK_SOFT}; font-size:11.5px; }}
+  /* 설명 줄도 block이어야 제목 아래로 떨어진다. inline이면 제목 끝에 이어 붙어
+     한 줄이 그만큼 길어지고, 배지까지 있는 툴팁에서 특히 지저분해진다. */
+  .bs-tip .bs-tip-detail {{ display:block; color:{theme.INK_SOFT}; font-size:11.5px; }}
 
   .bs-legend {{
     position:absolute; left:10px; bottom:12px; z-index:600;
@@ -753,6 +762,33 @@ D.events.forEach(function(e, i) {{
       .bindTooltip('모항', {{ permanent:true, direction:'right', offset:[8,0], className:'geo-label' }});
   }}
 }});
+
+// 툴팁을 지도 안쪽으로 물린다.
+//
+// Leaflet은 툴팁을 가리키는 지점 기준으로만 놓고 컨테이너 경계는 보지 않는다.
+// 어업인 화면은 2단 레이아웃이라 지도 폭이 500px도 안 되는데, 가장자리 지점에
+// 마우스를 올리면 툴팁이 밖으로 나가 `.leaflet-container{{overflow:hidden}}`에
+// 잘려 글자가 반쯤 사라진다.
+//
+// sticky 툴팁은 마우스를 따라다니므로 tooltipopen 한 번으로는 부족하다.
+// 매번 marginLeft를 0으로 되돌리고 다시 재서, 이전 보정이 누적되지 않게 한다.
+function clampTooltips() {{
+  const box = map.getContainer().getBoundingClientRect();
+  const pad = 8;
+  document.querySelectorAll('.leaflet-tooltip-pane .bs-tip').forEach(function(el) {{
+    el.style.marginLeft = '0px';
+    const tip = el.getBoundingClientRect();
+    let shift = 0;
+    if (tip.left < box.left + pad) {{
+      shift = (box.left + pad) - tip.left;
+    }} else if (tip.right > box.right - pad) {{
+      shift = (box.right - pad) - tip.right;
+    }}
+    if (shift) {{ el.style.marginLeft = shift + 'px'; }}
+  }});
+}}
+map.on('tooltipopen', clampTooltips);
+map.on('mousemove', clampTooltips);
 
 // 범례 — 색과 선이 무엇을 뜻하는지 지도 안에서 바로 확인한다.
 const legend = L.DomUtil.create('div', 'bs-legend');
