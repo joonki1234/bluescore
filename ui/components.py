@@ -225,24 +225,21 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
-def page_title(vessel_name: str, subtitle: str) -> None:
-    """어업인/금융기관 화면 최상단 제목 — 선박명 + 화면 종류.
+def page_title(title: str, subtitle: str, *, badge_html: str = "") -> None:
+    """어업인/금융기관/실산출 화면 최상단 제목 — 담백한 사각 박스 하나로 표시한다.
 
-    기존엔 st.markdown("### 선박 A · 내 조업 성적")처럼 Streamlit 기본 헤딩을
-    썼는데, 바로 아래 score_bar 등 다른 카드들과 존재감이 비슷해서 화면
-    최상단이라는 게 눈에 잘 안 들어온다는 지적(사용자, 2026-08-18)이 있었다.
-    좌측 축색 강조 바 + 더 크고 굵은 제목으로 확실히 구분되게 한다.
+    처음엔 좌측 축색 강조 바 + 큰 볼드체로 만들었는데, "AI가 만든 티가 난다"는
+    피드백(사용자, 2026-08-18)으로 다른 카드들과 같은 bs-card 스타일(흰 배경 +
+    옅은 테두리)로 바꿨다 — 화면 안 다른 요소들과 톤을 맞추면서도 "여기가
+    화면 최상단"이라는 건 박스 구분으로 충분히 전달된다.
     """
     st.markdown(
-        f"""<div style="display:flex; align-items:center; gap:14px; margin:2px 0 16px;">
-  <div style="width:6px; height:40px; border-radius:3px; background:{theme.AXIS_A};
-    flex-shrink:0;"></div>
-  <div>
-    <div style="font-size:29px; font-weight:800; color:{theme.INK}; line-height:1.25;">
-      {vessel_name}</div>
-    <div style="font-size:13px; font-weight:700; color:{theme.AXIS_A}; letter-spacing:.02em;
-      margin-top:1px;">{subtitle}</div>
+        f"""<div class="bs-card" style="padding:16px 18px; margin-bottom:16px;">
+  <div style="display:flex; align-items:baseline; gap:10px;">
+    <span style="font-size:20px; font-weight:700; color:{theme.INK};">{title}</span>
+    {badge_html}
   </div>
+  <div class="bs-label" style="margin-top:2px;">{subtitle}</div>
 </div>""",
         unsafe_allow_html=True,
     )
