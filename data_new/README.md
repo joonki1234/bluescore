@@ -39,11 +39,13 @@ data_new/
 - `processed/gfw_vessels_normalized.jsonl`: GFW 선박명·어업종
 - `processed/events_with_weather.jsonl.gz`: 기상 결합 이벤트 275,782건
 
-최종 매칭은 TAC 한글 직접비교 방식이며 verified 1,234척, unmatched 4,089척이다.
-서비스 입력은 톤수 1,234척, 구체적인 GFW fishingType 2,682척, 둘 다 665척이다.
-실산출 상태는 success 289척, partial 3,395척, insufficientSample 1,630척,
-matchingFailed 9척이다. 과거 fuzzy/MOF 파이프라인의 수치와 조사 기록은
-`PROCESS_LOG.md`에 당시 결과로 보존한다.
+최종 매칭은 TAC 한글 직접비교 + TAC 유일성 강제 + 원양선 제외 방식이며
+verified **712척(13.4%)**, unmatched 4,611척이다(2026-08-18,
+PROCESS_LOG.md 53·54번 — TAC 중복배정·원양선 오매칭 스팟체크로 발견돼
+1,234척에서 두 차례 더 줄었다). success/partial/insufficientSample/
+matchingFailed별 서비스 상태는 이 매칭 수정 이전 값(55번 작성 당시
+스냅샷)이라 재계산 필요. 과거 fuzzy/MOF 파이프라인의 수치와 조사
+기록은 `PROCESS_LOG.md`에 당시 결과로 보존한다.
 
 ## 전체 파이프라인 실행 순서
 
@@ -64,14 +66,12 @@ cd ../process
 python normalize_gfw_events.py
 python normalize_gfw_vessels.py
 python normalize_tac.py
-python normalize_ports.py
 
 # 3. 매칭 (GFW<->TAC 한글 직접비교, matching_redesign_proposal/README.md 참고)
 python match_fuzzy_name.py              # 3단계: 한글 직접비교 + 카카오 지오코딩 거리확인
 python assemble_matches.py              # 4단계: 최종 판정 정리
 
 # 4. 부가 가공
-python tag_population.py                                 # 근해/연안·양식업 태그
 python attach_weather.py --start 20260401 --end 20260814  # 해양기상 부착(수집한 기간과 맞춰서)
 ```
 

@@ -27,6 +27,14 @@
    있고 유일하게 ≤150km면 verified(근해어업은 등록항에서 150km까지도
    나가 조업). 후보 중 하나라도 위치를 확인 못 하면 "모른다"를
    "가깝다"로 오판하지 않도록 확정하지 않는다.
+5. **TAC 쪽 유일성 강제(2026-08-18 추가)** — 위 1~4단계는 GFW 선박마다
+   독립적으로 판정하기 때문에, "한성호"처럼 흔하고 숫자 없는 이름은
+   서로 다른 GFW 선박 여러 척이 TAC의 같은 배(등록번호 1개) 하나를
+   동시에 "정답"으로 잡는 문제가 있었다(사람 스팟체크로 발견 —
+   verified의 63.8%가 이 충돌에 걸림, 5번 도입 전). 그래서 4단계까지
+   끝낸 뒤 TAC 등록번호별로 다시 묶어, 같은 TAC 배를 여러 GFW 선박이
+   주장하면 조업위치가 가장 가까운 하나만 verified로 남기고 나머지는
+   held_multi로 되돌린다(동률이면 전부 되돌림 — 4단계와 동일한 원칙).
 
 한글 후보가 없는 GFW 벡터(범용 영문명 등, ~17%)는 비교 대상 자체가
 없어 바로 매칭실패로 낸다 — 로마자 유사도 fallback은 검증 결과
@@ -179,6 +187,17 @@ def run() -> None:
             results.append(result)
             continue
 
+        if gfw.get("hasRegistryMatch"):
+            # GFW 공식 registryInfo가 있는 21척(0.4%)은 대부분 원양 대형선단
+            # 소속(사람 스팟체크로 발견 — "NO.6 KYUNG YANG"이 IMO번호·601GT·
+            # 56.5m 원양 참치연승선인데 TAC의 8.55톤 근해소형선과 오매칭됐음,
+            # 2026-08-18). 우리 모집단은 근해/연안 어선이라 후보풀에서 아예
+            # 제외한다 — registryInfo 없는 selfReportedInfo 기반 매칭만 신뢰.
+            result["category"] = "unmatched"
+            counts["unmatched"] += 1
+            results.append(result)
+            continue
+
         norm = _normalize(name)
         gfw_any_digit = _any_digit(norm)
         centroid = centroids.get(vessel_id)
@@ -223,6 +242,27 @@ def run() -> None:
             counts["held_multi"] += 1
 
         results.append(result)
+
+    # 5단계: TAC 쪽 유일성 강제 — 같은 TAC 배를 여러 GFW 선박이 동시에
+    # verified로 주장하면(흔한 이름 충돌) 가장 가까운 하나만 남긴다.
+    by_tac_key = defaultdict(list)
+    for r in results:
+        if r["category"] == "verified":
+            by_tac_key[(r["candidate"]["source"], r["candidate"]["key"])].append(r)
+
+    for claimants in by_tac_key.values():
+        if len(claimants) == 1:
+            continue
+        claimants.sort(key=lambda r: r["distKm"])
+        nearest, runner_up = claimants[0], claimants[1]
+        tied = runner_up["distKm"] - nearest["distKm"] <= 0.05
+        losers = claimants if tied else claimants[1:]
+        for r in losers:
+            r["category"] = "held_multi"
+            r["candidate"] = None
+            r["distKm"] = None
+            counts["verified"] -= 1
+            counts["held_multi"] += 1
 
     with OUT_PATH.open("w", encoding="utf-8") as out:
         for r in results:
