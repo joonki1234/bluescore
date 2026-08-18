@@ -3,9 +3,13 @@
   "configurations": [
     {
       "name": "bluescore-streamlit",
-      "runtimeExecutable": "streamlit",
-      "runtimeArgs": ["run", "app.py", "--server.headless", "true"],
-      "port": 8501
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "BLUESCORE_API_URL=http://127.0.0.1:8000 streamlit run app.py --server.headless true --server.port \"$PORT\""
+      ],
+      "port": 8501,
+      "autoPort": true
     }
   ]
 }

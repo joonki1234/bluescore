@@ -96,6 +96,45 @@ class TestFitBaselineModel:
         assert avg_large > avg_small
 
 
+class TestResidualCapturesSpeedSignal:
+    """averageSpeedKnots/totalDistanceKm을 LightGBM 입력에서 뺀 뒤, 잔차가
+    실제로 "속도 선택"을 반영하는지 확인한다 (2026-08-18, axis_b_baseline.py
+    docstring [해결됨] 항목 대응). 2026-08-13 데모에서는 속도를 피처에 남겨둬서
+    잔차가 -21.8%~+8.2%로 무질서하게 흩어졌었다."""
+
+    def test_residual_increases_with_speed_when_other_conditions_are_equal(self):
+        # 톤수 여러 단계 × 속도 여러 단계 조합으로 기준선을 학습시킨다 —
+        # 톤수 효과는 배우되 속도는 피처가 아니므로 배울 수 없어야 한다.
+        training_rows = [
+            make_row(f"train-t{tonnage}-s{speed}", tonnage_gt=tonnage, average_speed_knots=speed, duration_hours=10.0)
+            for tonnage in (30.0, 50.0, 70.0, 100.0)
+            for speed in (5.0, 8.0, 11.0, 14.0, 17.0, 20.0)
+        ]
+        model, _ = fit_baseline_model(training_rows)
+
+        # 톤수·기간·해황·어업종·해역·계절이 전부 같고 속도만 다른 선박들.
+        speeds = [5.0, 8.0, 11.0, 14.0, 17.0, 20.0]
+        eval_rows = [
+            make_row(f"v{i}", tonnage_gt=50.0, average_speed_knots=speed, duration_hours=10.0)
+            for i, speed in enumerate(speeds)
+        ]
+        results = compute_axis_b_efficiency(eval_rows, model)
+        residuals = [results[f"v{i}"].residual_raw for i in range(len(speeds))]
+
+        # 속도 오름차순 = 잔차도 오름차순(단조증가)이어야 한다 — 빠르게 달릴수록
+        # "기대보다 더 썼다"는 신호가 커진다는 뜻.
+        assert residuals == sorted(residuals)
+        # 잡음이 아니라 뚜렷한 신호여야 한다 — 가장 빠른 배와 가장 느린 배의
+        # 잔차 차이가 커야 한다(2026-08-13 데모의 흩어진 잔차와 대비).
+        assert residuals[-1] - residuals[0] > 0
+
+    def test_averageSpeedKnots_and_totalDistanceKm_are_not_lightgbm_features(self):
+        from score.axis_b_baseline import NUMERIC_FEATURE_COLUMNS
+
+        assert "averageSpeedKnots" not in NUMERIC_FEATURE_COLUMNS
+        assert "totalDistanceKm" not in NUMERIC_FEATURE_COLUMNS
+
+
 class TestComputeAxisBEfficiency:
     def test_missing_required_feature_is_skipped_with_reason(self):
         large_fast, small_slow = make_dummy_dataset()

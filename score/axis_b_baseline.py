@@ -37,20 +37,28 @@ B축 원값으로 산출한다.
     - 입력 피처(NUMERIC_FEATURE_COLUMNS, CATEGORICAL_FEATURE_COLUMNS)는 기획서에
       나열된 후보를 전부 반영한 것이며, 실제 어떤 피처를 쓸 수 있는지는
       데이터팀(김태윤) 확인 후 확정해야 한다.
-    - [팀 논의 대기] estimated_fuel_kg는 실측 연료 데이터가 없어 물리식
+    - [해결됨, 2026-08-18] estimated_fuel_kg는 실측 연료 데이터가 없어 물리식
       추정치로 대체한 값인데, 그 물리식이 정확히 tonnageGt/averageSpeedKnots/
-      durationHours만의 매끈한 함수(잡음 없음)다. 그런데 LightGBM 기준선도
-      같은 세 변수를 입력으로 그대로 받기 때문에, 모델이 "기대"를 사실상 그
-      물리식 자체로 근사해버려 잔차(residual_raw)가 진짜 운항 효율
-      차이가 아니라 LightGBM의 곡선 근사 오차(노이즈)에 가까워지는 문제가
-      있다. (데모: 톤수·속도만 다른 20척으로 확인한 잔차가 -21.8%~+8.2%로
-      뚜렷한 패턴 없이 흩어짐 — 2026-08-13.)
-      해결 후보: averageSpeedKnots를 LightGBM 입력에서 빼고 톤수·어업종·해역·
-      계절·해황만으로 기대치를 예측하면, 잔차가 "이 선박이 비슷한 조건의
-      다른 배들보다 빠르게(=비효율적으로) 움직였는가"를 반영하게 되어 실제
-      효율 신호가 될 수 있다. 다만 기획서 원문은 평균속도도 입력에 포함하도록
-      명시하고 있어, 이 변경은 팀 논의 후 결정하기로 함 (2026-08-13 기준 보류
-      — 오동규 확인 필요).
+      durationHours만의 매끈한 함수(잡음 없음)다. averageSpeedKnots를
+      LightGBM 기준선 입력에도 그대로 두면, 모델이 "기대"를 사실상 그 물리식
+      자체로 근사해버려 잔차(residual_raw)가 진짜 운항 효율 차이가 아니라
+      LightGBM의 곡선 근사 오차(노이즈)에 가까워지는 문제가 있었다. (데모:
+      톤수·속도만 다른 20척으로 확인한 잔차가 -21.8%~+8.2%로 뚜렷한 패턴 없이
+      흩어짐 — 2026-08-13.)
+      판단 기준: 기대치(baseline) 입력에는 "그 배가 어쩔 수 없이 처한 조건"만
+      남기고, "그 배가 스스로 선택한 조업 방식"은 뺀다 — 그래야 그 선택의
+      결과가 잔차에 남는다. tonnageGt(배 크기)·durationHours(조업에 걸리는
+      시간, 어장 규모에 좌우됨)·해황·어업종·해역·계절은 조건이라 남기고,
+      averageSpeedKnots(속도 선택)는 뺀다.
+      **totalDistanceKm도 같이 빼야 한다** — totalDistanceKm ≈
+      averageSpeedKnots × durationHours × 1.852라서, durationHours가 이미
+      피처에 있는 상태로 totalDistanceKm만 남기면 속도가 (거리 ÷ 기간)으로
+      뒷문으로 다시 들어온다. 둘 다 NUMERIC_FEATURE_COLUMNS에서 뺐다.
+      기획서 원문은 평균속도도 입력에 포함하도록 명시하지만, 물리식 잔차
+      구조상 그러면 순환성이 생겨 신호가 노이즈가 되므로 이 변경이 맞다는
+      결론(오동규 확인, 2026-08-18). `test_axis_b_baseline.py`의
+      `TestResidualCapturesSpeedSignal`이 조건이 같고 속도만 다른 선박들에서
+      잔차가 실제로 속도와 함께 단조증가하는지 검증한다.
 """
 
 from dataclasses import dataclass, field
@@ -71,20 +79,17 @@ LGBM_MIN_CHILD_SAMPLES = 2
 LGBM_RANDOM_STATE = 42
 LGBM_VERBOSITY = -1
 
-# LightGBM 입력 피처 컬럼 — 기획서에 나열된 후보 전부. 실제 사용 가능 여부는
-# 데이터팀 확인 후 확정 필요.
+# LightGBM 입력 피처 컬럼. 기획서 원문 후보 중 averageSpeedKnots/totalDistanceKm은
+# 뺐다 — 물리식 추정치(estimated_fuel_kg)도 이 값들의 함수라, 기준선 입력에
+# 그대로 두면 "기대"가 물리식을 베껴버려 잔차가 노이즈가 된다. 모듈 docstring의
+# [해결됨, 2026-08-18] 항목 참고.
 NUMERIC_FEATURE_COLUMNS = [
     "tonnageGt",
     "seaSurfaceTempC",
     "windSpeedMs",
     "currentSpeedMs",
-    "averageSpeedKnots",
-    "totalDistanceKm",
     "durationHours",
 ]
-# 주의: averageSpeedKnots가 물리식 추정치(estimated_fuel_kg) 계산에도 쓰이는
-# 변수라서 그대로 LightGBM 입력에 두면 잔차가 노이즈에 가까워질 수 있다.
-# 모듈 docstring의 [팀 논의 대기] 항목 참고 — 제외 여부 미정.
 CATEGORICAL_FEATURE_COLUMNS = ["gearType", "seaArea", "season"]
 
 # "추정(estimated proxy) 연료소비량"을 물리식으로 계산하는 데 필수인 필드.
