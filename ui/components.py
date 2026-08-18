@@ -229,12 +229,14 @@ def page_title(title: str, subtitle: str, *, badge_html: str = "") -> None:
     """어업인/금융기관/실산출 화면 최상단 제목 — 담백한 사각 박스 하나로 표시한다.
 
     처음엔 좌측 축색 강조 바 + 큰 볼드체로 만들었는데, "AI가 만든 티가 난다"는
-    피드백(사용자, 2026-08-18)으로 다른 카드들과 같은 bs-card 스타일(흰 배경 +
-    옅은 테두리)로 바꿨다 — 화면 안 다른 요소들과 톤을 맞추면서도 "여기가
-    화면 최상단"이라는 건 박스 구분으로 충분히 전달된다.
+    피드백으로 다른 카드들과 같은 bs-card 스타일(흰 배경)로 바꿨었다. 그런데
+    그러면 바로 아래 score_bar와 색이 완전히 같아져서 구분이 안 된다는 지적
+    (사용자)으로, 배경만 옅은 축색 틴트(AXIS_A_SOFT)로 바꿨다 — 장식을
+    더 넣는 대신 다른 흰 카드들 사이에서 색 하나로 튀게 하는 가장 담백한 방법.
     """
     st.markdown(
-        f"""<div class="bs-card" style="padding:16px 18px; margin-bottom:16px;">
+        f"""<div class="bs-card" style="padding:16px 18px; margin-bottom:16px;
+  background:{theme.AXIS_A_SOFT}; border-color:{theme.AXIS_A};">
   <div style="display:flex; align-items:baseline; gap:10px;">
     <span style="font-size:20px; font-weight:700; color:{theme.INK};">{title}</span>
     {badge_html}
