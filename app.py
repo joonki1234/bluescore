@@ -126,14 +126,26 @@ def _bank_page() -> None:
         st.code("uvicorn api.main:app --reload --port 8000\nstreamlit run app.py")
 
 
+def _real_preview_page() -> None:
+    from ui import real_preview
+
+    try:
+        real_preview.render()
+    except adapter.ApiClientError as exc:
+        st.error(str(exc))
+        st.code("uvicorn api.main:app --reload --port 8000\nstreamlit run app.py")
+
+
 def main() -> None:
     theme.inject()
     # 기본 페이지는 Streamlit이 루트("/")로 서빙하며 url_path를 무시한다.
-    # 따라서 시연용 북마크 주소는 어업인 "/" · 금융기관 "/bank" 두 개다.
+    # 따라서 시연용 북마크 주소는 어업인 "/" · 금융기관 "/bank" · 실산출 "/real" 세 개다.
     pages = [
         st.Page(_fisher_page, title="어업인", icon=":material/sailing:", default=True),
         st.Page(_bank_page, title="금융기관", icon=":material/account_balance:",
                 url_path="bank"),
+        st.Page(_real_preview_page, title="실산출", icon=":material/database:",
+                url_path="real"),
     ]
     st.navigation(pages, position="top").run()
 
