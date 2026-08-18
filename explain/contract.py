@@ -83,8 +83,8 @@ class ExplainInput:
     axis_a_score: float
     axis_b_score: float
     peer_count: int
-    top_percent: int
-    fuel_delta_percent: float
+    top_percent: Optional[int]
+    fuel_delta_percent: Optional[float]
     shap_factors: List[ShapFactor] = field(default_factory=list)
     factor_metrics: List[FactorMetric] = field(default_factory=list)
     season: Optional[str] = None  # facts.py의 금어기 조회 키
@@ -106,10 +106,13 @@ class ExplainInput:
             self.axis_a_score,
             self.axis_b_score,
             float(self.peer_count),
-            float(self.top_percent),
-            self.fuel_delta_percent,
-            abs(self.fuel_delta_percent),
         ]
+        if self.top_percent is not None:
+            values.append(float(self.top_percent))
+        if self.fuel_delta_percent is not None:
+            values.extend(
+                [self.fuel_delta_percent, abs(self.fuel_delta_percent)]
+            )
         for factor in self.shap_factors:
             values.append(factor.value)
             values.append(abs(factor.value))

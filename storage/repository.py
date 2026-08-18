@@ -184,15 +184,28 @@ class Repository:
         result["review"] = _row_dict(review)
         return result
 
-    def list_appeals(self, status: Optional[str] = None) -> List[Dict[str, Any]]:
-        sql = "SELECT appeal_id FROM appeals"
-        params: tuple = ()
+    def list_appeals(
+        self,
+        status: Optional[str] = None,
+        source_type: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        sql = (
+            "SELECT appeals.appeal_id FROM appeals "
+            "JOIN score_runs ON score_runs.score_run_id = appeals.score_run_id"
+        )
+        conditions = []
+        params = []
         if status:
-            sql += " WHERE status = ?"
-            params = (status,)
-        sql += " ORDER BY submitted_at DESC"
+            conditions.append("appeals.status = ?")
+            params.append(status)
+        if source_type:
+            conditions.append("score_runs.source_type = ?")
+            params.append(source_type)
+        if conditions:
+            sql += " WHERE " + " AND ".join(conditions)
+        sql += " ORDER BY appeals.submitted_at DESC"
         with self.database.connect() as connection:
-            rows = connection.execute(sql, params).fetchall()
+            rows = connection.execute(sql, tuple(params)).fetchall()
         return [self.get_appeal(row["appeal_id"]) for row in rows]  # type: ignore[list-item]
 
     def save_review(self, review: Dict[str, Any], appeal_status: Optional[str] = None) -> None:

@@ -142,18 +142,38 @@ class WorkflowService:
             raise NotFoundError(f"점수 산출 건을 찾을 수 없습니다: {score_run_id}")
         return ScoreResponse.model_validate(stored["result"])
 
-    def simulate(self, vessel_id: str, request: SimulationRequest) -> SimulationResponse:
-        self.get_score(vessel_id, "demo")
+    def simulate(
+        self,
+        vessel_id: str,
+        request: SimulationRequest,
+        source_type: str = "demo",
+    ) -> SimulationResponse:
+        self.get_score(vessel_id, source_type)
+        if source_type == "real":
+            raise InvalidStateError(
+                "실산출 시뮬레이션은 정책 파라미터 검증 전이라 지원하지 않습니다."
+            )
         return self.scoring.simulate(vessel_id, request)
 
-    def simulation_surface(self, vessel_id: str) -> SimulationSurfaceResponse:
-        self.get_score(vessel_id, "demo")
+    def simulation_surface(
+        self, vessel_id: str, source_type: str = "demo"
+    ) -> SimulationSurfaceResponse:
+        self.get_score(vessel_id, source_type)
+        if source_type == "real":
+            raise InvalidStateError(
+                "실산출 시뮬레이션은 정책 파라미터 검증 전이라 지원하지 않습니다."
+            )
         return self.scoring.simulation_surface(vessel_id)
 
     def explanation(
-        self, vessel_id: str, *, use_llm: bool = False, refresh: bool = False
+        self,
+        vessel_id: str,
+        source_type: str = "demo",
+        *,
+        use_llm: bool = False,
+        refresh: bool = False,
     ) -> ExplanationResponse:
-        score = self.get_score(vessel_id, "demo")
+        score = self.get_score(vessel_id, source_type)
         stored = self.repository.get_score_run(score.score_run_id)
         if stored and stored.get("report") and not refresh:
             try:
@@ -168,9 +188,16 @@ class WorkflowService:
         )
         return report
 
-    def answer_question(self, vessel_id: str, question: str, *, use_llm: bool = False) -> TextResponse:
-        self.get_score(vessel_id, "demo")
-        return self.scoring.answer_question(vessel_id, question, use_llm=use_llm)
+    def answer_question(
+        self,
+        vessel_id: str,
+        question: str,
+        source_type: str = "demo",
+        *,
+        use_llm: bool = False,
+    ) -> TextResponse:
+        score = self.get_score(vessel_id, source_type)
+        return self.scoring.answer_question(score, question, use_llm=use_llm)
 
     def submit_appeal(self, request: AppealCreate) -> AppealDetail:
         score = self.get_score_run(request.score_run_id)
@@ -193,10 +220,19 @@ class WorkflowService:
             raise ConflictError("이의제기를 저장하지 못했습니다.") from exc
         return self._appeal_detail(self.repository.get_appeal(record["appeal_id"]))
 
-    def list_appeals(self, status: Optional[str] = None) -> AppealListResponse:
-        items = [self._appeal_detail(row) for row in self.repository.list_appeals(status)]
-        # 이의제기가 하나도 없어도 시연 시스템의 버전은 demo로 명시한다.
-        return AppealListResponse(appeals=items, **response_metadata("demo"))
+    def list_appeals(
+        self, status: Optional[str] = None, source_type: str = "demo"
+    ) -> AppealListResponse:
+        items = [
+            self._appeal_detail(row)
+            for row in self.repository.list_appeals(status, source_type)
+        ]
+        return AppealListResponse(
+            appeals=items,
+            **response_metadata(
+                source_type, axis_b_included=source_type == "real"
+            ),
+        )
 
     def get_appeal(self, appeal_id: str) -> AppealDetail:
         row = self.repository.get_appeal(appeal_id)
@@ -212,8 +248,9 @@ class WorkflowService:
             raise NotFoundError(f"이의제기를 찾을 수 없습니다: {appeal_id}")
         if appeal.get("ai_response") and not refresh:
             return self._appeal_detail(appeal)
+        score = self.get_score_run(appeal["score_run_id"])
         generated = self.scoring.respond_to_objection(
-            appeal["vessel_id"], appeal["reason"], appeal["detail"], use_llm=use_llm
+            score, appeal["reason"], appeal["detail"], use_llm=use_llm
         )
         self.repository.save_appeal_response(appeal_id, generated.text, generated.source)
         return self.get_appeal(appeal_id)
@@ -273,8 +310,8 @@ class WorkflowService:
             raise ConflictError(str(exc)) from exc
         return self._review_detail(review)
 
-    @staticmethod
-    def _review_detail(row: dict) -> ReviewDetail:
+    def _review_detail(self, row: dict) -> ReviewDetail:
+        score = self.get_score_run(row["score_run_id"])
         return ReviewDetail(
             review_id=row["review_id"],
             score_run_id=row["score_run_id"],
@@ -284,6 +321,7 @@ class WorkflowService:
             reviewer=row["reviewer"],
             final_discount_bp=row.get("final_discount_bp"),
             decided_at=row["decided_at"],
+            **_metadata_from_score(score),
         )
 
     def commit_report(self, score_run_id: str) -> ChainCommitResponse:

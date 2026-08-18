@@ -93,6 +93,16 @@ def _discount_text(band: RateBand) -> str:
     return f"{band.grade} · 우대 없음" if band.discount_bp <= 0 else f"{band.grade} · −{band.discount_bp}bp"
 
 
+def _metadata_from_score(score: ScoreResponse) -> dict:
+    return {
+        "data_snapshot_id": score.data_snapshot_id,
+        "model_version": score.model_version,
+        "scoring_rule_version": score.scoring_rule_version,
+        "rate_table_version": score.rate_table_version,
+        "source_type": score.source_type,
+    }
+
+
 def _fishing_type_text(fishing_type) -> str:
     """fishingType은 리스트(예: ["SET_GILLNETS"])라, f-string에 그냥 넣으면
     파이썬 repr(`['SET_GILLNETS']`)이 그대로 화면에 노출된다 — 실산출
@@ -421,6 +431,35 @@ class ScoringService:
             ],
         )
 
+    @staticmethod
+    def _explain_input_from_score(score: ScoreResponse) -> ExplainInput:
+        """저장된 점수 응답에 실제로 있는 값만 설명 계층으로 전달한다."""
+        return ExplainInput(
+            vessel_id=score.vessel.vessel_id,
+            vessel_label=score.vessel.meta,
+            fleet_label=score.vessel.fleet_label,
+            blue_score=score.blue_score,
+            axis_a_score=score.axis_a.score,
+            axis_b_score=score.axis_b.score,
+            peer_count=score.peer_group.count,
+            top_percent=score.peer_group.top_percent,
+            fuel_delta_percent=score.fuel_delta_percent,
+            shap_factors=[
+                ShapFactor(label=item.label, value=item.value, axis=item.axis)
+                for item in score.shap_factors
+            ],
+            factor_metrics=[
+                FactorMetric(
+                    label=item.label,
+                    axis=item.axis,
+                    self_value=item.self_value,
+                    peer_average=item.peer_average,
+                    unit=item.unit,
+                )
+                for item in score.factor_metrics
+            ],
+        )
+
     def simulation_surface(self, vessel_id: str) -> SimulationSurfaceResponse:
         vessel = self._demo_vessel(vessel_id)
         if vessel["status"] != "success":
@@ -527,51 +566,73 @@ class ScoringService:
     def explain(self, score: ScoreResponse, *, use_llm: bool = False) -> ExplanationResponse:
         if score.status != "success" or score.blue_score is None:
             raise InvalidStateError("완전한 점수가 없는 산출 건은 설명을 만들 수 없습니다.")
-        vessel = self._demo_vessel(score.vessel.vessel_id)
-        explain_input = self._explain_input(vessel)
+        explain_input = self._explain_input_from_score(score)
         generated = run_explain(explain_input, use_llm=use_llm)
-        generated_report = generate_detailed_report(explain_input, use_llm=use_llm)
-        report_sentences = generated_report.items
-        contributions = {item["label"]: item["value"] for item in vessel.get("shapFactors", [])}
+        if explain_input.factor_metrics:
+            generated_report = generate_detailed_report(explain_input, use_llm=use_llm)
+            report_sentences = generated_report.items
+            report_source = generated_report.source
+        else:
+            report_sentences = {}
+            report_source = "fallback:no_factor_metrics"
+        contributions = {item.label: item.value for item in score.shap_factors}
         report = [
             DetailedReportItem(
-                **metric,
-                contribution=contributions.get(metric["label"]),
-                diff=round(metric["selfValue"] - metric["peerAverage"], 2),
-                sentence=report_sentences.get(metric["label"], ""),
+                label=metric.label,
+                axis=metric.axis,
+                self_value=metric.self_value,
+                peer_average=metric.peer_average,
+                unit=metric.unit,
+                contribution=contributions.get(metric.label),
+                diff=round(metric.self_value - metric.peer_average, 2),
+                sentence=report_sentences.get(metric.label, ""),
             )
-            for metric in vessel.get("factorMetrics", [])
+            for metric in score.factor_metrics
         ]
         return ExplanationResponse(
             score_run_id=score.score_run_id,
-            vessel_id=vessel["vesselId"],
+            vessel_id=score.vessel.vessel_id,
             summary=generated.summary,
             shap_factors=[ShapFactorSchema(**item.as_dict()) for item in generated.shap_factors],
             recommendations=[
                 RecommendationSchema(**item.as_dict()) for item in generated.recommendations
             ],
             detailed_report=report,
-            improvement_plans=self.improvement_plans(vessel["vesselId"], use_llm=use_llm),
+            improvement_plans=(
+                self.improvement_plans(score.vessel.vessel_id, use_llm=use_llm)
+                if score.source_type == "demo"
+                else []
+            ),
             explanation_source=generated.source,
-            report_source=generated_report.source,
+            report_source=report_source,
             generated_at=datetime.now(timezone.utc),
-            **response_metadata("demo"),
+            **_metadata_from_score(score),
         )
 
     def answer_question(
-        self, vessel_id: str, question: str, *, use_llm: bool = False
+        self, score: ScoreResponse, question: str, *, use_llm: bool = False
     ) -> TextResponse:
-        vessel = self._demo_vessel(vessel_id)
+        if score.status != "success" or score.blue_score is None:
+            raise InvalidStateError("완전한 점수가 없는 산출 건에는 답변할 수 없습니다.")
         generated = generate_answer(
-            self._explain_input(vessel), question, use_llm=use_llm
+            self._explain_input_from_score(score), question, use_llm=use_llm
         )
-        return TextResponse(text=generated.text, source=generated.source, **response_metadata("demo"))
+        return TextResponse(
+            text=generated.text,
+            source=generated.source,
+            **_metadata_from_score(score),
+        )
 
     def respond_to_objection(
-        self, vessel_id: str, reason: str, detail: str, *, use_llm: bool = False
+        self, score: ScoreResponse, reason: str, detail: str, *, use_llm: bool = False
     ) -> TextResponse:
-        vessel = self._demo_vessel(vessel_id)
+        if score.status != "success" or score.blue_score is None:
+            raise InvalidStateError("완전한 점수가 없는 산출 건에는 답변할 수 없습니다.")
         generated = generate_objection_response(
-            self._explain_input(vessel), reason, detail, use_llm=use_llm
+            self._explain_input_from_score(score), reason, detail, use_llm=use_llm
         )
-        return TextResponse(text=generated.text, source=generated.source, **response_metadata("demo"))
+        return TextResponse(
+            text=generated.text,
+            source=generated.source,
+            **_metadata_from_score(score),
+        )
