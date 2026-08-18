@@ -1,44 +1,40 @@
 """매칭 3단계 — GFW 선박과 TAC를 한글 직접비교로 매칭한다.
 
-기존엔 GFW 자기신고 로마자명을 로마자로 변환한 TAC/어선원부 이름과
-유사도(SequenceMatcher)로 비교했다. 사람이 GFW 영문명 4,662척 전체를
-직접 한글로 재변환한 데이터(`gfw_korean_name_candidates.csv`)가 생기면서
-로마자 대신 한글 원문끼리 직접 비교할 수 있게 됐고, 검증 결과(사람
-스팟체크로 발견한 여러 버그 수정 포함) 로마자 유사도의 구조적 오탐
-("-성호"류, 서로 다른 이름인데 로마자로 바꾸면 끝부분이 겹쳐서 점수가
-높게 나옴)을 없앨 수 있다고 확인돼 이 방식으로 교체함(2026-08-18,
-`data_new/matching_redesign_proposal/README.md`에 검증 과정 전체 기록).
+GFW 자기신고 영문명을 사람이 미리 한글로 변환해둔 후보
+(`gfw_korean_name_candidates.csv`)와 TAC 한글 원문을 대조한다. 로마자
+유사도 대신 한글 원문끼리 비교하는 이유: 로마자로 바꾸면 서로 다른
+실제 이름인데 끝부분이 겹쳐 점수가 높게 나오는 구조적 오탐이 있다
+(예: EUNSEONGHO가 은성호 대신 금성호로 매칭되는 식). 검증 과정 전체
+기록은 `data_new/matching_redesign_proposal/README.md`.
 
-어선원부는 후보풀에서 아예 뺐다(2026-08-18) — 전체 등록대장이 아니라
+어선원부·MOF는 후보풀에 안 쓴다 — 어선원부는 전체 등록대장이 아니라
 2006년 처리배치 일부(1,379행, 전부 현행여부='N')라 TAC 대비 신뢰도가
-낮고, 기여분(tier2_callsign)도 0.1%(3척)뿐이라 GFW-TAC 매칭만 쓰기로
-정리함. 1단계(TAC<->어선원부 연결)·2단계(GFW<->어선원부 콜사인)도 같이
-폐기.
+낮고, MOF는 이름검색이 어선보다 상선 위주로 편향돼 있다.
 
-매칭 규칙 4단계:
+매칭 규칙 5단계:
 1. 한글 직접비교(exact match만, fuzzy 유사도는 안 씀)
 2. 숫자 하드필터 — 자릿수 상관없이 GFW·후보 양쪽에 다 숫자가 보이는데
    값이 다르면 배제
 3. "제N호" 정규화 — TAC 원문은 "제707태근호"처럼 선단
    일련번호를 이름에 그대로 갖고 있는데 GFW 쪽 한글변환은 숫자를
    분리해서 뺐으므로, 비교 시 pool 쪽에서도 이 접두어를 한 번 더 뗀다
-4. 카카오 지오코딩 거리 확인 — 이름이 동률(후보 2개+)이면 GFW
-   조업위치와 후보 항구 거리로 판단. 후보 전원의 위치를 확인할 수
-   있고 유일하게 ≤150km면 verified(근해어업은 등록항에서 150km까지도
-   나가 조업). 후보 중 하나라도 위치를 확인 못 하면 "모른다"를
-   "가깝다"로 오판하지 않도록 확정하지 않는다.
-5. **TAC 쪽 유일성 강제(2026-08-18 추가)** — 위 1~4단계는 GFW 선박마다
-   독립적으로 판정하기 때문에, "한성호"처럼 흔하고 숫자 없는 이름은
-   서로 다른 GFW 선박 여러 척이 TAC의 같은 배(등록번호 1개) 하나를
-   동시에 "정답"으로 잡는 문제가 있었다(사람 스팟체크로 발견 —
-   verified의 63.8%가 이 충돌에 걸림, 5번 도입 전). 그래서 4단계까지
-   끝낸 뒤 TAC 등록번호별로 다시 묶어, 같은 TAC 배를 여러 GFW 선박이
-   주장하면 조업위치가 가장 가까운 하나만 verified로 남기고 나머지는
-   held_multi로 되돌린다(동률이면 전부 되돌림 — 4단계와 동일한 원칙).
+4. 카카오 지오코딩 거리 확인 — 후보가 몇 개든(1개든 2개+든) GFW
+   조업위치와 후보 항구 거리를 반드시 확인해야 한다. 확인할 수 있고
+   ≤150km면 verified. 거리를 확인 못 하면(지오코딩 실패) 후보가
+   이름만으로 유일해도 "모른다"를 "가깝다"로 오판하지 않도록
+   확정하지 않는다.
+5. TAC 쪽 유일성 강제 — 1~4단계는 GFW 선박마다 독립적으로 판정하기
+   때문에, "한성호"처럼 흔하고 숫자 없는 이름은 서로 다른 GFW 선박
+   여러 척이 TAC의 같은 배(등록번호 1개) 하나를 동시에 주장할 수
+   있다. 4단계까지 끝낸 뒤 TAC 등록번호별로 다시 묶어, 같은 TAC 배를
+   여러 GFW 선박이 주장하면 조업위치가 가장 가까운 하나만 verified로
+   남기고 나머지는 held_multi로 되돌린다(동률이면 전부 되돌림 — 4단계와
+   동일한 원칙).
 
-한글 후보가 없는 GFW 벡터(범용 영문명 등, ~17%)는 비교 대상 자체가
-없어 바로 매칭실패로 낸다 — 로마자 유사도 fallback은 검증 결과
-오탐이 많아 안 쓴다.
+GFW `registryInfo`(공식 등록정보)가 있는 선박은 대부분 원양 대형선단
+소속이라 근해/연안 모집단과 성격이 달라 후보풀 비교 전에 제외한다.
+한글 후보가 없는 GFW 벡터(범용 영문명 등)도 비교 대상 자체가 없어
+바로 매칭실패로 낸다.
 
 사용법:
     python match_fuzzy_name.py
@@ -62,7 +58,7 @@ EVENTS_PATH = PROCESSED / "gfw_events_normalized.jsonl"
 KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "gfw_korean_name_candidates.csv"
 OUT_PATH = PROCESSED / "fuzzy_name_candidates.jsonl"
 
-LOC_VERIFIED_KM = 150.0  # 근해어업은 등록항에서 150km까지도 나가 조업(사용자 확인, 2026-08-18)
+LOC_VERIFIED_KM = 150.0  # 근해어업 조업범위 감안한 보수적 값 — 법·데이터 근거 없음, matching_redesign_proposal/README.md "왜 150km인가" 참고
 
 
 def _haversine_km(lat1, lon1, lat2, lon2) -> float:
@@ -96,7 +92,7 @@ def _normalize(s: str) -> str:
 
 def _any_digit(s: str) -> str:
     """이름에 보이는 숫자 하나(자릿수 제한 없음). 불일치하면 다른 배라는
-    신호는 자릿수와 무관하게 신뢰할 수 있다(사람 스팟체크로 검증)."""
+    신호는 자릿수와 무관하게 신뢰할 수 있다."""
     m = re.search(r"(\d+)", s)
     return m.group(1) if m else ""
 
@@ -155,7 +151,7 @@ def _try_resolve_by_nearest(passing: list):
     후보 중 하나라도 지오코딩 실패로 거리를 못 구했으면 확정하지 않는다
     — "거리 모름"을 "후보 아님"으로 취급하면 지오코딩 안 된 후보가
     조용히 비교에서 빠지고 지오코딩된 후보 1개만 "유일한 최근접"으로
-    둔갑하는 문제가 있었다(사람 스팟체크로 발견)."""
+    둔갑해버린다."""
     if any(p["distKm"] is None for p in passing):
         return None
     nearest = min(passing, key=lambda x: x["distKm"])
@@ -188,11 +184,8 @@ def run() -> None:
             continue
 
         if gfw.get("hasRegistryMatch"):
-            # GFW 공식 registryInfo가 있는 21척(0.4%)은 대부분 원양 대형선단
-            # 소속(사람 스팟체크로 발견 — "NO.6 KYUNG YANG"이 IMO번호·601GT·
-            # 56.5m 원양 참치연승선인데 TAC의 8.55톤 근해소형선과 오매칭됐음,
-            # 2026-08-18). 우리 모집단은 근해/연안 어선이라 후보풀에서 아예
-            # 제외한다 — registryInfo 없는 selfReportedInfo 기반 매칭만 신뢰.
+            # 공식 registryInfo가 있는 선박은 대부분 원양 대형선단 소속이라
+            # 근해/연안 모집단과 성격이 다르다 — 후보풀 비교 없이 바로 제외.
             result["category"] = "unmatched"
             counts["unmatched"] += 1
             results.append(result)
@@ -244,7 +237,7 @@ def run() -> None:
         results.append(result)
 
     # 5단계: TAC 쪽 유일성 강제 — 같은 TAC 배를 여러 GFW 선박이 동시에
-    # verified로 주장하면(흔한 이름 충돌) 가장 가까운 하나만 남긴다.
+    # verified로 주장하면 가장 가까운 하나만 남긴다.
     by_tac_key = defaultdict(list)
     for r in results:
         if r["category"] == "verified":
