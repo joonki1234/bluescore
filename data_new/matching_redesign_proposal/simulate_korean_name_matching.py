@@ -15,6 +15,11 @@ assemble_matches.py)에 반영 안 됨** — 팀 결정(README.md 참고) 전까
   ≤50km면 verified, 50~150km면 held(낮은신뢰도), 그 외/위치정보
   없으면 held_multi(모호, 계산 불가)
 - (source,key) 동일한 후보는 데이터중복으로 보고 dedup
+- pool 쪽 이름에서 "제<숫자>" 접두어를 비교 전용으로 한 번 더 뗀다
+  (`_strip_je_number`) — GFW 한글변환은 숫자를 통째로 분리해서 뺐는데
+  TAC/어선원부 원문은 "제707태근호"처럼 번호를 이름에 그대로 갖고 있어
+  안 떼면 exact match가 실패했음(교차분석으로 935건 중 124건 확인,
+  README.md 발견 4)
 
 한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은 파일도
 같이 낸다(`output/korean_matching_comparison.jsonl`) — 팀원이 숫자만
@@ -97,6 +102,17 @@ def _strip_ho(name: str) -> str:
     return name[:-1] if name.endswith("호") else name
 
 
+def _strip_je_number(base: str) -> str:
+    """"제707태근" -> "태근". GFW 쪽 한글변환은 숫자를 통째로 분리해서
+    뺐는데(letterPart_호제외 컬럼), TAC/어선원부 원문은 "제N호" 선단
+    일련번호를 이름에 그대로 갖고 있어 exact match가 실패하던 버그
+    (교차분석에서 확인: old확신/new실패 935척 중 124척이 이 패턴).
+    숫자일치는 이미 별도 하드필터(_digit_prefix)로 확인하니, 여기서
+    또 떼도 변별력 손실 없음 — 비교 전용 정규화일 뿐 표시용 원본
+    이름(matchedName)은 그대로 둔다."""
+    return re.sub(r"^제\d+", "", base)
+
+
 def _load_korean_candidates() -> dict:
     out = {}
     with KOREAN_CSV_PATH.open(encoding="utf-8-sig") as f:
@@ -114,6 +130,7 @@ def _build_pool() -> list:
         pool.append({"source": "vessel_registry", "name": r["nameRegistry"], "key": r["vesselNoRegistry"], "ports": [r["portNameRegistry"]] if r.get("portNameRegistry") else []})
     for p in pool:
         p["base"] = _strip_ho(p["name"])
+        p["compareBase"] = _strip_je_number(p["base"])
         p["digitPrefix"] = _digit_prefix(_normalize(p["name"]))
         p["romanized"] = _normalize(_romanize(p["name"]))
     return pool
@@ -180,7 +197,7 @@ def run() -> list:
         for p in pool:
             if digit and p["digitPrefix"] and digit != p["digitPrefix"]:
                 continue
-            if p["base"] in korean_cands:  # exact만, fuzzy는 폐기(제안서 발견 3)
+            if p["base"] in korean_cands or p["compareBase"] in korean_cands:  # exact만(fuzzy는 폐기, 발견 3) + "제N호" 정규화(발견 4)
                 dist = _nearest_port_km(ports, centroid, p["ports"])
                 passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "distKm": dist})
 
