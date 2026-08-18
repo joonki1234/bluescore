@@ -11,7 +11,7 @@
 **정밀도 약 75%**로 이미 팀 결정에 반영돼 있다(CLAUDE.md 10번).
 
 이번에 GFW 영문명 4,662척 전체를 사람이 직접 한글로 재변환한 데이터
-(`data_new/gfw_korean_name_candidates.csv`, 3,878척 채워짐, 이미 커밋됨)가
+(`gfw_korean_name_candidates.csv`, 3,878척 채워짐, 이미 커밋됨)가
 생겨서 — 로마자 대신 한글 원문끼리 직접 비교가 가능해졌다. 그 결과를 검증한
 요약이다.
 
@@ -95,9 +95,13 @@ verified 916척(정밀도 최상) + held 535척(계산 가능, 낮은신뢰도) 
 
 ## 재현/참고
 
-- 입력 데이터: `data_new/gfw_korean_name_candidates.csv`(커밋됨)
-- 재현: `python data_new/analysis/simulate_korean_name_matching.py` —
-  요약 통계 출력 + `data_new/analysis/output/korean_matching_comparison.jsonl`
+- 이 폴더(`data_new/matching_redesign_proposal/`)가 이 제안 전체의 위치다
+  — 입력 데이터(`gfw_korean_name_candidates.csv`), 위치신호 의존성
+  (`geocode_kr.py`, `reference/`), 시뮬레이션 스크립트, 결과물(`output/`)이
+  전부 여기 모여있다. 라이브 파이프라인(`data_new/process/`)과는 완전히
+  분리돼있어 채택 안 해도 그쪽엔 아무 영향 없다.
+- 재현: `python data_new/matching_redesign_proposal/simulate_korean_name_matching.py` —
+  요약 통계 출력 + `output/korean_matching_comparison.jsonl`
   생성(GFW 5,323척 전부, 척당 기존 판정과 이번 판정을 나란히 기록). 숫자만
   보지 말고 이 파일을 직접 열어 카테고리별로 필터링·스팟체크해보고
   판단할 것 — 예를 들어 `2 DEOKSEUNGHO`는 기존이 오히려 맞았는데(제2덕성호,

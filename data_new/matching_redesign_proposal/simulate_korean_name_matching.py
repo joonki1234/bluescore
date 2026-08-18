@@ -1,10 +1,10 @@
-"""한글 직접비교 매칭 재설계 시뮬레이션 (MATCHING_REDESIGN_PROPOSAL.md 근거).
+"""한글 직접비교 매칭 재설계 시뮬레이션 (이 폴더의 README.md 근거).
 
 로마자 유사도 대신, 사람이 GFW 영문명을 직접 한글로 변환한 후보
 (`gfw_korean_name_candidates.csv`)를 TAC/어선원부 원문 한글과 직접
 비교하면 정밀도가 얼마나 오르는지(대신 커버리지를 얼마나 잃는지)
-확인한다. **아직 실제 파이프라인(process/match_fuzzy_name.py,
-assemble_matches.py)에 반영 안 됨** — 팀 결정(제안서 참고) 전까지는
+확인한다. **아직 실제 파이프라인(data_new/process/match_fuzzy_name.py,
+assemble_matches.py)에 반영 안 됨** — 팀 결정(README.md 참고) 전까지는
 이 스크립트가 유일한 산출 경로다.
 
 핵심 설계:
@@ -51,7 +51,7 @@ from match_fuzzy_name import (  # noqa: E402
     _vessel_centroids,
 )
 
-KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "gfw_korean_name_candidates.csv"
+KOREAN_CSV_PATH = Path(__file__).resolve().parent / "gfw_korean_name_candidates.csv"
 OLD_MATCHES_PATH = Path(__file__).resolve().parent.parent / "processed" / "final_vessel_matches.jsonl"
 COMPARISON_OUT_PATH = Path(__file__).resolve().parent / "output" / "korean_matching_comparison.jsonl"
 ROMAN_FALLBACK_THRESHOLD = 0.85  # 한글후보 자체가 없는 벡터에만 씀

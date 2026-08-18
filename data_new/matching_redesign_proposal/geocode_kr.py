@@ -1,6 +1,7 @@
 """한국 행정구역명(시군구) -> 중심좌표 지오코딩.
 
-data_new/reference/sigungu_centroids_2017.csv 출처: cubensys/Korea_District
+data_new/matching_redesign_proposal/reference/sigungu_centroids_2017.csv
+출처: cubensys/Korea_District
 (대한민국_기초자치단체_중심점_2017, CC 공개 저장소). TAC `portNamesTac`이
 항구명이 아니라 행정구역명("경주시 감포읍" 등)인 경우가 많아서(46번,
 어항정보 113개 리스트로는 3.6%만 커버) 이 표로 폴백한다.
@@ -20,7 +21,7 @@ import csv
 import re
 from pathlib import Path
 
-CENTROID_PATH = Path(__file__).resolve().parent.parent / "reference" / "sigungu_centroids_2017.csv"
+CENTROID_PATH = Path(__file__).resolve().parent / "reference" / "sigungu_centroids_2017.csv"
 
 
 def _load_sigungu() -> dict:
