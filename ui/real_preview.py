@@ -112,18 +112,31 @@ def render() -> None:
         height=108,
     )
 
+    # services/scoring.py의 AXIS_A_WEIGHT/AXIS_B_WEIGHT와 동일한 값을 여기 직접
+    # 쓴다 — adapter.formula_text()는 데모 fixture 설정(data/mock/dashboard_mock.json의
+    # axisWeights)에서 가중치를 읽어오는 함수라, 지금은 값이 우연히 같아도(둘 다
+    # 0.65/0.35) 실산출 화면에 데모 설정을 끌어다 쓰는 건 개념적으로 맞지 않다.
+    #
+    # BlueScore가 없는 경우(현재 94.6%, B축 미산출)에도 섹션 자체를 숨기지 않고
+    # 왜 계산이 안 됐는지 보여준다 — 조용히 사라지면 "원래 계산식이 없다"로
+    # 오해할 수 있다("모르면 모른다" 원칙).
     blue_score = score.get("blueScore")
     if blue_score is not None and axis_a_score is not None and axis_b_score is not None:
-        # services/scoring.py의 AXIS_A_WEIGHT/AXIS_B_WEIGHT와 동일한 값을 여기 직접
-        # 쓴다 — adapter.formula_text()는 데모 fixture 설정(data/mock/dashboard_mock.json의
-        # axisWeights)에서 가중치를 읽어오는 함수라, 지금은 값이 우연히 같아도(둘 다
-        # 0.65/0.35) 실산출 화면에 데모 설정을 끌어다 쓰는 건 개념적으로 맞지 않다.
         st.markdown(
             f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
             f'color:{theme.INK_SOFT};">{_AXIS_A_WEIGHT:g} × {axis_a_score:g} + '
             f'{_AXIS_B_WEIGHT:g} × {axis_b_score:g} = {blue_score:g}</span>'
             f'<div class="bs-note" style="margin-top:8px;">축 간 비중(자원 압력 '
             f'{_AXIS_A_WEIGHT:g} · 운항 효율 {_AXIS_B_WEIGHT:g})은 검증 전 잠정치입니다.</div></div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        missing_reason = score["axisB"].get("missingReason") or score["axisA"].get("missingReason")
+        st.markdown(
+            f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
+            f'color:{theme.INK_SOFT};">{_AXIS_A_WEIGHT:g} × A + {_AXIS_B_WEIGHT:g} × B = BlueScore</span>'
+            f'<div class="bs-note" style="margin-top:8px;">B축이 산출되지 않아 BlueScore는 '
+            f'계산하지 않습니다{f" — {missing_reason}" if missing_reason else ""}.</div></div>',
             unsafe_allow_html=True,
         )
 
