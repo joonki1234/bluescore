@@ -37,9 +37,9 @@ def render() -> None:
     )
     st.caption(
         "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(data_new/, 2026-04~08월)로 "
-        "계산한 결과입니다. 표본 5,323척 중 A축 실산출 61.4%, BlueScore까지 완전 "
-        "산출되는 건 15.2%(807척)뿐입니다. 해양기상 단위(풍속 m/s)는 공식 확인이 "
-        "아니라 정황 추정이며, 유속·일부 어업종 필드는 미확인 상태입니다."
+        "계산한 결과입니다. 실제 5,323척 규모 데이터 중 807척에 대해 BlueScore가 "
+        "완전 산출됩니다. 해양기상 단위(풍속 m/s)는 공식 확인이 아니라 정황 "
+        "추정이며, 유속·일부 어업종 필드는 미확인 상태입니다."
     )
 
     list_placeholder = st.empty()
@@ -89,13 +89,13 @@ def render() -> None:
                 "size": 26,
             },
             {
-                "label": "A축",
+                "label": "자원 압력 (A축)",
                 "value": axis_a_score if axis_a_score is not None else "—",
                 "decimals": 1,
                 "size": 26,
             },
             {
-                "label": "B축",
+                "label": "운항 효율 (B축)",
                 "value": axis_b_score if axis_b_score is not None else "—",
                 "decimals": 1,
                 "size": 26,
