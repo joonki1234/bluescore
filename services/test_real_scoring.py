@@ -48,3 +48,26 @@ def test_real_axis_a_does_not_invent_score_without_events():
     assert result.axis_a_score is None
     assert result.matching_reason
 
+
+def test_shap_factors_populated_for_axis_a_only():
+    """2026-08-18: A축 요인 기여도(SHAP) 실연결 — B축은 연결 안 하므로
+    axis="b"가 섞이면 안 된다."""
+    events = [
+        _event("R1", "1", "2026-05-01T00:00:00Z"),
+        _event("R1", "2", "2026-05-01T06:00:00Z"),
+        _event("R2", "3", "2026-05-01T00:00:00Z", 35.2, 128.2),
+        _event("R2", "4", "2026-05-02T00:00:00Z", 35.2, 128.2),
+        _event("R3", "5", "2026-05-01T00:00:00Z", 35.3, 128.3),
+        _event("R3", "6", "2026-05-03T00:00:00Z", 35.3, 128.3),
+    ]
+
+    result = compute_axis_a_for_vessel("R1", _vessels(), events, min_peer_size=3)
+
+    assert len(result.shap_factors) == 3
+    assert all(f["axis"] == "a" for f in result.shap_factors)
+
+
+def test_shap_factors_empty_when_matching_failed():
+    result = compute_axis_a_for_vessel("R1", _vessels(), [], min_peer_size=1)
+    assert result.shap_factors == []
+

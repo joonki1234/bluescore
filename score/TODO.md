@@ -93,6 +93,28 @@ score/ 자체 구현은 A축·유사군·점수조립·금리매핑·트레이�
         단위로 바꾸는 환산 정책, `explain/contract.ShapFactor`로의 배선,
         `services/`(최지희) 연결.
 
+      **(2026-08-18 후속) A축만 `services/real_scoring.py`에 실제 연결
+      완료(오동규, 최지희 확인 필요)**: 위 "raw→포인트 환산" 문제를 A축은
+      다르게 풀었다 — 개별 요인의 절대 "점수"는 유사군 분포 없이 못 구하지만,
+      "전체 A축 raw 압력에서 이 요인이 차지하는 상대적 비중(%)"은 유사군
+      없이도 정직하게 계산된다는 걸 이용해서 `axis_a_factor_shares()`를
+      새로 추가(`score/shap_factors.py`). `RealAxisAResult.shap_factors`
+      필드 신설 → `_result_from_context()`에서 `axis_result`가 있으면
+      status(insufficientSample 포함)와 무관하게 채움(raw 분해 자체가 유사군
+      표본과 무관하니까) → `services/scoring.py::_build_real_score`가
+      `ShapFactorSchema`로 감싸 `ScoreResponse.shap_factors`에 실제로 담음
+      (지금까지 이 인자가 아예 빠져 있어서 실산출 경로는 조용히 항상
+      빈 리스트였음). **B축은 여전히 미연결** — SHAP이 "점수"가 아니라
+      "기준선 조건"만 설명한다는 의미론적 제약은 그대로 유효하기 때문
+      (`axis_b_baseline_factor_contributions()` docstring 참고).
+      실측 확인: `RealAxisAAdapter`로 실제 3척 조회 — 3개 요인·`axis="a"`만·
+      절댓값 합 100.00%로 정확히 나옴. 테스트 4개 추가
+      (`score/test_shap_factors.py`의 `TestAxisAFactorShares` +
+      `services/test_real_scoring.py`), `pytest -q` 334 passed(env
+      서브프로세스 테스트 1개만 무관하게 실패). `explain/`(LLM 문장화) 연결은
+      여전히 범위 밖 — 실산출 경로가 아직 `explain/explain()`을 안 써서
+      (B축 `unavailable`이라 완전한 설명을 못 만듦) 별도 작업 필요.
+
 - [x] **A축 격자 크기·재방문 스케일 확정** — **완료(2026-08-18, 오동규, 최지희 요청
       회의)**: `GRID_CELL_SIZE_DEG` 0.05→**0.1도**, `REVISIT_PRESSURE_SCALE_HOURS`
       24→**60시간**으로 확정. CLAUDE.md 확정된 규칙 8번에 근거 전문 기록함

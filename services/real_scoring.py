@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import gzip
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -25,6 +25,7 @@ from score.axis_b_baseline import VesselAxisBResult
 from score.peer_grouping import MIN_PEER_GROUP_SAMPLE_SIZE, build_peer_groups, peer_group_for_vessel
 from score.real_axis_b_scoring import compute_axis_b_results
 from score.score_assembly import raw_to_score, score_status_for_group
+from score.shap_factors import axis_a_factor_shares
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +56,10 @@ class RealAxisAResult:
     axis_b_score: Optional[float] = None
     axis_b_raw: Optional[float] = None
     axis_b_used_row_count: Optional[int] = None
+    # 2026-08-18 A축 요인 기여도(SHAP) 연결 추가분. B축은 연결 안 함 —
+    # score/shap_factors.py의 axis_b_baseline_factor_contributions()
+    # docstring 참고("점수"가 아니라 "기준선 조건"만 설명하는 의미론적 제약).
+    shap_factors: List[dict] = field(default_factory=list)
 
 
 def _axis_b_score_for_vessel(
@@ -177,6 +182,9 @@ def _result_from_context(
         axis_b_score=axis_b_score,
         axis_b_raw=axis_b_raw,
         axis_b_used_row_count=axis_b_used_row_count,
+        # status(insufficientSample 포함)와 무관하게 채운다 — raw 분해
+        # 자체는 유사군 표본과 무관하게 항상 계산 가능하다.
+        shap_factors=axis_a_factor_shares(axis_result),
     )
 
 

@@ -18,6 +18,15 @@ score/에 있어야 한다. `requirements.txt`에 `shap` 패키지가 있었지�
 `run_real_axis_b.py`가 "된다"만 증명하고 화면 배선은 안 한 것과 같은 패턴.
 증명은 `score/scripts/run_shap_factors.py` 참고.
 
+**(2026-08-18 추가) 예외 — A축은 raw가 아니라 "상대적 비중(%)"으로
+`services/real_scoring.py`에 실제 연결됐다** — `axis_a_factor_shares()`
+참고. A축은 raw→점수 환산이 원래 안 되지만(유사군 백분위라 개별 요인 하나만
+떼서 "몇 점"으로 못 바꿈), "전체 A축 raw 압력에서 이 요인이 차지하는
+비중(%)"은 유사군 분포 없이도 정직하게 계산 가능해서, 이 프레이밍으로
+`api/schemas.ShapFactorSchema.value`에 바로 넣을 수 있게 했다. B축은 여전히
+연결 안 됨(위 설명대로 SHAP이 "점수"가 아니라 "기준선 조건"만 설명하는
+의미론적 제약 때문).
+
 A축과 B축은 계산 방식이 다르다:
     - A축(`axis_a_factor_contributions`): `axis_a_pressure.py`의
       `axis_a_pressure_raw`는 트리 모델이 아니라 명시적 가중합+상호작용항
@@ -86,6 +95,35 @@ def axis_a_factor_contributions(
         {"label": "재방문압력", "raw_contribution": revisit_contribution, "axis": "a"},
         {"label": "혼잡압력", "raw_contribution": congestion_contribution, "axis": "a"},
         {"label": "재방문×혼잡 상호작용", "raw_contribution": interaction_contribution, "axis": "a"},
+    ]
+
+
+def axis_a_factor_shares(
+    result: VesselAxisAResult,
+    revisit_weight: float = AXIS_A_REVISIT_WEIGHT,
+    congestion_weight: float = AXIS_A_CONGESTION_WEIGHT,
+    interaction_weight: float = AXIS_A_INTERACTION_WEIGHT,
+) -> List[dict]:
+    """`axis_a_factor_contributions()`의 raw 기여도를, 세 항의 절댓값 합
+    대비 상대적 비중(%, 부호 유지)으로 바꾼다.
+
+    `api/schemas.ShapFactorSchema.value`에 바로 넣을 수 있도록 키 이름도
+    `raw_contribution`이 아니라 `value`로 낸다. 세 항이 전부 0이면(재방문·
+    혼잡 raw가 둘 다 0인 선박) 0으로 나누기를 피해 셋 다 `value=0.0`으로
+    반환한다.
+    """
+    contributions = axis_a_factor_contributions(
+        result, revisit_weight, congestion_weight, interaction_weight
+    )
+    total_magnitude = sum(abs(c["raw_contribution"]) for c in contributions)
+
+    return [
+        {
+            "label": c["label"],
+            "value": (c["raw_contribution"] / total_magnitude * 100) if total_magnitude else 0.0,
+            "axis": "a",
+        }
+        for c in contributions
     ]
 
 
