@@ -55,7 +55,7 @@ PROCESSED = Path(__file__).resolve().parent.parent / "processed"
 GFW_VESSELS_PATH = PROCESSED / "gfw_vessels_normalized.jsonl"
 TAC_PATH = PROCESSED / "tac_vessels_normalized.jsonl"
 EVENTS_PATH = PROCESSED / "gfw_events_normalized.jsonl"
-KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "gfw_korean_name_candidates.csv"
+KOREAN_CSV_PATH = Path(__file__).resolve().parent.parent / "reference" / "gfw_korean_name_candidates.csv"
 OUT_PATH = PROCESSED / "fuzzy_name_candidates.jsonl"
 
 LOC_VERIFIED_KM = 150.0  # 근해어업 조업범위 감안한 보수적 값 — 법·데이터 근거 없음, matching_redesign_proposal/README.md "왜 150km인가" 참고

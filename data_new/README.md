@@ -22,13 +22,13 @@ data_new/
 ├── process/       processed/를 만드는 가공·매칭 스크립트
 ├── processed/     정규화·매칭 결과(재실행하면 덮어써도 안전 — raw에서
 │                  결정론적으로 재생성 가능)
-├── analysis/      읽기전용 탐색적 분석 스크립트(raw/·processed/ 안 건드림)
-│                  결과는 analysis/output/*.json
 ├── SCHEMA_DRAFT.md   데이터 정의(엔티티·필드)
 ├── PROCESS_LOG.md    진행 기록(결정과 근거, 시간순)
-├── TODO.md           체크리스트
-└── requirements.txt  이 파이프라인 전용 추가 의존성(bluescore/requirements.txt에 더해 설치)
+└── TODO.md           체크리스트
 ```
+
+고유 의존성 없음 — 루트 `requirements.txt`(pandas/openpyxl/requests/
+python-dotenv 등) 하나로 충분하다.
 
 ## 현재 서비스 스냅샷 (2026-08-19 기준)
 
@@ -53,7 +53,7 @@ matchingFailed별 서비스 상태는 이 매칭 수정 이전 값(55번 작성 
 각 스크립트 상단 docstring 참고.
 
 ```bash
-pip install -r requirements.txt -r ../requirements.txt
+pip install -r ../requirements.txt
 
 # 1. 수집 (collect/) — .env에 GFW_API_KEY/MARINE_WEATHER_API_KEY/KAKAO_API_KEY 필요
 cd collect

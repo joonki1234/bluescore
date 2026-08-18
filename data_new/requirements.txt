@@ -1,7 +1,0 @@
-# data_new/ 파이프라인 전용 추가 의존성.
-# bluescore/requirements.txt(pandas, openpyxl, requests, python-dotenv 등)에
-# 이걸 더해서 설치. data_new가 확정되기 전까지는 루트 requirements.txt를
-# 직접 건드리지 않는다(사용자 지시, 2026-08-17).
-
-# korean-romanizer는 2026-08-18 매칭 재설계(한글 직접비교로 교체)로 더 이상 안 씀.
-# requests/python-dotenv는 루트 requirements.txt에 이미 있음(process/geocode_kakao.py가 씀).

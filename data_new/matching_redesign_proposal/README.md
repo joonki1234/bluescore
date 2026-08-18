@@ -211,7 +211,7 @@ GFW 이벤트/선박 수집 -> TAC 정규화 -> 한글 직접비교 매칭으로
 ## 재현/참고
 
 - **채택 후 실제 코드는 `data_new/process/match_fuzzy_name.py`·
-  `assemble_matches.py`에 있다** — 입력 데이터(`data_new/
+  `assemble_matches.py`에 있다** — 입력 데이터(`data_new/reference/
   gfw_korean_name_candidates.csv`), 지오코더(`data_new/process/
   geocode_kakao.py`)도 다 그쪽으로 옮겨졌다. 이 폴더는 이 README 하나만
   검증 과정 기록으로 남아있다(시뮬레이션 스크립트는 라이브 코드 변경으로
