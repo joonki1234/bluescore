@@ -19,10 +19,10 @@ class TestComputeAxisBResults:
         assert first is second
 
     def test_some_vessels_have_used_rows(self):
-        # 태윤님이 data_new/ 매칭을 GFW-TAC 한글 직접비교 단일 소스로 바꾸면서
-        # 톤수 매칭 커버리지가 43.4%(2,278척대)에서 23.2%(1,234척)로 줄었다
+        # 태윤님이 data_new/ 매칭에 TAC 유일성 강제 + 원양선 제외를 추가하면서
+        # 톤수 매칭 커버리지가 23.2%(1,234척)에서 13.4%(712척)로 더 줄었다
         # (CLAUDE.md 참고, final_vessel_matches.jsonl 재생성). 임계값도 그에
         # 맞춰 낮춘다 — 여전히 "일부 선박은 B축 계산이 된다"만 확인하면 된다.
         results = compute_axis_b_results()
         used = [r for r in results.values() if r.used_row_count > 0]
-        assert len(used) > 1000
+        assert len(used) > 600

@@ -199,12 +199,12 @@ class TestBuildAxisBRows:
         assert set(rows[0].keys()) == expected_keys
 
     def test_snapshot_feature_counts(self, rows):
-        assert sum(row["tonnageGt"] is not None for row in rows) == 85_985
+        assert sum(row["tonnageGt"] is not None for row in rows) == 55_608
         assert sum(row["gearType"] is not None for row in rows) == 147_441
         assert sum(
             row["tonnageGt"] is not None and row["gearType"] is not None
             for row in rows
-        ) == 45_305
+        ) == 29_249
 
     def test_excluded_gear_labels_are_absent(self, rows):
         gear_types = {row["gearType"] for row in rows if row["gearType"] is not None}

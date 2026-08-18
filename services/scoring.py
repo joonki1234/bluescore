@@ -310,7 +310,7 @@ class ScoringService:
         evidence = vessel.get("matchingEvidence") or {}
 
         # A축만 되는 대다수 선박은 그대로 "partial"이고(톤수 매칭 커버리지
-        # 23.2%뿐), A축+B축이 둘 다 유사군 백분위까지 나온 선박만 "success"로
+        # 13.4%뿐), A축+B축이 둘 다 유사군 백분위까지 나온 선박만 "success"로
         # 승격해 BlueScore·금리구간을 낸다.
         has_axis_b = result.axis_b_score is not None
         status = "success" if result.status == "partial" and has_axis_b else result.status
