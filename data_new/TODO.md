@@ -78,13 +78,13 @@
       진행함 — `gearType`은 이번엔 비워둠(`None`), `seaArea`/`season`은
       `score/peer_grouping.py`의 `region_key()`/`season_key()`를 이벤트 자체의
       위경도·시각으로 재계산해 채움(태그 파일 안 기다림). 상세는
-      `score/TODO.md`의 같은 항목 참고. **김태윤님 확인 부탁드리는 것**: 톤수
+      `score/TODO.md`의 같은 항목 참고. **김태윤 확인 필요한 것**: 톤수
       (`tac.tonnageGtTac`/`mof.tonnageGtMof` 중 있는 값 사용, 둘 다 있는 행은
       0건 실측 확인함)와 날씨 필드 매핑(단위는 정황상 m/s·°C로 추정만 하고
       진행 — `score/real_axis_b_input.py` 모듈 docstring 참고).
 
       **(2026-08-18 병합 당시 기록 — 현재 해결됨) 같은 목적의 스크립트가 두 개가 됐다** —
-      김태윤님이 거의 같은 시각에 독립적으로 `data_new/process/
+      김태윤이 거의 같은 시각에 독립적으로 `data_new/process/
       build_axis_b_input.py`를 만들어서 git merge 충돌이 났다(`score/scripts/
       run_real_axis_b.py`에서, 서로 다른 두 스크립트를 각자 참조하고 있었음).
       정리한 내용:
@@ -119,7 +119,7 @@
       계산 — 둘 다 원본 소스는 안 바꾸고 받는 쪽에서 번역함). 최종 형태(score/
       요구 스키마)를 score팀이 제일 잘 알아서 score팀이 짜기로 함.
       **단, 필드 매핑표(원본 필드 -> score/ 필드, 특히 날씨 단위·gearType 근거)는
-      김태윤님이 확인**하기로 함 — 원본 구조는 데이터팀이 제일 잘 앎.
+      김태윤이 확인**하기로 함 — 원본 구조는 데이터팀이 제일 잘 앎.
       진행 상황은 `score/TODO.md`에 기록.
 
       **현재 정리(2026-08-19)**: `tac_vessels_normalized.jsonl`은 Git에서 추적

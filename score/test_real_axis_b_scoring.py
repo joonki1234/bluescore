@@ -19,7 +19,7 @@ class TestComputeAxisBResults:
         assert first is second
 
     def test_some_vessels_have_used_rows(self):
-        # 태윤님이 data_new/ 매칭에 TAC 유일성 강제 + 원양선 제외를 추가하면서
+        # data_new/ 매칭에 TAC 유일성 강제 + 원양선 제외가 추가되면서
         # 톤수 매칭 커버리지가 23.2%(1,234척)에서 13.4%(712척)로 더 줄었다
         # (CLAUDE.md 참고, final_vessel_matches.jsonl 재생성). 임계값도 그에
         # 맞춰 낮춘다 — 여전히 "일부 선박은 B축 계산이 된다"만 확인하면 된다.
