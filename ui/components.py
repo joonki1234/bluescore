@@ -221,43 +221,9 @@ def card(body: str) -> None:
 
 # ─── 실산출 미리보기 전용 시각화 ────────────────────────────────────────────
 # 2026-08-18(김준기, 최지희 확인 필요): 실산출 화면이 "숫자만 던지는" 느낌이라
-# 커버리지·요인 기여도(SHAP)처럼 이미 API 응답에 있지만 화면에 안 쓰이던
-# 값들을 시각화로 추가함. 링 애니메이션은 온체인 체크마크·게이지 핀과 같은
-# 방식(정적 @keyframes, iframe 불필요)이고, 요인 막대는 axis_breakdown()과
-# 같은 components.v1.html 카운트업+채움 패턴을 그대로 재사용해 톤을 맞췄다.
-def coverage_ring(success: int, total: int, *, label: str = "완전 산출") -> None:
-    """5,323척 중 807척처럼 "전체 대비 계산된 비율"을 링 도넛으로 보여준다."""
-    percent = (success / total * 100) if total else 0.0
-    radius = 36
-    circumference = 2 * math.pi * radius
-    offset = circumference * (1 - percent / 100)
-
-    st.markdown(
-        f"""<div class="bs-card" style="display:flex; align-items:center; gap:18px;">
-  <style>
-    @keyframes bs-ring-draw {{
-      from {{ stroke-dashoffset: {circumference}; }}
-      to {{ stroke-dashoffset: {offset}; }}
-    }}
-    .bs-ring-fill {{
-      stroke: {theme.POSITIVE}; stroke-width: 8; fill: none; stroke-linecap: round;
-      stroke-dasharray: {circumference}; animation: bs-ring-draw 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }}
-  </style>
-  <svg width="84" height="84" viewBox="0 0 84 84" style="flex-shrink:0; transform:rotate(-90deg);">
-    <circle cx="42" cy="42" r="{radius}" stroke="{theme.LINE}" stroke-width="8" fill="none" />
-    <circle class="bs-ring-fill" cx="42" cy="42" r="{radius}" />
-  </svg>
-  <div>
-    <div style="font-size:26px; font-weight:800; color:{theme.INK}; font-family:{theme.FONT_MONO};">
-      {percent:.1f}%</div>
-    <div class="bs-note">전체 {total:,}척 중 {success:,}척 {label}</div>
-  </div>
-</div>""",
-        unsafe_allow_html=True,
-    )
-
-
+# 요인 기여도(SHAP)처럼 이미 API 응답에 있지만 화면에 안 쓰이던 값을
+# 시각화로 추가함. axis_breakdown()과 같은 components.v1.html 카운트업+채움
+# 패턴을 그대로 재사용해 톤을 맞췄다.
 def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer_count: int,
                            used_event_count: Optional[int]) -> None:
     """선택한 선박의 어업종·톤수·조업 이벤트 건수를 pill 형태로 보여준다."""

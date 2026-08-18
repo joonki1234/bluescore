@@ -22,12 +22,6 @@ import streamlit as st
 
 from ui import adapter, components
 
-# 실측 규모 — API가 전체 모집단 크기를 별도 필드로 안 주기 때문에(목록
-# 엔드포인트는 limit개만 반환) 캡션·커버리지 링에 쓰는 값으로 고정해둔다.
-# score/TODO.md의 매칭 오탐 필터 적용 결과(2026-08-18)와 같은 숫자다.
-_TOTAL_VESSELS = 5323
-_FULL_SUCCESS_VESSELS = 807
-
 
 def _discount_text(band: dict) -> str:
     if band["discountBp"] <= 0:
@@ -44,7 +38,6 @@ def render() -> None:
     st.caption(
         "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(2026-04~08월)로 계산한 결과입니다."
     )
-    components.coverage_ring(_FULL_SUCCESS_VESSELS, _TOTAL_VESSELS)
 
     list_placeholder = st.empty()
     with list_placeholder.container():
@@ -65,7 +58,7 @@ def render() -> None:
     }
 
     vessel_id = st.selectbox(
-        "선박 (실데이터)",
+        "선박 선택 (실데이터, 클릭해서 다른 선박 보기)",
         options=options,
         format_func=lambda vid: label_by_id.get(vid, vid),
         key="real_vessel_id",
@@ -99,13 +92,13 @@ def render() -> None:
                 "size": 26,
             },
             {
-                "label": "자원 압력 (A축)",
+                "label": "A. 자원 압력",
                 "value": axis_a_score if axis_a_score is not None else "—",
                 "decimals": 1,
                 "size": 26,
             },
             {
-                "label": "운항 효율 (B축)",
+                "label": "B. 운항 효율",
                 "value": axis_b_score if axis_b_score is not None else "—",
                 "decimals": 1,
                 "size": 26,
@@ -119,8 +112,5 @@ def render() -> None:
 
     shap_factors = score.get("shapFactors") or []
     if shap_factors:
-        st.markdown("###### A축 요인 기여도")
+        st.markdown("###### A. 자원 압력 — 요인 기여도")
         components.real_shap_factor_bars(shap_factors)
-
-    with st.expander("원본 API 응답 (디버그용)"):
-        st.json(score)
