@@ -3,23 +3,20 @@ flat 이벤트 행(vesselId/tonnageGt/averageSpeedKnots/durationHours/
 seaSurfaceTempC/windSpeedMs/currentSpeedMs/gearType/seaArea/season)으로
 events_with_weather.jsonl + final_vessel_matches.jsonl을 합친다.
 
-TODO.md 47번(B축 연결 스크립트 없음) 대응. score/ 필드명 계약은
-data_new/SCHEMA_DRAFT.md, score/axis_b_baseline.py의
-REQUIRED_PHYSICS_FIELDS/NUMERIC_FEATURE_COLUMNS/CATEGORICAL_FEATURE_COLUMNS
-참고.
+score/ 필드명 계약은 data_new/SCHEMA_DRAFT.md, score/axis_b_baseline.py의
+REQUIRED_PHYSICS_FIELDS/NUMERIC_FEATURE_COLUMNS/CATEGORICAL_FEATURE_COLUMNS 참고.
 
-⚠ 매칭 실패 선박은 tonnageGt=None으로 그대로 내보낸다 — 걸러내지 않는다.
+매칭 실패 선박은 tonnageGt=None으로 그대로 내보낸다 — 걸러내지 않는다.
 score/axis_b_baseline.py._prepare_valid_rows가 REQUIRED_PHYSICS_FIELDS
 결측 행을 스킵사유와 함께 이미 처리하므로 여기서 중복 구현하지 않는다.
 
-⚠ 해양기상 필드 단위가 미확인 상태(README.md 한계 목록)다 — 여기서는
-값만 그대로 옮기고 단위 검증은 하지 않는다. 확인 전까지 seaSurfaceTempC
-등 절대값을 신뢰하지 말 것.
+해양기상 필드 단위가 미확인 상태다 — 값만 그대로 옮기고 단위 검증은
+하지 않는다. 확인 전까지 seaSurfaceTempC 등 절대값을 신뢰하지 말 것.
 
-⚠ gearType/seaArea는 TAC 경유 매칭에서만 나온다(MOF는 세부 어업방법 정보가
-없음) — tier3에서 top 후보 출처가 tac이어도 assemble_matches.py가 만드는
-축약 tac 딕셔너리엔 gearTypeNamesTac/portNamesTac이 안 들어있어서, 여기서
-vesselNoTac으로 tac_vessels_normalized.jsonl을 다시 조회해 채운다.
+gearType/seaArea는 TAC 경유 매칭에서만 나온다(MOF는 세부 어업방법 정보가
+없음) — assemble_matches.py가 만드는 축약 tac 딕셔너리엔 gearTypeNamesTac/
+portNamesTac이 안 들어있어서, 여기서 vesselNoTac으로 tac_vessels_normalized.jsonl을
+다시 조회해 채운다.
 
 사용법:
     python build_axis_b_input.py

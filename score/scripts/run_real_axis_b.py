@@ -2,17 +2,8 @@
 담당: 김준기, 오동규
 
 실제 data_new/ 산출물로 B축을 선박 단위까지 산출해보는 검증 스크립트.
-
-배경: `score/real_axis_b_input.py`가 `data_new/processed/`의
-`events_with_weather.jsonl.gz` + `final_vessel_matches.jsonl`을
-`score/axis_b_baseline.py`가 요구하는 형태로 변환하는데, 이걸로 실제로
-`fit_baseline_model()` -> `compute_axis_b_efficiency()`까지 에러 없이
-도는지 증명한다(`score/scripts/run_real_axis_a.py`가 A축에서 한 것과 같은
-목적). 화면 연결은 범위 밖 — 여기서는 "된다"만 증명한다.
-
-참고: `data_new/process/build_axis_b_input.py`(김태윤)도 같은 목적의 병합을
-독립적으로 시도한 것이다 — `data_new/TODO.md`/`score/TODO.md`의 "B축 입력
-병합 스크립트" 항목에 두 접근을 어떻게 정리했는지 기록해뒀다.
+`build_axis_b_rows()` -> `fit_baseline_model()` -> `compute_axis_b_efficiency()`가
+에러 없이 도는지 확인한다(화면 연결은 범위 밖).
 
 실행:
     python -m score.scripts.run_real_axis_b

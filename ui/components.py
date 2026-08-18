@@ -36,9 +36,8 @@ ESRI_ATTRIBUTION = "Tiles &copy; Esri — Esri, Maxar, Earthstar Geographics"
 # 줌 역산에 쓰는 가정 폭(px). 2단 레이아웃의 왼쪽 컬럼 실측에 가깝게 잡았다.
 _ASSUMED_MAP_WIDTH_PX = 560
 
-# 어두운 위성 배경 위에서 읽히도록 조정한 지도 전용 색.
-# 축 색 체계는 그대로다 — 조업 이벤트는 A축 계열(파랑), 보호구역은 방향색
-# 체계의 감점색(theme.NEGATIVE)을 그대로 써서 "감점 요인"임을 색으로도 전달한다.
+# 어두운 위성 배경 위에서 읽히도록 조정한 지도 전용 색. 조업 이벤트는 A축
+# 계열(파랑), 보호구역은 감점색(theme.NEGATIVE)을 그대로 써서 축 색 체계를 유지한다.
 MAP_FISHING = "#60A5FA"
 MAP_SAILING = "#BBD3FA"
 MAP_GAP = "#EEF1F5"
@@ -51,12 +50,10 @@ _LANDMARKS = [
 ]
 
 # ─── JS 애니메이션 위젯 공용 스타일·스크립트 ───────────────────────────────────
-# Streamlit이 재실행마다 DOM을 새로 그리는 방식이라, CSS 트랜지션은 브라우저가
-# 중간 상태를 그리지 않고 최종값을 바로 페인트해버려 재생을 보장하지 못한다.
-# 그래서 숫자 카운트업·막대 채움처럼 "임팩트가 중요한" 요소는 지도와 같은
-# components.v1.html(iframe) 안에서 진짜 JS로 애니메이션한다. iframe은 페이지의
-# 공용 CSS(theme.inject())를 못 받으므로, bs-card 스타일을 최소한으로 복제해
-# 여기 한 곳에만 정의하고 여러 컴포넌트가 재사용한다.
+# Streamlit이 재실행마다 DOM을 새로 그리므로 CSS 트랜지션은 중간 상태 없이
+# 최종값을 바로 페인트한다. 카운트업·막대 채움은 components.v1.html(iframe) 안에서
+# 진짜 JS로 애니메이션한다. iframe은 전역 CSS를 못 받아 bs-card 스타일을 여기 한
+# 곳에 최소 복제해 재사용한다.
 _MINI_CARD_CSS = f"""
 <style>
   * {{ box-sizing:border-box; }}
@@ -143,13 +140,10 @@ def _stat_card_html(s: Dict) -> str:
 
 
 def animated_stat_cards(stats: List[Dict], height: int = 100) -> None:
-    """
-    숫자 카드 여러 개를 한 행에 0→값 카운트업 애니메이션과 함께 그린다.
+    """숫자 카드 여러 개를 한 행에 0→값 카운트업 애니메이션과 함께 그린다.
 
     `stats` 각 항목: {"label","value","unit","color","decimals","signed"}. `value`가
     문자열이면(예: 등급 텍스트) 애니메이션 없이 그대로 표시한다.
-    기존 st.columns + bs-card 조합을 대체하는 자리에 쓴다 — 표시값은 동일하고
-    애니메이션만 더해진다.
     """
     cards = "".join(_stat_card_html(s) for s in stats)
     html = (
@@ -171,11 +165,8 @@ def animated_transition_card(
     note_html: str = "",
     height: int = 118,
 ) -> None:
-    """
-    "72.6 → 76.3" 같은 전후 비교 카드. 시뮬레이터·개선 추천 카드에서 반복되는
-    패턴이라 공용으로 뺐다. before/after가 숫자면 그 구간을 카운트업하고,
-    문자열(등급 텍스트 등)이면 애니메이션 없이 페이드인만 한다.
-    """
+    """"72.6 → 76.3" 같은 전후 비교 카드. before/after가 숫자면 그 구간을
+    카운트업하고, 문자열(등급 텍스트 등)이면 애니메이션 없이 페이드인만 한다."""
     numeric = isinstance(before, (int, float)) and isinstance(after, (int, float))
     if numeric:
         color = color or theme.direction_color(after - before)
@@ -225,23 +216,19 @@ def card(body: str) -> None:
     st.markdown(f'<div class="bs-card">{body}</div>', unsafe_allow_html=True)
 
 
-def page_title(title: str, subtitle: str, *, badge_html: str = "") -> None:
-    """어업인/금융기관/실산출 화면 최상단 제목 — 담백한 사각 박스 하나로 표시한다.
+def page_title(title: str, subtitle: str = "", *, badge_html: str = "") -> None:
+    """어업인/금융기관/실산출 화면 최상단 제목.
 
-    처음엔 좌측 축색 강조 바 + 큰 볼드체로 만들었는데, "AI가 만든 티가 난다"는
-    피드백으로 다른 카드들과 같은 bs-card 스타일(흰 배경)로 바꿨었다. 그런데
-    그러면 바로 아래 score_bar와 색이 완전히 같아져서 구분이 안 된다는 지적
-    (사용자)으로, 배경만 옅은 축색 틴트(AXIS_A_SOFT)로 바꿨다 — 장식을
-    더 넣는 대신 다른 흰 카드들 사이에서 색 하나로 튀게 하는 가장 담백한 방법.
+    박스·틴트 배경까지 시도했다가 "원래대로, 그냥 텍스트로 하고 옆에 세로
+    네모 포인트만 달라"는 요청으로 되돌렸다 — 일반 텍스트 한 줄("선박 A ·
+    내 조업 성적")에 왼쪽에 작은 남색 세로 막대 하나만 붙인다. subtitle이
+    없으면(예: 실산출 페이지 제목) title만 표시한다.
     """
+    label = f"{title} · {subtitle}" if subtitle else title
     st.markdown(
-        f"""<div class="bs-card" style="padding:16px 18px; margin-bottom:16px;
-  background:{theme.AXIS_A_SOFT}; border-color:{theme.AXIS_A};">
-  <div style="display:flex; align-items:baseline; gap:10px;">
-    <span style="font-size:20px; font-weight:700; color:{theme.INK};">{title}</span>
-    {badge_html}
-  </div>
-  <div class="bs-label" style="margin-top:2px;">{subtitle}</div>
+        f"""<div style="display:flex; align-items:center; gap:10px; margin:4px 0 14px;">
+  <div style="width:5px; height:22px; border-radius:2px; background:#1E3A5F; flex-shrink:0;"></div>
+  <div style="font-size:22px; font-weight:700; color:{theme.INK};">{label}{badge_html}</div>
 </div>""",
         unsafe_allow_html=True,
     )
@@ -273,13 +260,10 @@ def real_vessel_meta_card(vessel_meta: str, matching_reason: Optional[str], peer
 def real_shap_factor_bars(factors: List[Dict]) -> None:
     """A축 요인 기여도(SHAP)를 axis_breakdown()과 같은 카운트업+채움 막대로 보여준다.
 
-    factors는 score/shap_factors.axis_a_factor_shares()가 낸 {"label","value","axis"} 리스트 —
-    value는 세 항 절댓값 합 대비 부호 있는 비중(%)이다. value는 axis_a_pressure_raw에
-    더해지는 방향이고, score/score_assembly.raw_to_score()는 raw가 낮을수록(=압력이
-    적을수록) A축 점수를 높게 준다 — 즉 value의 +/- 부호는 좋고 나쁨과 반대로
-    읽혀서 오독하기 쉽다. +/- 부호는 아예 빼고 절댓값만 보여주며, 유리(압력 감소,
-    value<0)는 초록색(B축 산출 근거 카드와 같은 POSITIVE 색), 불리(압력 증가,
-    value>0)는 빨간색으로 직접 칠한다 — 두 축 다 "좋다=초록"으로 통일.
+    factors는 score/shap_factors.axis_a_factor_shares()가 낸 {"label","value","axis"} 리스트.
+    raw가 낮을수록(압력이 적을수록) A축 점수가 높아지므로, value의 +/- 부호는
+    좋고 나쁨과 반대로 읽혀 오독하기 쉽다. +/- 부호는 빼고 절댓값만 보여주며,
+    유리(value<0)는 초록, 불리(value>0)는 빨강으로 직접 칠해 "좋다=초록"을 통일한다.
     """
     if not factors:
         return
@@ -317,13 +301,10 @@ def real_shap_factor_bars(factors: List[Dict]) -> None:
 
 
 def skeleton_score_card(label: str = "불러오는 중…") -> None:
-    """
-    BlueScore/A축/B축 카드 자리의 로딩 스켈레톤.
+    """BlueScore/A축/B축 카드 자리의 로딩 스켈레톤.
 
-    실산출 화면은 첫 요청에서 전체 선박 상태 정렬(약 21초, 프로세스당 1회) ·
-    B축 LightGBM 학습(약 5초, 프로세스당 1회)이 걸린다. 빈 화면을 그대로
-    두면 멈춘 것처럼 보이므로, 데이터를 기다리는 동안 값 없는 회색 막대
-    카드를 보여준다.
+    실산출 화면은 첫 요청에서 전체 선박 상태 정렬·B축 LightGBM 학습이 걸려
+    빈 화면이 멈춘 것처럼 보이므로, 기다리는 동안 값 없는 회색 막대를 보여준다.
     """
     bar = '<div class="bs-skeleton-bar" style="height:{h}px; width:{w}%; margin-bottom:{m}px;"></div>'
     cols_html = "".join(
@@ -364,14 +345,9 @@ _SCOREBAR_CSS = f"""
 
 
 def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
-    """
-    화면 최상단에 항상 붙는 점수 띠.
-
-    어느 탭에 있든 점수가 보이게 해서 시뮬레이터에서 "72.6이 몇 점으로" 라는
-    변화가 시야에서 사라지지 않게 한다. BlueScore 숫자는 0에서 실제 값까지
-    카운트업된다 — components.v1.html(iframe) 안에서 진짜 JS로 도는
-    _COUNT_UP_JS를 재사용한다(다른 곳과 같은 이유: st.markdown의 <script>는
-    Streamlit이 실행해주지 않는다).
+    """화면 최상단에 항상 붙는 점수 띠. 어느 탭에 있든 점수가 보이게 해서
+    시뮬레이터에서의 변화가 시야에서 사라지지 않게 한다. st.markdown의 <script>는
+    Streamlit이 실행해주지 않으므로 components.v1.html(iframe)에서 _COUNT_UP_JS로 돌린다.
     """
     if not adapter.is_scored(vessel):
         notice = adapter.blocked_notice(vessel)
@@ -416,15 +392,11 @@ def score_bar(vessel: Dict, *, show_grade: bool = True) -> None:
 
 
 def voyage_map(vessel: Dict, height: int = 380) -> None:
-    """
-    조업 이벤트 지도.
+    """조업 이벤트 지도.
 
     CLAUDE.md 확정 규칙 1번 — GFW는 연속 항적이 아니라 이산 이벤트만 제공하므로
     점선 보간 + 이벤트 지점 강조로 그린다. 이어진 선은 항적선이 아니라 이벤트
-    순서 보조선이다.
-
-    조업 이벤트를 파랑(A축 색)으로 칠한다. 조업 위치와 재방문이 만들어내는 값이
-    A축이기 때문이며, 앰버는 연료·효율(B축)에만 남긴다.
+    순서 보조선이다. 조업 이벤트는 파랑(A축 색), 앰버는 연료·효율(B축)에만 남긴다.
     """
     track = vessel["track"]
     if not track:
@@ -450,9 +422,8 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
     for idx, (gx, gy) in enumerate(track):
         cell_members.setdefault((gx // cell_size, gy // cell_size), []).append(idx)
 
-    # 재방문 '횟수'는 그 격자의 이벤트 개수가 아니라 **연속 구간(방문)의 개수**다.
-    # 한 번 들어가 이벤트가 세 건 찍힌 것은 세 번 돌아온 것이 아니다 — A축이
-    # 재방문 '간격'을 보는 지표이므로 이 구분이 곧 지표의 정의다.
+    # 재방문 '횟수'는 그 격자의 이벤트 개수가 아니라 연속 구간(방문)의 개수다 —
+    # A축이 재방문 '간격'을 보는 지표이므로 이 구분이 곧 지표의 정의다.
     def _visit_runs(members: List[int]) -> List[List[int]]:
         runs: List[List[int]] = []
         for idx in members:
@@ -477,12 +448,10 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
     )
 
     def _impact_of(factor: Optional[Dict]) -> str:
-        """
-        점수를 올린 요인인지 내린 요인인지는 **실제 기여도 부호**로 정한다.
+        """점수를 올린 요인인지 내린 요인인지는 실제 기여도 부호로 정한다.
 
         "반복 조업 = 점수 하락"으로 단정하면, 재방문 간격을 충분히 확보해
-        기여도가 양수인 선박에서 화면이 사실과 반대되는 말을 하게 된다
-        (실제로 선박 A가 그랬다 — 재방문 간격 +6.2점인데 '하락 요인'으로 표시됨).
+        기여도가 양수인 선박에서 화면이 사실과 반대되는 말을 하게 된다.
         """
         if not factor:
             return "neutral"
@@ -512,9 +481,8 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
         else:
             kind, radius = "항해", 4
 
-        # 무슨 일이 있었는지(headline)는 관측 사실만 쓰고, 점수를 올렸는지
-        # 내렸는지(impact)는 실제 기여도 부호에서 가져온다. 둘을 섞어 단정하면
-        # 화면이 계산 결과와 반대되는 말을 하게 된다.
+        # headline(무슨 일이 있었는지)은 관측 사실만, impact(점수 방향)는 실제
+        # 기여도 부호에서 가져온다 — 섞어 단정하면 계산 결과와 반대로 말하게 된다.
         if is_mpa:
             impact = "down"
             headline = "해양보호구역에서 조업 신호가 잡혔어요"
@@ -621,12 +589,10 @@ def voyage_map(vessel: Dict, height: int = 380) -> None:
 
 
 def _fit_view(events: List[Dict], height: int) -> tuple:
-    """
-    항적이 화면에 알맞게 들어오는 중심 좌표와 줌을 계산한다.
+    """항적이 화면에 알맞게 들어오는 중심 좌표와 줌을 계산한다.
 
     Leaflet의 fitBounds에 맡기지 않는 이유 — iframe 안에서는 지도 컨테이너 크기가
-    확정되기 전에 스크립트가 실행될 수 있어 잘못된 줌이 잡힌다. 파이썬에서 미리
-    계산해 넘기면 그 경합이 사라진다.
+    확정되기 전에 스크립트가 실행될 수 있어 잘못된 줌이 잡힌다.
     """
     lats = [e["lat"] for e in events]
     lngs = [e["lng"] for e in events]
@@ -647,16 +613,11 @@ def _fit_view(events: List[Dict], height: int) -> tuple:
 
 
 def _leaflet_html(payload: Dict, height: int) -> str:
-    """
-    Leaflet + Esri World Imagery 위성 지도를 iframe 안에 그린다.
+    """Leaflet + Esri World Imagery 위성 지도를 iframe 안에 그린다.
 
-    pydeck을 쓰지 않는 이유 — Streamlit의 deck.gl 컴포넌트에서 Carto/Mapbox
-    베이스맵이 뜨지 않았다(키 없이는 배경이 비어 나옴). Leaflet + Esri 조합은
-    API 키가 필요 없고, 발표용 목업(blue_score_dashboard_3.html)에서 이미
-    정상 동작을 확인한 방식이다.
-
-    iframe으로 격리돼 있어 Streamlit이 다른 위젯 때문에 재실행돼도 지도 상태가
-    Streamlit 위젯 트리에 얽히지 않는다.
+    pydeck을 쓰지 않는 이유 — Streamlit의 deck.gl 컴포넌트는 키 없이는
+    Carto/Mapbox 베이스맵이 비어 나온다. Leaflet + Esri는 API 키가 필요 없다.
+    iframe으로 격리돼 있어 다른 위젯 재실행에도 지도 상태가 얽히지 않는다.
     """
     data = json.dumps(payload, ensure_ascii=False)
     return f"""
@@ -1531,24 +1492,15 @@ _SIMULATOR_HTML = """
 
 
 def live_simulator(vessel: Dict, height: int = 880) -> None:
-    """
-    개선 시뮬레이터 전체를 iframe 하나에 담아 서버 왕복 없이 돌린다.
+    """개선 시뮬레이터 전체를 iframe 하나에 담아 서버 왕복 없이 돌린다.
 
-    왜 통째로 옮겼나 — `st.slider`는 한 칸 움직일 때마다 Python을 왕복하고
-    페이지 전체를 다시 그린다. 왕복 1회에 300~570ms, DOM 변경 약 2,400건,
-    결과 카드 iframe 2개가 매번 다시 로드된다. 카운트업 애니메이션이 900ms인데
-    왕복이 320ms마다 들어오니, 드래그하는 동안 숫자가 목표값에 **한 번도
-    도달하지 못하고** 계속 0부터 다시 셌다.
-
-    대신 `adapter.simulate_surface()`가 슬라이더 전 구간을 미리 계산해 넘기고,
-    브라우저는 그 표를 조회만 한다. 계산은 여전히 adapter 한 곳에서만 나온다.
-
-    사전계산한 표가 있으니 점수 곡선과 최적점도 같이 그린다 — "슬라이더를
-    끝까지 밀면 만점"이 아니라는 것을 문장이 아니라 곡선으로 보여준다.
+    `st.slider`는 움직일 때마다 Python 왕복 + 전체 리렌더가 일어나 카운트업
+    애니메이션이 목표값에 도달하지 못하고 계속 0부터 다시 셌다. 대신
+    `adapter.simulate_surface()`가 슬라이더 전 구간을 미리 계산해 넘기고
+    브라우저는 조회만 한다 — 계산은 여전히 adapter 한 곳에서만 나온다.
     """
     surface = adapter.simulate_surface(vessel)
     # 추천 개선 조합은 슬라이더와 무관하게 선박당 고정이라 표에 함께 실어 보낸다.
-    # 점수는 adapter가 계산하고 팁 문장만 explain/이 만든다.
     surface["plans"] = adapter.improvement_plans(vessel)
     tokens = {
         "axisA": theme.AXIS_A,
@@ -1833,10 +1785,8 @@ def rate_gauge(vessel: Dict) -> None:
         if [g for g in ordered if g["minScore"] < floor["minScore"]] else 0
     )
 
-    # 핀이 정적으로 뜨면 "경계까지 여유가 있다"는 게 숫자를 읽어야만 전달된다.
-    # @keyframes로 왼쪽 끝에서 실제 위치까지 슬라이드시켜 여유를 체감하게 한다.
-    # bs-fill과 같은 이유로 CSS transition이 아니라 정적 keyframe을 쓴다 —
-    # transition은 초기 렌더에서 중간 상태 없이 최종값을 바로 페인트해버린다.
+    # 핀을 왼쪽 끝에서 실제 위치까지 @keyframes로 슬라이드시켜 여유를 체감하게
+    # 한다. transition은 초기 렌더에서 중간 상태 없이 최종값을 바로 페인트한다.
     st.markdown(
         f'<div class="bs-card">'
         f'  <style>@keyframes bs-gauge-pin-slide {{ from {{ left:-1px; }} '
@@ -2022,11 +1972,8 @@ def peer_metric_comparison(vessel: Dict, height_per_row: int = 46) -> None:
 
 
 def detailed_report(vessel: Dict) -> None:
-    """
-    점수리포트 탭 — 요인별 상세 리포트.
+    """점수리포트 탭 — 요인별 상세 리포트.
 
-    예전에는 LLM이 만든 5~8문장을 한 문단으로 그대로 뿌렸는데, 어느 문장이
-    어느 수치를 설명하는지 독자가 직접 맞춰야 해서 읽히지 않았다. 지금은
     `explain/`이 요인별로 문장을 돌려주므로(요인 라벨이 키다) 요인 하나를
     한 줄로 묶어 그린다 — 실측값·유사군 평균·기여도·설명이 같은 줄에 있다.
     """

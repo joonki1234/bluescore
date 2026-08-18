@@ -3,12 +3,9 @@
 
 BlueScore 값을 금리구간(A/B/C/D)과 우대금리(bp)로 매핑한다.
 
-참고: BlueScore 프로젝트 기획서 - 스코어 활용(신용점수 기반 금리 등급 산정).
-
-주의: 아래 RATE_GRADES의 구간 경계값(78/68/55)과 discount_bp는 `ui/bank.py`,
-`data/mock/generate_dashboard_mock.py`에 쓰인 목업(placeholder) 값을 그대로
-가져온 것이며, 팀이 실제 금융기관 정책으로 확정한 값이 아니다. 은행 사전 승인
-회의 후 교체해야 한다 (TODO).
+주의: RATE_GRADES의 구간 경계값(78/68/55)과 discount_bp는 `ui/bank.py`,
+`data/mock/generate_dashboard_mock.py`의 목업 값을 그대로 가져온 것이며,
+실제 금융기관 정책으로 확정된 값이 아니다 (TODO: 확정 후 교체).
 """
 
 from dataclasses import dataclass

@@ -1,8 +1,9 @@
 """
 담당: 김준기, 오동규
 
-화면의 중복 해시 구현을 제거한 뒤 단일 원본인 chain/hashing.py의 정규화 규칙을
-고정하는 회귀 테스트다.
+chain/hashing.py의 정규화 규칙을 고정하는 회귀 테스트. ui/adapter.py의
+score_hash()가 같은 규칙을 독립적으로 구현하므로, 이 값이 어긋나면 온체인
+해시와 화면 표시 해시가 달라진다.
 """
 
 from chain.hashing import canonical_json, compute_result_hash

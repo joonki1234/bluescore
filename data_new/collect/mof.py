@@ -1,10 +1,9 @@
 """MOF 선박제원정보 조회 — GFW에서 찾은 선박명으로 국내 등록정보 후보를
 찾는다 (조인키 설계 2~3단계의 "이름" 신호 원자재 수집).
 
-MOF Info3 API는 이름 부분일치(포함) 검색이라(사용자 제공 활용가이드로 확인,
-PROCESS_LOG.md 9번) 결과에 동명이배가 여러 척 섞여 나온다. 여기서는 후보
-전부를 원본 그대로 저장하고, 실제 매칭 판단(가공)은 이후 단계로 미룬다
-(원칙1). 응답은 XML(공식 스펙, JSON 옵션 없음).
+MOF Info3 API는 이름 부분일치(포함) 검색이라 결과에 동명이배가 여러 척
+섞여 나온다. 여기서는 후보 전부를 원본 그대로 저장하고, 실제 매칭 판단
+(가공)은 이후 단계로 미룬다. 응답은 XML(공식 스펙, JSON 옵션 없음).
 
 입력: gfw_vessels.py로 받은 선박 상세에서 이름을 뽑는다 — registryInfo
 이름이 있으면 그걸(더 신뢰도 높음), 없으면 selfReportedInfo 이름을 쓴다.
@@ -25,9 +24,8 @@ from xml.etree import ElementTree
 
 from http_common import request_with_retry, save_snapshot
 
-# 이 API(data.go.kr)는 동시요청 15개로 60건을 4초에 처리해도 에러 0건
-# (resultCode 전부 00) — 순차 대비 대폭 단축. PROCESS_LOG.md 33번 참고.
-# 네트워크 요청만 병렬화하고, 파일 저장(save_snapshot)은 타임스탬프
+# 이 API(data.go.kr)는 동시요청 15개로도 에러 없이 처리돼 순차 대비 대폭
+# 단축. 네트워크 요청만 병렬화하고, 파일 저장(save_snapshot)은 타임스탬프
 # 충돌(TOCTOU) 방지를 위해 메인 스레드에서 순차로 한다.
 MAX_WORKERS = 15
 
@@ -84,7 +82,7 @@ def collect(api_key: str, limit: int = None) -> None:
     with cf.ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
         for i, (gfw_id, name, resp) in enumerate(ex.map(fetch, items)):
             # resp.url엔 serviceKey가 그대로(URL인코딩된 채로) 박혀있어 메타에 못 씀
-            # (원칙4 위반) — 요청 파라미터를 직접 구성해서 키만 가린다.
+            # — 요청 파라미터를 직접 구성해서 키만 가린다.
             meta = {
                 "request_params": {"pageNo": "1", "numOfRows": "10", "vsslNm": name, "serviceKey": "REDACTED"},
                 "status_code": resp.status_code,

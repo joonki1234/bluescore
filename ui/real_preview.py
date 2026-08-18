@@ -32,8 +32,10 @@ def _discount_text(band: dict) -> str:
 def render() -> None:
     components.page_title(
         "실산출 미리보기",
-        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(2026-04~08월)로 계산한 결과입니다.",
         badge_html='<span class="bs-live-badge"><span class="dot"></span>LIVE DATA</span>',
+    )
+    st.caption(
+        "가명 시연 데이터가 아니라 실제 GFW 조업 이벤트(2026-04~08월)로 계산한 결과입니다."
     )
 
     list_placeholder = st.empty()
