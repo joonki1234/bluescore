@@ -223,3 +223,13 @@ __marimo__/
 # 해양기상 API 원본 캐시 — 재수집 없이 attach 로직 재판정용으로 로컬에만 둠
 # (434MB, 최종 산출물 gfw_events_with_weather.jsonl.gz만 커밋하면 충분— 2026-08-15)
 data/raw/event_weather/
+
+# data_new 파이프라인 — raw는 원본 스냅샷(1.1GB, 23,832파일) — raw에서
+# 재실행하면 재생성 가능(원칙, README.md 참고). 코드/문서만 커밋 — 2026-08-18
+data_new/raw/
+
+# processed/도 대부분 재생성 가능한 중간산출물(357MB)이라 안 올림.
+# 팀원 확인용으로 최종 산출물 2개만 예외(1.4MB + gzip 31MB) — 2026-08-18
+data_new/processed/*
+!data_new/processed/final_vessel_matches.jsonl
+!data_new/processed/events_with_weather.jsonl.gz

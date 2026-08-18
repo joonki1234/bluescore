@@ -1,0 +1,722 @@
+[
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "d3a55921a-ac65-f4f2-5a00-7a3484ee9f3b",
+    "gfwName": "DU RI HO",
+    "candidateName": "드림호",
+    "score": 0.857,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "9d4b46851-1e16-bf5d-259b-e24b7b14be13",
+    "gfwName": "JAICO 75HO",
+    "candidateName": "자이코75",
+    "score": 0.75,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "603f1744a-a90f-b1de-071c-b14841a052dc",
+    "gfwName": "JIN YANG HO",
+    "candidateName": "진양호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "4e8b0c2ae-ef3e-09f5-0fa2-c03d47c4c15c",
+    "gfwName": "2013HANJINHO",
+    "candidateName": "2013한진호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "4ae1dea3c-c1f1-1cff-de1e-37056507b1d6",
+    "gfwName": "308GWANGMYEONG",
+    "candidateName": "제308광명호",
+    "score": 0.875,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "6bdd421ca-af1d-0b74-6a39-1174b1d798be",
+    "gfwName": "307 HAE CHEON HO",
+    "candidateName": "제307해천호",
+    "score": 0.929,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "295d3cf50-0cfb-5674-6816-2617547f0583",
+    "gfwName": "109BEOMJIN",
+    "candidateName": "101범진호",
+    "score": 0.818,
+    "source": "tac",
+    "numFlag": "mismatch"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "0a5166e6c-c70f-088d-e632-21e3552c9e17",
+    "gfwName": "SAIANHO",
+    "candidateName": "신한호",
+    "score": 0.8,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "0c87f42e9-95da-5ff1-ab3b-5ca430de43b2",
+    "gfwName": "BADA1HO",
+    "candidateName": "바다호",
+    "score": 0.923,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "c034fba4e-e25b-681d-e05e-f4b172010eb2",
+    "gfwName": "POSEIDON HO",
+    "candidateName": "보성호",
+    "score": 0.785,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "e452a05f4-402e-4dae-25b5-3d84a4a6c95b",
+    "gfwName": "3DAEYOUNG HO",
+    "candidateName": "대영호",
+    "score": 0.944,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "0d677c9f1-16b8-39fc-6217-574b1ed47e57",
+    "gfwName": "793 KUM JEONG HO",
+    "candidateName": "제793금정호",
+    "score": 0.828,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "9d897cf76-6134-c949-96db-7497004a2976",
+    "gfwName": "PUNG NYEON 2",
+    "candidateName": "풍년2호",
+    "score": 0.909,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "915beb05c-c9ee-8c09-67f1-5e2cd0b47e04",
+    "gfwName": "SEOUNG BOK HO",
+    "candidateName": "성복호",
+    "score": 0.952,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "68feecda7-7503-4d76-c0c0-67535549ba1f",
+    "gfwName": "207EOJIN",
+    "candidateName": "제207어진호",
+    "score": 0.8,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "83920095d-db0c-6699-a4dc-3763d6adeacf",
+    "gfwName": "1HAESANG",
+    "candidateName": "해성",
+    "score": 0.75,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "f46906b8b-b4d6-cb24-d1d4-e0615064add5",
+    "gfwName": "NAM YEONG HO",
+    "candidateName": "남영호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "026125e2e-eb55-89fa-508e-81b60d436c1a",
+    "gfwName": "MIN SEUNG",
+    "candidateName": "민승호",
+    "score": 0.889,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "6407c3bbb-b5ba-0360-d87a-9d6985ef1660",
+    "gfwName": "2025JANG MI HO",
+    "candidateName": "제2025장미호",
+    "score": 0.923,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "27e097efe-ed43-d38e-c83f-ec13428e6e9c",
+    "gfwName": "2007YEONAN",
+    "candidateName": "2007연안호",
+    "score": 0.909,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "d7774857d-d2d5-c3ef-0c79-6252a930d9c7",
+    "gfwName": "MIN SEONG",
+    "candidateName": "민성호",
+    "score": 0.889,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "b07262554-41bd-cd50-6f7f-d507922802f7",
+    "gfwName": "107YONG JIN HO",
+    "candidateName": "107명진호",
+    "score": 0.923,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "8479f1039-9d71-33cf-2321-51bd6b908805",
+    "gfwName": "3 SUNGWON HO",
+    "candidateName": "3성원호",
+    "score": 0.857,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "2c2083aa7-7448-83b7-0e2e-17853439a3a4",
+    "gfwName": "2023 DAE SIN",
+    "candidateName": "제2023대신호",
+    "score": 0.833,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "60838c4a2-2ed7-6e2c-91dc-5d808c951515",
+    "gfwName": "3 HAENG BOG HO",
+    "candidateName": "행복호",
+    "score": 0.857,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "b5377be8c-c469-4de2-05f8-3973431ff4ee",
+    "gfwName": "ORIENT HO",
+    "candidateName": "오리엔탈김호",
+    "score": 0.762,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "b124b258f-f1bb-ed9f-c46b-619d32ccc823",
+    "gfwName": "2005 JU YOUNG",
+    "candidateName": "제2005주영호",
+    "score": 0.769,
+    "source": "rejected",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "210e1ac98-853a-3f9b-3222-4d4a828894cf",
+    "gfwName": "HAENG UN HO",
+    "candidateName": "행운호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "6b181e898-8e39-1b47-0377-6f2495ab1fa5",
+    "gfwName": "MIN SEONG",
+    "candidateName": "민성호",
+    "score": 0.889,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "1ab5d2244-47f8-18b2-4db1-2a9a69f6fb02",
+    "gfwName": "RA PA YEL HO",
+    "candidateName": "라파엘호",
+    "score": 0.941,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "0bc692c37-7503-cc24-8017-cfa258970c78",
+    "gfwName": "306BAEK YANG",
+    "candidateName": "제306백양",
+    "score": 0.833,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "3d38ee8f9-9aa3-bc09-3c08-babc30074d8d",
+    "gfwName": "237YANGCHANG",
+    "candidateName": "33융창호",
+    "score": 0.72,
+    "source": "rejected",
+    "numFlag": "mismatch"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "1f75e197a-a061-0deb-7b2c-51bf460aa4b9",
+    "gfwName": "DONG GANG HO",
+    "candidateName": "동광호",
+    "score": 0.952,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "ad4f1f6ca-aab4-1d64-c784-83c0f189fe13",
+    "gfwName": "JIN YOUNG",
+    "candidateName": "진용호",
+    "score": 0.824,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "5d900d4e8-8cca-772c-9831-4ef43ee97ab8",
+    "gfwName": "SEUNG RI HO",
+    "candidateName": "승리호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "b8820dfac-cbff-4eca-3d6e-70b9351d851c",
+    "gfwName": "108 BONG SUNG",
+    "candidateName": "제108봉성호",
+    "score": 0.741,
+    "source": "rejected",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "5d5d217c4-4acd-f025-a880-398325b64b15",
+    "gfwName": "88TAEUNG",
+    "candidateName": "제88태웅호",
+    "score": 0.8,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "386be122a-a1de-8675-5292-8a59dcff3911",
+    "gfwName": "138JUNG IL HO",
+    "candidateName": "제138정일호",
+    "score": 0.8,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "6e5aad916-6837-e0d0-a140-093dc8078e18",
+    "gfwName": "102-CHUNG-RYONG",
+    "candidateName": "창룡호",
+    "score": 0.72,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "1b96acbd7-79b8-4e39-025c-6f25416808ef",
+    "gfwName": "608 DEOKJIN HO",
+    "candidateName": "제608덕진호",
+    "score": 0.923,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "1d357e821-19af-611c-5a24-e9805fb1b688",
+    "gfwName": "HAESINHO",
+    "candidateName": "해신호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "52d523b7b-b6da-bc1c-e471-a719b689fdad",
+    "gfwName": "MIN JI HO",
+    "candidateName": "신진호",
+    "score": 0.8,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "4c49199e9-961b-1d7e-aa24-ab81479517a1",
+    "gfwName": "528 YONG JUNG HO",
+    "candidateName": "528용정호",
+    "score": 0.889,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "33e604a77-716b-4969-4489-b76fd0dfae46",
+    "gfwName": "SOO YOUNG HO",
+    "candidateName": "수용호",
+    "score": 0.778,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "dd9aaadf9-9241-1ef7-7311-3bcccc6e2a62",
+    "gfwName": "MYEONGGWANGHO",
+    "candidateName": "명광호",
+    "score": 1.038,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "eb7ffd39f-f882-37c5-ed04-fb256e081a3a",
+    "gfwName": "EUNSUNG",
+    "candidateName": "3은성",
+    "score": 0.75,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "450a7da3e-ee1d-509b-2e38-867769e238d7",
+    "gfwName": "WON JI HO",
+    "candidateName": "원진호",
+    "score": 0.933,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "6c7b70b09-9319-65ec-20d7-d0910a2fbff6",
+    "gfwName": "19 SE GIL",
+    "candidateName": "제31세길호",
+    "score": 0.755,
+    "source": "rejected",
+    "numFlag": "mismatch"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "10815bf40-0972-5c2a-e912-4a915d8d5a80",
+    "gfwName": "HAE YANG HO",
+    "candidateName": "해양호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "3035478c1-1fb1-9de1-619e-7803cebb5973",
+    "gfwName": "YUROPA HO@",
+    "candidateName": "유조호",
+    "score": 0.714,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "619a16e18-85c2-fbb9-3ec1-40813a471b43",
+    "gfwName": "YANGJI HO",
+    "candidateName": "양진호",
+    "score": 0.941,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "78871d9c0-033d-45e1-eed2-5b847ede0f48",
+    "gfwName": "DAYEONHO",
+    "candidateName": "대영호",
+    "score": 0.962,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "71056ff16-6356-4bf9-b66b-18326f91ce1c",
+    "gfwName": "JE102MANSEONGHO",
+    "candidateName": "제100한성호",
+    "score": 0.867,
+    "source": "tac",
+    "numFlag": "mismatch"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "6ba06a3c0-054b-3a56-821b-a38a75ae21bb",
+    "gfwName": "153DONGGWANG",
+    "candidateName": "동광호",
+    "score": 0.783,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "0ac8b3b92-2232-0366-c10c-42237fbecf56",
+    "gfwName": "YU BIN HO",
+    "candidateName": "유민호",
+    "score": 0.857,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "f13d0c32d-d82d-601f-b7d6-eac7e40fa391",
+    "gfwName": "603 HAE SEUNG",
+    "candidateName": "제603해승호",
+    "score": 0.846,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "bc5032307-7b96-da7e-4b68-040ff93560d5",
+    "gfwName": "2 O SUNG HO",
+    "candidateName": "수용호",
+    "score": 0.75,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "52798deb8-8882-9a5a-2d0d-f42e60f71bed",
+    "gfwName": "DEOK YANG@",
+    "candidateName": "덕양호",
+    "score": 0.778,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "775dc8a22-20c3-861f-cb10-4cd8543ce9b8",
+    "gfwName": "WOONYEONGHO",
+    "candidateName": "원영호",
+    "score": 0.952,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "a92d03c6b-be4e-9961-0488-2664b95c35a9",
+    "gfwName": "702HAE JIN",
+    "candidateName": "제702해진호",
+    "score": 0.888,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "cdf461795-5be4-f3e3-4a08-9a3c90453b7c",
+    "gfwName": "DONG KYUNG",
+    "candidateName": "동양호",
+    "score": 0.747,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "c701d35b3-3e9d-3d2e-b842-d8f39f008985",
+    "gfwName": "WOONG EI HO",
+    "candidateName": "월송호",
+    "score": 0.778,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "276badef1-1a0f-9876-1857-b50f953b591f",
+    "gfwName": "SUK KWANG HO",
+    "candidateName": "수광호",
+    "score": 0.842,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "698bee167-78eb-4ccb-f7cc-1a5273963634",
+    "gfwName": "311SUNGYONG",
+    "candidateName": "제311성용호",
+    "score": 0.741,
+    "source": "rejected",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "6957ab3fb-b22c-bed9-66f2-56a59565e98f",
+    "gfwName": "88 TAE IL",
+    "candidateName": "88태일호",
+    "score": 0.875,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "24ec9f018-8055-a50b-b1bc-057c33ce1c3a",
+    "gfwName": "BO MUL SEON HO",
+    "candidateName": "복성호",
+    "score": 0.825,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "15c70cd82-2e18-e402-c652-83650b36d73c",
+    "gfwName": "99HONGWON",
+    "candidateName": "성원",
+    "score": 0.706,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "e650ea12b-bf44-b989-7bb0-dae5988b51b7",
+    "gfwName": "YEO MYEONG HO",
+    "candidateName": "여명호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "d22cb5148-8d7b-dffb-b283-97426213cff8",
+    "gfwName": "909 GEUM SEOK HO",
+    "candidateName": "제909금석호",
+    "score": 0.929,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "544b6b165-5442-1354-b783-314c36ad2f10",
+    "gfwName": "103 SU GWANG",
+    "candidateName": "제103수광호",
+    "score": 0.833,
+    "source": "tac",
+    "numFlag": "match"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "350852403-3ae9-33f3-0a1f-f060b9771ade",
+    "gfwName": "NEW GANG SEONG HO",
+    "candidateName": "강성호",
+    "score": 0.88,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.8-0.85",
+    "gfwVesselId": "df90890e1-1577-c90e-0e7b-35328cf87305",
+    "gfwName": "PUNGWOLHO",
+    "candidateName": "풍어호",
+    "score": 0.824,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "831d29681-17f6-9476-ec1d-9148b77df026",
+    "gfwName": "SINILHO",
+    "candidateName": "신길호",
+    "score": 0.933,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "a688dc2fb-bd4a-64a2-8916-86ca0fd7073f",
+    "gfwName": "JE53MAN SEONG HO",
+    "candidateName": "제33만선호",
+    "score": 0.889,
+    "source": "tac",
+    "numFlag": "mismatch"
+  },
+  {
+    "group": "unmatched_0.70-0.80",
+    "gfwVesselId": "4f59b8068-8f69-ded1-3b68-f95354d35e25",
+    "gfwName": "HAE YOUNG 6001 HO",
+    "candidateName": "해룡호",
+    "score": 0.75,
+    "source": "rejected",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "ec12cafb7-7524-0bd3-7b08-2610f9073f4e",
+    "gfwName": "CHEONG UN H0",
+    "candidateName": "청운호",
+    "score": 0.9,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "f76951d88-8c86-53c4-7b86-b4df2c36732b",
+    "gfwName": "DAE DONG 5HO",
+    "candidateName": "대동호",
+    "score": 1.037,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.95-1.2",
+    "gfwVesselId": "2971c1c4a-aecb-edd5-dcbf-9ba7b3168612",
+    "gfwName": "AN SEONG HO",
+    "candidateName": "안성호",
+    "score": 1.0,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.85-0.9",
+    "gfwVesselId": "e60ac1e08-8e0e-6fe1-c555-2908ec2b202b",
+    "gfwName": "308 GYEONGDONGHO",
+    "candidateName": "경동호",
+    "score": 0.889,
+    "source": "tac",
+    "numFlag": "unknown"
+  },
+  {
+    "group": "matched_0.9-0.95",
+    "gfwVesselId": "6bf338e6c-cffc-a070-b39e-c8d608465bf3",
+    "gfwName": "2025 U JIN HO",
+    "candidateName": "제2025우진호",
+    "score": 0.909,
+    "source": "tac",
+    "numFlag": "match"
+  }
+]

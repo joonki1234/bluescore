@@ -1,0 +1,6 @@
+# data_new/ 파이프라인 전용 추가 의존성.
+# bluescore/requirements.txt(pandas, openpyxl, requests, python-dotenv 등)에
+# 이걸 더해서 설치. data_new가 확정되기 전까지는 루트 requirements.txt를
+# 직접 건드리지 않는다(사용자 지시, 2026-08-17).
+
+korean-romanizer  # process/match_fuzzy_name.py — 한글 선박명 로마자 변환
