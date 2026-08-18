@@ -7,14 +7,7 @@ score/shap_factors.py 단위 테스트.
 import pytest
 
 from score.axis_a_pressure import VesselAxisAResult
-from score.axis_b_baseline import fit_baseline_model
-from score.shap_factors import (
-    axis_a_factor_contributions,
-    axis_a_factor_shares,
-    axis_b_baseline_expected_value,
-    axis_b_baseline_factor_contributions,
-)
-from score.test_axis_b_baseline import make_dummy_dataset
+from score.shap_factors import axis_a_factor_contributions, axis_a_factor_shares
 
 
 def _make_axis_a_result(revisit_raw=4.0, congestion_raw=3.0):
@@ -96,41 +89,3 @@ class TestAxisAFactorShares:
         shares = axis_a_factor_shares(result)
 
         assert all(s["value"] == 0.0 for s in shares)
-
-
-@pytest.fixture(scope="module")
-def fitted_model():
-    large_fast, small_slow = make_dummy_dataset()
-    model, _ = fit_baseline_model(large_fast + small_slow)
-    return model, (large_fast + small_slow)[0]
-
-
-class TestAxisBBaselineFactorContributions:
-    def test_returns_one_factor_per_feature_column(self, fitted_model):
-        model, row = fitted_model
-        factors = axis_b_baseline_factor_contributions(model, row)
-
-        assert len(factors) == 8  # NUMERIC 5 + CATEGORICAL 3
-        assert all(f["axis"] == "b" for f in factors)
-        assert all("raw_contribution_kg" in f for f in factors)
-
-    def test_labels_are_korean_not_raw_column_names(self, fitted_model):
-        model, row = fitted_model
-        factors = axis_b_baseline_factor_contributions(model, row)
-
-        labels = {f["label"] for f in factors}
-        assert "톤수" in labels
-        assert "tonnageGt" not in labels
-
-    def test_additivity_matches_model_prediction(self, fitted_model):
-        """SHAP의 기본 성질: 모든 피처 기여도 합 + 기준값 == 모델 예측값.
-        연료 물리와 무관하게 항상 성립해야 한다 — 안 맞으면 구현이 잘못된 것."""
-        from score.axis_b_baseline import predict_expected_fuel_kg
-
-        model, row = fitted_model
-        factors = axis_b_baseline_factor_contributions(model, row)
-        base_value = axis_b_baseline_expected_value(model, row)
-
-        total = sum(f["raw_contribution_kg"] for f in factors) + base_value
-        predicted = predict_expected_fuel_kg(model, [row])[0]
-        assert total == pytest.approx(predicted, abs=1e-6)

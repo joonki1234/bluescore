@@ -57,8 +57,9 @@ class RealAxisAResult:
     axis_b_raw: Optional[float] = None
     axis_b_used_row_count: Optional[int] = None
     # 2026-08-18 A축 요인 기여도(SHAP) 연결 추가분. B축은 연결 안 함 —
-    # score/shap_factors.py의 axis_b_baseline_factor_contributions()
-    # docstring 참고("점수"가 아니라 "기준선 조건"만 설명하는 의미론적 제약).
+    # score/shap_factors.py 모듈 docstring 참고("점수"가 아니라 "기준선
+    # 조건"만 설명 가능하다는 의미론적 제약으로, B축 SHAP 코드 자체를
+    # 팀 결정으로 들어냄).
     shap_factors: List[dict] = field(default_factory=list)
 
 
