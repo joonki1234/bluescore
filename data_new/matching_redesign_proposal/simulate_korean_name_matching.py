@@ -7,25 +7,18 @@
 assemble_matches.py)에 반영 안 됨** — 팀 결정(README.md 참고) 전까지는
 이 스크립트가 유일한 산출 경로다.
 
-핵심 설계:
-- 이름비교는 exact match만 쓴다(fuzzy 0.85+는 검증 사례 19/19가
-  "제N호"류 내부번호 소실 버그로 오매칭이라 폐기 — 제안서 발견 3 참고)
-- 숫자접두어(2~4자리) 하드필터는 기존 그대로(사람 라벨링 검증됨)
-- 동률 후보는 최근접 항구 거리로 소프트 타이브레이크:
-  ≤50km면 verified, 50~150km면 held(낮은신뢰도), 그 외/위치정보
-  없으면 held_multi(모호, 계산 불가)
-- (source,key) 동일한 후보는 데이터중복으로 보고 dedup
+핵심 설계(자세한 배경은 README.md 참고):
+- 이름비교는 exact match만 쓴다(로마자 유사도 fuzzy는 구조적 오탐이 있어 안 씀)
+- 숫자 하드필터: 자릿수 상관없이 GFW·후보 양쪽에 다 숫자가 보이는데
+  값이 다르면 배제(`_any_digit`)
 - pool 쪽 이름에서 "제<숫자>" 접두어를 비교 전용으로 한 번 더 뗀다
   (`_strip_je_number`) — GFW 한글변환은 숫자를 통째로 분리해서 뺐는데
   TAC/어선원부 원문은 "제707태근호"처럼 번호를 이름에 그대로 갖고 있어
-  안 떼면 exact match가 실패했음(교차분석으로 935건 중 124건 확인,
-  README.md 발견 4)
-- 벡터 단독 최근접 타이브레이크로도 안 풀리는 동률(후보 2개+) 벡터는
-  gearType 대충매핑(9개 키워드)으로 한 번 더 걸러본다(README.md 발견 5).
-  헝가리안 전역할당(GFW벡터끼리 같은 후보를 다투는 걸 고려한 최적배정)도
-  시도했었으나 폐기함 — 총비용은 최소화해도 개별 배정의 정답 여부까진
-  보장 못 해서, 스팟체크로 숫자대조 가능한 37건 중 7건(19%)이 숫자불일치인
-  걸 확인함(후보풀에 진짜 정답이 없을 때 억지로 그럴듯한 걸 골라버림).
+  안 떼면 exact match가 실패한다
+- 동률 후보는 카카오 지오코딩 거리로 판단: 후보 전원의 위치를 알고
+  유일하게 ≤150km면 verified, 그 외/위치정보 없으면 held_multi(모호,
+  계산 불가) — "모른다"를 "가깝다"로 오판하지 않는다
+- (source,key) 동일한 후보는 데이터중복으로 보고 dedup
 
 한 척씩 old(현재 라이브)/new(이 시뮬레이션) 판정을 나란히 놓은 파일도
 같이 낸다(`output/korean_matching_comparison.jsonl`) — 팀원이 숫자만
@@ -62,56 +55,27 @@ from match_fuzzy_name import (  # noqa: E402
 )
 
 
-def _digit_prefix(normalized: str) -> str:
-    """정규화된 문자열에서 선두 2~4자리 숫자열을 뽑는다(사람 라벨링 49번
-    검증 범위). match_fuzzy_name.py의 동명 함수는 아직 이 세션의 미커밋
-    수정에만 있어서(라이브 파이프라인엔 없음) — 이 제안이 라이브 코드의
-    미커밋 상태에 의존하지 않도록 여기 그대로 복제해둔다."""
-    m = re.match(r"^\D*?(\d{2,4})", normalized)
-    return m.group(1) if m else ""
-
-
 def _any_digit(normalized: str) -> str:
-    """자릿수 제한 없이 이름에 보이는 숫자 하나(1자리 포함). 2~4자리
-    하드필터(위)는 사람 라벨링 검증범위라 그대로 두되, 후보 쪽 숫자가
-    1자리라 그 필터에 안 걸리는 사각지대를 잡는 최종 확인용으로 쓴다
-    — GFW 숫자(2~4자리, 신뢰도 검증됨)가 있는데 후보 이름에 눈에 보이는
-    다른 숫자가 있으면(1자리라도) 명백한 반대증거로 취급(발견 8,
-    "102HAE SANG"->"제8해상호"처럼 verified로 새던 사례로 확인)."""
+    """이름에 보이는 숫자 하나(자릿수 제한 없음, 1자리 포함).
+
+    원래는 2~4자리만 하드필터로 썼다(사람 라벨링 49번이 검증한 범위가
+    거기까지라서 — "일치하면 신뢰"라는 긍정신호로 쓸 땐 1자리는 "제1호"
+    류가 너무 흔해 우연히 겹칠 위험이 컸음). 근데 발견 8·9에서 실측
+    확인한 건 그거랑 다른 얘기다: "불일치하면 배제"라는 부정신호로 쓸 땐
+    자릿수가 몇이든 상관없다 — "제8해상호"의 8이든 "제505대풍호"의
+    505든, GFW가 신고한 숫자랑 눈으로 봐도 다르면 그냥 다른 배다.
+    그래서 2~4자리 하드필터와 1자리 예외처리를 따로 유지할 이유가
+    없어 이거 하나로 통일함(양쪽 다 뭐든 숫자가 보이는데 값이 다르면
+    배제)."""
     m = re.search(r"(\d+)", normalized)
     return m.group(1) if m else ""
-
-
-# TAC 어업종류(한글) -> GFW gear 카테고리 대충 매핑(9개 키워드, 정식 검증
-# 안 됨 — README.md 발견 5 참고). 어선원부는 gearType 필드 자체가 없어서
-# 이 매핑은 TAC 후보에만 적용된다.
-GEAR_KEYWORD_MAP = [
-    ("저인망", "TRAWLERS"), ("트롤", "TRAWLERS"),
-    ("자망", "SET_GILLNETS"),
-    ("연승", "SET_LONGLINES"),
-    ("통발", "POTS_AND_TRAPS"),
-    ("형망", "DREDGE_FISHING"),
-    ("선망", "PURSE_SEINES"),
-    ("권현망", "SEINERS"),
-    ("채낚기", "POLE_AND_LINE"),
-]
-GEAR_GENERIC_LABELS = {"FISHING", "NA", "INCONCLUSIVE"}
-
-
-def _guess_gfw_gear(tac_gears: list) -> set:
-    out = set()
-    for g in tac_gears or []:
-        for kw, cat in GEAR_KEYWORD_MAP:
-            if kw in g:
-                out.add(cat)
-    return out
 
 
 KOREAN_CSV_PATH = Path(__file__).resolve().parent / "gfw_korean_name_candidates.csv"
 OLD_MATCHES_PATH = Path(__file__).resolve().parent.parent / "processed" / "final_vessel_matches.jsonl"
 COMPARISON_OUT_PATH = Path(__file__).resolve().parent / "output" / "korean_matching_comparison.jsonl"
 ROMAN_FALLBACK_THRESHOLD = 0.85  # 한글후보 자체가 없는 벡터에만 씀
-LOC_VERIFIED_KM = 50.0
+LOC_VERIFIED_KM = 150.0  # 근해어업은 등록항에서 150km까지도 나가 조업함(사용자 확인, 2026-08-18)
 LOC_HELD_CAP_KM = 150.0
 
 # 참고용 — 현재 라이브에 커밋된 로마자매칭(FUZZY_NAME_THRESHOLD=0.8) 실측치.
@@ -148,7 +112,7 @@ def _strip_je_number(base: str) -> str:
     뺐는데(letterPart_호제외 컬럼), TAC/어선원부 원문은 "제N호" 선단
     일련번호를 이름에 그대로 갖고 있어 exact match가 실패하던 버그
     (교차분석에서 확인: old확신/new실패 935척 중 124척이 이 패턴).
-    숫자일치는 이미 별도 하드필터(_digit_prefix)로 확인하니, 여기서
+    숫자일치는 이미 별도 하드필터(_any_digit)로 확인하니, 여기서
     또 떼도 변별력 손실 없음 — 비교 전용 정규화일 뿐 표시용 원본
     이름(matchedName)은 그대로 둔다."""
     return re.sub(r"^제\d+", "", base)
@@ -166,14 +130,12 @@ def _load_korean_candidates() -> dict:
 def _build_pool() -> list:
     pool = []
     for t in _load_jsonl(TAC_PATH):
-        pool.append({"source": "tac", "name": t["nameTac"], "key": t["vesselNoTac"], "ports": t.get("portNamesTac") or [], "gear": _guess_gfw_gear(t.get("gearTypeNamesTac"))})
+        pool.append({"source": "tac", "name": t["nameTac"], "key": t["vesselNoTac"], "ports": t.get("portNamesTac") or []})
     for r in _load_jsonl(REGISTRY_PATH):
-        # 어선원부는 gearType 필드 자체가 없음(빈 집합 = "모른다", 필터에서 안 걸림)
-        pool.append({"source": "vessel_registry", "name": r["nameRegistry"], "key": r["vesselNoRegistry"], "ports": [r["portNameRegistry"]] if r.get("portNameRegistry") else [], "gear": set()})
+        pool.append({"source": "vessel_registry", "name": r["nameRegistry"], "key": r["vesselNoRegistry"], "ports": [r["portNameRegistry"]] if r.get("portNameRegistry") else []})
     for p in pool:
         p["base"] = _strip_ho(p["name"])
         p["compareBase"] = _strip_je_number(p["base"])
-        p["digitPrefix"] = _digit_prefix(_normalize(p["name"]))
         # compareBase("제N호" 뗀 것)가 아니라 base(원문에서 호만 뗀 것)에서
         # 뽑아야 함 — compareBase는 "제8해상"->"해상"처럼 그 숫자 자체를
         # 지워버려서 anyDigit이 항상 빈 값이 됨(발견 8). 숫자는 원래
@@ -207,7 +169,6 @@ def run() -> list:
     old_matches = _load_old_matches()
 
     rows = []
-    pending = []  # 후보 2개+인 벡터들 — 나중에 _resolve_pending()에서 한번에 처리
 
     for gfw in gfw_vessels:
         vessel_id = gfw["vesselId"]
@@ -220,7 +181,6 @@ def run() -> list:
             continue
 
         norm = _normalize(name)
-        digit = _digit_prefix(norm)
         gfw_any_digit = _any_digit(norm)
         centroid = centroids.get(vessel_id)
         korean_cands = gfw_korean.get(vessel_id, [])
@@ -230,7 +190,7 @@ def run() -> list:
             best = None
             best_name = None
             for p in pool:
-                if digit and p["digitPrefix"] and digit != p["digitPrefix"]:
+                if gfw_any_digit and p["anyDigit"] and gfw_any_digit != p["anyDigit"]:
                     continue
                 s = _similarity(norm, p["romanized"])
                 if best is None or s > best:
@@ -243,19 +203,14 @@ def run() -> list:
 
         passing = []
         for p in pool:
-            if digit and p["digitPrefix"] and digit != p["digitPrefix"]:
-                continue
-            # 발견 8(+대칭 보완): 2~4자리 하드필터는 양쪽 다 2~4자리일
-            # 때만 비교해서, 한쪽이 1자리면 사각지대가 생김 — "102HAE
-            # SANG"(102)vs"제8해상호"(8)만이 아니라 "NO.2JAESUNGHO"(2,
-            # 1자리라 하드필터 대상 밖)vs"제22재성호"(22) 같은 반대
-            # 방향도 마찬가지로 새는 걸 확인함. 자릿수 무관하게 눈에
-            # 보이는 숫자 자체가 다르면(양쪽 다 있을 때) 반대증거로 배제.
+            # 발견 8·9: 자릿수 상관없이 양쪽 다 숫자가 보이는데 값이
+            # 다르면 반대증거로 배제("102HAE SANG"vs"제8해상호",
+            # "NO.2JAESUNGHO"vs"제22재성호" 둘 다 이 한 줄로 걸러짐).
             if gfw_any_digit and p["anyDigit"] and gfw_any_digit != p["anyDigit"]:
                 continue
             if p["base"] in korean_cands or p["compareBase"] in korean_cands:  # exact만(fuzzy는 폐기, 발견 3) + "제N호" 정규화(발견 4)
                 dist = _nearest_port_km(centroid, p["ports"])
-                passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "distKm": dist, "gear": p["gear"]})
+                passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "distKm": dist})
 
         if not passing:
             rows.append({**row, "category": "unmatched", "matchedName": None, "distKm": None, "candidateCount": 0, "koreanCandidates": korean_cands})
@@ -265,10 +220,7 @@ def run() -> list:
         if len(distinct_vessels) == 1:
             # 버그 수정(2026-08-18): 후보가 애초에 1개뿐(경쟁자 없음)이라고
             # 거리 체크 없이 무조건 verified로 확정하면 안 됨 — 375km짜리도
-            # verified로 새는 사례를 사용자가 직접 찾아냄. "제N호" 정규화
-            # (발견 4)로 내부번호를 비교에서 뗐는데, GFW 쪽 숫자가 1자리라
-            # 하드필터도 안 걸리는 경우("2 DEOKSEUNGHO" vs "제103덕승호") 이름만
-            # 맞으면 번호가 완전히 달라도 걸러지지 않았음 — 다른 경로처럼
+            # verified로 새는 사례를 사용자가 직접 찾아냄. 다른 경로처럼
             # 거리 신뢰도 기준을 여기도 적용한다.
             p = passing[0]
             d = p["distKm"]
@@ -279,69 +231,15 @@ def run() -> list:
                 rows.append({**row, "category": category, "matchedName": p["name"], "distKm": d, "candidateCount": 1})
             continue
 
-        # 벡터 단독 최근접 타이브레이크부터 먼저 시도 — 이미 이걸로 풀리는
-        # 건(가까운 후보가 유일함) 그대로 확정한다. gearType은 이 단독판단
-        # 으로도 진짜 안 풀리는 것에만 쓴다.
+        # 동률(후보 2개+) — 벡터 단독 최근접 타이브레이크로 풀어본다.
         resolved = _try_resolve_by_nearest(passing)
         if resolved is not None:
             category, matched_name, dist = resolved
             rows.append({**row, "category": category, "matchedName": matched_name, "distKm": dist, "candidateCount": len(distinct_vessels)})
-            continue
-
-        # 그래도 안 풀림 — gearType 필터로 재시도(README.md 발견 5).
-        gfw_gear = {g for g in (gfw.get("combinedGearTypes") or []) if g not in GEAR_GENERIC_LABELS}
-        pending.append({
-            "row": row, "vesselId": vessel_id, "passing": passing,
-            "gfwGear": gfw_gear, "centroid": centroid,
-        })
-
-    _resolve_pending(pending, rows)
-    return rows
-
-
-def _resolve_pending(pending: list, rows: list) -> None:
-    """동률 후보 벡터들을 gearType으로 거른 뒤, 남으면 최근접 타이브레이크로
-    확정한다.
-
-    헝가리안 전역할당(scipy.optimize.linear_sum_assignment)도 시도했었으나
-    — 스팟체크 결과 숫자대조 가능한 사례 37건 중 7건(19%)이 숫자불일치인
-    걸로 확인돼(예: '2 TAE YANG HO'(2)를 '제88태양호'(88)에 배정) 폐기함.
-    전역최적화가 총비용은 최소화해도 개별 배정의 정답 여부까진 보장 못 함
-    — 후보풀에 진짜 정답이 없을 때 억지로 그럴듯한 걸 골라버리는 게 원인."""
-    for item in pending:
-        orig_passing = item["passing"]
-        gfw_gear = item["gfwGear"]
-        if gfw_gear:
-            filtered = [
-                p for p in orig_passing
-                if not (p["gear"] and not (p["gear"] & gfw_gear))
-            ]
-            # 전부 걸러지면(=매핑이 의심스러운 경우) gearType 자체를 무시하고 원래대로.
-            item["passing"] = filtered if filtered else orig_passing
-
-        distinct = {(p["source"], p["key"]) for p in item["passing"]}
-        if len(distinct) == 1:
-            # 버그 수정(2026-08-18): gearType으로 후보가 1개로 좁혀졌다고 거리
-            # 체크 없이 무조건 verified로 처리하면 안 됨 — 241.9km짜리도
-            # verified로 새는 사례를 스팟체크로 발견함. gearType은 후보를
-            # 거르는 용도일 뿐 거리 신뢰도 기준을 대체하지 않는다. 위치정보
-            # 자체가 없는 경우(d is None)는 후보 1개까지 좁힌 근거는 있으니
-            # held_multi보다 held_위치애매(낮은신뢰도로 계산 가능)로 둔다.
-            p = item["passing"][0]
-            d = p["distKm"]
-            if d is not None and d > LOC_HELD_CAP_KM:
-                rows.append({**item["row"], "category": "held_multi_동명이선", "matchedName": None, "distKm": None, "candidateCount": 1, "candidateNames": [p["name"]]})
-            else:
-                category = "verified" if (d is not None and d <= LOC_VERIFIED_KM) else "held_위치애매"
-                rows.append({**item["row"], "category": category, "matchedName": p["name"], "distKm": d, "candidateCount": 1, "resolvedBy": "gearType"})
-            continue
-
-        resolved = _try_resolve_by_nearest(item["passing"])
-        if resolved is not None:
-            category, matched_name, dist = resolved
-            rows.append({**item["row"], "category": category, "matchedName": matched_name, "distKm": dist, "candidateCount": len(distinct), "resolvedBy": "gearType"})
         else:
-            _finalize_by_nearest(item, rows)
+            rows.append({**row, "category": "held_multi_동명이선", "matchedName": None, "distKm": None, "candidateCount": len(distinct_vessels), "candidateNames": [p["name"] for p in passing]})
+
+    return rows
 
 
 def _try_resolve_by_nearest(passing: list) -> tuple | None:
@@ -368,15 +266,6 @@ def _try_resolve_by_nearest(passing: list) -> tuple | None:
     if nearest["distKm"] <= LOC_HELD_CAP_KM:
         return ("held_위치애매", nearest["name"], nearest["distKm"])
     return None
-
-
-def _finalize_by_nearest(item: dict, rows: list) -> None:
-    """경쟁자 없는(전역할당 대상 아닌, 그리고 이미 단독판단으로도 안 풀린)
-    벡터의 최종 처리 — 여기 오는 건 정의상 _try_resolve_by_nearest가 이미
-    실패한 것들이라 held_multi로 확정."""
-    passing = item["passing"]
-    distinct = {(p["source"], p["key"]) for p in passing}
-    rows.append({**item["row"], "category": "held_multi_동명이선", "matchedName": None, "distKm": None, "candidateCount": len(distinct), "candidateNames": [p["name"] for p in passing]})
 
 
 def main() -> None:
