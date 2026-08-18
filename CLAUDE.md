@@ -14,6 +14,15 @@ BlueScore는 어선의 조업 데이터를 기반으로 두 축(A축: 자원 압
   이 외에도 `data/`에는 국내 선박제원정보(MOF), TAC 할당승인정보, 해양기상, 해양수산부
   AIS 위치정보 통계, 어업별어선 등 공공데이터 클라이언트/로더가 추가돼 있다(김태윤 담당,
   현황은 `data/TODO.md` 참고).
+- **`data_new/`(2026-08-18~)** — 김태윤이 처음부터 다시 짠 데이터 파이프라인.
+  `data/`(구, flag=KOR AND shiptypes=FISHING, 31,605척, 확정매칭 순도 9.5%) 대신
+  EEZ 제한 모집단(5,323척, 사람 라벨링 실측 정밀도 약 75%)을 쓴다.
+  `services/real_scoring.py`의 A축 실산출이 이미 이쪽으로 전환됐고(2026-08-18),
+  **팀 결정으로 앞으로는 `data_new/` 기준으로만 작업한다** — `data/`(구)를 실제로
+  사용했을 때의 문제(90.5% 비어선 등, `data/TODO.md`·`data/BlueScore_*.md` 참고)는
+  더 이상 고려 대상이 아니며, `data/`(구)의 원본·중간산출물은 필요 없어지면 정리
+  대상이다(단, `data/`는 김태윤 담당이라 실제 삭제는 담당자 확인 후 진행). 상세는
+  `data_new/README.md`·`data_new/PROCESS_LOG.md`.
 - `score/axis_a_pressure.py` — A축(자원 압력) raw 값 산출: 재방문 간격 + 혼잡가중압력
   (self-exclusion + 상호작용항 반영 완료). GFW 이벤트만 있으면 바로 실행 가능.
 - `score/axis_b_physics.py` — Coello et al. (2015) 계수 기반 물리식 연료 소비 추정.
