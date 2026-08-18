@@ -39,9 +39,18 @@
       있으면 자동으로 skip되니, 평소 개발 중에는 Node/노드 실행 없이도 항상
       `pytest`가 잘 돈다.
 - [x] score/ ↔ chain/ 연결부 — `commit_score_result.py`(`commit_score_result`/
-      `verify_score_result`). score/가 아직 mock 폴백이라 실제로 호출하는 곳은
-      없지만, 실산출 전환 시 바로 쓸 수 있게 미리 준비. record_id 정책(예:
-      `f"{vesselId}:{period}"`)은 호출부(예정된 main.py)가 정함. 테스트 3개.
+      `verify_score_result`). record_id 정책(예: `f"{vesselId}:{period}"`)은
+      호출부가 정함. 테스트 3개.
+      **(2026-08-18 현황)** `commit_score_result()`는 실제로는
+      `services/workflow.py`의 `commit_report()`(더 정교한 예외처리 포함)가
+      대체해서 씀 — 이쪽 단순 버전은 안 바꿔치기함. `verify_score_result()`는
+      아직 아무도 안 씀, **해시 위조 검증 API(아직 미착수, 아래 참고)가 생기면
+      쓰일 자리로 남겨둠.**
+- [ ] 해시 위조 검증 API/UI — 최지희님이 처음에 "가장 임팩트 있는 시연 장면"
+      으로 꼽았던 것(원문 고치면 해시 불일치가 뜬다). `verify_score_result()`는
+      준비돼 있는데, 실제로 부르는 엔드포인트·화면이 아직 없음. `api/`,
+      `ui/bank.py`가 최지희님 소유 파일이라 저희가 임의로 새 기능을 얹기보다
+      확인 후 진행이 맞아 보임.
 - [x] UI 중복 해시 구현 제거 및 FastAPI 업무 흐름 연결.
       `WorkflowService.commit_report()`가 승인/보류 뒤 온체인 커밋하고 트랜잭션
       해시·블록번호·기록시각·컨트랙트 주소를 SQLite에 저장한다. 금융기관 화면은
