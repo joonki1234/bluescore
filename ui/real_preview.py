@@ -109,6 +109,7 @@ def render() -> None:
     # 왜 계산이 안 됐는지 보여준다 — 조용히 사라지면 "원래 계산식이 없다"로
     # 오해할 수 있다("모르면 모른다" 원칙).
     blue_score = score.get("blueScore")
+    st.markdown("###### BlueScore 계산")
     if blue_score is not None and axis_a_score is not None and axis_b_score is not None:
         st.markdown(
             f'<div class="bs-card"><span class="bs-mono" style="font-size:14px; '
