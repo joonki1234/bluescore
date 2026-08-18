@@ -47,11 +47,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "process"))
 
-from geocode_kr import geocode as geocode_sigungu  # noqa: E402
+from geocode_kakao import geocode_kakao  # noqa: E402
 from match_fuzzy_name import (  # noqa: E402
     EVENTS_PATH,
     GFW_VESSELS_PATH,
-    PORTS_PATH,
     REGISTRY_PATH,
     TAC_PATH,
     _haversine_km,
@@ -69,6 +68,17 @@ def _digit_prefix(normalized: str) -> str:
     수정에만 있어서(라이브 파이프라인엔 없음) — 이 제안이 라이브 코드의
     미커밋 상태에 의존하지 않도록 여기 그대로 복제해둔다."""
     m = re.match(r"^\D*?(\d{2,4})", normalized)
+    return m.group(1) if m else ""
+
+
+def _any_digit(normalized: str) -> str:
+    """자릿수 제한 없이 이름에 보이는 숫자 하나(1자리 포함). 2~4자리
+    하드필터(위)는 사람 라벨링 검증범위라 그대로 두되, 후보 쪽 숫자가
+    1자리라 그 필터에 안 걸리는 사각지대를 잡는 최종 확인용으로 쓴다
+    — GFW 숫자(2~4자리, 신뢰도 검증됨)가 있는데 후보 이름에 눈에 보이는
+    다른 숫자가 있으면(1자리라도) 명백한 반대증거로 취급(발견 8,
+    "102HAE SANG"->"제8해상호"처럼 verified로 새던 사례로 확인)."""
+    m = re.search(r"(\d+)", normalized)
     return m.group(1) if m else ""
 
 
@@ -164,16 +174,21 @@ def _build_pool() -> list:
         p["base"] = _strip_ho(p["name"])
         p["compareBase"] = _strip_je_number(p["base"])
         p["digitPrefix"] = _digit_prefix(_normalize(p["name"]))
+        # compareBase("제N호" 뗀 것)가 아니라 base(원문에서 호만 뗀 것)에서
+        # 뽑아야 함 — compareBase는 "제8해상"->"해상"처럼 그 숫자 자체를
+        # 지워버려서 anyDigit이 항상 빈 값이 됨(발견 8). 숫자는 원래
+        # ASCII라 _normalize(한글 다 지움) 없이 base 원문에 바로 찾는다.
+        p["anyDigit"] = _any_digit(p["base"])
         p["romanized"] = _normalize(_romanize(p["name"]))
     return pool
 
 
-def _nearest_port_km(ports: dict, centroid, port_names) -> float | None:
+def _nearest_port_km(centroid, port_names) -> float | None:
     if not centroid:
         return None
     best = None
     for port_name in port_names:
-        coord = ports.get(port_name) or geocode_sigungu(port_name)
+        coord = geocode_kakao(port_name)
         if not coord:
             continue
         d = _haversine_km(centroid[0], centroid[1], coord[0], coord[1])
@@ -187,7 +202,6 @@ def run() -> list:
     `old`가 현재 라이브 판정(비교용)."""
     gfw_vessels = _load_jsonl(GFW_VESSELS_PATH)
     pool = _build_pool()
-    ports = {p["portName"]: (p["latitude"], p["longitude"]) for p in _load_jsonl(PORTS_PATH)}
     centroids = _vessel_centroids(_load_jsonl(EVENTS_PATH))
     gfw_korean = _load_korean_candidates()
     old_matches = _load_old_matches()
@@ -230,8 +244,14 @@ def run() -> list:
         for p in pool:
             if digit and p["digitPrefix"] and digit != p["digitPrefix"]:
                 continue
+            # 발견 8: candidate 숫자가 1자리라 위 2~4자리 하드필터에 안
+            # 걸리는 사각지대 — GFW 쪽에 검증된 2~4자리 숫자가 있는데
+            # 후보 이름에 눈에 보이는 다른 숫자가 있으면(1자리 포함)
+            # 명백한 반대증거로 보고 배제("102HAE SANG"->"제8해상호" 사례).
+            if digit and p["anyDigit"] and digit != p["anyDigit"]:
+                continue
             if p["base"] in korean_cands or p["compareBase"] in korean_cands:  # exact만(fuzzy는 폐기, 발견 3) + "제N호" 정규화(발견 4)
-                dist = _nearest_port_km(ports, centroid, p["ports"])
+                dist = _nearest_port_km(centroid, p["ports"])
                 passing.append({"source": p["source"], "key": p["key"], "name": p["name"], "distKm": dist, "gear": p["gear"]})
 
         if not passing:
@@ -240,7 +260,20 @@ def run() -> list:
 
         distinct_vessels = {(c["source"], c["key"]) for c in passing}
         if len(distinct_vessels) == 1:
-            rows.append({**row, "category": "verified", "matchedName": passing[0]["name"], "distKm": passing[0]["distKm"], "candidateCount": len(distinct_vessels)})
+            # 버그 수정(2026-08-18): 후보가 애초에 1개뿐(경쟁자 없음)이라고
+            # 거리 체크 없이 무조건 verified로 확정하면 안 됨 — 375km짜리도
+            # verified로 새는 사례를 사용자가 직접 찾아냄. "제N호" 정규화
+            # (발견 4)로 내부번호를 비교에서 뗐는데, GFW 쪽 숫자가 1자리라
+            # 하드필터도 안 걸리는 경우("2 DEOKSEUNGHO" vs "제103덕승호") 이름만
+            # 맞으면 번호가 완전히 달라도 걸러지지 않았음 — 다른 경로처럼
+            # 거리 신뢰도 기준을 여기도 적용한다.
+            p = passing[0]
+            d = p["distKm"]
+            if d is not None and d > LOC_HELD_CAP_KM:
+                rows.append({**row, "category": "held_multi_동명이선", "matchedName": None, "distKm": None, "candidateCount": 1, "candidateNames": [p["name"]]})
+            else:
+                category = "verified" if (d is not None and d <= LOC_VERIFIED_KM) else "held_위치애매"
+                rows.append({**row, "category": category, "matchedName": p["name"], "distKm": d, "candidateCount": 1})
             continue
 
         # 벡터 단독 최근접 타이브레이크부터 먼저 시도 — 이미 이걸로 풀리는
@@ -259,11 +292,11 @@ def run() -> list:
             "gfwGear": gfw_gear, "centroid": centroid,
         })
 
-    _resolve_pending(pending, ports, rows)
+    _resolve_pending(pending, rows)
     return rows
 
 
-def _resolve_pending(pending: list, ports: dict, rows: list) -> None:
+def _resolve_pending(pending: list, rows: list) -> None:
     """동률 후보 벡터들을 gearType으로 거른 뒤, 남으면 최근접 타이브레이크로
     확정한다.
 
