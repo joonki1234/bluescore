@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -42,7 +43,6 @@ from match_fuzzy_name import (  # noqa: E402
     PORTS_PATH,
     REGISTRY_PATH,
     TAC_PATH,
-    _digit_prefix,
     _haversine_km,
     _load_jsonl,
     _normalize,
@@ -50,6 +50,16 @@ from match_fuzzy_name import (  # noqa: E402
     _similarity,
     _vessel_centroids,
 )
+
+
+def _digit_prefix(normalized: str) -> str:
+    """정규화된 문자열에서 선두 2~4자리 숫자열을 뽑는다(사람 라벨링 49번
+    검증 범위). match_fuzzy_name.py의 동명 함수는 아직 이 세션의 미커밋
+    수정에만 있어서(라이브 파이프라인엔 없음) — 이 제안이 라이브 코드의
+    미커밋 상태에 의존하지 않도록 여기 그대로 복제해둔다."""
+    m = re.match(r"^\D*?(\d{2,4})", normalized)
+    return m.group(1) if m else ""
+
 
 KOREAN_CSV_PATH = Path(__file__).resolve().parent / "gfw_korean_name_candidates.csv"
 OLD_MATCHES_PATH = Path(__file__).resolve().parent.parent / "processed" / "final_vessel_matches.jsonl"
