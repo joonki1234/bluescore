@@ -137,8 +137,9 @@
       `AXIS_B_COST_PER_REVISIT_STEP`)를 실제로 `axis_b_points_per_knot`/
       `axis_b_points_per_revisit_step` 호출로 교체함(`services/scoring.py`).
       데모 fixture에 톤수가 없어 임시 대표값(`DEMO_FALLBACK_TONNAGE_GT=50.0`)을
-      씀 — **최지희님 확인 필요** (`services/`는 최지희님 소유 파일이라 배선
-      자체를 오동규가 대신 넣어둔 상태). 부작용으로 시뮬레이터 곡선 최고점이
+      씀 — **최지희 확인 완료(2026-08-18)** (`services/`는 최지희님 소유 파일이라
+      배선 자체는 오동규가 대신 넣어둔 상태였음, 2026-08-18 A축 격자 크기·
+      재방문 스케일 확정값 변경분까지 포함해 확인받음). 부작용으로 시뮬레이터 곡선 최고점이
       실제로 구간 중간(예: VESSEL_A 기준 8.6kn)으로 이동함 — 아래 "4. 우선순위"
       P1-1 "시뮬레이터 점수 곡선과 축 간 상충효과 시각화" 항목과 연결됨.
       상세는 `score/TODO.md` 참고.

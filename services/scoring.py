@@ -61,7 +61,8 @@ AXIS_A_COST_PER_KNOT = 0.8
 # score/tradeoff_coefficients.py의 실제 물리식 기반 함수로 교체했다 — 원래 여기
 # 있던 고정 상수(AXIS_B_GAIN_PER_KNOT=3.2, AXIS_B_COST_PER_REVISIT_STEP=2.4)는
 # 근거 없는 정책 예시였다. 이 파일은 services/ 소유자(최지희)의 파일이라 배선을
-# 바꾸는 것 자체가 조율 대상이었음 — 오동규가 작업, 최지희 확인 필요.
+# 바꾸는 것 자체가 조율 대상이었음 — 오동규가 작업, 최지희 확인 완료(2026-08-18,
+# 같은 날짜에 추가된 A축 격자 크기·재방문 스케일 확정값 변경분 포함).
 FUEL_PERCENT_PER_AXIS_B_POINT = 0.55
 AXIS_SCORE_FLOOR = 4.0
 AXIS_SCORE_CEIL = 97.0
