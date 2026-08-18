@@ -75,7 +75,6 @@ python match_fuzzy_name.py              # 3단계: 한글 직접비교 + 카카�
 python assemble_matches.py              # 4단계: 최종 판정 정리
 
 # 4. 부가 가공
-python tag_population.py                                 # 근해/연안·양식업 태그
 python attach_weather.py --start 20260401 --end 20260814  # 해양기상 부착(수집한 기간과 맞춰서)
 ```
 
